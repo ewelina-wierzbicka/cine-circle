@@ -5,7 +5,7 @@ interface SearchMoviesResponse {
   hasMore: boolean;
 }
 
-const getMovies = async (
+export const getMovies = async (
   query: string,
   page: number = 1,
 ): Promise<SearchMoviesResponse> => {
@@ -18,6 +18,7 @@ const getMovies = async (
     `${baseUrl}/search/movie?query=${encodeURIComponent(query)}&page=${page}`,
     {
       headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 3600 },
     },
   );
 
@@ -37,4 +38,29 @@ const getMovies = async (
   };
 };
 
-export default getMovies;
+export const getMovieDetails = async (id: string): Promise<Movie> => {
+  const baseUrl = 'https://api.themoviedb.org/3';
+  const token = process.env.TMDB_TOKEN;
+
+  if (!token) throw new Error('Missing TMDB token');
+
+  const res = await fetch(`${baseUrl}/movie/${id}?append_to_response=credits`, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 86400 },
+  });
+
+  if (!res.ok) {
+    throw new Error(`TMDB API error: ${res.status}`);
+  }
+
+  const data = await res.json();
+
+  const director = data.credits?.crew?.find(
+    (person: { job: string }) => person.job === 'Director',
+  )?.name;
+
+  return {
+    ...data,
+    director,
+  };
+};

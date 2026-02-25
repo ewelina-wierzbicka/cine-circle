@@ -14,7 +14,7 @@ type Props = {
 const Header = ({ searchProps }: Props) => {
   return (
     <header>
-      <div className="mx-auto p-6 w-full max-w-content flex align-start justify-between">
+      <div className="mx-auto px-4 py-6 w-full max-w-content flex align-start justify-between">
         <Link href="/">
           <Image
             src="/logo.png"
@@ -27,8 +27,8 @@ const Header = ({ searchProps }: Props) => {
         {searchProps && (
           <div className="w-50">
             <Input
-              id="searchMovie"
-              type="search"
+              id="searchMovieHeader"
+              variant="search"
               handleChange={searchProps.handleChange}
               handleKeyDown={searchProps.handleKeyDown}
               handleIconClick={searchProps.handleIconClick}

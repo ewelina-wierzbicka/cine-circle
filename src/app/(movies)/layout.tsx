@@ -42,7 +42,7 @@ function SearchLayout({
           error: showError ? 'Please enter at least 3 characters' : '',
         }}
       />
-      <div className="w-full max-w-content min-h-full-screen mx-auto p-4 flex flex-col">
+      <div className="w-full max-w-content min-h-full-screen mx-auto py-8 px-4">
         {children}
       </div>
     </>

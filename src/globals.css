@@ -11,12 +11,12 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-lato);
   --color-primary: var(--color-gray-100);
-  --color-secondary: var(--color-gray-300);
+  --color-secondary: var(--color-gray-400);
   --color-dark: #1e2122;
-  --height-full-screen: calc(100vh - 172px);
+  --color-accent: var(--color-blue-300);
+  --height-full-screen: calc(100vh - 176px);
   --max-width-content: 1440px;
 }
 
@@ -36,4 +36,14 @@ body {
 
 .animate-spin-reverse {
   animation: spin-reverse 1s linear infinite;
+}
+
+/* React Day Picker Custom Styling */
+.rdp-today:not(.rdp-outside) {
+  color: var(--color-accent) !important;
+  font-weight: bold !important;
+}
+
+.rdp-selected .rdp-day_button {
+  border: 2px solid var(--color-accent) !important;
 }

@@ -12,7 +12,9 @@
     "@tanstack/react-query": "^5.90.21",
     "next": "16.1.6",
     "react": "19.2.3",
+    "react-day-picker": "^9.13.2",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.71.2",
     "react-toastify": "^11.0.5",
     "use-debounce": "^10.1.0"
   },
