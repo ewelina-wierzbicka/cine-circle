@@ -15,26 +15,18 @@ export type SavedMovieDetails = {
   director?: string;
 };
 
-export type SavedWatchedMovieUserEntry = {
-  status: 'watched';
+export type SavedMovieUserEntry = {
+  status: 'watched' | 'to_watch';
   watched_date?: string;
   rating?: number;
   review?: string;
 };
 
-type SavedToWatchMovieUserEntry = {
-  status: 'to_watch';
-};
-
-export type SavedMovieUserEntry =
-  | SavedWatchedMovieUserEntry
-  | SavedToWatchMovieUserEntry;
-
 export type SavedMovieType = SavedMovieDetails & SavedMovieUserEntry;
 
 export type UserMovie = SavedMovieUserEntry & {
-  id: string;
-  movie: SavedMovieDetails & { id: string };
+  id: number;
+  movie: SavedMovieDetails & { id: number };
 };
 
 export type UserMoviesPage = {

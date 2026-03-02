@@ -1,15 +1,18 @@
-import { Movie } from '@/types';
+import { Movie, SavedMovieType } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FC } from 'react';
+import StarRating from './StarRating';
 
 type Props = {
-  movie: Movie & { href: string };
+  movie: (SavedMovieType | Movie) & { href: string };
   priority?: boolean;
 };
 
 const MovieCard: FC<Props> = ({ movie, priority = false }) => {
   const { title, release_date, poster_path, href } = movie;
+  const rating = 'rating' in movie ? movie.rating : undefined;
+  const status = 'status' in movie ? movie.status : undefined;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
 
   return (
@@ -18,6 +21,7 @@ const MovieCard: FC<Props> = ({ movie, priority = false }) => {
         {title}
       </p>
       <p className="text-sm text-secondary mt-1">{releaseYear}</p>
+      {status === 'watched' && rating != null && <StarRating rating={rating} />}
       <div className="w-full aspect-3/4 relative mt-2">
         <Image
           style={{ objectFit: 'cover', objectPosition: 'top center' }}

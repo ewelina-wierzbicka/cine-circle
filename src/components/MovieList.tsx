@@ -2,12 +2,12 @@
 
 import BorderContainer from '@/components/BorderContainer';
 import Loader from '@/components/Loader';
-import { Movie } from '@/types';
+import { Movie, SavedMovieType } from '@/types';
 import { FC, useCallback, useEffect, useRef } from 'react';
 import MovieCard from './MovieCard';
 
 type Props = {
-  movies: (Movie & { href: string })[];
+  movies: ((SavedMovieType | Movie) & { href: string })[];
   heading?: React.ReactNode;
   emptyMessage?: string;
   hasNextPage?: boolean;
@@ -67,7 +67,11 @@ const MovieList: FC<Props> = ({
       )}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-8">
         {movies.map((movie, index) => (
-          <MovieCard key={movie.id} movie={movie} priority={index < 12} />
+          <MovieCard
+            key={'tmdb_id' in movie ? movie.tmdb_id : movie.id}
+            movie={movie}
+            priority={index < 12}
+          />
         ))}
       </div>
       <div ref={loadMoreRef} className="w-full pt-16" />

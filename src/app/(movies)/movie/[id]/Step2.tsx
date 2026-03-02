@@ -5,7 +5,7 @@ import DatePicker from '@/components/DatePicker';
 import Input from '@/components/Input';
 import Textarea from '@/components/Textarea';
 import { addUserMovie } from '@/services/addUserMovie';
-import { Movie, SavedWatchedMovieUserEntry } from '@/types';
+import { Movie, SavedMovieUserEntry } from '@/types';
 import { useRouter } from 'next/navigation';
 import { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -24,12 +24,12 @@ const Step2: FC<Props> = ({ movie }) => {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<SavedWatchedMovieUserEntry>();
+  } = useForm<SavedMovieUserEntry>();
   const selectedDate = watch('watched_date');
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const onSubmit = async (data: SavedWatchedMovieUserEntry) => {
+  const onSubmit = async (data: SavedMovieUserEntry) => {
     const { rating, review, watched_date } = data;
 
     const normalizedRating = typeof rating !== 'number' ? undefined : rating;
