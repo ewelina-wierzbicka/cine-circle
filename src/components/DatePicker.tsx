@@ -6,7 +6,7 @@ import 'react-day-picker/style.css';
 type Props = {
   id: string;
   selected?: Date;
-  handleChange: (date: Date) => void;
+  handleChange: (date?: Date) => void;
   className?: string;
   error?: string;
 };
@@ -45,7 +45,7 @@ const DatePicker: FC<Props> = ({
     };
   }, [isOpen]);
 
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = (date?: Date) => {
     handleChange(date);
     setIsOpen(false);
   };
@@ -72,7 +72,6 @@ const DatePicker: FC<Props> = ({
             mode="single"
             selected={selected}
             onSelect={handleDateSelect}
-            required={true}
             classNames={{
               nav_button: 'color-accent',
               chevron: 'fill-accent',

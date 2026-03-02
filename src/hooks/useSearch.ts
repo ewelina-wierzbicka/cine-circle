@@ -1,31 +1,26 @@
 import { useState } from 'react';
+import { useDebounce } from 'use-debounce';
 
 interface UseSearchOptions {
   onSearch: (query: string) => void;
   initialQuery?: string;
-  minLength?: number;
+  debounceMs?: number;
 }
 
 export function useSearch({
   onSearch,
   initialQuery = '',
-  minLength = 3,
+  debounceMs,
 }: UseSearchOptions) {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [showError, setShowError] = useState(false);
+  const [debouncedQuery] = useDebounce(searchQuery, debounceMs ?? 0);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setShowError(false);
   };
 
   const handleSearch = () => {
-    if (searchQuery.length >= minLength) {
-      setShowError(false);
-      onSearch(searchQuery);
-    } else {
-      setShowError(true);
-    }
+    onSearch(searchQuery);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -36,8 +31,7 @@ export function useSearch({
   };
 
   return {
-    searchQuery,
-    showError,
+    debouncedQuery,
     handleChange,
     handleSearch,
     handleKeyDown,

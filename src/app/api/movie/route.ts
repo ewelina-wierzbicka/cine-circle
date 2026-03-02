@@ -2,7 +2,11 @@ import { getMovieDetails } from '@/services/getMovies';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id') || '';
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return Response.json({ error: 'Missing movie id' }, { status: 400 });
+  }
 
   try {
     const data = await getMovieDetails(id);

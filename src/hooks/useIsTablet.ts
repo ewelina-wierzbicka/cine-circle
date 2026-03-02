@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from 'react';
 
 function getMediaQuery(breakpoint: number) {
   return window.matchMedia(`(max-width: ${breakpoint - 1}px)`);

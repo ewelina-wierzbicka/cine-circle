@@ -7,21 +7,24 @@ type Props = {
   variant?: 'primary' | 'secondary';
   size?: 'small' | 'medium';
   className?: string;
+  disabled?: boolean;
 };
 
 const Button: FC<Props> = ({
   text,
   handleClick,
-  type,
+  type = 'button',
   variant,
   size = 'medium',
   className,
+  disabled,
 }) => {
   return (
     <button
       type={type}
       onClick={handleClick}
-      className={`w-full ${size === 'medium' ? 'h-15' : 'h-12'} rounded-3xl text-dark font-bold uppercase cursor-pointer ${variant === 'secondary' ? 'bg-secondary' : 'bg-primary'} ${className ? className : ''}`}
+      disabled={disabled}
+      className={`w-full ${size === 'medium' ? 'h-15' : 'h-12'} rounded-3xl text-dark font-bold uppercase cursor-pointer ${variant === 'secondary' ? 'bg-secondary' : 'bg-primary'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className ? className : ''}`}
     >
       {text}
     </button>

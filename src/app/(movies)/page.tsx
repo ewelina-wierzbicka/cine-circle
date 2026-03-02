@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const router = useRouter();
 
-  const { showError, handleChange, handleSearch, handleKeyDown } = useSearch({
+  const { handleChange, handleSearch, handleKeyDown } = useSearch({
     onSearch: (query) => {
       router.push(`/search?query=${encodeURIComponent(query)}`);
     },
@@ -25,7 +25,6 @@ export default function Home() {
           handleChange={handleChange}
           handleKeyDown={handleKeyDown}
           handleIconClick={handleSearch}
-          error={showError ? 'Please enter at least 3 characters' : ''}
         />
       </div>
     </div>

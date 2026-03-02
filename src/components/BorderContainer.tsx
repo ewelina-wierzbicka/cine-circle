@@ -1,3 +1,5 @@
+import { twMerge } from '@/lib/cn';
+
 const BorderContainer = ({
   children,
   className,
@@ -7,7 +9,10 @@ const BorderContainer = ({
 }>) => {
   return (
     <div
-      className={`w-full min-h-full-screen border border-primary rounded-3xl px-4 lg:px-14 py-4 md:py-10 ${className ? className : ''}`}
+      className={twMerge(
+        'w-full min-h-full-screen border border-primary rounded-3xl px-4 lg:px-14 py-4 md:py-10',
+        className,
+      )}
     >
       {children}
     </div>

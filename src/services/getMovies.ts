@@ -29,7 +29,7 @@ export const getMovies = async (
   const data = await res.json();
 
   const sortedResults = data?.results?.sort(
-    (a: Movie, b: Movie) => b.popularity - a.popularity,
+    (a: Movie, b: Movie) => (b.popularity || 0) - (a.popularity || 0),
   );
 
   return {
