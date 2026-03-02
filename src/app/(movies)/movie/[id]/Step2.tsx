@@ -18,8 +18,13 @@ type Props = {
 const Step2: FC<Props> = ({ movie }) => {
   const { id, title, release_date, poster_path, director } = movie;
   const router = useRouter();
-  const { register, handleSubmit, setValue, watch } =
-    useForm<SavedWatchedMovieUserEntry>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<SavedWatchedMovieUserEntry>();
   const selectedDate = watch('watched_date');
 
   const [isSaving, setIsSaving] = useState(false);
@@ -84,7 +89,14 @@ const Step2: FC<Props> = ({ movie }) => {
               id="rating"
               variant="rating"
               type="number"
-              {...register('rating')}
+              {...register('rating', {
+                min: { value: 0, message: 'Rating must be at least 0' },
+                max: {
+                  value: 10,
+                  message: 'Rating cannot be greater than 10',
+                },
+              })}
+              error={errors.rating?.message}
             />
           </div>
         </div>
@@ -92,8 +104,14 @@ const Step2: FC<Props> = ({ movie }) => {
           <label htmlFor="review">Any thoughts?</label>
           <Textarea
             id="review"
-            {...register('review')}
+            {...register('review', {
+              maxLength: {
+                value: 1000,
+                message: 'Please use up to 1000 characters.',
+              },
+            })}
             className="mt-3 lg:mt-6"
+            error={errors.review?.message}
           />
         </div>
       </div>

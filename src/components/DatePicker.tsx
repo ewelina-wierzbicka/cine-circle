@@ -62,9 +62,7 @@ const DatePicker: FC<Props> = ({
         className={`date-picker rounded-3xl bg-neutral-300/20 pl-6 pr-4 w-full h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 cursor-pointer ${className ?? ''}`}
         onClick={toggleDayPicker}
       />
-      {error && (
-        <p className="text-red-400 text-xs mt-2 text-center">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
 
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 z-50 bg-dark text-primary border border-primary/50 rounded-3xl p-4">
@@ -76,6 +74,7 @@ const DatePicker: FC<Props> = ({
               nav_button: 'color-accent',
               chevron: 'fill-accent',
             }}
+            disabled={{ after: new Date() }}
           />
         </div>
       )}
