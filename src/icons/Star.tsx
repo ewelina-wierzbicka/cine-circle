@@ -1,11 +1,9 @@
-import { FC, memo } from 'react';
-
 type Props = {
   className?: string;
   filled?: boolean;
 };
 
-const StarIcon: FC<Props> = memo(({ className, filled = false }) => {
+export default function StarIcon({ className, filled = false }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -22,8 +20,4 @@ const StarIcon: FC<Props> = memo(({ className, filled = false }) => {
       />
     </svg>
   );
-});
-
-StarIcon.displayName = 'StarIcon';
-
-export default StarIcon;
+}

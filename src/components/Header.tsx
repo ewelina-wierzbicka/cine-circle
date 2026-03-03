@@ -11,7 +11,7 @@ type Props = {
   };
 };
 
-const Header = ({ searchProps }: Props) => {
+export default function Header({ searchProps }: Props) {
   return (
     <header>
       <div className="mx-auto px-4 py-6 w-full max-w-content flex align-start justify-between">
@@ -39,6 +39,4 @@ const Header = ({ searchProps }: Props) => {
       </div>
     </header>
   );
-};
-
-export default Header;
+}

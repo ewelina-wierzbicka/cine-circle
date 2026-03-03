@@ -3,7 +3,7 @@
 import BorderContainer from '@/components/BorderContainer';
 import Loader from '@/components/Loader';
 import { Movie, SavedMovieType } from '@/types';
-import { FC, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import MovieCard from './MovieCard';
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
   className?: string;
 };
 
-const MovieList: FC<Props> = ({
+export default function MovieList({
   movies,
   heading,
   emptyMessage = 'No movies found',
@@ -24,7 +24,7 @@ const MovieList: FC<Props> = ({
   isFetchingNextPage,
   fetchNextPage,
   className,
-}) => {
+}: Props) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const handleObserver = useCallback(
@@ -78,6 +78,4 @@ const MovieList: FC<Props> = ({
       {isFetchingNextPage && <Loader />}
     </BorderContainer>
   );
-};
-
-export default MovieList;
+}

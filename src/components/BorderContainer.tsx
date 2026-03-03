@@ -1,12 +1,12 @@
 import { twMerge } from '@/lib/cn';
 
-const BorderContainer = ({
+export default function BorderContainer({
   children,
   className,
 }: Readonly<{
   children: React.ReactNode;
   className?: string;
-}>) => {
+}>) {
   return (
     <div
       className={twMerge(
@@ -17,6 +17,4 @@ const BorderContainer = ({
       {children}
     </div>
   );
-};
-
-export default BorderContainer;
+}

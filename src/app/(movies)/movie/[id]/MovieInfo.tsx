@@ -3,8 +3,9 @@
 import Button from '@/components/Button';
 import { addUserMovie } from '@/services/addUserMovie';
 import { Movie } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 type Props = {
@@ -13,10 +14,11 @@ type Props = {
   isTablet: boolean;
 };
 
-const Step1: FC<Props> = ({ movie, addToWatched, isTablet }) => {
+export default function MovieInfo({ movie, addToWatched, isTablet }: Props) {
   const { id, title, release_date, poster_path, director } = movie;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
 
   const addToToWatch = async () => {
@@ -34,6 +36,7 @@ const Step1: FC<Props> = ({ movie, addToWatched, isTablet }) => {
           status: 'to_watch',
         },
       );
+      await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
       toast.success(`"${title}" was saved to your "to watch" list!`);
       router.push('/my-movies?tab=to_watch');
     } catch (err) {
@@ -48,7 +51,7 @@ const Step1: FC<Props> = ({ movie, addToWatched, isTablet }) => {
   return (
     <div className="flex flex-col w-full h-1/2 md:h-full -mt-30 md:mt-0 z-50">
       <p
-        className={`${title.length > 40 ? 'text-4xl' : 'text-5xl'} sm:text-5xl font-bold uppercase`}
+        className={`${title.length > 35 ? 'text-4xl' : 'text-5xl'} sm:text-5xl font-bold uppercase`}
       >
         {title}
       </p>
@@ -73,6 +76,4 @@ const Step1: FC<Props> = ({ movie, addToWatched, isTablet }) => {
       </div>
     </div>
   );
-};
-
-export default Step1;
+}

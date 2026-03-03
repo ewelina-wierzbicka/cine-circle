@@ -1,10 +1,8 @@
-import { FC, memo } from 'react';
-
 type Props = {
   className?: string;
 };
 
-const SearchIcon: FC<Props> = memo(({ className }) => {
+export default function SearchIcon({ className }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,8 +19,4 @@ const SearchIcon: FC<Props> = memo(({ className }) => {
       />
     </svg>
   );
-});
-
-SearchIcon.displayName = 'SearchIcon';
-
-export default SearchIcon;
+}

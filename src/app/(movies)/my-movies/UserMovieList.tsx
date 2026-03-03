@@ -12,7 +12,11 @@ type Props = {
   searchQuery?: string;
 };
 
-const UserMovieList = ({ status, initialData, searchQuery = '' }: Props) => {
+export default function UserMovieList({
+  status,
+  initialData,
+  searchQuery = '',
+}: Props) {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
     useUserMovies(status, initialData, searchQuery);
 
@@ -31,6 +35,4 @@ const UserMovieList = ({ status, initialData, searchQuery = '' }: Props) => {
       />
     </>
   );
-};
-
-export default UserMovieList;
+}

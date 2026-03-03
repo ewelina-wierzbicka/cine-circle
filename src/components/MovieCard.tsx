@@ -1,7 +1,6 @@
 import { Movie, SavedMovieType } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FC } from 'react';
 import StarRating from './StarRating';
 
 type Props = {
@@ -9,7 +8,7 @@ type Props = {
   priority?: boolean;
 };
 
-const MovieCard: FC<Props> = ({ movie, priority = false }) => {
+export default function MovieCard({ movie, priority = false }: Props) {
   const { title, release_date, poster_path, href } = movie;
   const rating = 'rating' in movie ? movie.rating : undefined;
   const status = 'status' in movie ? movie.status : undefined;
@@ -38,6 +37,4 @@ const MovieCard: FC<Props> = ({ movie, priority = false }) => {
       </div>
     </Link>
   );
-};
-
-export default MovieCard;
+}

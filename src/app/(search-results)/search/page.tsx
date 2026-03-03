@@ -35,7 +35,10 @@ export default function Page() {
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.hasMore ? allPages.length + 1 : undefined;
     },
-    enabled: query?.length > 0,
+    enabled: query.length > 0,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    retry: 1,
   });
 
   useEffect(() => {

@@ -18,9 +18,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
           ref={ref}
           {...rest}
         />
-        {error && (
-          <p className="text-red-400 text-xs mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
       </>
     );
   },

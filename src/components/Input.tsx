@@ -43,19 +43,20 @@ const Input = forwardRef<HTMLInputElement, Props>(
             {...rest}
           />
           {variant === 'search' && (
-            <button type="button" onClick={handleIconClick}>
-              <SearchIcon className="absolute right-[16] top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer" />
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={handleIconClick}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+            >
+              <SearchIcon className="w-5 h-5 text-gray-400" />
             </button>
           )}
           {variant === 'rating' && (
-            <div className="absolute right-[16] top-1/2 -translate-y-1/2">
-              /10
-            </div>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2">/10</div>
           )}
         </div>
-        {error && (
-          <p className="text-red-400 text-xs mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
       </>
     );
   },

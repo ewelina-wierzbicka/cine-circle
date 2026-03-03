@@ -1,5 +1,6 @@
 'use client';
-import { FC, useEffect, useRef, useState } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 
@@ -11,13 +12,13 @@ type Props = {
   error?: string;
 };
 
-const DatePicker: FC<Props> = ({
+export default function DatePicker({
   id,
   selected,
   handleChange,
   className,
   error,
-}) => {
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -80,6 +81,4 @@ const DatePicker: FC<Props> = ({
       )}
     </div>
   );
-};
-
-export default DatePicker;
+}

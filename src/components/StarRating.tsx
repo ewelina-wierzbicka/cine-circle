@@ -1,5 +1,3 @@
-'use client';
-
 import StarIcon from '@/icons/Star';
 
 type Props = {
@@ -11,7 +9,7 @@ const clamp = (value: number, min: number, max: number) => {
   return Math.min(Math.max(value, min), max);
 };
 
-const StarRating = ({ rating, className }: Props) => {
+export default function StarRating({ rating, className }: Props) {
   const fiveScale = rating / 2;
 
   return (
@@ -34,6 +32,4 @@ const StarRating = ({ rating, className }: Props) => {
       })}
     </div>
   );
-};
-
-export default StarRating;
+}

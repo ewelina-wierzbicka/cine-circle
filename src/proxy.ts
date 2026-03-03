@@ -33,7 +33,12 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
+  // Run only on page routes. Excluded:
+  // - _next/* static assets and image optimisation
+  // - favicon and common image extensions
+  // - /api/* — TMDB proxy routes don't use Supabase auth;
+  //   add individual API paths back here once they require session data
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

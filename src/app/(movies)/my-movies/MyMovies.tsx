@@ -16,7 +16,7 @@ function tabLinkClass(active: boolean, rounded: string) {
   } flex items-center justify-center`;
 }
 
-const MyMovies = ({ tab, initialData }: Props) => {
+export default function MyMovies({ tab, initialData }: Props) {
   const { debouncedQuery, handleChange, handleSearch, handleKeyDown } =
     useSearch({
       onSearch: () => {},
@@ -60,6 +60,4 @@ const MyMovies = ({ tab, initialData }: Props) => {
       />
     </>
   );
-};
-
-export default MyMovies;
+}

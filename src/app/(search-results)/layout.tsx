@@ -5,6 +5,7 @@ import Loader from '@/components/Loader';
 import { useSearch } from '@/hooks/useSearch';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+
 function SearchLayout({
   children,
 }: Readonly<{

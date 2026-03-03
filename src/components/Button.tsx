@@ -1,5 +1,3 @@
-import { FC } from 'react';
-
 type Props = {
   text: string;
   handleClick?: () => void;
@@ -10,7 +8,7 @@ type Props = {
   disabled?: boolean;
 };
 
-const Button: FC<Props> = ({
+export default function Button({
   text,
   handleClick,
   type = 'button',
@@ -18,7 +16,7 @@ const Button: FC<Props> = ({
   size = 'medium',
   className,
   disabled,
-}) => {
+}: Props) {
   return (
     <button
       type={type}
@@ -29,6 +27,4 @@ const Button: FC<Props> = ({
       {text}
     </button>
   );
-};
-
-export default Button;
+}

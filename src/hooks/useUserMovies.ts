@@ -40,11 +40,16 @@ const fetchUserMoviesPage = async ({
   };
 };
 
+const BASE_STALE_TIME = 1000 * 60 * 2;
+const SEARCH_STALE_TIME = 1000 * 30;
+
 export const useUserMovies = (
   status?: 'watched' | 'to_watch',
   initialData?: UserMoviesPage,
   search?: string,
 ) => {
+  const isSearch = !!search;
+
   return useInfiniteQuery({
     queryKey: ['user-movies', status, search],
     queryFn: ({ pageParam }) =>
@@ -52,9 +57,9 @@ export const useUserMovies = (
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialData:
-      !search && initialData
+      !isSearch && initialData
         ? { pages: [initialData], pageParams: [0] }
         : undefined,
-    staleTime: !search && initialData ? Infinity : 0,
+    staleTime: isSearch ? SEARCH_STALE_TIME : BASE_STALE_TIME,
   });
 };
