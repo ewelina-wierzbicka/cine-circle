@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { useIsTablet } from './useIsTablet';
 
-export function useDetailStep() {
-  const [step, setStep] = useState(1);
-  const isTablet = useIsTablet();
+export function useDetailStep(initialStep = 1) {
+  const [step, setStep] = useState(initialStep);
 
   return {
     step,
-    isTablet,
     goToForm: () => setStep(2),
     goToInfo: () => setStep(1),
   };

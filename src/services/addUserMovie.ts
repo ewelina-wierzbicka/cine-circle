@@ -1,13 +1,10 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { SavedMovieDetails, SavedMovieUserEntry } from '@/types';
+import { Movie, UserEntry } from '@/types';
 
-export const addUserMovie = async (
-  details: SavedMovieDetails,
-  userEntry: SavedMovieUserEntry,
-) => {
-  const { tmdb_id, title, release_date, poster_path, director } = details;
+export const addUserMovie = async (details: Movie, userEntry: UserEntry) => {
+  const { id: tmdb_id, title, release_date, poster_path, director } = details;
   const { status } = userEntry;
   const { watched_date, rating, review } =
     userEntry.status === 'watched'
@@ -53,14 +50,14 @@ export const addUserMovie = async (
 
 export const updateUserMovie = async (
   id: number,
-  entry: SavedMovieUserEntry,
+  entry: UserEntry,
 ): Promise<void> => {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  // const {
+  // data: { user },
+  // error: userError,
+  // } = await supabase.auth.getUser();
 
   // if (userError || !user) throw new Error('Not authenticated');
 

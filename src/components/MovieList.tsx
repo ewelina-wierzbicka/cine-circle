@@ -2,12 +2,12 @@
 
 import BorderContainer from '@/components/BorderContainer';
 import Loader from '@/components/Loader';
-import { Movie, SavedMovieType } from '@/types';
+import { Movie, SavedMovie } from '@/types';
 import { useCallback, useEffect, useRef } from 'react';
 import MovieCard from './MovieCard';
 
 type Props = {
-  movies: ((SavedMovieType | Movie) & { href: string })[];
+  movies: ((SavedMovie | Movie) & { href: string })[];
   heading?: React.ReactNode;
   emptyMessage?: string;
   hasNextPage?: boolean;
@@ -68,9 +68,14 @@ export default function MovieList({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-8">
         {movies.map((movie, index) => (
           <MovieCard
-            key={'tmdb_id' in movie ? movie.tmdb_id : movie.id}
+            key={movie.id}
             movie={movie}
             priority={index < 12}
+            userMovieId={
+              'userMovieId' in movie
+                ? (movie as SavedMovie).userMovieId
+                : undefined
+            }
           />
         ))}
       </div>

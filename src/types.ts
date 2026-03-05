@@ -7,26 +7,25 @@ export type Movie = {
   director?: string;
 };
 
-export type SavedMovieDetails = {
-  tmdb_id: number;
-  title: string;
-  release_date?: string;
-  poster_path?: string;
-  director?: string;
-};
-
-export type SavedMovieUserEntry = {
+export type UserEntry = {
   status: 'watched' | 'to_watch';
   watched_date?: string;
   rating?: number;
   review?: string;
 };
 
-export type SavedMovieType = SavedMovieDetails & SavedMovieUserEntry;
+export type SavedMovie = Movie & UserEntry & { userMovieId: number };
 
-export type UserMovie = SavedMovieUserEntry & {
+export type UserMovie = UserEntry & {
   id: number;
-  movie: SavedMovieDetails & { id: number };
+  movie: {
+    id: number;
+    tmdb_id: number;
+    title: string;
+    release_date?: string;
+    poster_path?: string;
+    director?: string;
+  };
 };
 
 export type UserMoviesPage = {

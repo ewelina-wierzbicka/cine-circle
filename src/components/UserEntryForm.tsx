@@ -5,7 +5,7 @@ import DatePicker from '@/components/DatePicker';
 import Input from '@/components/Input';
 import Textarea from '@/components/Textarea';
 import { addUserMovie, updateUserMovie } from '@/services/addUserMovie';
-import { Movie, SavedMovieUserEntry } from '@/types';
+import { Movie, UserEntry } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 type Props = {
   movie: Movie;
   userMovieId?: number;
-  initialData?: SavedMovieUserEntry;
+  initialData?: UserEntry;
   onUpdateSuccess?: () => void;
 };
 
@@ -35,7 +35,7 @@ export default function UserEntryForm({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<SavedMovieUserEntry>({
+  } = useForm<UserEntry>({
     defaultValues: {
       watched_date: watched_date,
       rating: rating,
@@ -48,7 +48,7 @@ export default function UserEntryForm({
 
   const isUpdateMode = userMovieId !== undefined;
 
-  const onSubmit = async (data: SavedMovieUserEntry) => {
+  const onSubmit = async (data: UserEntry) => {
     const { rating, review, watched_date } = data;
     const normalizedRating = !rating ? undefined : Number(rating);
 
@@ -66,13 +66,7 @@ export default function UserEntryForm({
         onUpdateSuccess?.();
       } else {
         await addUserMovie(
-          {
-            tmdb_id: id,
-            title,
-            release_date,
-            poster_path,
-            director,
-          },
+          { id, title, release_date, poster_path, director },
           {
             status: 'watched',
             watched_date,

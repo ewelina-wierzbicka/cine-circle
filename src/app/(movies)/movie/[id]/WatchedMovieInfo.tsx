@@ -1,10 +1,10 @@
 import Button from '@/components/Button';
 import StarRating from '@/components/StarRating';
-import { Movie, SavedMovieUserEntry } from '@/types';
+import { Movie, UserEntry } from '@/types';
 
 type Props = {
   movie: Movie;
-  userEntry: Pick<SavedMovieUserEntry, 'watched_date' | 'rating' | 'review'>;
+  userEntry: Pick<UserEntry, 'watched_date' | 'rating' | 'review'>;
   onEdit: () => void;
   isTablet: boolean;
 };
@@ -18,7 +18,6 @@ export default function WatchedMovieInfo({
   const { title, director, release_date } = movie;
   const { watched_date, rating, review } = userEntry;
   const isUserEntry = watched_date && rating != null && review;
-  console.log(isUserEntry);
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
 
   const formattedDate = watched_date
@@ -72,10 +71,7 @@ export default function WatchedMovieInfo({
             <p className="text-secondary uppercase tracking-widest mb-1">
               What do you think?
             </p>
-            <p
-              className="leading-relaxed whitespace-pre-wrap text-justify
-"
-            >
+            <p className="leading-relaxed whitespace-pre-wrap text-justify">
               {review}
             </p>
           </div>

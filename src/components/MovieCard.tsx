@@ -1,18 +1,49 @@
-import { Movie, SavedMovieType } from '@/types';
+'use client';
+
+import { deleteUserMovie } from '@/services/deleteUserMovie';
+import { Movie, SavedMovie } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Button from './Button';
 import StarRating from './StarRating';
 
 type Props = {
-  movie: (SavedMovieType | Movie) & { href: string };
+  movie: (SavedMovie | Movie) & { href: string };
   priority?: boolean;
+  userMovieId?: number;
 };
 
-export default function MovieCard({ movie, priority = false }: Props) {
+export default function MovieCard({
+  movie,
+  priority = false,
+  userMovieId,
+}: Props) {
   const { title, release_date, poster_path, href } = movie;
   const rating = 'rating' in movie ? movie.rating : undefined;
   const status = 'status' in movie ? movie.status : undefined;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const handleDelete = async () => {
+    if (!userMovieId) return;
+    setIsDeleting(true);
+    try {
+      await deleteUserMovie(userMovieId);
+      await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
+      router.refresh();
+    } catch {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleMoveToWatched = () => {
+    router.push(`${href}?step=2`);
+  };
 
   return (
     <Link href={href} className="w-full flex flex-col justify-end">
@@ -21,7 +52,7 @@ export default function MovieCard({ movie, priority = false }: Props) {
       </p>
       <p className="text-sm text-secondary mt-1">{releaseYear}</p>
       {status === 'watched' && rating != null && <StarRating rating={rating} />}
-      <div className="w-full aspect-3/4 relative mt-2">
+      <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
         <Image
           style={{ objectFit: 'cover', objectPosition: 'top center' }}
           fill={true}
@@ -34,6 +65,32 @@ export default function MovieCard({ movie, priority = false }: Props) {
           alt={title}
           priority={priority}
         />
+        {status === 'to_watch' && userMovieId && (
+          <div
+            className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-dark/90 flex flex-col items-center justify-center gap-3 z-10"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <Button
+              handleClick={handleMoveToWatched}
+              size="small"
+              variant="outlined"
+              className="text-xs md:text-sm"
+              text="              Move to watched
+"
+            />
+            <Button
+              handleClick={handleDelete}
+              disabled={isDeleting}
+              size="small"
+              variant="outlined"
+              className="text-xs md:text-sm"
+              text={isDeleting ? 'Deleting...' : 'Delete'}
+            />
+          </div>
+        )}
       </div>
     </Link>
   );

@@ -1,8 +1,11 @@
+import { twMerge } from '@/lib/cn';
+
 type Props = {
   text: string;
   handleClick?: () => void;
   type?: 'submit' | 'button';
-  variant?: 'primary' | 'secondary';
+  color?: 'primary' | 'secondary';
+  variant?: 'filled' | 'outlined';
   size?: 'small' | 'medium';
   className?: string;
   disabled?: boolean;
@@ -12,7 +15,8 @@ export default function Button({
   text,
   handleClick,
   type = 'button',
-  variant,
+  color = "primary",
+  variant = "filled",
   size = 'medium',
   className,
   disabled,
@@ -22,7 +26,15 @@ export default function Button({
       type={type}
       onClick={handleClick}
       disabled={disabled}
-      className={`w-full ${size === 'medium' ? 'h-15' : 'h-12'} rounded-3xl text-dark font-bold uppercase cursor-pointer ${variant === 'secondary' ? 'bg-secondary' : 'bg-primary'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className ? className : ''}`}
+      className={twMerge(
+        'w-full rounded-3xl font-bold uppercase cursor-pointer',
+        size === 'medium' ? 'h-15' : 'h-12',
+        variant === 'outlined'
+          ? 'text-primary border border-primary hover:bg-primary/10'
+          : twMerge('text-dark', color === 'secondary' ? 'bg-secondary' : 'bg-primary'),
+        disabled && 'opacity-50 cursor-not-allowed',
+        className,
+      )}
     >
       {text}
     </button>
