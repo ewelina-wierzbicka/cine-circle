@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Button from './Button';
+import MovieCardOverlay from './MovieCardOverlay';
 import StarRating from './StarRating';
 
 type Props = {
@@ -65,31 +66,47 @@ export default function MovieCard({
           alt={title}
           priority={priority}
         />
-        {status === 'to_watch' && userMovieId && (
-          <div
-            className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-dark/90 flex flex-col items-center justify-center gap-3 z-10"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            <Button
-              handleClick={handleMoveToWatched}
-              size="small"
-              variant="outlined"
-              className="text-xs md:text-sm"
-              text="              Move to watched
-"
-            />
-            <Button
-              handleClick={handleDelete}
-              disabled={isDeleting}
-              size="small"
-              variant="outlined"
-              className="text-xs md:text-sm"
-              text={isDeleting ? 'Deleting...' : 'Delete'}
-            />
-          </div>
+        {userMovieId && (
+          <>
+            {status === 'to_watch' && (
+              <MovieCardOverlay>
+                <Button
+                  handleClick={handleMoveToWatched}
+                  size="small"
+                  variant="outlined"
+                  className="text-xs md:text-sm"
+                  text="Move to watched"
+                />
+                <Button
+                  handleClick={handleDelete}
+                  disabled={isDeleting}
+                  size="small"
+                  variant="outlined"
+                  className="text-xs md:text-sm"
+                  text={isDeleting ? 'Deleting...' : 'Delete'}
+                />
+              </MovieCardOverlay>
+            )}
+            {status === 'watched' && (
+              <MovieCardOverlay>
+                <Button
+                  handleClick={() => router.push(href)}
+                  size="small"
+                  variant="outlined"
+                  className="text-xs md:text-sm"
+                  text="See details"
+                />
+                <Button
+                  handleClick={handleDelete}
+                  disabled={isDeleting}
+                  size="small"
+                  variant="outlined"
+                  className="text-xs md:text-sm"
+                  text={isDeleting ? 'Deleting...' : 'Delete'}
+                />
+              </MovieCardOverlay>
+            )}
+          </>
         )}
       </div>
     </Link>
