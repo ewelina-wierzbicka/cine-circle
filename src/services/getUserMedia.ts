@@ -1,11 +1,12 @@
 import { PAGE_SIZE } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
-import { UserMovie, UserMoviesPage } from '@/types';
+import { MediaType, UserMedia, UserMediaPage } from '@/types';
 
-export const getUserMovies = async (
-  status?: 'watched' | 'to_watch',
+export const getUserMediaList = async (
+  status: 'watched' | 'to_watch',
   page = 0,
-): Promise<UserMoviesPage> => {
+  mediaType?: MediaType,
+): Promise<UserMediaPage> => {
   const supabase = await createClient();
 
   //   const {
@@ -18,8 +19,8 @@ export const getUserMovies = async (
   const to = from + PAGE_SIZE - 1;
 
   let query = supabase
-    .from('user_movies')
-    .select('*, movie:movies(*)')
+    .from('user_media')
+    .select('*, media(*)')
     // .eq('user_id', user.id)
     .order('added_at', { ascending: false })
     .range(from, to);
@@ -28,26 +29,34 @@ export const getUserMovies = async (
     query = query.eq('status', status);
   }
 
+  if (mediaType) {
+    query = query.eq('media.media_type', mediaType);
+  }
+
   const { data, error } = await query;
 
   if (error) throw error;
 
   return {
-    movies: data as UserMovie[],
+    media: data as UserMedia[],
     nextPage: data.length === PAGE_SIZE ? page + 1 : null,
   };
 };
 
-export const getUserMovie = async (tmdbId: number): Promise<UserMovie> => {
+export const getUserMedia = async (
+  tmdbId: number,
+  mediaType: MediaType = 'movie',
+): Promise<UserMedia> => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from('user_movies')
-    .select('*, movie:movies!inner(*)')
-    .eq('movies.tmdb_id', tmdbId)
+    .from('user_media')
+    .select('*, media!inner(*)')
+    .eq('media.tmdb_id', tmdbId)
+    .eq('media.media_type', mediaType)
     .single();
 
   if (error) throw error;
 
-  return data as UserMovie;
+  return data as UserMedia;
 };

@@ -6,7 +6,7 @@ type Props = {
   className?: string;
 };
 
-export default function MoviePoster({
+export default function MediaPoster({
   title,
   posterPath,
   className = '',

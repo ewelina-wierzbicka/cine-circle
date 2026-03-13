@@ -1,24 +1,26 @@
 import { PAGE_SIZE } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/client';
-import { UserMovie, UserMoviesPage } from '@/types';
+import { FilterMediaType, MediaType, UserMedia, UserMediaPage } from '@/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-const fetchUserMoviesPage = async ({
+const fetchUserMediaPage = async ({
   status,
   page,
   search,
+  mediaType,
 }: {
-  status?: 'watched' | 'to_watch';
+  status: 'watched' | 'to_watch';
   page: number;
   search?: string;
-}): Promise<UserMoviesPage> => {
+  mediaType?: MediaType;
+}): Promise<UserMediaPage> => {
   const supabase = createClient();
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
   let query = supabase
-    .from('user_movies')
-    .select(`*, movie:movies${search ? '!inner' : ''}(*)`)
+    .from('user_media')
+    .select(`*, media${search ? '!inner' : ''}(*)`)
     .order('added_at', { ascending: false })
     .range(from, to);
 
@@ -27,15 +29,21 @@ const fetchUserMoviesPage = async ({
   }
 
   if (search) {
-    query = query.ilike('movies.title', `%${search}%`);
+    query = query.ilike('media.title', `%${search}%`);
+  }
+
+  if (mediaType) {
+    query = query.eq('media.media_type', mediaType);
   }
 
   const { data, error } = await query;
 
+      console.log(mediaType, data, error);
+
   if (error) throw error;
 
   return {
-    movies: data as UserMovie[],
+    media: data as UserMedia[],
     nextPage: data.length === PAGE_SIZE ? page + 1 : null,
   };
 };
@@ -43,17 +51,27 @@ const fetchUserMoviesPage = async ({
 const BASE_STALE_TIME = 1000 * 60 * 2;
 const SEARCH_STALE_TIME = 1000 * 30;
 
-export const useUserMovies = (
-  status?: 'watched' | 'to_watch',
-  initialData?: UserMoviesPage,
+export const useUserMedia = (
+  status: 'watched' | 'to_watch',
+  initialData?: UserMediaPage,
   search?: string,
+  mediaType?: FilterMediaType,
 ) => {
   const isSearch = !!search;
+  const resolvedMediaType =
+    mediaType === 'all' || !mediaType ? undefined : mediaType;
+
+    console.log('res', resolvedMediaType);
 
   return useInfiniteQuery({
-    queryKey: ['user-movies', status, search],
+    queryKey: ['user-movies', status, search, mediaType],
     queryFn: ({ pageParam }) =>
-      fetchUserMoviesPage({ status, page: pageParam, search }),
+      fetchUserMediaPage({
+        status,
+        page: pageParam,
+        search,
+        mediaType: resolvedMediaType,
+      }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialData:

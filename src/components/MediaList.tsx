@@ -2,12 +2,12 @@
 
 import BorderContainer from '@/components/BorderContainer';
 import Loader from '@/components/Loader';
-import { Movie, SavedMovie } from '@/types';
+import { NormalizedMedia, SavedMedia } from '@/types';
 import { useCallback, useEffect, useRef } from 'react';
-import MovieCard from './MovieCard';
+import MediaCard from './MediaCard';
 
 type Props = {
-  movies: ((SavedMovie | Movie) & { href: string })[];
+  media: ((SavedMedia | NormalizedMedia) & { href: string })[];
   heading?: React.ReactNode;
   emptyMessage?: string;
   hasNextPage?: boolean;
@@ -16,8 +16,8 @@ type Props = {
   className?: string;
 };
 
-export default function MovieList({
-  movies,
+export default function MediaList({
+  media,
   heading,
   emptyMessage = 'No movies found',
   hasNextPage,
@@ -47,16 +47,32 @@ export default function MovieList({
     });
 
     observer.observe(element);
-    return () => observer.unobserve(element);
+    return () => observer.disconnect();
   }, [handleObserver]);
 
-  if (movies.length === 0) {
+  if (media.length === 0) {
     return (
       <div className="flex items-center justify-center h-full-screen w-full">
         <p className="text-xl">{emptyMessage}</p>
       </div>
     );
   }
+
+  //   const hasNextPageRef = useRef(hasNextPage);
+  // const isFetchingNextPageRef = useRef(isFetchingNextPage);
+  // const fetchNextPageRef = useRef(fetchNextPage);
+
+  // useEffect(() => {
+  //   hasNextPageRef.current = hasNextPage;
+  //   isFetchingNextPageRef.current = isFetchingNextPage;
+  //   fetchNextPageRef.current = fetchNextPage;
+  // });
+
+  // const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+  //   if (entries[0].isIntersecting && hasNextPageRef.current && !isFetchingNextPageRef.current) {
+  //     fetchNextPageRef.current?.();
+  //   }
+  // }, []);
 
   return (
     <BorderContainer className={className}>
@@ -66,18 +82,18 @@ export default function MovieList({
         </div>
       )}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-8">
-        {movies.map((movie, index) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            priority={index < 12}
-            userMovieId={
-              'userMovieId' in movie
-                ? (movie as SavedMovie).userMovieId
-                : undefined
-            }
-          />
-        ))}
+        {media.map((item, index) => {
+          const tmdbId = 'tmdb_id' in item ? item.tmdb_id : item.id;
+          const userMediaId = 'tmdb_id' in item ? item.id : undefined;
+          return (
+            <MediaCard
+              key={`${item.media_type}-${tmdbId}`}
+              media={item}
+              priority={index < 12}
+              userMediaId={userMediaId}
+            />
+          );
+        })}
       </div>
       <div ref={loadMoreRef} className="w-full pt-16" />
       {isFetchingNextPage && <Loader />}

@@ -1,40 +1,42 @@
 'use client';
 
-import { deleteUserMovie } from '@/services/deleteUserMovie';
-import { Movie, SavedMovie } from '@/types';
+import { deleteUserMedia } from '@/services/deleteUserMedia';
+import { NormalizedMedia, SavedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Button from './Button';
-import MovieCardOverlay from './MovieCardOverlay';
+import MediaCardOverlay from './MediaCardOverlay';
 import StarRating from './StarRating';
 
 type Props = {
-  movie: (SavedMovie | Movie) & { href: string };
+  media: (SavedMedia | NormalizedMedia) & { href: string };
   priority?: boolean;
-  userMovieId?: number;
+  userMediaId?: number;
 };
 
-export default function MovieCard({
-  movie,
+export default function MediaCard({
+  media,
   priority = false,
-  userMovieId,
+  userMediaId,
 }: Props) {
-  const { title, release_date, poster_path, href } = movie;
-  const rating = 'rating' in movie ? movie.rating : undefined;
-  const status = 'status' in movie ? movie.status : undefined;
+  const { title, release_date, last_air_date, poster_path, href } = media;
+  const rating = 'rating' in media ? media.rating : undefined;
+  const status = 'status' in media ? media.status : undefined;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
+  const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : undefined;
+  const dateDisplay = lastAirYear ? `${releaseYear} – ${lastAirYear}` : releaseYear;
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
-    if (!userMovieId) return;
+    if (!userMediaId) return;
     setIsDeleting(true);
     try {
-      await deleteUserMovie(userMovieId);
+      await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
       router.refresh();
     } catch {
@@ -51,7 +53,7 @@ export default function MovieCard({
       <p className="text-sm md:text-base uppercase font-semibold w-full">
         {title}
       </p>
-      <p className="text-sm text-secondary mt-1">{releaseYear}</p>
+      <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
       {status === 'watched' && rating != null && <StarRating rating={rating} />}
       <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
         <Image
@@ -66,10 +68,10 @@ export default function MovieCard({
           alt={title}
           priority={priority}
         />
-        {userMovieId && (
+        {userMediaId && (
           <>
             {status === 'to_watch' && (
-              <MovieCardOverlay>
+              <MediaCardOverlay>
                 <Button
                   handleClick={handleMoveToWatched}
                   size="small"
@@ -85,10 +87,10 @@ export default function MovieCard({
                   className="text-xs md:text-sm"
                   text={isDeleting ? 'Deleting...' : 'Delete'}
                 />
-              </MovieCardOverlay>
+              </MediaCardOverlay>
             )}
             {status === 'watched' && (
-              <MovieCardOverlay>
+              <MediaCardOverlay>
                 <Button
                   handleClick={() => router.push(href)}
                   size="small"
@@ -104,7 +106,7 @@ export default function MovieCard({
                   className="text-xs md:text-sm"
                   text={isDeleting ? 'Deleting...' : 'Delete'}
                 />
-              </MovieCardOverlay>
+              </MediaCardOverlay>
             )}
           </>
         )}

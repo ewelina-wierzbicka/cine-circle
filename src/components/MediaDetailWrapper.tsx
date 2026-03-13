@@ -1,5 +1,5 @@
 import BorderContainer from '@/components/BorderContainer';
-import MoviePoster from '@/components/MoviePoster';
+import MediaPoster from '@/components/MediaPoster';
 import { ReactNode } from 'react';
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   className?: string;
 };
 
-export default function MovieDetailWrapper({
+export default function MediaDetailWrapper({
   posterPath,
   posterTitle,
   step,
@@ -26,7 +26,7 @@ export default function MovieDetailWrapper({
       className={`flex gap-8 flex-col ${step === 1 ? 'md:flex-row' : 'lg:flex-row'} ${className ?? ''}`}
     >
       {(step === 1 || !isTablet) && (
-        <MoviePoster posterPath={posterPath} title={posterTitle} />
+        <MediaPoster posterPath={posterPath} title={posterTitle} />
       )}
       {step === 1 ? infoSlot : formSlot}
     </BorderContainer>

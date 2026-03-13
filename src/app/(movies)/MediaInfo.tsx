@@ -1,31 +1,34 @@
 'use client';
 
 import Button from '@/components/Button';
-import { addUserMovie } from '@/services/addUserMovie';
-import { deleteUserMovie } from '@/services/deleteUserMovie';
-import { Movie } from '@/types';
+import { addUserMedia } from '@/services/addUserMedia';
+import { deleteUserMedia } from '@/services/deleteUserMedia';
+import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 type Props = {
-  movie: Movie;
-  userMovieId?: number;
+  media: NormalizedMedia;
+  userMediaId?: number;
   isToWatch?: boolean;
   addToWatched: () => void;
   isTablet: boolean;
 };
 
-export default function MovieInfo({
-  movie,
-  userMovieId,
+export default function MediaInfo({
+  media,
+  userMediaId,
   isToWatch,
   addToWatched,
   isTablet,
 }: Props) {
-  const { id, title, release_date, poster_path, director } = movie;
+  const { id, title, release_date, last_air_date, poster_path, director, media_type } = media;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
+  const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
+  const dateDisplay = lastAirYear ? `${releaseYear} – ${lastAirYear}` : releaseYear;
+  const creatorLabel = media_type === 'series' ? 'created by:' : 'dir.:';
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
@@ -34,13 +37,13 @@ export default function MovieInfo({
   const addToToWatch = async () => {
     setIsSaving(true);
     try {
-      await addUserMovie(
-        { id, title, release_date, poster_path, director },
+      await addUserMedia(
+        { id, title, release_date, last_air_date, poster_path, director, media_type },
         { status: 'to_watch' },
       );
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
       toast.success(`"${title}" was saved to your "to watch" list!`);
-      router.push('/my-movies?tab=to_watch');
+      router.push('/my-media?tab=to_watch');
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to save. Please try again.',
@@ -51,12 +54,12 @@ export default function MovieInfo({
   };
 
   const handleDelete = async () => {
-    if (!userMovieId) return;
+    if (!userMediaId) return;
     setIsDeleting(true);
     try {
-      await deleteUserMovie(userMovieId);
+      await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-      router.push('/my-movies?tab=to_watch');
+      router.push('/my-media?tab=to_watch');
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to delete. Please try again.',
@@ -73,9 +76,9 @@ export default function MovieInfo({
         {title}
       </p>
       <p className="text-sm text-secondary mt-8 pt-2 border-t border-primary min-w-40 lg:min-w-40 w-max max-w-full">
-        dir.: {director}
+        {creatorLabel} {director}
       </p>
-      <p className="text-sm text-secondary mt-1">{releaseYear}</p>
+      <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
       <div className="w-full sm:w-3/4 flex justify-center flex-col h-full mx-auto align-self-end">
         {isToWatch ? (
           <>

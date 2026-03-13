@@ -14,20 +14,21 @@ function SearchLayout({
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialQuery = searchParams.get('query') || '';
+  const type = searchParams.get('type') || 'all';
 
   const { debouncedQuery, handleChange, handleSearch, handleKeyDown } =
     useSearch({
       onSearch: (query) =>
-        router.replace(`/search?query=${encodeURIComponent(query)}`),
+        router.replace(`/search?query=${encodeURIComponent(query)}&type=${type}`),
       initialQuery,
       debounceMs: 500,
     });
 
   useEffect(() => {
     if (debouncedQuery) {
-      router.replace(`/search?query=${encodeURIComponent(debouncedQuery)}`);
+      router.replace(`/search?query=${encodeURIComponent(debouncedQuery)}&type=${type}`);
     }
-  }, [debouncedQuery, router]);
+  }, [debouncedQuery, router, type]);
 
   return (
     <>

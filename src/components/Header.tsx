@@ -27,7 +27,7 @@ export default function Header({ searchProps }: Props) {
         {searchProps && (
           <div className="w-50">
             <Input
-              id="searchMovieHeader"
+              id="searchMediaHeader"
               variant="search"
               handleChange={searchProps.handleChange}
               handleKeyDown={searchProps.handleKeyDown}

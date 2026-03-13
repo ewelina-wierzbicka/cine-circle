@@ -1,5 +1,5 @@
 import { apiError } from '@/lib/apiError';
-import { getMovieDetails } from '@/services/getMedia';
+import { getSeriesDetails } from '@/services/getMedia';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,10 +9,10 @@ export async function GET(request: Request) {
   if (!/^\d+$/.test(id)) return apiError('Invalid id parameter', 400);
 
   try {
-    const data = await getMovieDetails(id);
+    const data = await getSeriesDetails(id);
     return Response.json(data);
   } catch (error) {
-    console.error('Get movie details error:', error);
-    return apiError('Failed to get movie details', 500);
+    console.error('Get series details error:', error);
+    return apiError('Failed to get series details', 500);
   }
 }

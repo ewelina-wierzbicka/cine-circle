@@ -1,24 +1,27 @@
 import Button from '@/components/Button';
 import StarRating from '@/components/StarRating';
-import { Movie, UserEntry } from '@/types';
+import { NormalizedMedia, UserEntry } from '@/types';
 
 type Props = {
-  movie: Movie;
+  media: NormalizedMedia;
   userEntry: Pick<UserEntry, 'watched_date' | 'rating' | 'review'>;
   onEdit: () => void;
   isTablet: boolean;
 };
 
-export default function WatchedMovieInfo({
-  movie,
+export default function WatchedMediaInfo({
+  media,
   userEntry,
   onEdit,
   isTablet,
 }: Props) {
-  const { title, director, release_date } = movie;
+  const { title, director, release_date, last_air_date, media_type } = media;
   const { watched_date, rating, review } = userEntry;
   const isUserEntry = watched_date && rating != null && review;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
+  const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
+  const dateDisplay = lastAirYear ? `${releaseYear} – ${lastAirYear}` : releaseYear;
+  const creatorLabel = media_type === 'series' ? 'created by:' : 'dir.:';
 
   const formattedDate = watched_date
     ? new Date(watched_date).toLocaleDateString('en-GB', {
@@ -40,9 +43,9 @@ export default function WatchedMovieInfo({
         </p>
 
         <p className="text-sm text-secondary mt-8 pt-2 border-t border-primary min-w-40 w-max max-w-full">
-          dir.: {director}
+          {creatorLabel} {director}
         </p>
-        <p className="text-sm text-secondary mt-1">{releaseYear}</p>
+        <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
       </div>
       <div className="mt-8 flex flex-col gap-8 w-full">
         {formattedDate && (

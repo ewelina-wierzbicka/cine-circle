@@ -8,7 +8,10 @@ const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export function useIsTablet(breakpoint = 1024) {
-  const [isTablet, setIsTablet] = useState(false);
+  const [isTablet, setIsTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return getMediaQuery(breakpoint).matches;
+  });
 
   useIsomorphicLayoutEffect(() => {
     const mql = getMediaQuery(breakpoint);

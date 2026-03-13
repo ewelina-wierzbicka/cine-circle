@@ -1,28 +1,27 @@
 'use client';
 
-import MovieDetailWrapper from '@/components/MovieDetailWrapper';
+import MediaDetailWrapper from '@/components/MediaDetailWrapper';
 import UserEntryForm from '@/components/UserEntryForm';
 import { useDetailStep } from '@/hooks/useDetailStep';
 import { useIsTablet } from '@/hooks/useIsTablet';
-import { Movie, SavedMovie } from '@/types';
+import { NormalizedMedia, SavedMedia } from '@/types';
 import { useRouter } from 'next/navigation';
-import MovieInfo from './MovieInfo';
-import WatchedMovieInfo from './WatchedMovieInfo';
+import MediaInfo from './MediaInfo';
+import WatchedMediaInfo from './WatchedMediaInfo';
 
 type Props = {
-  movie: Movie | SavedMovie;
+  media: NormalizedMedia | SavedMedia;
   initialStep?: number;
 };
 
-export default function MovieDetail({ movie, initialStep = 1 }: Props) {
+export default function MediaDetail({ media, initialStep = 1 }: Props) {
   const { step, goToForm, goToInfo } = useDetailStep(initialStep);
   const isTablet = useIsTablet();
   const router = useRouter();
-
-  const isSaved = 'status' in movie;
-  const saved = isSaved ? (movie as SavedMovie) : null;
+  const isSaved = 'status' in media;
+  const saved = isSaved ? (media as SavedMedia) : null;
   const status = saved?.status;
-  const userMovieId = saved?.userMovieId;
+  const userMediaId = saved?.id;
 
   const handleUpdateSuccess = () => {
     router.refresh();
@@ -30,7 +29,7 @@ export default function MovieDetail({ movie, initialStep = 1 }: Props) {
   };
 
   const handleMoveToWatchedSuccess = () => {
-    router.push(`/my-movies?tab=watched`);
+    router.push(`/my-media?tab=watched`);
   };
 
   const onUpdateSuccess = !isSaved
@@ -41,8 +40,8 @@ export default function MovieDetail({ movie, initialStep = 1 }: Props) {
 
   const infoSlot =
     status === 'watched' ? (
-      <WatchedMovieInfo
-        movie={movie}
+      <WatchedMediaInfo
+        media={media}
         userEntry={{
           watched_date: saved!.watched_date,
           rating: saved!.rating,
@@ -52,9 +51,9 @@ export default function MovieDetail({ movie, initialStep = 1 }: Props) {
         isTablet={isTablet}
       />
     ) : (
-      <MovieInfo
-        movie={movie}
-        userMovieId={userMovieId}
+      <MediaInfo
+        media={media}
+        userMediaId={userMediaId}
         isToWatch={status === 'to_watch'}
         addToWatched={goToForm}
         isTablet={isTablet}
@@ -63,8 +62,8 @@ export default function MovieDetail({ movie, initialStep = 1 }: Props) {
 
   const formSlot = (
     <UserEntryForm
-      movie={movie}
-      userMovieId={userMovieId}
+      media={media}
+      userMediaId={userMediaId}
       initialData={
         status === 'watched'
           ? {
@@ -80,9 +79,9 @@ export default function MovieDetail({ movie, initialStep = 1 }: Props) {
   );
 
   return (
-    <MovieDetailWrapper
-      posterPath={movie.poster_path}
-      posterTitle={movie.title}
+    <MediaDetailWrapper
+      posterPath={media.poster_path}
+      posterTitle={media.title}
       step={step}
       isTablet={isTablet}
       className="h-full-screen"

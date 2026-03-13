@@ -14,7 +14,7 @@ export default async function Page({ params, searchParams }: Props) {
 
   if (!Number(slug.split('-')[0])) notFound();
 
-  const { data, error, initialStep } = await getMediaPageData(slug, 'movie', step);
+  const { data, error, initialStep } = await getMediaPageData(slug, 'series', step);
 
   return (
     <>

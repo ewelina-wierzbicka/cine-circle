@@ -22,7 +22,7 @@ export default function StarRating({ rating, className }: Props) {
         const width = `${fill * 100}%`;
 
         return (
-          <div key={i} className="relative h-4 w-4">
+          <div key={`star-${i}`} className="relative h-4 w-4">
             <StarIcon filled className="h-4 w-4 text-zinc-200" />
             <div className="absolute inset-0 overflow-hidden" style={{ width }}>
               <StarIcon filled className="h-4 w-4 text-yellow-500" />

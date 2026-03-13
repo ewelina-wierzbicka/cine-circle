@@ -4,8 +4,8 @@ import Button from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
 import Input from '@/components/Input';
 import Textarea from '@/components/Textarea';
-import { addUserMovie, updateUserMovie } from '@/services/addUserMovie';
-import { Movie, UserEntry } from '@/types';
+import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
+import { NormalizedMedia, UserEntry } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -13,19 +13,19 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 type Props = {
-  movie: Movie;
-  userMovieId?: number;
+  media: NormalizedMedia;
+  userMediaId?: number;
   initialData?: UserEntry;
   onUpdateSuccess?: () => void;
 };
 
 export default function UserEntryForm({
-  movie,
-  userMovieId,
+  media,
+  userMediaId,
   initialData,
   onUpdateSuccess,
 }: Props) {
-  const { id, title, release_date, poster_path, director } = movie;
+  const { id, title, release_date, last_air_date, poster_path, director, media_type } = media;
   const { watched_date, rating, review } = initialData || {};
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -46,7 +46,7 @@ export default function UserEntryForm({
 
   const [isSaving, setIsSaving] = useState(false);
 
-  const isUpdateMode = userMovieId !== undefined;
+  const isUpdateMode = userMediaId !== undefined;
 
   const onSubmit = async (data: UserEntry) => {
     const { rating, review, watched_date } = data;
@@ -55,7 +55,7 @@ export default function UserEntryForm({
     setIsSaving(true);
     try {
       if (isUpdateMode) {
-        await updateUserMovie(userMovieId, {
+        await updateUserMedia(userMediaId, {
           status: 'watched',
           watched_date,
           rating: normalizedRating,
@@ -65,8 +65,8 @@ export default function UserEntryForm({
         toast.success(`"${title}" was updated!`);
         onUpdateSuccess?.();
       } else {
-        await addUserMovie(
-          { id, title, release_date, poster_path, director },
+        await addUserMedia(
+          { id, title, release_date, last_air_date, poster_path, director, media_type },
           {
             status: 'watched',
             watched_date,
@@ -76,7 +76,7 @@ export default function UserEntryForm({
         );
         await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
         toast.success(`"${title}" was saved to your "watched" list!`);
-        router.push('/my-movies?tab=watched');
+        router.push('/my-media?tab=watched');
       }
     } catch (err) {
       toast.error(
