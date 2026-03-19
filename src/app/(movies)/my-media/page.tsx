@@ -1,4 +1,6 @@
+import ErrorToast from '@/components/ErrorToast';
 import { getUserMediaList } from '@/services/getUserMedia';
+import { UserMediaPage } from '@/types';
 import MyMedia from './MyMedia';
 
 type Props = {
@@ -9,7 +11,19 @@ export default async function Page({ searchParams }: Props) {
   const { tab: tabParam } = await searchParams;
   const tab = tabParam === 'watched' ? 'watched' : 'to_watch';
 
-  const initialData = await getUserMediaList(tab, 0);
+  let initialData: UserMediaPage = { media: [], nextPage: null };
+  let error: string | null = null;
 
-  return <MyMedia key={tab} tab={tab} initialData={initialData} />;
+  try {
+    initialData = await getUserMediaList(tab, 0);
+  } catch (err) {
+    error = (err as Error).message || 'Failed to load your media.';
+  }
+
+  return (
+    <>
+      {error && <ErrorToast message={error} />}
+      <MyMedia key={tab} tab={tab} initialData={initialData} />
+    </>
+  );
 }

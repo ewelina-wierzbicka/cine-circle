@@ -1,6 +1,7 @@
 'use client';
 
 import Input from '@/components/Input';
+import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
 import { FilterMediaType } from '@/types';
@@ -20,25 +21,23 @@ export default function SearchBox() {
   });
 
   return (
-    <div className="w-full md:w-1/2 px-6 flex gap-3">
-      <select
-        value={mediaType}
-        onChange={(e) => setMediaType(e.target.value as FilterMediaType)}
-        className="rounded-3xl bg-neutral-300/20 pl-4 pr-4 h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 shrink-0 cursor-pointer"
-      >
-        {MEDIA_TYPE_OPTIONS.map(({ value, label }) => (
-          <option key={value} value={value} className="bg-dark">
-            {label}
-          </option>
-        ))}
-      </select>
-      <Input
-        id="searchMedia"
-        variant="search"
-        handleChange={handleChange}
-        handleKeyDown={handleKeyDown}
-        handleIconClick={handleSearch}
-      />
+    <div className="w-full px-6 flex flex-col md:flex-row gap-3 justify-center">
+      <div className="w-full md:w-1/2 lg:w-1/3">
+        <Input
+          id="searchMedia"
+          variant="search"
+          handleChange={handleChange}
+          handleKeyDown={handleKeyDown}
+          handleIconClick={handleSearch}
+        />
+      </div>
+      <div className="w-full md:w-39 mt-2 md:mt-0">
+        <Select
+          value={mediaType}
+          options={MEDIA_TYPE_OPTIONS}
+          onChange={setMediaType}
+        />
+      </div>
     </div>
   );
 }

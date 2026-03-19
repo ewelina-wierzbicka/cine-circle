@@ -20,7 +20,7 @@ export const getUserMediaList = async (
 
   let query = supabase
     .from('user_media')
-    .select('*, media(*)')
+    .select(`*, media${mediaType ? '!inner' : ''}(*)`)
     // .eq('user_id', user.id)
     .order('added_at', { ascending: false })
     .range(from, to);

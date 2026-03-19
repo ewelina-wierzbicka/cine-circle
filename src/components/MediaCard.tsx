@@ -49,25 +49,29 @@ export default function MediaCard({
   };
 
   return (
-    <Link href={href} className="w-full flex flex-col justify-end">
-      <p className="text-sm md:text-base uppercase font-semibold w-full">
-        {title}
-      </p>
-      <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
-      {status === 'watched' && rating != null && <StarRating rating={rating} />}
+    <div className="w-full flex flex-col justify-end">
+      <Link href={href}>
+        <p className="text-sm md:text-base uppercase font-semibold w-full">
+          {title}
+        </p>
+        <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
+        {status === 'watched' && rating != null && <StarRating rating={rating} />}
+      </Link>
       <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
-        <Image
-          style={{ objectFit: 'cover', objectPosition: 'top center' }}
-          fill={true}
-          src={
-            poster_path
-              ? `https://image.tmdb.org/t/p/w342${poster_path}`
-              : '/no-image.jpg'
-          }
-          sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1280px) 25vw, 16vw"
-          alt={title}
-          priority={priority}
-        />
+        <Link href={href} className="absolute inset-0">
+          <Image
+            style={{ objectFit: 'cover', objectPosition: 'top center' }}
+            fill={true}
+            src={
+              poster_path
+                ? `https://image.tmdb.org/t/p/w342${poster_path}`
+                : '/no-image.jpg'
+            }
+            sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1280px) 25vw, 16vw"
+            alt={title}
+            priority={priority}
+          />
+        </Link>
         {userMediaId && (
           <>
             {status === 'to_watch' && (
@@ -111,6 +115,6 @@ export default function MediaCard({
           </>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

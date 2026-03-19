@@ -16,6 +16,25 @@ const TYPE_LABELS: Record<FilterMediaType, string> = {
   all: 'movies & series',
 };
 
+async function fetchMedia({
+  pageParam,
+  query,
+  type,
+}: {
+  pageParam: number;
+  query: string;
+  type: FilterMediaType;
+}): Promise<SearchMediaResponse> {
+  const res = await fetch(
+    `/api/search?query=${encodeURIComponent(query)}&page=${pageParam}&type=${type}`,
+  );
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.error || 'Failed to fetch');
+  }
+  return res.json() as Promise<SearchMediaResponse>;
+}
+
 type Props = {
   query: string;
   type: FilterMediaType;
@@ -23,32 +42,27 @@ type Props = {
 };
 
 export default function SearchResults({ query, type, initialData }: Props) {
-  const fetchMedia = async ({ pageParam = 1 }: { pageParam: number }) => {
-    const res = await fetch(
-      `/api/search?query=${encodeURIComponent(query)}&page=${pageParam}&type=${type}`,
-    );
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => null);
-      throw new Error(errorData?.error || 'Failed to fetch');
-    }
-    return res.json() as Promise<SearchMediaResponse>;
-  };
-
-  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['search', query, type],
-      queryFn: fetchMedia,
-      initialPageParam: 1,
-      getNextPageParam: (lastPage, allPages) =>
-        lastPage.hasMore ? allPages.length + 1 : undefined,
-      initialData: initialData
-        ? { pages: [initialData], pageParams: [1] }
-        : undefined,
-      enabled: query.length > 0,
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 10,
-      retry: 1,
-    });
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['search', query, type],
+    queryFn: ({ pageParam }) => fetchMedia({ pageParam, query, type }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.hasMore ? allPages.length + 1 : undefined,
+    initialData: initialData
+      ? { pages: [initialData], pageParams: [1] }
+      : undefined,
+    enabled: query.length > 0,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    retry: 1,
+  });
 
   useEffect(() => {
     if (error) {

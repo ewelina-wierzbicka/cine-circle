@@ -20,7 +20,7 @@ const fetchUserMediaPage = async ({
 
   let query = supabase
     .from('user_media')
-    .select(`*, media${search ? '!inner' : ''}(*)`)
+    .select(`*, media${search || mediaType ? '!inner' : ''}(*)`)
     .order('added_at', { ascending: false })
     .range(from, to);
 
@@ -37,8 +37,6 @@ const fetchUserMediaPage = async ({
   }
 
   const { data, error } = await query;
-
-      console.log(mediaType, data, error);
 
   if (error) throw error;
 
@@ -61,7 +59,15 @@ export const useUserMedia = (
   const resolvedMediaType =
     mediaType === 'all' || !mediaType ? undefined : mediaType;
 
-    console.log('res', resolvedMediaType);
+  const filteredInitialData =
+    initialData && resolvedMediaType
+      ? {
+          ...initialData,
+          media: initialData.media.filter(
+            (m) => m.media.media_type === resolvedMediaType,
+          ),
+        }
+      : initialData;
 
   return useInfiniteQuery({
     queryKey: ['user-movies', status, search, mediaType],
@@ -75,8 +81,8 @@ export const useUserMedia = (
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialData:
-      !isSearch && initialData
-        ? { pages: [initialData], pageParams: [0] }
+      !isSearch && filteredInitialData
+        ? { pages: [filteredInitialData], pageParams: [0] }
         : undefined,
     staleTime: isSearch ? SEARCH_STALE_TIME : BASE_STALE_TIME,
   });

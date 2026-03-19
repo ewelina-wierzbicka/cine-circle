@@ -1,11 +1,12 @@
 'use client';
 import Input from '@/components/Input';
+import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
-import { FilterMediaType, MediaType, UserMediaPage } from '@/types';
+import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
+import { FilterMediaType, UserMediaPage } from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import UserMediaList from './UserMediaList';
-import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
 
 type Props = {
   tab: 'to_watch' | 'watched';
@@ -28,7 +29,7 @@ export default function MyMedia({ tab, initialData }: Props) {
 
   return (
     <>
-      <div className="flex items-center w-full lg:gap-8 flex-col lg:flex-row">
+      <div className="flex items-center w-full md:gap-8 flex-col md:flex-row">
         <div className="mb-8 w-full lg:w-1/3 flex">
           <Link
             className={tabLinkClass(tab === 'to_watch', 'rounded-l-3xl')}
@@ -43,28 +44,26 @@ export default function MyMedia({ tab, initialData }: Props) {
             Watched
           </Link>
         </div>
-        <div className="w-full lg:w-1/3 mb-8 flex gap-3">
-          <select
-            value={mediaType}
-            onChange={(e) => setMediaType(e.target.value as MediaType)}
-            className="rounded-3xl bg-neutral-300/20 pl-4 pr-4 h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 shrink-0 cursor-pointer"
-          >
-            {MEDIA_TYPE_OPTIONS.map(({ value, label }) => (
-              <option key={value} value={value} className="bg-dark">
-                {label}
-              </option>
-            ))}
-          </select>
-          <Input
-            id="searchMedia"
-            variant="search"
-            handleChange={handleChange}
-            handleKeyDown={handleKeyDown}
-            handleIconClick={handleSearch}
-            placeholder={`Search in ${
-              tab === 'to_watch' ? 'to watch' : 'watched'
-            }`}
-          />
+        <div className="flex gap-3 w-full flex-col sm:flex-row mb-8 ">
+          <div className="w-full lg:w-1/3 flex gap-3">
+            <Input
+              id="searchMedia"
+              variant="search"
+              handleChange={handleChange}
+              handleKeyDown={handleKeyDown}
+              handleIconClick={handleSearch}
+              placeholder={`Search in ${
+                tab === 'to_watch' ? 'to watch' : 'watched'
+              }`}
+            />
+          </div>
+          <div className="w-full sm:w-39 shrink-0">
+            <Select
+              value={mediaType}
+              options={MEDIA_TYPE_OPTIONS}
+              onChange={setMediaType}
+            />
+          </div>
         </div>
       </div>
       <UserMediaList

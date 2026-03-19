@@ -23,7 +23,8 @@ export async function getMediaPageData(
   try {
     userMedia = await getUserMedia(tmdbId, mediaType);
   } catch (err) {
-    if ((err as { code?: string }).code !== 'PGRST116') {
+    const isNotFound = (err as { code?: string }).code === 'PGRST116';
+    if (!isNotFound) {
       error = (err as Error).message || 'Failed to load saved data.';
     }
   }

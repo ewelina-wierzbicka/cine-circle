@@ -35,7 +35,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
           <input
             type={type}
             id={id}
-            className={`rounded-3xl bg-neutral-300/20 pl-6 pr-1 w-full h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${className ?? ''}`}
+            className={`rounded-3xl bg-neutral-300/20 pl-6 pr-1 w-full h-10 outline-none text-sm focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${className ?? ''}`}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
               type="button"
               aria-label="Search"
               onClick={handleIconClick}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
+              className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer"
             >
               <SearchIcon className="w-5 h-5 text-gray-400" />
             </button>

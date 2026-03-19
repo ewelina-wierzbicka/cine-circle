@@ -1,7 +1,4 @@
-import ErrorToast from '@/components/ErrorToast';
-import { getMediaPageData } from '@/lib/getMediaPageData';
-import { notFound } from 'next/navigation';
-import MediaDetail from '../../MediaDetail';
+import MediaPage from '../../MediaPage';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -11,15 +8,5 @@ type Props = {
 export default async function Page({ params, searchParams }: Props) {
   const { id: slug } = await params;
   const { step } = await searchParams;
-
-  if (!Number(slug.split('-')[0])) notFound();
-
-  const { data, error, initialStep } = await getMediaPageData(slug, 'movie', step);
-
-  return (
-    <>
-      {error && <ErrorToast message={error} />}
-      {data && <MediaDetail media={data} initialStep={initialStep} />}
-    </>
-  );
+  return <MediaPage slug={slug} mediaType="movie" step={step} />;
 }

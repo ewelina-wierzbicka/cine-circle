@@ -52,27 +52,11 @@ export default function MediaList({
 
   if (media.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full-screen w-full">
+      <div className="flex items-center justify-center h-[calc(100vh-320px)] lg:h-[calc(100vh-248px)] w-full">
         <p className="text-xl">{emptyMessage}</p>
       </div>
     );
   }
-
-  //   const hasNextPageRef = useRef(hasNextPage);
-  // const isFetchingNextPageRef = useRef(isFetchingNextPage);
-  // const fetchNextPageRef = useRef(fetchNextPage);
-
-  // useEffect(() => {
-  //   hasNextPageRef.current = hasNextPage;
-  //   isFetchingNextPageRef.current = isFetchingNextPage;
-  //   fetchNextPageRef.current = fetchNextPage;
-  // });
-
-  // const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
-  //   if (entries[0].isIntersecting && hasNextPageRef.current && !isFetchingNextPageRef.current) {
-  //     fetchNextPageRef.current?.();
-  //   }
-  // }, []);
 
   return (
     <BorderContainer className={className}>
