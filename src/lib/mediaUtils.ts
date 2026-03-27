@@ -16,7 +16,8 @@ function toHref(tmdbId: number, title: string, mediaType: MediaType): string {
 }
 
 export function toSearchMediaListProps(media: NormalizedMedia) {
-  const { id, title, release_date, last_air_date, poster_path, media_type } = media;
+  const { id, title, release_date, last_air_date, poster_path, media_type } =
+    media;
   return {
     id,
     title,
@@ -40,7 +41,7 @@ export function toUserMediaListProps(userMedia: UserMedia) {
     poster_path: media.poster_path,
     media_type: media.media_type,
     rating: userMedia.rating,
-    status: userMedia.status,
+    watchStatus: userMedia.watchStatus,
     href,
   };
 }

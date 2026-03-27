@@ -24,10 +24,20 @@ export default function MediaInfo({
   addToWatched,
   isTablet,
 }: Props) {
-  const { id, title, release_date, last_air_date, poster_path, director, media_type } = media;
+  const {
+    id,
+    title,
+    release_date,
+    last_air_date,
+    poster_path,
+    director,
+    media_type,
+  } = media;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
-  const dateDisplay = lastAirYear ? `${releaseYear} – ${lastAirYear}` : releaseYear;
+  const dateDisplay = lastAirYear
+    ? `${releaseYear} – ${lastAirYear}`
+    : releaseYear;
   const creatorLabel = media_type === 'series' ? 'created by:' : 'dir.:';
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -38,8 +48,16 @@ export default function MediaInfo({
     setIsSaving(true);
     try {
       await addUserMedia(
-        { id, title, release_date, last_air_date, poster_path, director, media_type },
-        { status: 'to_watch' },
+        {
+          id,
+          title,
+          release_date,
+          last_air_date,
+          poster_path,
+          director,
+          media_type,
+        },
+        { watchStatus: 'to_watch' },
       );
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
       toast.success(`"${title}" was saved to your "to watch" list!`);

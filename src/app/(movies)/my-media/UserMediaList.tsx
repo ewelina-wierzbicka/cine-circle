@@ -7,20 +7,20 @@ import { toUserMediaListProps } from '@/lib/mediaUtils';
 import { FilterMediaType, UserMediaPage } from '@/types';
 
 type Props = {
-  status: 'to_watch' | 'watched';
+  watchStatus: 'to_watch' | 'watched';
   initialData: UserMediaPage;
   searchQuery?: string;
   mediaType: FilterMediaType;
 };
 
 export default function UserMediaList({
-  status,
+  watchStatus,
   initialData,
   searchQuery = '',
   mediaType,
 }: Props) {
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
-    useUserMedia(status, initialData, searchQuery, mediaType);
+    useUserMedia(watchStatus, initialData, searchQuery, mediaType);
 
   const media = data?.pages.flatMap((page) => page.media) ?? [];
 

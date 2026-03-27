@@ -24,10 +24,12 @@ export default function MediaCard({
 }: Props) {
   const { title, release_date, last_air_date, poster_path, href } = media;
   const rating = 'rating' in media ? media.rating : undefined;
-  const status = 'status' in media ? media.status : undefined;
+  const watchStatus = 'watchStatus' in media ? media.watchStatus : undefined;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : undefined;
-  const dateDisplay = lastAirYear ? `${releaseYear} – ${lastAirYear}` : releaseYear;
+  const dateDisplay = lastAirYear
+    ? `${releaseYear} – ${lastAirYear}`
+    : releaseYear;
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -55,7 +57,9 @@ export default function MediaCard({
           {title}
         </p>
         <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
-        {status === 'watched' && rating != null && <StarRating rating={rating} />}
+        {watchStatus === 'watched' && rating != null && (
+          <StarRating rating={rating} />
+        )}
       </Link>
       <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
         <Link href={href} className="absolute inset-0">
@@ -74,7 +78,7 @@ export default function MediaCard({
         </Link>
         {userMediaId && (
           <>
-            {status === 'to_watch' && (
+            {watchStatus === 'to_watch' && (
               <MediaCardOverlay>
                 <Button
                   handleClick={handleMoveToWatched}
@@ -93,7 +97,7 @@ export default function MediaCard({
                 />
               </MediaCardOverlay>
             )}
-            {status === 'watched' && (
+            {watchStatus === 'watched' && (
               <MediaCardOverlay>
                 <Button
                   handleClick={() => router.push(href)}

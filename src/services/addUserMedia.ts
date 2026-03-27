@@ -16,19 +16,19 @@ export const addUserMedia = async (
     director,
     media_type,
   } = details;
-  const { status } = userEntry;
+  const { watchStatus } = userEntry;
   const { watched_date, rating, review } =
-    userEntry.status === 'watched'
+    userEntry.watchStatus === 'watched'
       ? userEntry
       : { watched_date: undefined, rating: undefined, review: undefined };
   const supabase = await createClient();
 
-  // const {
-  //   data: { user },
-  //   error: userError,
-  // } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  // if (userError || !user) throw new Error('Not authenticated');
+  if (userError || !user) throw new Error('Not authenticated');
 
   const { data: media, error: mediaError } = await supabase
     .from('media')
@@ -49,16 +49,26 @@ export const addUserMedia = async (
 
   if (mediaError) throw mediaError;
 
-  const { error: entryError } = await supabase.from('user_media').insert({
-    user_id: '123e4567-e89b-12d3-a456-426614174000',
-    media_id: media.id,
-    status,
-    watched_date,
-    rating,
-    review,
-  });
+  const { data: existingEntry, error: checkError } = await supabase
+    .from('user_media')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('media_id', media.id)
+    .maybeSingle();
 
-  if (entryError) throw entryError;
+  if (checkError) throw checkError;
+
+  if (!existingEntry) {
+    const { error: entryError } = await supabase.from('user_media').insert({
+      user_id: user.id,
+      media_id: media.id,
+      watchStatus,
+      watched_date,
+      rating,
+      review,
+    });
+    if (entryError) throw entryError;
+  }
 };
 
 export const updateUserMedia = async (
@@ -67,18 +77,18 @@ export const updateUserMedia = async (
 ): Promise<void> => {
   const supabase = await createClient();
 
-  // const {
-  // data: { user },
-  // error: userError,
-  // } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  // if (userError || !user) throw new Error('Not authenticated');
+  if (userError || !user) throw new Error('Not authenticated');
 
   const { error } = await supabase
     .from('user_media')
     .update(entry)
-    .eq('id', id);
-  // .eq('user_id', user.id);
+    .eq('id', id)
+    .eq('user_id', user.id);
 
   if (error) throw error;
 };

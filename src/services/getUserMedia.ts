@@ -3,17 +3,17 @@ import { createClient } from '@/lib/supabase/server';
 import { MediaType, UserMedia, UserMediaPage } from '@/types';
 
 export const getUserMediaList = async (
-  status: 'watched' | 'to_watch',
+  watchStatus: 'watched' | 'to_watch',
   page = 0,
   mediaType?: MediaType,
 ): Promise<UserMediaPage> => {
   const supabase = await createClient();
 
-  //   const {
-  //     data: { user },
-  //   } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  //   if (!user) throw new Error('Not authenticated');
+  if (!user) throw new Error('Not authenticated');
 
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
@@ -21,12 +21,12 @@ export const getUserMediaList = async (
   let query = supabase
     .from('user_media')
     .select(`*, media${mediaType ? '!inner' : ''}(*)`)
-    // .eq('user_id', user.id)
+    .eq('user_id', user.id)
     .order('added_at', { ascending: false })
     .range(from, to);
 
-  if (status) {
-    query = query.eq('status', status);
+  if (watchStatus) {
+    query = query.eq('watchStatus', watchStatus);
   }
 
   if (mediaType) {
@@ -49,11 +49,19 @@ export const getUserMedia = async (
 ): Promise<UserMedia> => {
   const supabase = await createClient();
 
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase
     .from('user_media')
     .select('*, media!inner(*)')
     .eq('media.tmdb_id', tmdbId)
     .eq('media.media_type', mediaType)
+    .eq('user_id', user.id)
     .single();
 
   if (error) throw error;

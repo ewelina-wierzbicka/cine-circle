@@ -67,7 +67,7 @@ export default function MyMedia({ tab, initialData }: Props) {
         </div>
       </div>
       <UserMediaList
-        status={tab}
+        watchStatus={tab}
         initialData={initialData}
         searchQuery={debouncedQuery}
         mediaType={mediaType}

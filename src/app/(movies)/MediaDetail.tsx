@@ -1,7 +1,7 @@
 'use client';
 
+import UserEntryForm from '@/app/(movies)/UserEntryForm';
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
-import UserEntryForm from '@/components/UserEntryForm';
 import { useDetailStep } from '@/hooks/useDetailStep';
 import { useIsTablet } from '@/hooks/useIsTablet';
 import { NormalizedMedia, SavedMedia } from '@/types';
@@ -18,9 +18,9 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
   const { step, goToForm, goToInfo } = useDetailStep(initialStep);
   const isTablet = useIsTablet();
   const router = useRouter();
-  const isSaved = 'status' in media;
+  const isSaved = 'watchStatus' in media;
   const saved = isSaved ? (media as SavedMedia) : null;
-  const status = saved?.status;
+  const watchStatus = saved?.watchStatus;
   const userMediaId = saved?.id;
 
   const handleUpdateSuccess = () => {
@@ -34,12 +34,12 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
 
   const onUpdateSuccess = !isSaved
     ? undefined
-    : status === 'watched'
+    : watchStatus === 'watched'
       ? handleUpdateSuccess
       : handleMoveToWatchedSuccess;
 
   const infoSlot =
-    status === 'watched' ? (
+    watchStatus === 'watched' ? (
       <WatchedMediaInfo
         media={media}
         userEntry={{
@@ -54,7 +54,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
       <MediaInfo
         media={media}
         userMediaId={userMediaId}
-        isToWatch={status === 'to_watch'}
+        isToWatch={watchStatus === 'to_watch'}
         addToWatched={goToForm}
         isTablet={isTablet}
       />
@@ -65,12 +65,12 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
       media={media}
       userMediaId={userMediaId}
       initialData={
-        status === 'watched'
+        watchStatus === 'watched'
           ? {
               watched_date: saved!.watched_date,
               rating: saved!.rating,
               review: saved!.review,
-              status: 'watched',
+              watchStatus: 'watched',
             }
           : undefined
       }

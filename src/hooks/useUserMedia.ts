@@ -4,28 +4,36 @@ import { FilterMediaType, MediaType, UserMedia, UserMediaPage } from '@/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 const fetchUserMediaPage = async ({
-  status,
+  watchStatus,
   page,
   search,
   mediaType,
 }: {
-  status: 'watched' | 'to_watch';
+  watchStatus: 'watched' | 'to_watch';
   page: number;
   search?: string;
   mediaType?: MediaType;
 }): Promise<UserMediaPage> => {
   const supabase = createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) throw new Error('Not authenticated');
+
   const from = page * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
   let query = supabase
     .from('user_media')
     .select(`*, media${search || mediaType ? '!inner' : ''}(*)`)
+    .eq('user_id', user.id)
     .order('added_at', { ascending: false })
     .range(from, to);
 
-  if (status) {
-    query = query.eq('status', status);
+  if (watchStatus) {
+    query = query.eq('watchStatus', watchStatus);
   }
 
   if (search) {
@@ -50,7 +58,7 @@ const BASE_STALE_TIME = 1000 * 60 * 2;
 const SEARCH_STALE_TIME = 1000 * 30;
 
 export const useUserMedia = (
-  status: 'watched' | 'to_watch',
+  watchStatus: 'watched' | 'to_watch',
   initialData?: UserMediaPage,
   search?: string,
   mediaType?: FilterMediaType,
@@ -70,10 +78,10 @@ export const useUserMedia = (
       : initialData;
 
   return useInfiniteQuery({
-    queryKey: ['user-movies', status, search, mediaType],
+    queryKey: ['user-movies', watchStatus, search, mediaType],
     queryFn: ({ pageParam }) =>
       fetchUserMediaPage({
-        status,
+        watchStatus,
         page: pageParam,
         search,
         mediaType: resolvedMediaType,

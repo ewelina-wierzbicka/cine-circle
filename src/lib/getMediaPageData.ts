@@ -30,9 +30,16 @@ export async function getMediaPageData(
   }
 
   if (userMedia) {
-    const { id, status, watched_date, rating, review, media } = userMedia;
-    const { tmdb_id, title, release_date, last_air_date, poster_path, director, media_type } =
-      media;
+    const { id, watchStatus, watched_date, rating, review, media } = userMedia;
+    const {
+      tmdb_id,
+      title,
+      release_date,
+      last_air_date,
+      poster_path,
+      director,
+      media_type,
+    } = media;
     const data = {
       tmdb_id,
       title,
@@ -42,7 +49,7 @@ export async function getMediaPageData(
       director,
       media_type,
       id,
-      status,
+      watchStatus,
       watched_date,
       rating,
       review,

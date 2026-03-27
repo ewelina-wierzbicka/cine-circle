@@ -25,7 +25,15 @@ export default function UserEntryForm({
   initialData,
   onUpdateSuccess,
 }: Props) {
-  const { id, title, release_date, last_air_date, poster_path, director, media_type } = media;
+  const {
+    id,
+    title,
+    release_date,
+    last_air_date,
+    poster_path,
+    director,
+    media_type,
+  } = media;
   const { watched_date, rating, review } = initialData || {};
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -56,7 +64,7 @@ export default function UserEntryForm({
     try {
       if (isUpdateMode) {
         await updateUserMedia(userMediaId, {
-          status: 'watched',
+          watchStatus: 'watched',
           watched_date,
           rating: normalizedRating,
           review,
@@ -66,9 +74,17 @@ export default function UserEntryForm({
         onUpdateSuccess?.();
       } else {
         await addUserMedia(
-          { id, title, release_date, last_air_date, poster_path, director, media_type },
           {
-            status: 'watched',
+            id,
+            title,
+            release_date,
+            last_air_date,
+            poster_path,
+            director,
+            media_type,
+          },
+          {
+            watchStatus: 'watched',
             watched_date,
             rating: normalizedRating,
             review,

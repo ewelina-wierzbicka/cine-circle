@@ -1,3 +1,9 @@
+export type RegistrationData = {
+  email: string;
+  password: string;
+  confirmPassword?: string;
+};
+
 export type MediaType = 'movie' | 'series';
 
 export type FilterMediaType = 'movie' | 'series' | 'all';
@@ -21,10 +27,13 @@ export type Series = {
   created_by?: { name: string }[];
 };
 
-export type NormalizedMedia = Movie & { media_type: MediaType; last_air_date?: string };
+export type NormalizedMedia = Movie & {
+  media_type: MediaType;
+  last_air_date?: string;
+};
 
 export type UserEntry = {
-  status: 'watched' | 'to_watch';
+  watchStatus: 'watched' | 'to_watch';
   watched_date?: string;
   rating?: number;
   review?: string;
