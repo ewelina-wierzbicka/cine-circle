@@ -34,7 +34,7 @@ export default function Page() {
       </h3>
       <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
         <label htmlFor="email">Email</label>
-        <div className="mt-3 lg:mt-6 mb-8">
+        <div className="mt-2 lg:mt-6 mb-8">
           <Input
             id="email"
             type="email"
@@ -48,24 +48,8 @@ export default function Page() {
           />
         </div>
         <label htmlFor="password">Password</label>
-        <div className="mt-3 lg:mt-6 mb-8">
-          <Input
-            id="password"
-            type="password"
-            {...register('password', {
-              minLength: {
-                value: 8,
-                message: 'Password must be at least 8 characters',
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/,
-                message:
-                  'Password must contain uppercase, lowercase, number, and special character',
-              },
-            })}
-            error={errors.password?.message}
-          />
+        <div className="mt-2 lg:mt-6 mb-8">
+          <Input id="password" type="password" {...register('password')} />
         </div>
         <Button
           type="submit"

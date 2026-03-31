@@ -17,7 +17,7 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   return (
     <>
       {error && <ErrorToast message={error} />}
-      {data && <MediaDetail media={data} initialStep={initialStep} />}
+      {data && <MediaDetail media={({...data, media_type: mediaType })} initialStep={initialStep} />}
     </>
   );
 }

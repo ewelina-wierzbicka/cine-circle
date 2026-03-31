@@ -7,39 +7,25 @@ import { RegistrationData } from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import AuthFormLayout from '../AuthFormLayout';
 
 export default function Page() {
-  const [serverError, setServerError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm<RegistrationData>();
 
   const onSubmit = async (data: RegistrationData) => {
-    if (data.password !== data.confirmPassword) {
-      setServerError('Passwords do not match');
-      return;
-    }
-    setServerError(null);
     setIsPending(true);
     const result = await registerAction(data.email, data.password);
     if (result?.error) {
-      console.log(result?.error);
-      if (
-        result.error.toLowerCase().includes('user already registered') ||
-        result.error.toLowerCase().includes('email')
-      ) {
-        setServerError(
-          'An account with this email already exists. Please log in or use a different email.',
-        );
-      } else {
-        setServerError(result.error);
-      }
-      setIsPending(false);
+      toast.error(result.error || 'Failed to register. Please try again.');
     }
+    setIsPending(false);
   };
 
   return (
@@ -48,15 +34,13 @@ export default function Page() {
         Let&apos;s watch some movies!
       </h3>
       <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-        {serverError && (
-          <p className="mb-6 text-sm text-red-400">{serverError}</p>
-        )}
         <label htmlFor="email">Email</label>
-        <div className="mt-3 lg:mt-6 mb-8">
+        <div className="mt-2 lg:mt-6 mb-8">
           <Input
             id="email"
             type="email"
             {...register('email', {
+              required: 'Please enter your email address',
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: 'Please enter a valid email address',
@@ -66,11 +50,12 @@ export default function Page() {
           />
         </div>
         <label htmlFor="password">Password</label>
-        <div className="mt-3 lg:mt-6 mb-8">
+        <div className="mt-2 lg:mt-6 mb-8">
           <Input
             id="password"
             type="password"
             {...register('password', {
+              required: 'Please enter a password',
               minLength: {
                 value: 8,
                 message: 'Password must be at least 8 characters',
@@ -86,12 +71,16 @@ export default function Page() {
           />
         </div>
         <label htmlFor="confirmPassword">Confirm password</label>
-        <div className="mt-3 lg:mt-6 mb-8">
+        <div className="mt-2 lg:mt-6 mb-8">
           <Input
             id="confirmPassword"
             type="password"
             {...register('confirmPassword', {
-              // No validation here; handled in onSubmit
+              validate: (value) => {
+                if (!value) return 'Please confirm your password';
+                const password = getValues('password');
+                return value === password || 'Passwords do not match';
+              },
             })}
             error={errors.confirmPassword?.message}
           />
