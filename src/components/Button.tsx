@@ -15,8 +15,8 @@ export default function Button({
   text,
   handleClick,
   type = 'button',
-  color = "primary",
-  variant = "filled",
+  color = 'primary',
+  variant = 'filled',
   size = 'medium',
   className,
   disabled,
@@ -31,7 +31,10 @@ export default function Button({
         size === 'medium' ? 'h-15' : 'h-12',
         variant === 'outlined'
           ? 'text-primary border border-primary hover:bg-primary/10'
-          : twMerge('text-dark', color === 'secondary' ? 'bg-secondary' : 'bg-primary'),
+          : twMerge(
+              'text-dark',
+              color === 'secondary' ? 'bg-secondary' : 'bg-primary',
+            ),
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}

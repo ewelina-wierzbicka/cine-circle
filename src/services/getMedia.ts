@@ -21,7 +21,15 @@ async function tmdbFetch<T>(
 }
 
 function normalizeSeriesResult(raw: Series): NormalizedMedia {
-  const { id, name, first_air_date, last_air_date, poster_path, popularity, created_by } = raw;
+  const {
+    id,
+    name,
+    first_air_date,
+    last_air_date,
+    poster_path,
+    popularity,
+    created_by,
+  } = raw;
   return {
     id,
     title: name,
@@ -82,7 +90,7 @@ export const getMedia = async (
   const sortedResults = data?.results
     ?.map((movie) => ({ ...movie, media_type: 'movie' as const }))
     .toSorted((a, b) => (b.popularity || 0) - (a.popularity || 0));
-    
+
   return {
     results: sortedResults || [],
     hasMore: page < (data?.total_pages || 0),
