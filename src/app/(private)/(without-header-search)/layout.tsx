@@ -7,7 +7,7 @@ export default function HomeLayout({
 }>) {
   return (
     <>
-      <Header />
+      <Header isLoggedIn={true} />
       <div className="w-full max-w-content min-h-full-screen mx-auto py-8 px-4 flex items-center justify-center flex-col relative">
         {children}
       </div>

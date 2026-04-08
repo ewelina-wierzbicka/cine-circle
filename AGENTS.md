@@ -65,10 +65,10 @@ src/
         layout.tsx
       api/                    # Route Handlers
     layout.tsx                # root layout
-    globals.css
-    providers.tsx             # app-wide React context providers
-    proxy.ts                  # Next.js 16 middleware (formerly middleware.ts)
-    types.ts                  # app-wide TypeScript types
+  globals.css
+  providers.tsx             # app-wide React context providers
+  proxy.ts                  # Next.js 16 middleware (formerly middleware.ts)
+  types.ts                  # app-wide TypeScript types
   components/                 # shared components
   hooks/                      # custom React hooks
   icons/                      # icon components
@@ -101,7 +101,7 @@ Tailwind CSS v4 with custom design tokens defined in `globals.css`.
 **Rules:**
 
 - Mobile-first — use base styles for mobile, `sm:` / `md:` / `lg:` for larger screens
-- Always use design tokens for colors — never hardcode hex values like `#1e2122`
+- Always use design tokens for colors used in more then one place and tailwind classes for other colors — never hardcode hex values like `#1e2122`
 - Before adding a new color, check if an existing token fits
 - Use `max-w-content` for page-level content wrappers
 - Check existing components in `components/` for patterns before building new UI

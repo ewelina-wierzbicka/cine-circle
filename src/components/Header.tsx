@@ -3,7 +3,7 @@
 import AvatarIcon from '@/icons/Avatar';
 import { twMerge } from '@/lib/cn';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
-import { createClient } from '@/lib/supabase/client';
+import { logout } from '@/services/auth';
 import { FilterMediaType } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Input from './Input';
 import Select from './Select';
+import { createClient } from '@/lib/supabase/client';
 
 type Props = {
   searchProps?: {
@@ -21,6 +22,7 @@ type Props = {
   };
   mediaType?: FilterMediaType;
   setMediaType?: React.Dispatch<React.SetStateAction<FilterMediaType>>;
+  isLoggedIn?: boolean;
 };
 
 const dropdownOptions = [
@@ -40,36 +42,35 @@ export default function Header({
   searchProps,
   mediaType,
   setMediaType,
+  isLoggedIn: initialIsLoggedIn,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setIsLoggedIn(!!data.user);
-    });
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setIsLoggedIn(!!session?.user);
       },
     );
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
+    return () => listener?.subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.replace('/login');
     setDropdownOpen(false);
+    await logout();
   };
 
   const handleDropdownOpen = () => setDropdownOpen(true);
   const handleDropdownClose = () => setDropdownOpen(false);
+  const handleDropdownToggle = () => setDropdownOpen((prev) => !prev);
+
+  const handleMenuKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') handleDropdownClose();
+  };
 
   return (
     <header>
@@ -80,7 +81,7 @@ export default function Header({
             alt="logo"
             width={40}
             height={40}
-            style={{ objectFit: 'contain' }}
+            className="object-contain"
           />
         </Link>
         {searchProps && mediaType && setMediaType && (
@@ -109,19 +110,30 @@ export default function Header({
             className="relative pb-2"
             onMouseEnter={handleDropdownOpen}
             onMouseLeave={handleDropdownClose}
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget)) {
+                handleDropdownClose();
+              }
+            }}
           >
             <button
               className="flex items-center gap-1 bg-transparent border-none cursor-pointer p-0"
               aria-label="User menu"
+              aria-haspopup="menu"
+              aria-expanded={dropdownOpen}
+              aria-controls="user-dropdown-menu"
               type="button"
-              tabIndex={-1}
+              onClick={handleDropdownToggle}
+              onKeyDown={handleMenuKeyDown}
             >
               <AvatarIcon className="w-8 h-8 text-primary" />
             </button>
             {dropdownOpen && (
               <ul
+                id="user-dropdown-menu"
                 className="absolute right-0 z-50 mt-2 w-38 rounded-2xl bg-dark border border-neutral-300/20 overflow-hidden shadow-xl"
                 role="menu"
+                aria-label="User menu"
               >
                 {dropdownOptions.map((option) => (
                   <li
@@ -137,6 +149,15 @@ export default function Header({
                       router.push(option.href);
                       handleDropdownClose();
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        router.push(option.href);
+                        handleDropdownClose();
+                      } else if (e.key === 'Escape') {
+                        handleDropdownClose();
+                      }
+                    }}
                   >
                     {option.label}
                   </li>
@@ -145,9 +166,14 @@ export default function Header({
                   role="menuitem"
                   tabIndex={0}
                   className="px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-neutral-300/10 select-none"
-                  onClick={async () => {
-                    await handleLogout();
-                    handleDropdownClose();
+                  onClick={handleLogout}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      void handleLogout();
+                    } else if (e.key === 'Escape') {
+                      handleDropdownClose();
+                    }
                   }}
                 >
                   Logout

@@ -58,7 +58,7 @@ export default function DatePicker({
         id={id}
         name={id}
         readOnly
-        value={selected ? selected.toLocaleDateString() : ''}
+        value={selected ? selected.toLocaleDateString('en-US') : ''}
         placeholder="Select a date"
         className={`date-picker rounded-3xl bg-neutral-300/20 pl-6 pr-4 w-full h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 cursor-pointer ${className ?? ''}`}
         onClick={toggleDayPicker}

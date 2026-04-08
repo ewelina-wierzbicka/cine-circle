@@ -10,6 +10,7 @@ import { useState } from 'react';
 import Button from './Button';
 import MediaCardOverlay from './MediaCardOverlay';
 import StarRating from './StarRating';
+import { toast } from 'react-toastify';
 
 type Props = {
   media: (SavedMedia | NormalizedMedia) & { href: string };
@@ -41,13 +42,20 @@ export default function MediaCard({
       await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
       router.refresh();
-    } catch {
+    } catch (err) {
+      toast.error(
+        (err as Error).message || 'Failed to delete. Please try again.',
+      );
       setIsDeleting(false);
     }
   };
 
   const handleMoveToWatched = () => {
     router.push(`${href}?step=2`);
+  };
+
+  const handleSeeDetails = () => {
+    router.push(href);
   };
 
   return (
@@ -64,7 +72,7 @@ export default function MediaCard({
       <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
         <Link href={href} className="absolute inset-0">
           <Image
-            style={{ objectFit: 'cover', objectPosition: 'top center' }}
+            className="object-cover object-top-center"
             fill={true}
             src={
               poster_path
@@ -100,7 +108,7 @@ export default function MediaCard({
             {watchStatus === 'watched' && (
               <MediaCardOverlay>
                 <Button
-                  handleClick={() => router.push(href)}
+                  handleClick={handleSeeDetails}
                   size="small"
                   variant="outlined"
                   className="text-xs md:text-sm"

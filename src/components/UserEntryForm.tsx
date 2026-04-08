@@ -73,7 +73,7 @@ export default function UserEntryForm({
         toast.success(`"${title}" was updated!`);
         onUpdateSuccess?.();
       } else {
-        await addUserMedia(
+        const result = await addUserMedia(
           {
             id,
             title,
@@ -90,9 +90,13 @@ export default function UserEntryForm({
             review,
           },
         );
-        await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-        toast.success(`"${title}" was saved to your "watched" list!`);
-        router.push('/my-media?tab=watched');
+        if (result.status === 'duplicate') {
+          toast.info(`"${title}" is already in your list.`);
+        } else {
+          toast.success(`"${title}" was saved to your "watched" list!`);
+          await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
+          router.push('/my-media?tab=watched');
+        }
       }
     } catch (err) {
       toast.error(

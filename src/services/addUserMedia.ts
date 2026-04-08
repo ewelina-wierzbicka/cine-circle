@@ -58,17 +58,21 @@ export const addUserMedia = async (
 
   if (checkError) throw checkError;
 
-  if (!existingEntry) {
-    const { error: entryError } = await supabase.from('user_media').insert({
-      user_id: user.id,
-      media_id: media.id,
-      watchStatus,
-      watched_date,
-      rating,
-      review,
-    });
-    if (entryError) throw entryError;
+  if (existingEntry) {
+    return { status: 'duplicate' as const };
   }
+
+  const { error: entryError } = await supabase.from('user_media').insert({
+    user_id: user.id,
+    media_id: media.id,
+    watchStatus,
+    watched_date,
+    rating,
+    review,
+  });
+  if (entryError) throw entryError;
+
+  return { status: 'inserted' as const };
 };
 
 export const updateUserMedia = async (

@@ -47,7 +47,7 @@ export default function MediaInfo({
   const addToToWatch = async () => {
     setIsSaving(true);
     try {
-      await addUserMedia(
+      const result = await addUserMedia(
         {
           id,
           title,
@@ -60,8 +60,12 @@ export default function MediaInfo({
         { watchStatus: 'to_watch' },
       );
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-      toast.success(`"${title}" was saved to your "to watch" list!`);
-      router.push('/my-media?tab=to_watch');
+      if (result.status === 'duplicate') {
+        toast.info(`"${title}" is already in your list.`);
+      } else {
+        toast.success(`"${title}" was saved to your "to watch" list!`);
+        router.push('/my-media?tab=to_watch');
+      }
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to save. Please try again.',

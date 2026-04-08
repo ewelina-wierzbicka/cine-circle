@@ -17,10 +17,7 @@ export default function MediaPoster({
     >
       <div className="bg-linear-to-b from-transparent via-dark/30 via-30% to-dark to-80% absolute bottom-0 left-0 w-full h-3/4 z-10 pointer-events-none" />
       <Image
-        style={{
-          objectFit: 'cover',
-          objectPosition: 'top center',
-        }}
+        className="object-cover object-top-center"
         fill={true}
         src={
           posterPath

@@ -1,3 +1,5 @@
+'use client';
+
 import { twMerge } from '@/lib/cn';
 
 type Props = {

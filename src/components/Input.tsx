@@ -1,3 +1,5 @@
+'use client';
+
 import SearchIcon from '@/icons/MagnifyingGlass';
 import { forwardRef } from 'react';
 

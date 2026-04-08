@@ -10,7 +10,8 @@ type Props = {
 };
 
 export default async function MediaPage({ slug, mediaType, step }: Props) {
-  if (!Number(slug.split('-')[0])) notFound();
+  const id = slug.split('-')[0];
+  if (!id || !/^\d+$/.test(id)) notFound();
 
   const { data, error, initialStep } = await getMediaPageData(
     slug,

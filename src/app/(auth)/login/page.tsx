@@ -39,6 +39,7 @@ export default function Page() {
             id="email"
             type="email"
             {...register('email', {
+              required: 'Please enter your email address',
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 message: 'Please enter a valid email address',
