@@ -32,8 +32,8 @@ const dropdownOptions = [
     match: (pathname: string) => pathname === '/my-media',
   },
   {
-    label: 'Settings',
-    href: '/settings',
+    label: 'Profile',
+    href: '/profile',
     match: (pathname: string) => pathname === '/settings',
   },
 ];

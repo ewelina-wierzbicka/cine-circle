@@ -56,3 +56,10 @@ export type UserMediaPage = {
   media: UserMedia[];
   nextPage: number | null;
 };
+
+export type UserProfile = {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+};
