@@ -47,29 +47,27 @@ src/
     (auth)/                   # public routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
       layout.tsx
-    (private)/                # all protected routes
-      (with-header-search)/   # pages with search input in header
-        search/               # /search
-          page.tsx
-          SearchResults.tsx
-        layout.tsx
-      (without-header-search)/# pages without search input in header
-        movie/[id]/           # /movie/:id
-          page.tsx
-        my-media/             # /my-media
-          page.tsx
-          MyMedia.tsx
-          UserMediaList.tsx
-        series/[id]/          # /series/:id
-          page.tsx
-        layout.tsx
-      api/                    # Route Handlers
+    (private)/                # all protected routes (single layout, no sub-groups)
+      page.tsx                # / (home page)
+      search/                 # /search
+        page.tsx
+        SearchResults.tsx
+      movie/[id]/             # /movie/:id
+        page.tsx
+      my-media/               # /my-media
+        page.tsx
+        MyMedia.tsx
+        UserMediaList.tsx
+      series/[id]/            # /series/:id
+        page.tsx
+      layout.tsx
+    api/                      # Route Handlers
     layout.tsx                # root layout
   globals.css
-  providers.tsx             # app-wide React context providers
-  proxy.ts                  # Next.js 16 middleware (formerly middleware.ts)
-  types.ts                  # app-wide TypeScript types
-  components/                 # shared components
+  providers.tsx               # app-wide React context providers
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts)
+  types.ts                    # app-wide TypeScript types
+  components/                 # shared components (SearchBox, Header, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -85,25 +83,39 @@ src/
 
 ## Styling
 
-Tailwind CSS v4 with custom design tokens defined in `globals.css`.
+Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always use these — never hardcode hex values.
+
+**Fonts:**
+
+- `font-sans` — DM Sans (primary body font, weights 300/400/500/600)
+- `font-serif` — DM Serif Display (headings, display text)
+- `font-mono` — DM Mono (labels, nav items, monospaced text)
 
 **Design tokens:**
 
-- `text-primary` / `bg-primary` / `color-primary` — main text/background color (gray-100)
-- `text-secondary` / `bg-secondary` / `color-secondary` — muted text/background (gray-400)
-- `bg-dark` / `color-dark` — dark background (`#1e2122`)
-- `text-accent` / `color-accent` — accent/highlight color (blue-300)
-- `--background-gradient` — page background gradient (CSS variable, applied on `body`)
-- `--height-full-screen` — full viewport height minus header and bottom margin (`calc(100vh - 176px)`)
-- `--max-width-content` — max content width (`1440px`)
-- `font-sans` — Lato font
+| Token                         | Value                    | Use                                     |
+| ----------------------------- | ------------------------ | --------------------------------------- |
+| `text-primary` / `bg-primary` | `#ece9e3`                | Warm near-white — primary text          |
+| `text-secondary`              | `rgba(236,233,227,0.75)` | Muted / supporting text                 |
+| `text-dim`                    | `rgba(236,233,227,0.50)` | Tertiary / label text                   |
+| `bg-dark` / `text-dark`       | `#0d0d10`                | Page background / text on mint          |
+| `bg-bg2`                      | `#18181f`                | Card / input background                 |
+| `bg-bg3`                      | `#21212a`                | Elevated elements (hover states, chips) |
+| `text-mint` / `bg-mint`       | `oklch(82% 0.10 165)`    | Pastel mint — primary accent            |
+
+> Star ratings use Tailwind's built-in `text-amber-400` — not a custom token.
+
+**Animation utilities (defined in `globals.css`):**
+
+- `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring
+- `animate-fade-in` — opacity 0→1, 400ms ease
 
 **Rules:**
 
 - Mobile-first — use base styles for mobile, `sm:` / `md:` / `lg:` for larger screens
 - Always use design tokens for colors used in more then one place and tailwind classes for other colors — never hardcode hex values like `#1e2122`
 - Before adding a new color, check if an existing token fits
-- Use `max-w-content` for page-level content wrappers
+- For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
 
 ---
@@ -112,9 +124,22 @@ Tailwind CSS v4 with custom design tokens defined in `globals.css`.
 
 - Use the **server client** (`lib/supabase/server.ts`) in Server Components and Route Handlers
 - Use the **browser client** (`lib/supabase/client.ts`) in Client Components only
+- Use the **admin client** (`lib/supabase/admin.ts`) only for privileged server-side operations (e.g. `deleteUser`) — it bypasses RLS
 - Never expose the service role key — it must only be used server-side
 - Row Level Security (RLS) is enabled — always test that policies enforce access correctly
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
+
+### Schema
+
+| Table      | Key columns                                                   | Notes                                   |
+| ---------- | ------------------------------------------------------------- | --------------------------------------- |
+| `profiles` | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call |
+
+### Storage
+
+| Bucket    | Public | Path pattern           | Notes                                    |
+| --------- | ------ | ---------------------- | ---------------------------------------- |
+| `avatars` | ✅     | `{user_id}/{filename}` | Users can only write to their own folder |
 
 ---
 
@@ -200,6 +225,30 @@ Project-specific skills are in `.agents/skills/`. Consult them before working on
 - `typescript-advanced-types` — generics, conditional types, mapped types, template literals, utility types
 - `vercel-composition-patterns` — React composition patterns, compound components, render props, context providers
 - `vercel-react-best-practices` — Vercel-specific deployment and React patterns
+
+---
+
+## Approach
+
+- Read existing files before writing. Don't re-read unless changed.
+- Thorough in reasoning, concise in output.
+- Skip files over 100KB unless required.
+- Do not guess APIs, versions, flags, commit SHAs, or package names. Verify by reading code or docs before asserting.
+
+---
+
+## Communication Style
+
+- Short sentences only (8-10 words max)
+- No filler, no preamble, no pleasantries
+- Never use em-dashes or replacement hyphens
+- Avoid parenthetical clauses entirely
+- Hyphens map to standard grammar only
+- Code stays normal. English gets compressed
+- Tool first. Result first. No explain unless asked
+- Do NOT explain what you are about to do before doing it
+- Skip summaries between steps
+- Only report when a task is fully complete or when you need input
 
 ---
 

@@ -78,11 +78,17 @@ export default function SearchResults({ query, type, initialData }: Props) {
       <MediaList
         media={allMedia.map(toSearchMediaListProps)}
         heading={
-          <>
-            Search results for:{' '}
-            <span className="font-bold">&quot;{query}&quot;</span> (
-            {TYPE_LABELS[type]})
-          </>
+          <div>
+            <p className="font-mono text-[9px] tracking-[0.2em] text-mint uppercase mb-2">
+              Search Results
+            </p>
+            <p className="font-serif text-[clamp(24px,3.5vw,38px)] tracking-[-0.02em] leading-none">
+              &ldquo;{query}&rdquo;{' '}
+              <span className="text-secondary text-[0.6em] font-sans">
+                {TYPE_LABELS[type]}
+              </span>
+            </p>
+          </div>
         }
         emptyMessage={`No ${TYPE_LABELS[type]} found for: "${query}"`}
         hasNextPage={hasNextPage}

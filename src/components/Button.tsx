@@ -3,25 +3,25 @@
 import { twMerge } from '@/lib/cn';
 
 type Props = {
-  text: string;
   handleClick?: () => void;
   type?: 'submit' | 'button';
-  color?: 'primary' | 'secondary';
+  color?: 'primary' | 'secondary' | 'mint';
   variant?: 'filled' | 'outlined';
   size?: 'small' | 'medium';
   className?: string;
   disabled?: boolean;
+  children?: React.ReactNode;
 };
 
 export default function Button({
-  text,
   handleClick,
   type = 'button',
-  color = 'primary',
+  color = 'mint',
   variant = 'filled',
   size = 'medium',
   className,
   disabled,
+  children,
 }: Props) {
   return (
     <button
@@ -29,19 +29,22 @@ export default function Button({
       onClick={handleClick}
       disabled={disabled}
       className={twMerge(
-        'w-full rounded-3xl font-bold uppercase cursor-pointer',
-        size === 'medium' ? 'h-15' : 'h-12',
+        'w-full rounded-xl font-semibold uppercase tracking-[0.08em] cursor-pointer transition-opacity',
+        size === 'medium' ? 'h-12 text-base' : 'h-10 text-[10px]',
         variant === 'outlined'
-          ? 'text-primary border border-primary hover:bg-primary/10'
+          ? 'text-primary border border-white/50 hover:bg-white/5'
           : twMerge(
-              'text-dark',
-              color === 'secondary' ? 'bg-secondary' : 'bg-primary',
+              color === 'mint'
+                ? 'bg-mint text-dark hover:opacity-[0.82]'
+                : color === 'secondary'
+                  ? 'bg-secondary text-dark'
+                  : 'bg-primary text-dark',
             ),
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
     >
-      {text}
+      {children}
     </button>
   );
 }

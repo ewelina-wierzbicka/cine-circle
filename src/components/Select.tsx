@@ -72,12 +72,12 @@ export default function Select<T extends string = string>({
         onKeyDown={handleKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center justify-between gap-2 rounded-3xl bg-neutral-300/20 px-4 h-10 w-full cursor-pointer outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40"
+        className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-white/[0.07] px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-mint transition-colors"
       >
-        <span className="text-sm">{selectedLabel}</span>
+        <span className="text-xs text-primary">{selectedLabel}</span>
         <ChevronIcon
           className={twMerge(
-            'w-4 h-4 text-gray-400 transition-transform duration-200 shrink-0',
+            'w-3.5 h-3.5 text-dim transition-transform duration-200 shrink-0',
             open && 'rotate-180',
           )}
         />
@@ -86,7 +86,7 @@ export default function Select<T extends string = string>({
       {open && (
         <ul
           role="listbox"
-          className="absolute z-50 mt-2 w-full min-w-max rounded-2xl bg-dark border border-neutral-300/20 overflow-hidden shadow-xl"
+          className="absolute z-50 mt-1.5 w-full min-w-max rounded-xl bg-bg2 border border-white/[0.07] overflow-hidden shadow-xl"
         >
           {options.map((option) => (
             <li
@@ -95,8 +95,8 @@ export default function Select<T extends string = string>({
               aria-selected={option.value === value}
               onClick={() => handleChange(option.value)}
               className={twMerge(
-                'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-neutral-300/10 select-none',
-                option.value === value && 'font-semibold bg-neutral-300/5',
+                'px-3.5 py-2 text-xs cursor-pointer transition-colors hover:bg-bg3 select-none text-secondary',
+                option.value === value && 'text-primary bg-white/3',
               )}
             >
               {option.label}

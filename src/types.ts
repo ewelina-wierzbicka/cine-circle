@@ -63,3 +63,10 @@ export type UserProfile = {
   display_name: string | null;
   avatar_url: string | null;
 };
+
+export type TrendingMovie = {
+  title: string;
+  year: string;
+  genre: string;
+  posterUrl?: string;
+};

@@ -56,11 +56,12 @@ Always read AGENTS.md before starting any task. It contains the project structur
 - Tailwind CSS v4 — use utility classes only, no inline styles
 - **Mobile-first** — write base styles for mobile, use `sm:` / `md:` / `lg:` for larger screens
 - Always use design tokens for colors — never hardcode hex values:
-  - `text-primary` — main text
-  - `text-secondary` — muted text
-  - `bg-dark` — dark background
-  - `text-accent` — highlights and interactive elements
-- Use `max-w-content` for page-level content wrappers
+  - `text-primary` — main text (`#ece9e3`)
+  - `text-secondary` / `text-dim` — muted / tertiary text
+  - `bg-dark` — page background (`#0d0d10`)
+  - `bg-bg2` / `bg-bg3` — card and elevated surfaces
+  - `text-mint` / `bg-mint` — mint accent for highlights and interactive elements
+  - `text-dark` — text on mint backgrounds
 - Before building new UI, check `components/` for existing patterns to stay consistent
 
 - Feature works as described

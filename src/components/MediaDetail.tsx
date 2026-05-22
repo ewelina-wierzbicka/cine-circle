@@ -3,7 +3,6 @@
 import UserEntryForm from '@/components/UserEntryForm';
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
 import { useDetailStep } from '@/hooks/useDetailStep';
-import { useIsTablet } from '@/hooks/useIsTablet';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useRouter } from 'next/navigation';
 import MediaInfo from './MediaInfo';
@@ -16,7 +15,6 @@ type Props = {
 
 export default function MediaDetail({ media, initialStep = 1 }: Props) {
   const { step, goToForm, goToInfo } = useDetailStep(initialStep);
-  const isTablet = useIsTablet();
   const router = useRouter();
   const isSaved = 'watchStatus' in media;
   const saved = isSaved ? (media as SavedMedia) : null;
@@ -48,7 +46,6 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
           review: saved!.review,
         }}
         onEdit={goToForm}
-        isTablet={isTablet}
       />
     ) : (
       <MediaInfo
@@ -56,7 +53,6 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
         userMediaId={userMediaId}
         isToWatch={watchStatus === 'to_watch'}
         addToWatched={goToForm}
-        isTablet={isTablet}
       />
     );
 
@@ -83,8 +79,6 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
       posterPath={media.poster_path}
       posterTitle={media.title}
       step={step}
-      isTablet={isTablet}
-      className="h-full-screen"
       infoSlot={infoSlot}
       formSlot={formSlot}
     />

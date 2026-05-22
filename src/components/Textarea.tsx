@@ -1,5 +1,6 @@
 'use client';
 
+import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
 
 type Props = {
@@ -15,7 +16,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
       <>
         <textarea
           id={id}
-          className={`rounded-3xl bg-neutral-300/20 p-5 w-full h-48 outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 ${className ?? ''}`}
+          className={twMerge(
+            'h-11.5 rounded-xl bg-bg2 border border-white/[0.07] pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-dim focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+            className,
+          )}
           onChange={handleChange}
           ref={ref}
           {...rest}

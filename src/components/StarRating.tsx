@@ -1,33 +1,45 @@
 import StarIcon from '@/icons/Star';
+import { twMerge } from '@/lib/cn';
 
 type Props = {
   rating: number;
   className?: string;
 };
 
-const clamp = (value: number, min: number, max: number) => {
-  return Math.min(Math.max(value, min), max);
-};
-
 export default function StarRating({ rating, className }: Props) {
-  const fiveScale = rating / 2;
+  const raw = rating / 2;
+  const fullStars = Math.floor(raw);
+  const hasHalf = raw % 1 !== 0;
 
   return (
     <div
-      className={`flex items-center gap-0.5 ${className ?? ''}`}
-      aria-label={`Rating: ${fiveScale} out of 5`}
+      className={twMerge('flex items-center gap-0.5', className)}
+      aria-label={`Rating: ${raw} out of 5`}
     >
       {Array.from({ length: 5 }).map((_, i) => {
-        const fill = clamp(fiveScale - i, 0, 1);
-        const width = `${fill * 100}%`;
+        const isFull = i < fullStars;
+        const isHalf = i === fullStars && hasHalf;
+
+        if (isHalf) {
+          return (
+            <div key={i} className="relative size-3">
+              <StarIcon className="absolute size-3 text-white/15" />
+              <div className="absolute w-[50%] overflow-hidden">
+                <StarIcon className="size-3 text-amber-400" filled />
+              </div>
+            </div>
+          );
+        }
 
         return (
-          <div key={`star-${i}`} className="relative h-4 w-4">
-            <StarIcon filled className="h-4 w-4 text-zinc-200" />
-            <div className="absolute inset-0 overflow-hidden" style={{ width }}>
-              <StarIcon filled className="h-4 w-4 text-yellow-500" />
-            </div>
-          </div>
+          <StarIcon
+            key={i}
+            filled={isFull}
+            className={twMerge(
+              'size-3',
+              isFull ? 'text-amber-400' : 'text-white/15',
+            )}
+          />
         );
       })}
     </div>

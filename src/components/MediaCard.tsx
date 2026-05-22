@@ -7,10 +7,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import Button from './Button';
 import MediaCardOverlay from './MediaCardOverlay';
 import StarRating from './StarRating';
-import { toast } from 'react-toastify';
 
 type Props = {
   media: (SavedMedia | NormalizedMedia) & { href: string };
@@ -59,72 +59,88 @@ export default function MediaCard({
   };
 
   return (
-    <div className="w-full flex flex-col justify-end">
-      <Link href={href}>
-        <p className="text-sm md:text-base uppercase font-semibold w-full">
-          {title}
-        </p>
-        <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
-        {watchStatus === 'watched' && rating != null && (
-          <StarRating rating={rating} />
-        )}
-      </Link>
-      <div className="w-full aspect-3/4 relative mt-2 group overflow-hidden">
-        <Link href={href} className="absolute inset-0">
-          <Image
-            className="object-cover object-top-center"
-            fill={true}
-            src={
-              poster_path
-                ? `https://image.tmdb.org/t/p/w342${poster_path}`
-                : '/no-image.jpg'
-            }
-            sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1280px) 25vw, 16vw"
-            alt={title}
-            priority={priority}
-          />
+    <div className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)]">
+      <div
+        className="relative rounded-xl overflow-hidden border border-white/[0.07] group-hover:border-mint transition-colors duration-200 aspect-2/3"
+        style={{
+          ...(!poster_path && {
+            background: `linear-gradient(160deg, #1A3A5CED 0%,  #1a3a5c66 45%, #0d0d10 100%)`,
+          }),
+        }}
+      >
+        <Link href={href} className="absolute inset-0" tabIndex={-1}>
+          {poster_path && (
+            <Image
+              className="object-cover object-top"
+              fill={true}
+              src={
+                poster_path
+                  ? `https://image.tmdb.org/t/p/w342${poster_path}`
+                  : '/no-image.jpg'
+              }
+              sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1280px) 25vw, 16vw"
+              alt={title}
+              priority={priority}
+            />
+          )}
         </Link>
-        {userMediaId && (
-          <>
-            {watchStatus === 'to_watch' && (
-              <MediaCardOverlay>
-                <Button
-                  handleClick={handleMoveToWatched}
-                  size="small"
-                  variant="outlined"
-                  className="text-xs md:text-sm"
-                  text="Move to watched"
-                />
-                <Button
-                  handleClick={handleDelete}
-                  disabled={isDeleting}
-                  size="small"
-                  variant="outlined"
-                  className="text-xs md:text-sm"
-                  text={isDeleting ? 'Deleting...' : 'Delete'}
-                />
-              </MediaCardOverlay>
-            )}
-            {watchStatus === 'watched' && (
-              <MediaCardOverlay>
-                <Button
-                  handleClick={handleSeeDetails}
-                  size="small"
-                  variant="outlined"
-                  className="text-xs md:text-sm"
-                  text="See details"
-                />
-                <Button
-                  handleClick={handleDelete}
-                  disabled={isDeleting}
-                  size="small"
-                  variant="outlined"
-                  className="text-xs md:text-sm"
-                  text={isDeleting ? 'Deleting...' : 'Delete'}
-                />
-              </MediaCardOverlay>
-            )}
-          </>
+        {!userMediaId && (
+          <div className="absolute inset-0 flex items-end p-3 z-10 bg-linear-to-t from-dark/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <span className="font-mono text-[9px] text-mint tracking-[0.12em]">
+              VIEW →
+            </span>
+          </div>
+        )}
+        {userMediaId && watchStatus === 'to_watch' && (
+          <MediaCardOverlay>
+            <Button
+              handleClick={handleMoveToWatched}
+              size="small"
+              variant="outlined"
+            >
+              Move to watched
+            </Button>
+            <Button
+              handleClick={handleDelete}
+              disabled={isDeleting}
+              size="small"
+              variant="outlined"
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </Button>
+          </MediaCardOverlay>
+        )}
+        {userMediaId && watchStatus === 'watched' && (
+          <MediaCardOverlay>
+            <Button
+              handleClick={handleSeeDetails}
+              size="small"
+              variant="outlined"
+            >
+              See details
+            </Button>
+            <Button
+              handleClick={handleDelete}
+              disabled={isDeleting}
+              size="small"
+              variant="outlined"
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </Button>
+          </MediaCardOverlay>
+        )}
+      </div>
+      <div className="px-0.5">
+        <Link href={href}>
+          <p className="text-[11px] font-medium text-primary leading-snug line-clamp-2">
+            {title}
+          </p>
+          <p className="text-[10px] text-dim mt-0.5">{dateDisplay}</p>
+        </Link>
+        {watchStatus === 'watched' && rating != null && (
+          <div className="mt-1.5">
+            <StarRating rating={rating} />
+          </div>
         )}
       </div>
     </div>

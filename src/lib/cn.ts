@@ -1,9 +1,1 @@
-import { extendTailwindMerge } from 'tailwind-merge';
-
-export const twMerge = extendTailwindMerge({
-  extend: {
-    classGroups: {
-      'min-h': ['min-h-full-screen'],
-    },
-  },
-});
+export { twMerge } from 'tailwind-merge';

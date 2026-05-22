@@ -58,7 +58,7 @@ You review code only — you do not implement features or make changes. Your job
 
 - New shared components in `components/` — not colocated if used across route groups
 - Data fetching logic in `services/` — not inlined in components
-- New routes placed in correct group (`(with-header-search)` or `(without-header-search)`)
+- New routes placed inside `(private)/` — all protected routes live directly under this group
 
 ### Performance
 
@@ -97,7 +97,7 @@ You review code only — you do not implement features or make changes. Your job
 
 Structure your review as:
 
-**Summary** — one paragraph overview of the change and your overall assessment.
+**Summary** — one sentence overview of the change and your overall assessment.
 
 **Must fix** — issues that should block merging (bugs, security issues, broken conventions).
 

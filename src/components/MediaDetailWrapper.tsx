@@ -1,4 +1,3 @@
-import BorderContainer from '@/components/BorderContainer';
 import MediaPoster from '@/components/MediaPoster';
 import { ReactNode } from 'react';
 
@@ -6,29 +5,33 @@ type Props = {
   posterPath?: string;
   posterTitle: string;
   step: number;
-  isTablet: boolean;
   infoSlot: ReactNode;
   formSlot: ReactNode;
-  className?: string;
 };
 
 export default function MediaDetailWrapper({
   posterPath,
   posterTitle,
   step,
-  isTablet,
   infoSlot,
   formSlot,
-  className,
 }: Props) {
   return (
-    <BorderContainer
-      className={`flex gap-8 flex-col ${step === 1 ? 'md:flex-row' : 'lg:flex-row'} ${className ?? ''}`}
-    >
-      {(step === 1 || !isTablet) && (
-        <MediaPoster posterPath={posterPath} title={posterTitle} />
-      )}
-      {step === 1 ? infoSlot : formSlot}
-    </BorderContainer>
+    <div className="relative flex flex-col overflow-hidden bg-dark min-h-full">
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(at_25%_35%,rgb(26,42,74)_0%,rgba(26,42,74,0.333)_35%,rgb(13,13,16)_68%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_65%,rgba(168,230,207,0.04)_0%,transparent_55%)]" />
+        <div className="absolute inset-0 z-1 bg-[linear-gradient(to_bottom,rgba(13,13,16,0.55)_0%,rgba(13,13,16,0.05)_40%,rgba(13,13,16,0.65)_100%)]" />
+        <div className="absolute inset-0 z-1 bg-[linear-gradient(to_right,rgba(13,13,16,0)_35%,rgba(13,13,16,0.72)_100%)]" />
+      </div>
+      <div className="relative z-2 flex flex-1">
+        <div className="hidden md:flex w-1/2 shrink-0 items-center justify-center py-8 px-6 md:px-12 pr-4">
+          <MediaPoster posterPath={posterPath} title={posterTitle} />
+        </div>
+        <div className="flex-1 flex flex-col justify-center py-8 px-6 md:px-12 md:pl-10 overflow-y-auto">
+          {step === 1 ? infoSlot : formSlot}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ You handle everything database-related:
 - Postgres queries, indexes, and performance
 - Supabase client usage in the codebase (`lib/supabase/`)
 - Service functions that query Supabase (`services/`)
-- TypeScript type updates in `src/app/types.ts` caused by schema changes
+- TypeScript type updates in `src/types.ts` caused by schema changes
 
 You write correct, secure, and performant SQL and TypeScript service functions. You do not implement frontend features unless directly caused by a schema change (e.g., updating a TypeScript type in `types.ts`).
 
@@ -76,7 +76,7 @@ Before finishing any schema change task:
 - [ ] SQL is idempotent where possible
 - [ ] RLS policies included in the same migration (or a dedicated follow-up migration)
 - [ ] Indexes added for all foreign keys and frequent query columns
-- [ ] `src/app/types.ts` updated to reflect the new schema
+- [ ] `src/types.ts` updated to reflect the new schema
 - [ ] Affected service functions in `services/` updated
 - [ ] `npm run type-check` passes
 
@@ -127,6 +127,7 @@ CREATE POLICY "Users can insert own rows"
 
 - **Server Components and Route Handlers** → use `lib/supabase/server.ts`
 - **Client Components** → use `lib/supabase/client.ts`
+- **Privileged server-side operations** (e.g. `auth.admin.deleteUser`) → use `lib/supabase/admin.ts` (bypasses RLS — never import in client code)
 - Never use the service role key in Client Components or expose it to the browser
 - Always handle Supabase errors explicitly — check `data` and `error` from every call
 - Use `.select()` with explicit column lists — never `select('*')` in production paths
@@ -156,7 +157,7 @@ All Supabase data fetching and mutation logic lives in `services/`. When adding 
 - Always destructure and check `{ data, error }` — throw or return a typed error, never swallow it
 - Use the server client (`lib/supabase/server.ts`) — service functions run server-side
 - Use explicit `.select()` column lists — avoid `select('*')`
-- Co-locate the TypeScript types needed by a service function in `src/app/types.ts` (or import from there)
+- Co-locate the TypeScript types needed by a service function in `src/types.ts` (or import from there)
 
 ---
 
@@ -164,7 +165,7 @@ All Supabase data fetching and mutation logic lives in `services/`. When adding 
 
 When a schema change affects TypeScript types:
 
-- Update `src/app/types.ts` to reflect the new shape
+- Update `src/types.ts` to reflect the new shape
 - Update any affected service functions in `services/`
 - Keep types derived from the Supabase schema — do not duplicate type definitions
 - Run `npm run type-check` after changes to catch regressions

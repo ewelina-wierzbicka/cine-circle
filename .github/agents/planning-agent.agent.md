@@ -23,7 +23,7 @@ Always read AGENTS.md before producing any plan.
 
 - **feature-agent** — new routes, API handlers, server actions, and business logic not tied to a UI component. Creates a PR on completion.
 - **ui-agent** — new components, page layouts, Tailwind styling, design system usage. Wires components up to existing service functions but does not write service functions or touch Supabase.
-- **supabase-agent** — schema design, migrations, RLS policies, indexes, Supabase client usage in `lib/supabase/`, service functions in `services/`, and TypeScript type updates in `src/app/types.ts` caused by schema changes.
+- **supabase-agent** — schema design, migrations, RLS policies, indexes, Supabase client usage in `lib/supabase/`, service functions in `services/`, and TypeScript type updates in `src/types.ts` caused by schema changes.
 - **review-agent** — code review, PR feedback, convention audits, lint/type error triage. Read-only — does not implement.
 
 ## How to assign tasks
@@ -45,7 +45,7 @@ Not every feature needs all four agents. A pure UI change may only need ui-agent
 | ----------------------------------------------- | ------------------------------------------- |
 | Schema, migrations, RLS, indexes                | supabase-agent                              |
 | Service functions (`services/`)                 | supabase-agent                              |
-| `src/app/types.ts` schema-driven types          | supabase-agent                              |
+| `src/types.ts` schema-driven types              | supabase-agent                              |
 | Routes, API handlers, server actions            | feature-agent                               |
 | Business logic not tied to a UI component       | feature-agent                               |
 | React components, layouts, Tailwind styling     | ui-agent                                    |

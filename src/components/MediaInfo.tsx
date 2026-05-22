@@ -1,10 +1,11 @@
 'use client';
 
-import Button from '@/components/Button';
 import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
+import Button from '@/components/Button';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -14,7 +15,6 @@ type Props = {
   userMediaId?: number;
   isToWatch?: boolean;
   addToWatched: () => void;
-  isTablet: boolean;
 };
 
 export default function MediaInfo({
@@ -22,7 +22,6 @@ export default function MediaInfo({
   userMediaId,
   isToWatch,
   addToWatched,
-  isTablet,
 }: Props) {
   const {
     id,
@@ -38,7 +37,8 @@ export default function MediaInfo({
   const dateDisplay = lastAirYear
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
-  const creatorLabel = media_type === 'series' ? 'created by:' : 'dir.:';
+  const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
+  const typeLabel = media_type === 'series' ? 'SERIES' : 'FILM';
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
@@ -63,7 +63,7 @@ export default function MediaInfo({
       if (result.status === 'duplicate') {
         toast.info(`"${title}" is already in your list.`);
       } else {
-        toast.success(`"${title}" was saved to your "to watch" list!`);
+        toast.success(`"${title}" saved to your "to watch" list!`);
         router.push('/my-media?tab=to_watch');
       }
     } catch (err) {
@@ -91,48 +91,68 @@ export default function MediaInfo({
   };
 
   return (
-    <div className="flex flex-col w-full h-1/2 md:h-full -mt-30 md:mt-0 z-50">
-      <p
-        className={`${title.length > 35 ? 'text-4xl' : 'text-5xl'} sm:text-5xl font-bold uppercase`}
+    <div className="flex flex-col w-full animate-fade-up">
+      <Link
+        href="/my-media"
+        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-dim hover:text-mint transition-colors duration-150 mb-9 self-start"
+      >
+        ← BACK TO COLLECTION
+      </Link>
+      <p className="font-mono text-[10px] tracking-[0.22em] text-mint uppercase mb-3.5">
+        {typeLabel}
+      </p>
+
+      <h1
+        className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
+        style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
       >
         {title}
-      </p>
-      <p className="text-sm text-secondary mt-8 pt-2 border-t border-primary min-w-40 lg:min-w-40 w-max max-w-full">
-        {creatorLabel} {director}
-      </p>
-      <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
-      <div className="w-full sm:w-3/4 flex justify-center flex-col h-full mx-auto align-self-end">
+      </h1>
+      <div className="flex items-center gap-5 mb-7">
+        {director && (
+          <>
+            <span className="text-[13px] text-secondary">
+              <span className="font-mono text-[10px] tracking-[0.08em] text-dim mr-2">
+                {dirLabel}
+              </span>
+              {director}
+            </span>
+            <div className="w-0.75 h-0.75 rounded-full bg-dim shrink-0" />
+          </>
+        )}
+        <span className="font-mono text-[13px] tracking-[0.04em] text-secondary">
+          {dateDisplay}
+        </span>
+      </div>
+      <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
+      <div className="flex gap-2.5 max-w-110">
         {isToWatch ? (
           <>
+            <Button color="mint" handleClick={addToWatched} className="flex-1">
+              MOVE TO WATCHED
+            </Button>
             <Button
-              text="MOVE TO WATCHED"
-              size={isTablet ? 'small' : 'medium'}
-              className="mb-4 lg:mb-10"
-              handleClick={addToWatched}
-            />
-            <Button
-              text={isDeleting ? 'DELETING...' : 'DELETE'}
-              color="secondary"
-              disabled={isDeleting}
-              size={isTablet ? 'small' : 'medium'}
+              variant="outlined"
               handleClick={handleDelete}
-            />
+              disabled={isDeleting}
+              className="flex-1"
+            >
+              {isDeleting ? 'DELETING…' : 'DELETE'}
+            </Button>
           </>
         ) : (
           <>
             <Button
-              text={isSaving ? 'SAVING...' : 'I WANT TO WATCH'}
-              disabled={isSaving}
-              size={isTablet ? 'small' : 'medium'}
-              className="mb-4 lg:mb-10"
+              variant="outlined"
               handleClick={addToToWatch}
-            />
-            <Button
-              text="I WATCHED"
-              color="secondary"
-              size={isTablet ? 'small' : 'medium'}
-              handleClick={addToWatched}
-            />
+              disabled={isSaving}
+              className="flex-1"
+            >
+              {isSaving ? 'SAVING…' : 'I WANT TO WATCH'}
+            </Button>
+            <Button color="mint" handleClick={addToWatched} className="flex-1">
+              I WATCHED
+            </Button>
           </>
         )}
       </div>

@@ -25,21 +25,19 @@ src/
     (auth)/                   # public routes — login, register, confirm-email
       AuthFormLayout.tsx
       layout.tsx
-    (private)/                # all protected routes
-      (with-header-search)/   # pages with search input in header
-        search/               # /search
-        layout.tsx
-      (without-header-search)/# pages without search input in header
-        movie/[id]/           # /movie/:id
-        my-media/             # /my-media
-        series/[id]/          # /series/:id
-        layout.tsx
-      api/                    # Route Handlers
+    (private)/                # all protected routes (single layout)
+      page.tsx                # / (home page)
+      search/                 # /search
+      movie/[id]/             # /movie/:id
+      my-media/               # /my-media
+      series/[id]/            # /series/:id
+      layout.tsx
+    api/                      # Route Handlers
     layout.tsx
-    globals.css
-    providers.tsx
-    proxy.ts                  # Next.js 16 middleware (replaces middleware.ts)
-    types.ts
+  globals.css
+  providers.tsx
+  proxy.ts                    # Next.js 16 middleware (replaces middleware.ts)
+  types.ts                    # app-wide TypeScript types
   components/                 # shared components
   hooks/                      # custom React hooks
   icons/                      # icon components
@@ -105,6 +103,7 @@ export async function updatePost(id: string) {
 
 - Use the **server client** (`lib/supabase/server.ts`) in Server Components and Route Handlers
 - Use the **browser client** (`lib/supabase/client.ts`) in Client Components only
+- Use the **admin client** (`lib/supabase/admin.ts`) only for privileged operations (bypasses RLS) — server-side only
 - Never expose the service role key — server-side only
 - RLS is enabled — always ensure policies enforce access correctly
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
@@ -113,22 +112,29 @@ export async function updatePost(id: string) {
 
 ## Styling
 
-Tailwind CSS v4 with custom design tokens in `globals.css`.
+Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always use these — never hardcode hex values.
 
-| Token                             | Value                            |
-| --------------------------------- | -------------------------------- |
-| `text-primary` / `bg-primary`     | gray-100 — main text/background  |
-| `text-secondary` / `bg-secondary` | gray-400 — muted text/background |
-| `bg-dark`                         | `#1e2122` — dark background      |
-| `text-accent`                     | blue-300 — accent/highlight      |
-| `--background-gradient`           | CSS variable on `body`           |
-| `--height-full-screen`            | `calc(100vh - 176px)`            |
-| `--max-width-content`             | `1440px`                         |
-| `font-sans`                       | Lato                             |
+**Fonts:**
+
+- `font-sans` — DM Sans (primary body font)
+- `font-serif` — DM Serif Display (headings, display text)
+- `font-mono` — DM Mono (labels, nav items, monospaced text)
+
+**Design tokens:**
+
+| Token                         | Value                    | Use                                     |
+| ----------------------------- | ------------------------ | --------------------------------------- |
+| `text-primary` / `bg-primary` | `#ece9e3`                | Warm near-white — primary text          |
+| `text-secondary`              | `rgba(236,233,227,0.75)` | Muted / supporting text                 |
+| `text-dim`                    | `rgba(236,233,227,0.50)` | Tertiary / label text                   |
+| `bg-dark` / `text-dark`       | `#0d0d10`                | Page background / text on mint          |
+| `bg-bg2`                      | `#18181f`                | Card / input background                 |
+| `bg-bg3`                      | `#21212a`                | Elevated elements (hover states, chips) |
+| `text-mint` / `bg-mint`       | `oklch(82% 0.10 165)`    | Pastel mint — primary accent            |
 
 - **Mobile-first** — base styles for mobile, `sm:` / `md:` / `lg:` for larger screens
 - Always use design tokens for colors — never hardcode hex values
-- Use `max-w-content` for page-level content wrappers
+- For borders/overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`
 - Check existing components in `components/` before building new UI
 
 ---
@@ -148,3 +154,27 @@ Tailwind CSS v4 with custom design tokens in `globals.css`.
 - Adding a new npm dependency
 - Changing Supabase schema or RLS policies
 - Deleting or renaming files
+
+---
+
+## Approach
+
+- Read existing files before writing. Don't re-read unless changed.
+- Thorough in reasoning, concise in output.
+- Skip files over 100KB unless required.
+- Do not guess APIs, versions, flags, commit SHAs, or package names. Verify by reading code or docs before asserting.
+
+## Communication Style
+
+- Short sentences only (8-10 words max)
+- No filler, no preamble, no pleasantries,
+- Never use em-dashes or replacement hyphens
+- Avoid parenthetical clauses entirely
+- Hyphens map to standard grammar only
+- Code stays normal. English gets compressed
+- Tool first. Result first. No explain unless asked
+- Do NOT explain what you are about to do before doing it
+- Skip summaries between steps
+- Only report when a task is fully complete or when you need input
+
+---

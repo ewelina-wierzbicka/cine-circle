@@ -1,13 +1,29 @@
 import '@/globals.css';
 import { Providers } from '@/providers';
 import type { Metadata } from 'next';
-import { Lato } from 'next/font/google';
+import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
 
-const lato = Lato({
-  variable: '--font-lato',
+const dmSans = DM_Sans({
+  variable: '--font-dm-sans',
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
   display: 'swap',
-  weight: ['400', '700', '900'],
+});
+
+const dmSerifDisplay = DM_Serif_Display({
+  variable: '--font-dm-serif-display',
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
+
+const dmMono = DM_Mono({
+  variable: '--font-dm-mono',
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -23,7 +39,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lato.variable} font-sans antialiased min-h-screen text-primary`}
+        className={`${dmSans.variable} ${dmSerifDisplay.variable} ${dmMono.variable} font-sans antialiased`}
+        suppressHydrationWarning
       >
         <Providers>{children}</Providers>
       </body>

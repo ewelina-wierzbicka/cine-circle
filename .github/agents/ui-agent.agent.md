@@ -35,17 +35,21 @@ You do not handle data fetching, Supabase schema changes, or auth logic unless i
 
 The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`. Always use these — never hardcode hex values.
 
-| Token                             | Use                                           |
-| --------------------------------- | --------------------------------------------- |
-| `text-primary` / `bg-primary`     | Main text and backgrounds (gray-100)          |
-| `text-secondary` / `bg-secondary` | Muted / supporting text (gray-400)            |
-| `bg-dark`                         | Dark surface color (`#1e2122`)                |
-| `text-accent`                     | Highlight and interactive accent (blue-300)   |
-| `font-sans`                       | Lato — the project's only font                |
-| `max-w-content`                   | Page-level content wrapper max width (1440px) |
-| `h-full-screen`                   | Viewport minus header (`calc(100vh - 176px)`) |
+| Token                         | Use                                              |
+| ----------------------------- | ------------------------------------------------ |
+| `text-primary` / `bg-primary` | Warm near-white (`#ece9e3`) — primary text       |
+| `text-secondary`              | Muted text (`rgba(236,233,227,0.75)`)            |
+| `text-dim`                    | Tertiary / label text (`rgba(236,233,227,0.50)`) |
+| `bg-dark` / `text-dark`       | Page background / text on mint (`#0d0d10`)       |
+| `bg-bg2`                      | Card / input background (`#18181f`)              |
+| `bg-bg3`                      | Elevated elements, hover states (`#21212a`)      |
+| `text-mint` / `bg-mint`       | Pastel mint — primary accent                     |
+| `font-sans`                   | DM Sans — primary body font                      |
+| `font-serif`                  | DM Serif Display — headings, display text        |
+| `font-mono`                   | DM Mono — labels, nav items                      |
 
-The page background is defined on `body` via `--background-gradient` (dark gray gradient) — don't override it on page containers.
+> For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
+> Star ratings use `text-amber-400` (Tailwind built-in — not a custom token).
 
 ---
 
@@ -57,6 +61,7 @@ The page background is defined on `body` via `--background-gradient` (dark gray 
 - Use `twMerge` (from `@/lib/cn`) when merging classnames conditionally — never string-concat Tailwind classes
 - Use `next/image` for all images with explicit `width` and `height` (or `fill` + a sized container)
 - Use `next/link` for internal navigation — never `<a href>`
+- Use icon components from `@/icons/` — never inline raw `<svg>` in JSX. If an icon doesn't exist yet, create a named-export component in `src/icons/` following the existing pattern (props: `className?: string`, passes it to the `<svg>` element)
 
 **Shared vs colocated:**
 
@@ -72,6 +77,7 @@ The page background is defined on `body` via `--background-gradient` (dark gray 
 - No inline `style` props — use utility classes
 - No hardcoded colors — use design tokens above
 - Spacing and sizing: use Tailwind's scale (`p-4`, `gap-2`, `w-full`) — don't reach for arbitrary values (`w-[137px]`) unless there's a genuine design constraint
+- **Never use arbitrary values when a named utility exists.** Tailwind v4 uses a 1 unit = 4px numeric scale — any pixel value divisible by 4 maps to an exact utility (`h-[600px]` → `h-150`, `w-[18px]` → `w-4.5`, `max-w-[1280px]` → `max-w-7xl`). Always use the named utility.
 
 ---
 
@@ -81,7 +87,9 @@ Familiarize yourself with these before adding anything new:
 
 | Component                                        | Purpose                                                            |
 | ------------------------------------------------ | ------------------------------------------------------------------ |
+| `CinematicPoster`                                | Gradient poster placeholder with title/genre                       |
 | `Button`                                         | Primary and secondary actions; supports `color`, `variant`, `size` |
+| `SearchBox`                                      | Search input with filter chips                                     |
 | `Input`, `Textarea`, `Select`, `DatePicker`      | Form controls                                                      |
 | `StarRating`                                     | Read-only star display                                             |
 | `MediaCard`, `MediaCardOverlay`                  | Movie/series card with poster                                      |
@@ -92,7 +100,6 @@ Familiarize yourself with these before adding anything new:
 | `WatchedMediaInfo`                               | User's watched entry display                                       |
 | `UserEntryForm`                                  | Add/edit watched entry form                                        |
 | `Header`                                         | App header with optional search                                    |
-| `BorderContainer`                                | Bordered wrapper surface                                           |
 | `Loader`                                         | Spinner / loading state                                            |
 | `ErrorToast`                                     | Error notification                                                 |
 

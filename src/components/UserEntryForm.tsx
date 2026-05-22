@@ -1,6 +1,5 @@
 'use client';
 
-import Button from '@/components/Button';
 import DatePicker from '@/components/DatePicker';
 import Input from '@/components/Input';
 import Textarea from '@/components/Textarea';
@@ -11,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import Button from './Button';
 
 type Props = {
   media: NormalizedMedia;
@@ -108,66 +108,71 @@ export default function UserEntryForm({
   };
 
   return (
-    <div className="w-full h-[calc(100vh-240px)]">
+    <div className="w-full py-4 animate-fade-up">
+      <p className="font-serif text-[clamp(24px,3vw,36px)] font-normal tracking-[-0.02em] leading-[1.1] mb-8">
+        {isUpdateMode ? 'Update' : 'Add'}{' '}
+        <em className="text-mint">&ldquo;{title}&rdquo;</em>
+      </p>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full md:w-3/4 mx-auto h-full flex flex-col justify-between"
+        className="flex flex-col gap-7 max-w-full md:max-w-120"
       >
-        <p className="text-2xl lg:text-3xl text-center">
-          {isUpdateMode ? 'Updating' : 'Adding'}
-          <span className="font-bold">&quot;{title}&quot;</span>
-        </p>
-        <div className="flex gap-8 flex-col">
-          <div>
-            <label htmlFor="watched_date">When did you watch it?</label>
-            <DatePicker
-              id="watched_date"
-              className="mt-3 lg:mt-6"
-              handleChange={(date) =>
-                setValue('watched_date', date?.toISOString().split('T')[0])
-              }
-              selected={selectedDate ? new Date(selectedDate) : undefined}
-            />
-          </div>
-          <div>
-            <label htmlFor="rating">How did you like it?</label>
-            <div className="mt-3 lg:mt-6">
-              <Input
-                id="rating"
-                variant="rating"
-                type="number"
-                {...register('rating', {
-                  min: { value: 0, message: 'Rating must be at least 0' },
-                  max: {
-                    value: 10,
-                    message: 'Rating cannot be greater than 10',
-                  },
-                })}
-                error={errors.rating?.message}
-              />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="review">Any thoughts?</label>
-            <Textarea
-              id="review"
-              {...register('review', {
-                maxLength: {
-                  value: 1000,
-                  message: 'Please use up to 1000 characters.',
-                },
-              })}
-              className="mt-3 lg:mt-6"
-              error={errors.review?.message}
-            />
-          </div>
+        <div>
+          <label
+            htmlFor="watched_date"
+            className="block font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2.5"
+          >
+            When did you watch it?
+          </label>
+          <DatePicker
+            id="watched_date"
+            handleChange={(date) =>
+              setValue('watched_date', date?.toISOString().split('T')[0])
+            }
+            selected={selectedDate ? new Date(selectedDate) : undefined}
+          />
         </div>
-        <Button
-          type="submit"
-          text={isSaving ? 'SAVING...' : isUpdateMode ? 'UPDATE' : 'SAVE'}
-          size="small"
-          disabled={isSaving}
-        />
+        <div>
+          <label
+            htmlFor="rating"
+            className="block font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2.5"
+          >
+            How did you like it? (0–10)
+          </label>
+          <Input
+            id="rating"
+            variant="rating"
+            type="number"
+            {...register('rating', {
+              min: { value: 0, message: 'Rating must be at least 0' },
+              max: { value: 10, message: 'Rating cannot be greater than 10' },
+            })}
+            error={errors.rating?.message}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="review"
+            className="block font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2.5"
+          >
+            Any thoughts?
+          </label>
+          <Textarea
+            id="review"
+            {...register('review', {
+              maxLength: {
+                value: 1000,
+                message: 'Please use up to 1000 characters.',
+              },
+            })}
+            error={errors.review?.message}
+          />
+        </div>
+        <div className="pt-2">
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? 'SAVING…' : isUpdateMode ? 'UPDATE' : 'SAVE'}
+          </Button>
+        </div>
       </form>
     </div>
   );

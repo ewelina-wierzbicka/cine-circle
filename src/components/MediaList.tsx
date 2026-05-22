@@ -1,6 +1,5 @@
 'use client';
 
-import BorderContainer from '@/components/BorderContainer';
 import Loader from '@/components/Loader';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useCallback, useEffect, useRef } from 'react';
@@ -52,20 +51,18 @@ export default function MediaList({
 
   if (media.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-320px)] lg:h-[calc(100vh-248px)] w-full">
-        <p className="text-xl">{emptyMessage}</p>
+      <div className="flex items-center justify-center h-48 w-full">
+        <p className="font-mono text-[11px] tracking-[0.12em] text-dim uppercase">
+          {emptyMessage}
+        </p>
       </div>
     );
   }
 
   return (
-    <BorderContainer className={className}>
-      {heading && (
-        <div className="mb-10 border-b border-primary min-w-50 lg:min-w-100 w-max max-w-full -ml-4 lg:-ml-14">
-          <p className="text-base md:text-xl ml-4 lg:ml-14">{heading}</p>
-        </div>
-      )}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-8">
+    <div className={className}>
+      {heading && <div className="mb-8">{heading}</div>}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
         {media.map((item, index) => {
           const tmdbId = 'tmdb_id' in item ? item.tmdb_id : item.id;
           const userMediaId = 'tmdb_id' in item ? item.id : undefined;
@@ -79,8 +76,8 @@ export default function MediaList({
           );
         })}
       </div>
-      <div ref={loadMoreRef} className="w-full pt-16" />
+      <div ref={loadMoreRef} className="w-full pt-12" />
       {isFetchingNextPage && <Loader />}
-    </BorderContainer>
+    </div>
   );
 }

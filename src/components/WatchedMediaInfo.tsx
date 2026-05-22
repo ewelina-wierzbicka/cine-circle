@@ -1,29 +1,24 @@
-import Button from '@/components/Button';
 import StarRating from '@/components/StarRating';
 import { NormalizedMedia, UserEntry } from '@/types';
+import Link from 'next/link';
+import Button from './Button';
 
 type Props = {
   media: NormalizedMedia;
   userEntry: Pick<UserEntry, 'watched_date' | 'rating' | 'review'>;
   onEdit: () => void;
-  isTablet: boolean;
 };
 
-export default function WatchedMediaInfo({
-  media,
-  userEntry,
-  onEdit,
-  isTablet,
-}: Props) {
+export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
   const { title, director, release_date, last_air_date, media_type } = media;
   const { watched_date, rating, review } = userEntry;
-  const isUserEntry = watched_date && rating != null && review;
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
   const dateDisplay = lastAirYear
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
-  const creatorLabel = media_type === 'series' ? 'created by:' : 'dir.:';
+  const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
+  const typeLabel = media_type === 'series' ? 'SERIES' : 'FILM';
 
   const formattedDate = watched_date
     ? new Date(watched_date).toLocaleDateString('en-GB', {
@@ -34,61 +29,76 @@ export default function WatchedMediaInfo({
     : null;
 
   return (
-    <div
-      className={`flex flex-wrap justify-between w-full h-1/2 md:h-full ${isUserEntry ? 'md:min-h-[calc(100vh-240px)]' : 'md:min-h-[calc(50vh-120px)]'} -mt-30 md:mt-0 z-50`}
-    >
-      <div className="w-full">
-        <p
-          className={`${title.length > 35 ? 'text-4xl' : 'text-5xl'} sm:text-5xl font-bold uppercase`}
-        >
-          {title}
-        </p>
-
-        <p className="text-sm text-secondary mt-8 pt-2 border-t border-primary min-w-40 w-max max-w-full">
-          {creatorLabel} {director}
-        </p>
-        <p className="text-sm text-secondary mt-1">{dateDisplay}</p>
-      </div>
-      <div className="mt-8 flex flex-col gap-8 w-full">
-        {formattedDate && (
-          <div>
-            <p className="text-secondary uppercase tracking-widest mb-1">
-              Watched
-            </p>
-            <p className="text-base">{formattedDate}</p>
-          </div>
+    <div className="flex flex-col w-full animate-fade-up max-w-full sm:max-w-120">
+      <Link
+        href="/my-media"
+        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-dim hover:text-mint transition-colors duration-150 mb-9 self-start"
+      >
+        ← BACK TO COLLECTION
+      </Link>
+      <p className="font-mono text-[10px] tracking-[0.22em] text-mint uppercase mb-3.5">
+        {typeLabel}
+      </p>
+      <h1
+        className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
+        style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
+      >
+        {title}
+      </h1>
+      <div className="flex items-center gap-5 mb-7">
+        {director && (
+          <span className="text-[13px] text-secondary">
+            <span className="font-mono text-[10px] tracking-[0.08em] text-dim mr-2">
+              {dirLabel}
+            </span>
+            {director}
+          </span>
         )}
-
+        {director && (
+          <div className="w-0.75 h-0.75 rounded-full bg-dim shrink-0" />
+        )}
+        <span className="font-mono text-[13px] tracking-[0.04em] text-secondary">
+          {dateDisplay}
+        </span>
+      </div>
+      <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
+      <div className="flex flex-col gap-6 mb-8">
         {rating != null && (
           <div>
-            <p className="text-secondary uppercase tracking-widest mb-1">
-              Rating
+            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+              Your Rating
             </p>
             <div className="flex items-center gap-3">
               <StarRating rating={rating} />
-              <span>{rating}/10</span>
+              <span className="font-mono text-[13px] tracking-[0.06em] text-secondary">
+                {rating}/10
+              </span>
             </div>
           </div>
         )}
-
+        {formattedDate && (
+          <div>
+            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+              Watched
+            </p>
+            <p className="text-sm text-primary">{formattedDate}</p>
+          </div>
+        )}
         {review && (
           <div>
-            <p className="text-secondary uppercase tracking-widest mb-1">
-              What do you think?
+            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+              Review
             </p>
-            <p className="leading-relaxed whitespace-pre-wrap text-justify">
+            <p className="text-sm text-secondary leading-relaxed whitespace-pre-wrap">
               {review}
             </p>
           </div>
         )}
       </div>
-
-      <div className="w-full sm:w-3/4 flex justify-center flex-col mt-auto mx-auto pt-8 pb-4 md:pb-0">
-        <Button
-          text="UPDATE"
-          size={isTablet ? 'small' : 'medium'}
-          handleClick={onEdit}
-        />
+      <div>
+        <Button color="mint" handleClick={onEdit}>
+          UPDATE
+        </Button>
       </div>
     </div>
   );

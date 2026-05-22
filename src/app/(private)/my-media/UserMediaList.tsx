@@ -33,7 +33,6 @@ export default function UserMediaList({
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
-        className="min-h-[calc(100vh-320px)] lg:min-h-[calc(100vh-248px)]"
       />
     </>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import Input from '@/components/Input';
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
@@ -53,27 +54,26 @@ export default function DatePicker({
 
   return (
     <div className="relative" ref={containerRef}>
-      <input
-        type="text"
+      <Input
         id={id}
         name={id}
         readOnly
         value={selected ? selected.toLocaleDateString('en-US') : ''}
         placeholder="Select a date"
-        className={`date-picker rounded-3xl bg-neutral-300/20 pl-6 pr-4 w-full h-10 outline-none focus:ring-4 focus:ring-neutral-300/20 focus:ring-offset-1 focus:ring-offset-primary/40 cursor-pointer ${className ?? ''}`}
+        className={`cursor-pointer ${className ?? ''}`}
         onClick={toggleDayPicker}
+        error={error}
       />
-      {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 z-50 bg-dark text-primary border border-primary/50 rounded-3xl p-4">
+        <div className="absolute top-full right-0 mt-2 z-50 bg-bg2 text-primary border border-white/[0.07] rounded-2xl p-4 shadow-xl">
           <DayPicker
             mode="single"
             selected={selected}
             onSelect={handleDateSelect}
             classNames={{
-              nav_button: 'color-accent',
-              chevron: 'fill-accent',
+              nav_button: 'color-mint',
+              chevron: 'fill-mint',
             }}
             disabled={{ after: new Date() }}
           />

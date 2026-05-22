@@ -1,3 +1,4 @@
+import SearchBox from '@/components/SearchBox';
 import { getMedia } from '@/services/getMedia';
 import { FilterMediaType } from '@/types';
 import SearchResults from './SearchResults';
@@ -21,5 +22,12 @@ export default async function Page({ searchParams }: Props) {
     }
   }
 
-  return <SearchResults query={query} type={type} initialData={initialData} />;
+  return (
+    <div className="flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12">
+      <div className="mb-8 w-full max-w-160">
+        <SearchBox initialQuery={query} initialType={type} />
+      </div>
+      <SearchResults query={query} type={type} initialData={initialData} />
+    </div>
+  );
 }

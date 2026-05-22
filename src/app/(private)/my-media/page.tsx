@@ -21,9 +21,9 @@ export default async function Page({ searchParams }: Props) {
   }
 
   return (
-    <>
+    <div className="min-h-full px-6 md:px-10 lg:px-14">
       {error && <ErrorToast message={error} />}
       <MyMedia key={tab} tab={tab} initialData={initialData} />
-    </>
+    </div>
   );
 }

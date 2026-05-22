@@ -9,13 +9,16 @@ type Props = {
 export default function MediaCardOverlay({ children }: Props) {
   return (
     <div
-      className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-dark/90 flex flex-col items-center justify-center gap-3 z-10"
+      className="absolute inset-0 flex flex-col items-end justify-end translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-10"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
       }}
     >
-      {children}
+      <div className="absolute inset-0 bg-linear-to-t from-dark/95 via-dark/60 to-transparent pointer-events-none" />
+      <div className="relative z-10 flex flex-col w-full gap-1.5 p-2.5">
+        {children}
+      </div>
     </div>
   );
 }
