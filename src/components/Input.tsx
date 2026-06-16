@@ -1,5 +1,6 @@
 'use client';
 
+import SearchIcon from '@/icons/MagnifyingGlass';
 import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
 
@@ -32,11 +33,17 @@ const Input = forwardRef<HTMLInputElement, Props>(
     return (
       <>
         <div className="relative w-full">
+          {variant === 'search' && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary/80">
+              <SearchIcon className="w-3 h-3 shrink-0" />
+            </span>
+          )}
           <input
             type={type}
             id={id}
             className={twMerge(
-              'h-11.5 rounded-xl bg-bg2 border border-white/[0.07] pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-dim focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+              'h-11.5 rounded-xl bg-bg2 border border-secondary/25 pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-dim focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+              variant === 'search' && 'pl-8',
               className,
             )}
             onChange={handleChange}
@@ -46,12 +53,12 @@ const Input = forwardRef<HTMLInputElement, Props>(
             {...rest}
           />
           {variant === 'rating' && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-dim text-sm">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary text-sm">
               /10
             </div>
           )}
         </div>
-        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+        {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
       </>
     );
   },

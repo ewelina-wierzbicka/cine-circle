@@ -17,14 +17,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
         <textarea
           id={id}
           className={twMerge(
-            'h-11.5 rounded-xl bg-bg2 border border-white/[0.07] pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-dim focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+            'h-30 rounded-xl p-4 bg-bg2 border border-secondary/25 pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-secondary focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
             className,
           )}
           onChange={handleChange}
           ref={ref}
           {...rest}
         />
-        {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+        {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
       </>
     );
   },

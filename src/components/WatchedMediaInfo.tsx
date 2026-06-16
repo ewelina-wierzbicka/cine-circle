@@ -32,11 +32,11 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
     <div className="flex flex-col w-full animate-fade-up max-w-full sm:max-w-120">
       <Link
         href="/my-media"
-        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-dim hover:text-mint transition-colors duration-150 mb-9 self-start"
+        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
       >
         ← BACK TO COLLECTION
       </Link>
-      <p className="font-mono text-[10px] tracking-[0.22em] text-mint uppercase mb-3.5">
+      <p className="font-mono text-sm tracking-[0.22em] text-mint uppercase mb-3.5">
         {typeLabel}
       </p>
       <h1
@@ -47,30 +47,30 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
       </h1>
       <div className="flex items-center gap-5 mb-7">
         {director && (
-          <span className="text-[13px] text-secondary">
-            <span className="font-mono text-[10px] tracking-[0.08em] text-dim mr-2">
+          <span className="text-sm text-secondary">
+            <span className="font-mono text-xs tracking-[0.08em] text-secondary mr-2">
               {dirLabel}
             </span>
             {director}
           </span>
         )}
         {director && (
-          <div className="w-0.75 h-0.75 rounded-full bg-dim shrink-0" />
+          <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
         )}
-        <span className="font-mono text-[13px] tracking-[0.04em] text-secondary">
+        <span className="font-mono text-sm tracking-[0.04em] text-secondary">
           {dateDisplay}
         </span>
       </div>
       <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
-      <div className="flex flex-col gap-6 mb-8">
+      <div className="flex flex-col gap-8 mb-8">
         {rating != null && (
           <div>
-            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+            <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-3">
               Your Rating
             </p>
             <div className="flex items-center gap-3">
               <StarRating rating={rating} />
-              <span className="font-mono text-[13px] tracking-[0.06em] text-secondary">
+              <span className="font-mono text-sm tracking-[0.06em] text-secondary">
                 {rating}/10
               </span>
             </div>
@@ -78,7 +78,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
         )}
         {formattedDate && (
           <div>
-            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+            <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
               Watched
             </p>
             <p className="text-sm text-primary">{formattedDate}</p>
@@ -86,7 +86,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
         )}
         {review && (
           <div>
-            <p className="font-mono text-[9px] tracking-[0.18em] text-dim uppercase mb-2">
+            <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
               Review
             </p>
             <p className="text-sm text-secondary leading-relaxed whitespace-pre-wrap">

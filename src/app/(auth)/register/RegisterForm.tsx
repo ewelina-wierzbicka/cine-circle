@@ -29,25 +29,25 @@ export function RegisterForm() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="font-serif text-4xl tracking-[-0.02em] leading-[1.1] mb-2">
+      <div className="mb-10">
+        <h1 className="font-serif text-6xl tracking-[-0.02em] leading-[1.1] mb-3">
           Create your
           <br />
           <em className="text-mint">circle</em>
         </h1>
-        <p className="text-[13px] text-secondary">
+        <p className="text-base text-secondary">
           Track every film. Share your taste.
         </p>
       </div>
 
       <form
-        className="w-full flex flex-col gap-4"
+        className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
           <label
             htmlFor="email"
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-2"
+            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
           >
             Email
           </label>
@@ -68,7 +68,7 @@ export function RegisterForm() {
         <div>
           <label
             htmlFor="password"
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-2"
+            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
           >
             Password
           </label>
@@ -95,7 +95,7 @@ export function RegisterForm() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-2"
+            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
           >
             Confirm Password
           </label>
@@ -123,7 +123,7 @@ export function RegisterForm() {
         </Button>
       </form>
 
-      <p className="mt-5 text-center text-xs text-dim">
+      <p className="mt-6 text-center text-sm text-secondary">
         Already have an account?{' '}
         <Link
           href="/login"

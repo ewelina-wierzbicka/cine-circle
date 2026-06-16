@@ -47,6 +47,14 @@ src/
     (auth)/                   # public routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
       layout.tsx
+      login/
+        page.tsx
+        LoginForm.tsx
+      register/
+        page.tsx
+        RegisterForm.tsx
+      confirm-email/
+        page.tsx
     (private)/                # all protected routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
@@ -93,15 +101,21 @@ Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always u
 
 **Design tokens:**
 
-| Token                         | Value                    | Use                                     |
-| ----------------------------- | ------------------------ | --------------------------------------- |
-| `text-primary` / `bg-primary` | `#ece9e3`                | Warm near-white — primary text          |
-| `text-secondary`              | `rgba(236,233,227,0.75)` | Muted / supporting text                 |
-| `text-dim`                    | `rgba(236,233,227,0.50)` | Tertiary / label text                   |
-| `bg-dark` / `text-dark`       | `#0d0d10`                | Page background / text on mint          |
-| `bg-bg2`                      | `#18181f`                | Card / input background                 |
-| `bg-bg3`                      | `#21212a`                | Elevated elements (hover states, chips) |
-| `text-mint` / `bg-mint`       | `oklch(82% 0.10 165)`    | Pastel mint — primary accent            |
+```ts
+export const colors = {
+  // Page backgrounds — layered dark surfaces
+  bg: '#0d0d10', // maps to CSS var --color-dark
+  bg2: '#18181f', // maps to CSS var --color-bg2
+  bg3: '#21212a', // maps to CSS var --color-bg3
+
+  // Text
+  text: '#ece9e3', // maps to CSS var --color-primary
+  muted: 'rgba(236,233,227,0.75)', // maps to CSS var --color-secondary
+
+  // Accent — pastel mint
+  mint: 'oklch(82% 0.10 165)', // maps to CSS var --color-mint
+};
+```
 
 > Star ratings use Tailwind's built-in `text-amber-400` — not a custom token.
 

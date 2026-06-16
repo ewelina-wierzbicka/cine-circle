@@ -1,10 +1,10 @@
 'use client';
 
+import Button from '@/components/Button';
 import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import Button from '@/components/Button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -94,11 +94,11 @@ export default function MediaInfo({
     <div className="flex flex-col w-full animate-fade-up">
       <Link
         href="/my-media"
-        className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-dim hover:text-mint transition-colors duration-150 mb-9 self-start"
+        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
       >
         ← BACK TO COLLECTION
       </Link>
-      <p className="font-mono text-[10px] tracking-[0.22em] text-mint uppercase mb-3.5">
+      <p className="font-mono text-xs tracking-[0.22em] text-mint uppercase mb-3.5">
         {typeLabel}
       </p>
 
@@ -111,16 +111,16 @@ export default function MediaInfo({
       <div className="flex items-center gap-5 mb-7">
         {director && (
           <>
-            <span className="text-[13px] text-secondary">
-              <span className="font-mono text-[10px] tracking-[0.08em] text-dim mr-2">
+            <span className="text-sm text-secondary">
+              <span className="font-mono text-xs tracking-[0.08em] text-secondary mr-2">
                 {dirLabel}
               </span>
               {director}
             </span>
-            <div className="w-0.75 h-0.75 rounded-full bg-dim shrink-0" />
+            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
           </>
         )}
-        <span className="font-mono text-[13px] tracking-[0.04em] text-secondary">
+        <span className="font-mono text-sm tracking-[0.04em] text-secondary">
           {dateDisplay}
         </span>
       </div>

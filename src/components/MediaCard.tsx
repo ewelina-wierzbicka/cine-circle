@@ -86,7 +86,7 @@ export default function MediaCard({
         </Link>
         {!userMediaId && (
           <div className="absolute inset-0 flex items-end p-3 z-10 bg-linear-to-t from-dark/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <span className="font-mono text-[9px] text-mint tracking-[0.12em]">
+            <span className="font-mono text-sm text-mint tracking-[0.12em]">
               VIEW →
             </span>
           </div>
@@ -132,10 +132,10 @@ export default function MediaCard({
       </div>
       <div className="px-0.5">
         <Link href={href}>
-          <p className="text-[11px] font-medium text-primary leading-snug line-clamp-2">
+          <p className="text-sm font-medium text-primary leading-snug line-clamp-2">
             {title}
           </p>
-          <p className="text-[10px] text-dim mt-0.5">{dateDisplay}</p>
+          <p className="text-sm text-secondary mt-0.5">{dateDisplay}</p>
         </Link>
         {watchStatus === 'watched' && rating != null && (
           <div className="mt-1.5">

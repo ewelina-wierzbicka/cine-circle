@@ -36,7 +36,7 @@ export default async function AuthFormLayout({
             height={26}
             className="object-contain"
           />
-          <span className="font-mono text-[13px] font-medium tracking-[0.05em] text-primary">
+          <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
             cineCircle
           </span>
         </div>

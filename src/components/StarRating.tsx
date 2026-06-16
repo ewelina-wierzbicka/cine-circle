@@ -22,10 +22,10 @@ export default function StarRating({ rating, className }: Props) {
 
         if (isHalf) {
           return (
-            <div key={i} className="relative size-3">
-              <StarIcon className="absolute size-3 text-white/15" />
+            <div key={i} className="relative size-5">
+              <StarIcon className="absolute size-5 text-white/15" />
               <div className="absolute w-[50%] overflow-hidden">
-                <StarIcon className="size-3 text-amber-400" filled />
+                <StarIcon className="size-5 text-amber-400" filled />
               </div>
             </div>
           );
@@ -36,7 +36,7 @@ export default function StarRating({ rating, className }: Props) {
             key={i}
             filled={isFull}
             className={twMerge(
-              'size-3',
+              'size-5',
               isFull ? 'text-amber-400' : 'text-white/15',
             )}
           />

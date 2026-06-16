@@ -30,7 +30,7 @@ export default function Button({
       disabled={disabled}
       className={twMerge(
         'w-full rounded-xl font-semibold uppercase tracking-[0.08em] cursor-pointer transition-opacity',
-        size === 'medium' ? 'h-12 text-base' : 'h-10 text-[10px]',
+        size === 'medium' ? 'h-12 text-base' : 'h-10 text-sm',
         variant === 'outlined'
           ? 'text-primary border border-white/50 hover:bg-white/5'
           : twMerge(

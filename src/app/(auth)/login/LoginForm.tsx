@@ -28,23 +28,23 @@ export function LoginForm() {
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+      <div className="mb-10">
+        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
           Welcome
           <br />
           <em className="text-mint">back</em>
         </h1>
-        <p className="text-[13px] text-secondary">Sign in to your collection</p>
+        <p className="text-base text-secondary">Sign in to your collection</p>
       </div>
 
       <form
-        className="w-full flex flex-col gap-4"
+        className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
           <label
             htmlFor="email"
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-2"
+            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
           >
             Email
           </label>
@@ -65,7 +65,7 @@ export function LoginForm() {
         <div>
           <label
             htmlFor="password"
-            className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-2"
+            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
           >
             Password
           </label>
@@ -82,7 +82,7 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <p className="mt-5 text-center text-xs text-dim">
+      <p className="mt-6 text-center text-sm text-secondary">
         Don&apos;t have an account?{' '}
         <Link
           href="/register"

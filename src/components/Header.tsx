@@ -11,8 +11,8 @@ import { useState } from 'react';
 const NAV_ITEMS = [
   {
     label: 'Search',
-    href: '/search',
-    match: (p: string) => p.startsWith('/search'),
+    href: '/',
+    match: (p: string) => p === '/',
   },
   {
     label: 'Collection',
@@ -46,7 +46,7 @@ export default function Header() {
           height={26}
           className="object-contain"
         />
-        <span className="font-mono text-[13px] font-medium tracking-[0.05em] text-primary">
+        <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
           cineCircle
         </span>
       </Link>
@@ -56,10 +56,10 @@ export default function Header() {
             key={href}
             href={href}
             className={twMerge(
-              'px-3 py-1.5 rounded-full text-xs font-sans font-medium tracking-[0.02em] transition-all duration-150',
+              'px-3 py-1.5 rounded-full text-sm font-sans font-medium tracking-[0.02em] transition-all duration-150',
               match(pathname)
-                ? 'bg-white/4 border border-white/12 text-primary'
-                : 'text-dim hover:text-secondary',
+                ? 'bg-white/4 border border-secondary/50 text-primary'
+                : 'text-secondary hover:text-primary',
             )}
           >
             {label}
@@ -101,7 +101,7 @@ export default function Header() {
                 role="menuitem"
                 tabIndex={0}
                 className={twMerge(
-                  'px-4 py-2.5 text-[13px] cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
+                  'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
                   pathname === href && 'text-primary font-medium',
                 )}
                 onClick={() => {
@@ -124,7 +124,7 @@ export default function Header() {
             <li
               role="menuitem"
               tabIndex={0}
-              className="px-4 py-2.5 text-[13px] cursor-pointer transition-colors hover:bg-white/4 select-none text-dim border-t border-white/[0.07]"
+              className="px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary border-t border-white/[0.07]"
               onClick={handleLogout}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {

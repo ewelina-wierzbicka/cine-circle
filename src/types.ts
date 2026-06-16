@@ -69,4 +69,5 @@ export type TrendingMovie = {
   year: string;
   genre: string;
   posterUrl?: string;
+  id?: number;
 };

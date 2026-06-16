@@ -2,38 +2,17 @@
 
 import Loader from '@/components/Loader';
 import MediaList from '@/components/MediaList';
+import { SearchMediaResponse, useGetMedia } from '@/hooks/useGetMedia';
 import { toSearchMediaListProps } from '@/lib/mediaUtils';
-import { FilterMediaType, NormalizedMedia } from '@/types';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { FilterMediaType } from '@/types';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-
-type SearchMediaResponse = { results: NormalizedMedia[]; hasMore: boolean };
 
 const TYPE_LABELS: Record<FilterMediaType, string> = {
   movie: 'movies',
   series: 'series',
   all: 'movies & series',
 };
-
-async function fetchMedia({
-  pageParam,
-  query,
-  type,
-}: {
-  pageParam: number;
-  query: string;
-  type: FilterMediaType;
-}): Promise<SearchMediaResponse> {
-  const res = await fetch(
-    `/api/search?query=${encodeURIComponent(query)}&page=${pageParam}&type=${type}`,
-  );
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => null);
-    throw new Error(errorData?.error || 'Failed to fetch');
-  }
-  return res.json() as Promise<SearchMediaResponse>;
-}
 
 type Props = {
   query: string;
@@ -49,19 +28,10 @@ export default function SearchResults({ query, type, initialData }: Props) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['search', query, type],
-    queryFn: ({ pageParam }) => fetchMedia({ pageParam, query, type }),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) =>
-      lastPage.hasMore ? allPages.length + 1 : undefined,
-    initialData: initialData
-      ? { pages: [initialData], pageParams: [1] }
-      : undefined,
-    enabled: query.length > 0,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
-    retry: 1,
+  } = useGetMedia({
+    query,
+    type,
+    initialData,
   });
 
   useEffect(() => {
@@ -79,7 +49,7 @@ export default function SearchResults({ query, type, initialData }: Props) {
         media={allMedia.map(toSearchMediaListProps)}
         heading={
           <div>
-            <p className="font-mono text-[9px] tracking-[0.2em] text-mint uppercase mb-2">
+            <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
               Search Results
             </p>
             <p className="font-serif text-[clamp(24px,3.5vw,38px)] tracking-[-0.02em] leading-none">

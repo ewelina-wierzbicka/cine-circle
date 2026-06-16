@@ -35,18 +35,17 @@ You do not handle data fetching, Supabase schema changes, or auth logic unless i
 
 The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`. Always use these — never hardcode hex values.
 
-| Token                         | Use                                              |
-| ----------------------------- | ------------------------------------------------ |
-| `text-primary` / `bg-primary` | Warm near-white (`#ece9e3`) — primary text       |
-| `text-secondary`              | Muted text (`rgba(236,233,227,0.75)`)            |
-| `text-dim`                    | Tertiary / label text (`rgba(236,233,227,0.50)`) |
-| `bg-dark` / `text-dark`       | Page background / text on mint (`#0d0d10`)       |
-| `bg-bg2`                      | Card / input background (`#18181f`)              |
-| `bg-bg3`                      | Elevated elements, hover states (`#21212a`)      |
-| `text-mint` / `bg-mint`       | Pastel mint — primary accent                     |
-| `font-sans`                   | DM Sans — primary body font                      |
-| `font-serif`                  | DM Serif Display — headings, display text        |
-| `font-mono`                   | DM Mono — labels, nav items                      |
+| Token                         | Use                                                  |
+| ----------------------------- | ---------------------------------------------------- |
+| `text-primary` / `bg-primary` | Warm near-white (`#ece9e3`) — primary text           |
+| `text-secondary`              | Muted text (`rgba(236,233,227,0.75)`)                |
+| `bg-dark` / `text-dark`       | Page background / text on mint (`#0d0d10`)           |
+| `bg-bg2`                      | Card / input background (`#18181f`)                  |
+| `bg-bg3`                      | Elevated elements, hover states (`#21212a`)          |
+| `text-mint` / `bg-mint`       | Pastel mint — primary accent (`oklch(82% 0.10 165)`) |
+| `font-sans`                   | DM Sans — primary body font                          |
+| `font-serif`                  | DM Serif Display — headings, display text            |
+| `font-mono`                   | DM Mono — labels, nav items                          |
 
 > For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 > Star ratings use `text-amber-400` (Tailwind built-in — not a custom token).
@@ -85,23 +84,30 @@ The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`
 
 Familiarize yourself with these before adding anything new:
 
-| Component                                        | Purpose                                                            |
-| ------------------------------------------------ | ------------------------------------------------------------------ |
-| `CinematicPoster`                                | Gradient poster placeholder with title/genre                       |
-| `Button`                                         | Primary and secondary actions; supports `color`, `variant`, `size` |
-| `SearchBox`                                      | Search input with filter chips                                     |
-| `Input`, `Textarea`, `Select`, `DatePicker`      | Form controls                                                      |
-| `StarRating`                                     | Read-only star display                                             |
-| `MediaCard`, `MediaCardOverlay`                  | Movie/series card with poster                                      |
-| `MediaDetail`, `MediaDetailWrapper`, `MediaInfo` | Detail page layout                                                 |
-| `MediaList`                                      | Grid list of media cards                                           |
-| `MediaPage`                                      | Full media detail page composition                                 |
-| `MediaPoster`                                    | Standalone poster image                                            |
-| `WatchedMediaInfo`                               | User's watched entry display                                       |
-| `UserEntryForm`                                  | Add/edit watched entry form                                        |
-| `Header`                                         | App header with optional search                                    |
-| `Loader`                                         | Spinner / loading state                                            |
-| `ErrorToast`                                     | Error notification                                                 |
+| Component                                        | Purpose                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `CinematicPoster`                                | Gradient poster placeholder used in listings and hero views                          |
+| `Button`                                         | Primary and secondary actions; supports `color`, `variant`, and `size`               |
+| `SearchBox`                                      | Search input with filter chips, debounced queries, and dropdown with infinite scroll |
+| `SearchDropdownItem`                             | Single item renderer used by `SearchBox` dropdown                                    |
+| `Input`                                          | Text input component with shared styling                                             |
+| `Textarea`                                       | Multiline input with shared validation styles                                        |
+| `Select`                                         | Select control used in forms                                                         |
+| `DatePicker`                                     | Date selection control used in user entry forms                                      |
+| `StarRating`                                     | Read-only star display (supports half-stars via overlay clipping)                    |
+| `MediaCard`                                      | Movie/series card with poster, title, and metadata                                   |
+| `MediaCardOverlay`                               | Overlay content for `MediaCard` (hover/focus states)                                 |
+| `MediaPoster`                                    | Standalone poster image component; handles sizing and `next/image` usage             |
+| `MediaList`                                      | Responsive grid list of `MediaCard` components                                       |
+| `MediaPage`                                      | Full media detail page composition (page-level wrapper)                              |
+| `MediaDetail`, `MediaDetailWrapper`, `MediaInfo` | Detail layout and metadata regions used on media pages                               |
+| `WatchedMediaInfo`                               | Displays user's watched entry (rating, date, notes)                                  |
+| `UserEntryForm`                                  | Add / edit watched entry form (uses `Input`, `Textarea`, `DatePicker`, `Select`)     |
+| `Header`                                         | App header with navigation, search affordance, and responsive behavior               |
+| `Loader`                                         | Spinner / skeleton loader used across pages                                          |
+| `ErrorToast`                                     | Transient error notification component                                               |
+
+---
 
 ---
 

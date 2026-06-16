@@ -1,6 +1,6 @@
-import AuthFormLayout from '../AuthFormLayout';
 import { EnvelopeIcon } from '@/icons/Envelope';
 import Link from 'next/link';
+import AuthFormLayout from '../AuthFormLayout';
 
 export default function ConfirmEmailPage() {
   return (
@@ -15,28 +15,28 @@ export default function ConfirmEmailPage() {
           <br />
           <em className="text-mint">inbox</em>
         </h1>
-        <p className="text-[13px] text-secondary">
+        <p className="text-sm text-secondary">
           One step left to join the circle.
         </p>
       </div>
 
       <div className="w-full flex flex-col gap-4">
-        <p className="text-[13px] text-secondary leading-relaxed">
+        <p className="text-sm text-secondary leading-relaxed">
           We sent a confirmation link to your email address. Click the link to
           activate your account.
         </p>
 
         <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-dim mb-1">
+          <p className="font-mono text-xs uppercase tracking-[0.14em] text-secondary mb-1">
             Didn&apos;t receive it?
           </p>
-          <p className="text-[12px] text-secondary leading-relaxed">
+          <p className="text-sm text-secondary leading-relaxed">
             Check your spam folder. It may take a few minutes to arrive.
           </p>
         </div>
       </div>
 
-      <p className="mt-8 text-center text-xs text-dim">
+      <p className="mt-8 text-center text-sm text-secondary">
         Back to{' '}
         <Link
           href="/login"

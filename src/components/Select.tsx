@@ -72,12 +72,12 @@ export default function Select<T extends string = string>({
         onKeyDown={handleKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-white/[0.07] px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-mint transition-colors"
+        className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-mint transition-colors"
       >
-        <span className="text-xs text-primary">{selectedLabel}</span>
+        <span className="text-sm text-primary">{selectedLabel}</span>
         <ChevronIcon
           className={twMerge(
-            'w-3.5 h-3.5 text-dim transition-transform duration-200 shrink-0',
+            'w-3.5 h-3.5 text-secondary transition-transform duration-200 shrink-0',
             open && 'rotate-180',
           )}
         />
@@ -95,7 +95,7 @@ export default function Select<T extends string = string>({
               aria-selected={option.value === value}
               onClick={() => handleChange(option.value)}
               className={twMerge(
-                'px-3.5 py-2 text-xs cursor-pointer transition-colors hover:bg-bg3 select-none text-secondary',
+                'px-3.5 py-4 text-sm cursor-pointer transition-colors hover:bg-bg3 select-none text-secondary',
                 option.value === value && 'text-primary bg-white/3',
               )}
             >

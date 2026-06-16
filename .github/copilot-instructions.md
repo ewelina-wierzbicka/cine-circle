@@ -25,12 +25,27 @@ src/
     (auth)/                   # public routes — login, register, confirm-email
       AuthFormLayout.tsx
       layout.tsx
+      login/
+        page.tsx
+        LoginForm.tsx
+      register/
+        page.tsx
+        RegisterForm.tsx
+      confirm-email/
+        page.tsx
     (private)/                # all protected routes (single layout)
       page.tsx                # / (home page)
       search/                 # /search
+        page.tsx
+        SearchResults.tsx
       movie/[id]/             # /movie/:id
+        page.tsx
       my-media/               # /my-media
+        page.tsx
+        MyMedia.tsx
+        UserMediaList.tsx
       series/[id]/            # /series/:id
+        page.tsx
       layout.tsx
     api/                      # Route Handlers
     layout.tsx
@@ -122,15 +137,21 @@ Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always u
 
 **Design tokens:**
 
-| Token                         | Value                    | Use                                     |
-| ----------------------------- | ------------------------ | --------------------------------------- |
-| `text-primary` / `bg-primary` | `#ece9e3`                | Warm near-white — primary text          |
-| `text-secondary`              | `rgba(236,233,227,0.75)` | Muted / supporting text                 |
-| `text-dim`                    | `rgba(236,233,227,0.50)` | Tertiary / label text                   |
-| `bg-dark` / `text-dark`       | `#0d0d10`                | Page background / text on mint          |
-| `bg-bg2`                      | `#18181f`                | Card / input background                 |
-| `bg-bg3`                      | `#21212a`                | Elevated elements (hover states, chips) |
-| `text-mint` / `bg-mint`       | `oklch(82% 0.10 165)`    | Pastel mint — primary accent            |
+```ts
+export const colors = {
+  // Page backgrounds — layered dark surfaces
+  bg: '#0d0d10', // maps to CSS var --color-dark
+  bg2: '#18181f', // maps to CSS var --color-bg2
+  bg3: '#21212a', // maps to CSS var --color-bg3
+
+  // Text
+  text: '#ece9e3', // maps to CSS var --color-primary
+  muted: 'rgba(236,233,227,0.75)', // maps to CSS var --color-secondary
+
+  // Accent — pastel mint
+  mint: 'oklch(82% 0.10 165)', // maps to CSS var --color-mint
+};
+```
 
 - **Mobile-first** — base styles for mobile, `sm:` / `md:` / `lg:` for larger screens
 - Always use design tokens for colors — never hardcode hex values

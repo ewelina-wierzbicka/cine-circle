@@ -1,6 +1,6 @@
 # cineCircle — Design System & Screen Specs
 
-> **This document is a complete design reference** for implementing the cineCircle app UI in a React codebase. A working HTML prototype (`cineCircle.html`) is included for visual reference — do not copy it directly; instead recreate each screen using your project's component patterns and the spec below.
+> **This document is a complete design reference** for implementing the cineCircle app UI in a React codebase.
 
 ---
 
@@ -17,39 +17,27 @@
 ```ts
 // tokens/colors.ts
 export const colors = {
-  // Backgrounds — layered dark surfaces
-  bg: '#0d0d10', // page background  (CSS: --color-dark → bg-dark)
-  bg1: '#121217', // slightly lifted surface (design intent — used inline as bg-white/3 etc.)
-  bg2: '#18181f', // card / input background (CSS: --color-bg2 → bg-bg2)
-  bg3: '#21212a', // elevated element (hover state bg, chips) (CSS: --color-bg3 → bg-bg3)
-
-  // Borders
-  border: 'rgba(255,255,255,0.07)', // default subtle border (used inline as border-white/[0.07])
-  border2: 'rgba(255,255,255,0.12)', // slightly more visible border (used inline)
+  // Page backgrounds — layered dark surfaces
+  bg: '#0d0d10', // maps to CSS var --color-dark
+  bg2: '#18181f', // maps to CSS var --color-bg2
+  bg3: '#21212a', // maps to CSS var --color-bg3
 
   // Text
-  text: '#ece9e3', // primary text (CSS: --color-primary → text-primary)
-  muted: 'rgba(236,233,227,0.75)', // secondary text (CSS: --color-secondary → text-secondary)
-  dim: 'rgba(236,233,227,0.50)', // tertiary / label text (CSS: --color-dim → text-dim)
+  text: '#ece9e3', // maps to CSS var --color-primary
+  muted: 'rgba(236,233,227,0.75)', // maps to CSS var --color-secondary
 
   // Accent — pastel mint
-  mint: 'oklch(82% 0.10 165)', // ~#a8e6cf (CSS: --color-mint → text-mint / bg-mint)
-  mintBg: 'oklch(82% 0.10 165 / 0.12)', // mint tint background (used inline)
-  mintGlow: 'oklch(82% 0.10 165 / 0.20)', // mint glow overlay (used inline)
-
-  // Rating stars
-  amber: 'oklch(76% 0.14 80)', // ~#e8c547 (used via Tailwind built-in: text-amber-400)
-
-  // Glass / overlay (used inline as bg-white/X or backdrop-filter utilities)
-  glass: 'rgba(13,13,16,0.70)',
-  glassHi: 'rgba(255,255,255,0.04)',
+  mint: 'oklch(82% 0.10 165)', // maps to CSS var --color-mint
 };
 ```
 
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-mint`).
-> - Design values without a named token (`bg1`, `border`, `mintBg`, `glass`, `amber`, etc.) are applied as inline Tailwind opacity utilities: `bg-white/[0.07]`, `border-white/12`, `bg-white/4`, `text-amber-400`, etc.
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-mint`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`.
+> - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `mint` → `--color-mint`.
+> - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
+> - Note: `src/globals.css` sets `body { overflow: hidden }` and `#root { position: fixed; inset: 0 }`.
 
 ### Typography
 
@@ -95,30 +83,23 @@ export const type = {
     lineHeight: 1.1,
   },
   body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
-  bodySmall: { fontFamily: fonts.sans, fontSize: 13, fontWeight: 400 },
   label: {
     fontFamily: fonts.mono,
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: 400,
     letterSpacing: '0.14em',
     textTransform: 'uppercase',
   },
-  labelSm: {
-    fontFamily: fonts.mono,
-    fontSize: 9,
-    fontWeight: 400,
-    letterSpacing: '0.20em',
-    textTransform: 'uppercase',
-  },
   navItem: {
     fontFamily: fonts.sans,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 500,
     letterSpacing: '0.02em',
   },
   btnLabel: {
     fontFamily: fonts.sans,
-    fontSize: 11,
+    // Buttons use text-base (16px) for medium and text-sm (14px) for small
+    fontSize: 16,
     fontWeight: 600,
     letterSpacing: '0.08em',
   },
@@ -173,168 +154,257 @@ export const motion = {
 
 ## Shared Components
 
-### TopBar
+### TopBar (Header)
 
-- `position: absolute`, `top: 0`, full width, `height: 56px`, `z-index: 50`, transparent background
-- Left: Logo (26px) + "cineCircle" wordmark `DM Mono 13px / weight 500 / tracking 0.05em`
-- Right: "Search" + "Collection" pill nav buttons, `1px` separator, avatar button (32×32px circle)
-- Active nav: `background: rgba(255,255,255,0.04)` + `border: 1px solid rgba(255,255,255,0.12)`
+- Implemented in `src/components/Header.tsx`.
+- Relative header bar (`h-14`) with `px-6 md:px-12` padding.
+- Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
+- Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
+- Right: avatar button with accessible dropdown, keyboard support and route handlers.
 
-### CinematicPoster (poster placeholder)
+### CinematicPoster
 
-Each movie has a unique color that drives the gradient:
-
-- Background: `linear-gradient(160deg, {color}ee 0%, {color}66 45%, #0d0d10 100%)`
-- Top fade overlay: `linear-gradient(to bottom, rgba(0,0,0,0.25), transparent)`, height 50%
-- Bottom content: genre label `DM Mono 8px mint tracking 0.15em`, title `DM Serif Display 14px`, year `DM Mono 8px dim`
-- Default size: `width: 100%`, `aspect-ratio: 2/3`
+- `src/components/CinematicPoster.tsx`.
+- Shows poster image or gradient placeholder.
+- Top fade overlay and optional vignette.
+- Bottom textual metadata is commented out; callers provide layout and aspect ratio (typically 2/3).
 
 ### StarRating
 
-- 5 SVG polygon stars, 26px hit area
-- Filled: amber `oklch(76% 0.14 80)`, empty: `rgba(255,255,255,0.10)`
-- Interactive: hover preview, click to set, `scale(0.82)` press
-- **Only shown after user adds movie to collection**
+- `src/components/StarRating.tsx`.
+- Renders 5 stars, supports half-stars via overlay clipping.
+- Filled: `text-amber-400`; empty: `text-white/15`.
+- Display-only component; used where ratings exist.
 
-### MovieCard (collection grid)
+### MovieCard (MediaCard)
 
-- Full column width, `aspect-ratio: 2/3`, `border-radius: 12px`
-- Border: `1px solid rgba(255,255,255,0.07)`, hover: mint
-- Hover: `translateY(-5px)` + bottom gradient + "VIEW →" mint label
-- Below: title `DM Sans 11px / weight 500`, year `10px dim`, optional stars
+- `src/components/MediaCard.tsx`.
+- Card: `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
+- Hover lift (`-translate-y-1.25`) and hover border tint to mint.
+- Poster image fills card; placeholder gradient when missing.
+- Hover overlay exposes actions or a `VIEW →` label (`font-mono text-sm text-mint`).
+- Title/date use `text-sm`; title `font-medium`.
+- Shows `StarRating` when `watchStatus === 'watched'` and `rating` present.
+
+### MediaCardOverlay
+
+- `src/components/MediaCardOverlay.tsx`.
+- Positioned overlay that slides up on hover.
+- Renders action buttons and prevents pointer event propagation to card link.
+
+### MediaPoster
+
+- `src/components/MediaPoster.tsx`.
+- Large poster container used in detail pages.
+- Rotated card visual (`-1.5deg`), rounded-2xl, heavy shadow and inset vignette.
+- Uses placeholder gradient when no poster path.
+
+### MediaInfo & WatchedMediaInfo
+
+- `src/components/MediaInfo.tsx` and `src/components/WatchedMediaInfo.tsx`.
+- MediaInfo: actions for adding/removing media, shows director, date, and call-to-action buttons.
+- WatchedMediaInfo: shows rating, watched date, and review; includes Update button.
+- Both use `font-mono` for labels and `font-serif` for large title with `clamp(42px, 5.5vw, 72px)`.
+
+### MediaDetail & MediaDetailWrapper
+
+- `src/components/MediaDetail.tsx` orchestrates detail UI and form vs info slots.
+- `MediaDetailWrapper.tsx` provides backdrop radial gradients and two-column layout with `MediaPoster` on the left (hidden on small screens).
+
+### MediaPage
+
+- `src/components/MediaPage.tsx` is an async wrapper used by route handlers.
+- Fetches data via `getMediaPageData`, shows `ErrorToast` on error and `MediaDetail` on success.
+
+### MediaList
+
+- `src/components/MediaList.tsx`.
+- Grid list of `MediaCard` components with responsive columns.
+- Implements intersection-observer pagination and shows `Loader` while fetching.
+
+### Input
+
+- `src/components/Input.tsx`.
+- Controlled input with `variant` prop: `search` adds an icon and padding; `rating` shows `/10` suffix.
+- Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `mint` and `bg3`.
+- Forwards ref and renders error text when provided.
+
+### SearchBox
+
+- `src/components/SearchBox.tsx`.
+- Uses `Input`, `useGetMedia` and `useGetMediaDetails` hooks.
+- Debounced query, filter chips (All/Movies/Series), dropdown with infinite-scroll via IntersectionObserver.
+- Dropdown renders `SearchDropdownItem` entries and supports keyboard/blur closing behavior.
+
+### SearchDropdownItem
+
+- `src/components/SearchDropdownItem.tsx`.
+- Renders compact row with poster thumbnail, title, director/year, and media_type tag.
+- Navigates on mouseDown to avoid losing focus before click.
+
+### Select
+
+- `src/components/Select.tsx`.
+- Accessible custom select with keyboard nav (ArrowUp/ArrowDown/Escape/Enter).
+- Renders a listbox when open and highlights selected option.
+
+### DatePicker
+
+- `src/components/DatePicker.tsx`.
+- Wraps `react-day-picker` and exposes a read-only `Input` that toggles the calendar.
+- Click-outside closes the picker and the DayPicker disables future dates.
+
+### UserEntryForm
+
+- `src/components/UserEntryForm.tsx`.
+- Form to add or update a user's watched entry (watched_date, rating, review).
+- Uses `react-hook-form`, `DatePicker`, `Input`, `Textarea`, and `Button`.
+- Calls `addUserMedia` or `updateUserMedia` and invalidates queries on success.
+
+### Textarea
+
+- `src/components/Textarea.tsx`.
+- Styled rounded textarea (`h-30`) with focus styles, forwards ref and shows error messages.
+
+### Button
+
+- `src/components/Button.tsx`.
+- Variants: `filled` (default) and `outlined`.
+- Colors: `mint` (default), `primary`, `secondary`.
+- Sizes: `medium` (h-12 text-base) and `small` (h-10 text-sm).
+- Uses `uppercase tracking-[0.08em] font-semibold` and merges custom classes via `twMerge`.
+
+### Loader
+
+- `src/components/Loader.tsx`.
+- Simple spinner using a bordered circle with `animate-spin`.
+- Accepts `fullScreen` prop to fill container height.
+
+### ErrorToast
+
+- `src/components/ErrorToast.tsx`.
+- Shows a toast.error when mounted via `react-toastify`.
 
 ---
 
-## Screen 1 — Login
+---
 
-**Layout:** Two-column flex, full viewport (`position: fixed; inset: 0`)
+## Login/Register
 
-### Left column (50%)
+- Implemented by `src/app/(auth)/AuthFormLayout.tsx` with `LoginForm` and `RegisterForm` as children.
+- Layout: fixed two-column auth shell (`fixed inset-0 flex`). Left column contains the form; right column (desktop) shows a 3×2 grid of `CinematicPoster` tiles fetched from `getTrendingMovies()`.
 
-- `background: #0d0d10`
-- Grid texture: `repeating-linear-gradient` at `48px` intervals, `rgba(255,255,255,0.07)`, `opacity: 0.4`
-- Mint radial glow at bottom: `480px`, `oklch(82% 0.10 165 / 0.10)`
-- Logo `top: 28px / left: 24px`
-- Form (max-width 360px, vertically centered):
-  - Heading: `"Welcome"` + newline + `<em color:mint>back.</em>` — DM Serif Display 36px
-  - Subtext: `"Sign in to your collection"` — 13px muted
-  - Inputs: `height 46px`, `border-radius 12px`, `bg2` bg, focus: mint border + `bg3` bg
-  - Labels: DM Mono 10px uppercase dim, `margin-bottom 8px`
-  - SIGN IN button: `height 48px`, `border-radius 12px`, mint bg, bg text, hover `opacity 0.82`
+Left column (Form)
 
-### Right column (flex: 1)
+- Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
+- Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with mint-emphasized word (`<em class="text-mint">`).
+- Subtext: `text-base text-secondary`.
+- Labels: `font-mono text-sm uppercase tracking-[0.14em] text-secondary`.
+- Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-mint` and `bg-bg3`.
+- Buttons: use `Button` component (color `mint`, medium size → `h-12 text-base`). Disabled/pending states handled.
+- Footer link toggles between Login and Register using `text-mint` links.
 
-- `background: #0d0d10`
-- `3×2 CSS grid` of CinematicPoster tiles, `gap: 3px`, fills entire column
-- Each tile: `width/height: 100%`, `border-radius: 0`
-- Gradient overlays:
-  - Right-to-left: `rgba(13,13,16,0.92) → transparent` at 40%
-  - Top/bottom vignette
-- Bottom-right label: "FILM" DM Serif Display 28px / opacity 0.12 + "TRACK · RATE · SHARE" mono 9px mint / opacity 0.7
+Right column (Visuals)
+
+- Rendered only on `lg` and up (`hidden lg:block`).
+- 3×2 grid of `CinematicPoster` components; each tile fills its cell.
+- Two overlay gradients: a right-to-left dark fade and a top/bottom vignette applied via absolute layers.
+- Top-left logo (26×26) and `font-mono` wordmark are positioned absolutely.
 
 ---
 
-## Screen 2 — Search / Home
+## Search / Home
 
-**Layout:** Full viewport flex column. TopBar (absolute) + hero + bottom strip.
+- Implemented in `src/app/(private)/page.tsx`.
 
-### Ambient background (absolute, inset 0)
+Layout & Ambient
 
-Three radial gradient blobs from movie colors:
+- `min-h-full` flex column with three absolute radial blobs implemented as blurred rounded divs.
+- Blobs mimic movie color accents and a mint blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 
-- Blob 1: `top: -30%, left: -5%`, `60% × 130%`, movie[0].color, `blur: 55px`, `opacity: 0.35`
-- Blob 2: `top: 10%, right: -10%`, `50% × 80%`, movie[6].color, `blur: 55px`, `opacity: 0.25`
-- Blob 3: `bottom: -20%, left: 30%`, `40% × 80%`, mint `oklch(82% 0.10 165 / 0.15)`, `blur: 40px`
+Hero
 
-### Ghost watermark (absolute, centered)
+- Heading implemented as `h2` using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with mint emphasis via `<em class="text-mint">`.
+- Subtext: `text-secondary text-md` and centered.
+- Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
-- "FILM" — DM Serif Display `28vw`, `color: rgba(255,255,255,0.02)`, `letter-spacing: -0.05em`
+Search
 
-### Hero content (flex 1, centered)
+- Central SearchBox (`src/components/SearchBox.tsx`) placed in a `max-w-160` wrapper.
+- SearchBox internals: `Input` with transparent background in the centered layout, container toggles focus state to `bg-bg2` and `border-mint` plus focus shadow `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
+- Filter chips are buttons with `font-mono text-sm tracking-[0.05em]`; active chip uses `bg-mint text-dark font-medium`.
+- SearchBox provides `hintTitles` from `getTrendingMovies()` and renders an animated dropdown with infinite-scroll via IntersectionObserver.
 
-- Heading: `"What will you"` + `<em color:mint>watch next?</em>` — DM Serif Display 52px, `line-height: 0.95`
-- Sub: `"Search any title to add it to your circle"` — 13px muted, centered
+Recently Watched
 
-### Search bar (max-width 640px)
+- Uses `getUserMediaList('watched')` to build `recentPosters` and renders a horizontal `overflow-x-auto` strip of `CinematicPoster` links.
+- Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
+- Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-mint tracking-[0.08em]`.
 
-- `bg1` → `bg2` on focus, `border: 1px solid` (mint on focus), `border-radius: 16px`, `padding: 6px 6px 6px 20px`
-- Focus glow: `box-shadow: 0 0 0 3px oklch(82% 0.10 165 / 0.12)`
-- Filter chips: "All" / "Movies" / "Series" — active: mint bg; inactive: transparent
-
-### Recently Watched strip (bottom, `padding: 0 48px 32px`)
-
-- Label "RECENTLY WATCHED" DM Mono 9px dim + "SEE ALL →" mint
+- Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" mint
 - Horizontal scroll of `110×165px` CinematicPoster cards, `border-radius: 10px`, `gap: 12px`
 
 ---
 
-## Screen 3 — Collection
+## Collection
 
-**Layout:** Full viewport flex column.
+- Implemented under `src/app/(private)/my-media/` via `Page` (server component) and `MyMedia` (client component).
 
-### Ambient glow
+Layout & Header
 
-Two radial blobs from first two visible movie colors, `opacity: 0.12`, `blur: 80px`
+- Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-mint uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
+- Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-mint text-dark`.
+- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering.
+- Search filter is debounced via `useSearch` hook.
 
-### Header (`padding: 72px 48px 20px`)
+List & Cards
 
-Left:
+- `UserMediaList` (client) fetches paginated data via `useUserMedia` and renders `MediaList`.
+- `MediaList` uses a responsive CSS grid: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5`.
+- Cards are `MediaCard` components with `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
+- Empty state shows a centered `font-mono text-sm` message.
+- Pagination uses IntersectionObserver to fetch next pages and shows `Loader` while loading.
 
-- Eyebrow: "MY COLLECTION" — DM Mono 9px mint, tracking 0.2em
-- Title: "Watched" (mint italic) or "To Watch" — DM Serif Display 48px, `letter-spacing: -0.03em`
-- Count: "N TITLES" — DM Mono 12px dim
+Notes
 
-Right:
-
-- Filter input: `bg2`, `border`, `border-radius: 10px`
-- Tab toggle: active = mint bg; inactive = transparent
-- `(count label removed from right — shown under heading)`
-
-### Movie Grid
-
-- CSS Grid: `repeat(6, 1fr)` gap `20px` (poster mode) / `repeat(8, 1fr)` gap `14px` (compact)
-- Cards: `MovieCard` component, full column width, aspect-ratio 2/3
+- Title and counts are derived server-side; the right-side count label is omitted in favor of a prominent heading.
 
 ---
 
-## Screen 4 — Movie Detail
+## Movie Detail
 
-**Layout:** Full viewport. `position: fixed; inset: 0`
+- Implemented via `src/app/(movie|series)/[slug]/page.tsx` → `MediaPage` → `MediaDetail`.
 
-### Cinematic backdrop (2 layers, z-index 0)
+Overall structure
 
-1. `radial-gradient(ellipse at 25% 35%, {movie.color} 0%, {movie.color}55 35%, #0d0d10 68%)`
-2. `radial-gradient(ellipse at 75% 65%, {movie.color}33 0%, transparent 55%)`
+- `MediaPage` is an async route loader that calls `getMediaPageData` and renders `ErrorToast` on error or `MediaDetail` on success.
+- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = info, 2 = form). It detects saved state by checking `watchStatus` in the media object.
+- `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
 
-### Vignette overlays (z-index 1)
+Poster & Visuals
 
-- Bottom: `linear-gradient(to bottom, rgba(13,13,16,0.55) 0%, rgba(13,13,16,0.1) 40%, rgba(13,13,16,0.75) 100%)`
-- Right: `linear-gradient(to right, transparent 35%, rgba(13,13,16,0.72) 100%)`
+- `MediaPoster` is a rotated card (`-1.5deg`), `rounded-2xl`, heavy drop shadow and inset vignette. Uses placeholder gradient when no poster.
+- Backdrop gradients and vignette overlays are implemented in `MediaDetailWrapper` via absolute `bg-[radial-gradient(...)]` and `bg-[linear-gradient(...)]` utilities.
 
-### Main layout (top: 56px → bottom: 0, flex row)
+Info & Form
 
-**Left (40%)**
+- Info view (`MediaInfo` or `WatchedMediaInfo`) shows:
+  - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
+  - Eyebrow (type) using `font-mono text-xs tracking-[0.22em] text-mint uppercase`.
+  - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
+  - Meta row: director label `font-mono text-xs tracking-[0.08em]` and date `font-mono text-[13px]`.
+  - Mint divider `w-12 h-px bg-mint opacity-60`.
+  - Action buttons: `Button` (mint filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
-- Centered, `padding: 32px 16px 32px 64px`
-- CinematicPoster: `width: min(100%, 340px)`, `aspect-ratio: 2/3`
-- Container: `border-radius: 16px`, `box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07)`, `transform: rotate(-1.5deg)`
+- Watched view (`WatchedMediaInfo`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
 
-**Right (flex: 1)**
+- Form view (`UserEntryForm`) uses `react-hook-form` and includes:
+  - DatePicker (`DatePicker`) for `watched_date` (disables future dates).
+  - Rating input (`Input` variant `rating`) validated 0–10.
+  - Review textarea (`Textarea`) with maxLength 1000.
+  - Submit calls `addUserMedia` (create) or `updateUserMedia` (update) and invalidates user media queries. On success it navigates or toggles back to info.
 
-- `padding: 32px 80px 32px 40px`, centered vertically
+Interactions & Accessibility
 
-Content order:
-
-1. `← BACK TO COLLECTION` — DM Mono 10px dim, hover: mint
-2. Genre eyebrow — DM Mono 10px mint, tracking 0.22em
-3. **Title** — DM Serif Display `clamp(42px, 5.5vw, 72px)`, `line-height: 0.95`
-4. Meta — "DIR." mono label + director + dot + year
-5. Mint divider — `48px × 1px`, opacity 0.6
-6. **Star rating** — only when `hasBeenAdded === true`
-7. **Action buttons** — "I WANT TO WATCH" / "I WATCHED"
-   - Active: mint bg + bg text
-   - Inactive: `rgba(255,255,255,0.06)` + `backdrop-filter: blur(8px)`
-   - Clicking sets `watchState` and reveals rating + notes
-8. **Note textarea** — only when `hasBeenAdded === true`
-
----
+- `MediaCard` and detail actions use Links/Buttons with clear focus and hover states.
+- Keyboard and mouse interactions are handled in dropdowns and selects (accessible listbox behavior in `Select`).
