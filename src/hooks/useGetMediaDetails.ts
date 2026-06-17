@@ -1,5 +1,5 @@
 import { NormalizedMedia } from '@/types';
-import { useQuery } from '@tanstack/react-query';
+import { useQueries } from '@tanstack/react-query';
 
 async function fetchMediaDetail(
   item: NormalizedMedia,
@@ -15,12 +15,6 @@ async function fetchMediaDetail(
   }
 }
 
-async function fetchMediaDetails(
-  items: NormalizedMedia[],
-): Promise<NormalizedMedia[]> {
-  return Promise.all(items.map(fetchMediaDetail));
-}
-
 type UseMediaDetailsOptions = {
   items: NormalizedMedia[];
   enabled?: boolean;
@@ -32,12 +26,23 @@ export function useGetMediaDetails({
   enabled = true,
   staleTime = 1000 * 60 * 5,
 }: UseMediaDetailsOptions) {
-  return useQuery({
-    queryKey: ['media-details', items.length, ...items.map((i) => i.id)],
-    queryFn: () => fetchMediaDetails(items),
-    enabled: enabled && items.length > 0,
-    staleTime,
-    gcTime: 1000 * 60 * 10,
-    retry: 1,
+  const queries = useQueries({
+    queries: items.map((item) => ({
+      queryKey: ['media-detail', item.media_type, item.id],
+      queryFn: () => fetchMediaDetail(item),
+      enabled,
+      staleTime,
+      gcTime: 1000 * 60 * 10,
+      retry: 1,
+    })),
+    combine: (results) => ({
+      data: results.every((r) => r.data !== undefined)
+        ? results.map((r) => r.data as NormalizedMedia)
+        : undefined,
+      isLoading: results.some((r) => r.isLoading),
+      isError: results.some((r) => r.isError),
+    }),
   });
+
+  return queries;
 }

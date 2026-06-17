@@ -35,9 +35,11 @@ export function SearchBox({
   const [debouncedQuery] = useDebounce(query, 300);
   const [displayCount, setDisplayCount] = useState(6);
   const [showResults, setShowResults] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Track search key to reset display count when query or type changes
   const searchKey = `${debouncedQuery}-${mediaType}`;
@@ -46,6 +48,7 @@ export function SearchBox({
   if (searchKey !== lastSearchKey) {
     setLastSearchKey(searchKey);
     setDisplayCount(6);
+    setActiveIndex(-1);
   }
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -74,6 +77,7 @@ export function SearchBox({
         !containerRef.current.contains(event.target as Node)
       ) {
         setShowResults(false);
+        setActiveIndex(-1);
       }
     };
 
@@ -81,15 +85,113 @@ export function SearchBox({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const navigate = (q: string) => {
+    if (!q.trim()) return;
+    router.push(`/search?query=${encodeURIComponent(q)}&type=${mediaType}`);
+  };
+
+  // Keyboard navigation for dropdown
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showDropdown || displayResults.length === 0) return;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setActiveIndex((prev) => {
+            const next = prev < displayResults.length - 1 ? prev + 1 : prev;
+
+            // If navigating near the end, load more (only once per batch)
+            if (
+              next >= displayResults.length - 1 &&
+              (displayCount < allResults.length || hasNextPage)
+            ) {
+              setDisplayCount((prevCount) => {
+                const newCount = prevCount + 6;
+                if (
+                  newCount >= allResults.length &&
+                  hasNextPage &&
+                  !isFetchingNextPage
+                ) {
+                  fetchNextPage();
+                }
+                return newCount;
+              });
+              // Reset trigger after a short delay
+              setTimeout(() => {}, 500);
+            }
+
+            // Scroll into view
+            setTimeout(() => {
+              itemRefs.current[next]?.scrollIntoView({
+                block: 'nearest',
+                behavior: 'smooth',
+              });
+            }, 0);
+            return next;
+          });
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          setActiveIndex((prev) => {
+            const next = prev > 0 ? prev - 1 : -1;
+            // Scroll into view
+            if (next >= 0) {
+              setTimeout(() => {
+                itemRefs.current[next]?.scrollIntoView({
+                  block: 'nearest',
+                  behavior: 'smooth',
+                });
+              }, 0);
+            }
+            return next;
+          });
+          break;
+
+        case 'Enter':
+          e.preventDefault();
+          if (activeIndex >= 0 && displayResults[activeIndex]) {
+            const item = displayResults[activeIndex];
+            const href =
+              item.media_type === 'series'
+                ? `/series/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+                : `/movie/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            router.push(href);
+          } else {
+            navigate(query);
+          }
+          break;
+
+        case 'Escape':
+          e.preventDefault();
+          setShowResults(false);
+          setActiveIndex(-1);
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [
+    displayResults,
+    activeIndex,
+    query,
+    mediaType,
+    router,
+    allResults.length,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  ]);
+
   // Intersection observer for infinite scroll within dropdown
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          // Show 6 more results
           setDisplayCount((prev) => {
             const newCount = prev + 6;
-            // If we've shown all available results and there are more pages, fetch next page
             if (
               newCount >= allResults.length &&
               hasNextPage &&
@@ -123,11 +225,6 @@ export function SearchBox({
     fetchNextPage,
   ]);
 
-  const navigate = (q: string) => {
-    if (!q.trim()) return;
-    router.push(`/search?query=${encodeURIComponent(q)}&type=${mediaType}`);
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -159,6 +256,15 @@ export function SearchBox({
           handleKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          role="combobox"
+          aria-expanded={showDropdown}
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          aria-activedescendant={
+            activeIndex >= 0
+              ? `search-result-${displayResults[activeIndex]?.id}`
+              : undefined
+          }
         />
         <div className="flex gap-1 ml-2 shrink-0">
           {FILTER_CHIPS.map(({ label, value }) => (
@@ -182,6 +288,8 @@ export function SearchBox({
       {showDropdown && (
         <div
           ref={dropdownRef}
+          role="listbox"
+          aria-label="Search results"
           className="absolute left-0 right-0 top-full z-30 bg-bg2 border border-secondary/30 rounded-xl mt-2 shadow-lg animate-fade-in max-h-96 overflow-y-auto"
         >
           {isLoading ? (
@@ -194,6 +302,11 @@ export function SearchBox({
                 <SearchDropdownItem
                   key={`${item.media_type}-${item.id}-${idx}`}
                   item={item}
+                  ref={(el) => {
+                    itemRefs.current[idx] = el;
+                  }}
+                  isActive={activeIndex === idx}
+                  onMouseEnter={() => setActiveIndex(idx)}
                 />
               ))}
               {(displayCount < allResults.length || hasNextPage) && (
