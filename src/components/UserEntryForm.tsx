@@ -1,7 +1,7 @@
 'use client';
 
 import DatePicker from '@/components/DatePicker';
-import Input from '@/components/Input';
+import StarRatingInput from '@/components/StarRatingInput';
 import Textarea from '@/components/Textarea';
 import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
 import { NormalizedMedia, UserEntry } from '@/types';
@@ -133,20 +133,12 @@ export default function UserEntryForm({
           />
         </div>
         <div>
-          <label
-            htmlFor="rating"
-            className="block font-mono text-sm tracking-[0.18em] text-secondary uppercase my-3"
-          >
-            How did you like it? (0–10)
+          <label className="block font-mono text-sm tracking-[0.18em] text-secondary uppercase my-3">
+            How did you like it?
           </label>
-          <Input
-            id="rating"
-            variant="rating"
-            type="number"
-            {...register('rating', {
-              min: { value: 0, message: 'Rating must be at least 0' },
-              max: { value: 10, message: 'Rating cannot be greater than 10' },
-            })}
+          <StarRatingInput
+            value={watch('rating') ?? 0}
+            onChange={(v) => setValue('rating', v)}
             error={errors.rating?.message}
           />
         </div>
