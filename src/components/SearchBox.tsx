@@ -246,37 +246,39 @@ export function SearchBox({
     <div ref={containerRef} className="relative">
       <div
         className={twMerge(
-          'flex items-center rounded-2xl border transition-all duration-200 pl-5 pr-1.5 py-1.5',
+          'flex flex-wrap sm:flex-nowrap items-center rounded-2xl border transition-all duration-200 pl-5 pr-1.5 py-1.5',
           focused
             ? 'bg-bg2 border-mint shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]'
             : 'border-secondary/50',
         )}
       >
-        <SearchIcon className="w-4 h-4 text-secondary shrink-0 mr-3" />
-        <Input
-          id="search-input"
-          type="text"
-          value={query}
-          placeholder="Search movies & series…"
-          className="flex-1 bg-transparent border-none h-10 text-sm pl-0 pr-0 rounded-none focus:border-transparent focus:bg-transparent"
-          handleChange={(e) => {
-            setQuery(e.target.value);
-            setShowResults(true);
-          }}
-          handleKeyDown={handleKeyDown}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          role="combobox"
-          aria-expanded={showDropdown}
-          aria-controls="search-results"
-          aria-autocomplete="list"
-          aria-activedescendant={
-            activeIndex >= 0
-              ? `search-result-${displayResults[activeIndex]?.id}`
-              : undefined
-          }
-        />
-        <div className="flex gap-1 ml-2 shrink-0">
+        <div className="flex items-center flex-1 min-w-0">
+          <SearchIcon className="w-4 h-4 text-secondary shrink-0 mr-3" />
+          <Input
+            id="search-input"
+            type="text"
+            value={query}
+            placeholder="Search movies & series…"
+            className="flex-1 bg-transparent border-none h-10 text-sm pl-0 pr-0 rounded-none focus:border-transparent focus:bg-transparent"
+            handleChange={(e) => {
+              setQuery(e.target.value);
+              setShowResults(true);
+            }}
+            handleKeyDown={handleKeyDown}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            role="combobox"
+            aria-expanded={showDropdown}
+            aria-controls="search-results"
+            aria-autocomplete="list"
+            aria-activedescendant={
+              activeIndex >= 0
+                ? `search-result-${displayResults[activeIndex]?.id}`
+                : undefined
+            }
+          />
+        </div>
+        <div className="flex gap-1 sm:ml-2 shrink-0 w-full sm:w-auto pt-1 sm:pt-0">
           {FILTER_CHIPS.map(({ label, value }) => (
             <button
               key={value}
