@@ -58,7 +58,7 @@ export default function UserEntryForm({
 
   const onSubmit = async (data: UserEntry) => {
     const { rating, review, watched_date } = data;
-    const normalizedRating = !rating ? undefined : Number(rating);
+    const normalizedRating = rating === 0 ? null : (rating ?? undefined);
 
     setIsSaving(true);
     try {
