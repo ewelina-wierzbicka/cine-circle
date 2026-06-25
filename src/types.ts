@@ -35,7 +35,7 @@ export type NormalizedMedia = Movie & {
 export type UserEntry = {
   watchStatus: 'watched' | 'to_watch';
   watched_date?: string;
-  rating?: number;
+  rating?: number | null;
   review?: string;
 };
 
