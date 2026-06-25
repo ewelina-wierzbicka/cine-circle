@@ -96,9 +96,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
         )}
       </div>
       <div>
-        <Button color="mint" handleClick={onEdit}>
-          UPDATE
-        </Button>
+        <Button handleClick={onEdit}>UPDATE</Button>
       </div>
     </div>
   );

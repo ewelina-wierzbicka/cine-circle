@@ -72,12 +72,7 @@ export function LoginForm() {
           <Input id="password" type="password" {...register('password')} />
         </div>
 
-        <Button
-          type="submit"
-          color="mint"
-          className="mt-3"
-          disabled={isPending}
-        >
+        <Button type="submit" className="mt-3" disabled={isPending}>
           SIGN IN
         </Button>
       </form>

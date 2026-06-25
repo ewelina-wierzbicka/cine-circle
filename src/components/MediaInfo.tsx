@@ -128,7 +128,7 @@ export default function MediaInfo({
       <div className="flex gap-2.5 max-w-110">
         {isToWatch ? (
           <>
-            <Button color="mint" handleClick={addToWatched} className="flex-1">
+            <Button handleClick={addToWatched} className="flex-1">
               MOVE TO WATCHED
             </Button>
             <Button
@@ -150,7 +150,7 @@ export default function MediaInfo({
             >
               {isSaving ? 'SAVING…' : 'I WANT TO WATCH'}
             </Button>
-            <Button color="mint" handleClick={addToWatched} className="flex-1">
+            <Button handleClick={addToWatched} className="flex-1">
               I WATCHED
             </Button>
           </>

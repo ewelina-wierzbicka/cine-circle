@@ -5,7 +5,6 @@ import { twMerge } from '@/lib/cn';
 type Props = {
   handleClick?: () => void;
   type?: 'submit' | 'button';
-  color?: 'primary' | 'secondary' | 'mint';
   variant?: 'filled' | 'outlined';
   size?: 'small' | 'medium';
   className?: string;
@@ -16,7 +15,6 @@ type Props = {
 export default function Button({
   handleClick,
   type = 'button',
-  color = 'mint',
   variant = 'filled',
   size = 'medium',
   className,
@@ -33,13 +31,7 @@ export default function Button({
         size === 'medium' ? 'h-12 text-base' : 'h-10 text-sm',
         variant === 'outlined'
           ? 'text-primary border border-white/50 hover:bg-white/5'
-          : twMerge(
-              color === 'mint'
-                ? 'bg-mint text-dark hover:opacity-[0.82]'
-                : color === 'secondary'
-                  ? 'bg-secondary text-dark'
-                  : 'bg-primary text-dark',
-            ),
+          : 'bg-mint text-dark hover:opacity-[0.82]',
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
