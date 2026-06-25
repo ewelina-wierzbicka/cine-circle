@@ -22,7 +22,6 @@ export default function MediaList({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
-  className,
 }: Props) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,9 +59,9 @@ export default function MediaList({
   }
 
   return (
-    <div className={className}>
+    <div className="w-full">
       {heading && <div className="mb-8">{heading}</div>}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+      <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {media.map((item, index) => {
           const tmdbId = 'tmdb_id' in item ? item.tmdb_id : item.id;
           const userMediaId = 'tmdb_id' in item ? item.id : undefined;

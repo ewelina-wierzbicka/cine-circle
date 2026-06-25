@@ -54,7 +54,7 @@ export default function SearchResults({ query, type, initialData }: Props) {
             </p>
             <p className="font-serif text-[clamp(24px,3.5vw,38px)] tracking-[-0.02em] leading-none">
               &ldquo;{query}&rdquo;{' '}
-              <span className="text-secondary text-[0.6em] font-sans">
+              <span className="text-secondary text-xl font-sans">
                 {TYPE_LABELS[type]}
               </span>
             </p>

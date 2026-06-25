@@ -23,14 +23,14 @@ export default function MyMedia({ tab, initialData }: Props) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-10 pb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-10 pb-12">
         <div>
           <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
             My Collection
           </p>
           <h1 className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95]">
             {tab === 'watched' ? (
-              <em className="text-mint">Watched</em>
+              <em className="text-primary">Watched</em>
             ) : (
               <>
                 To <em className="text-primary">Watch</em>

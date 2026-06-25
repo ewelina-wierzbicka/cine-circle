@@ -19,9 +19,7 @@ export default function MediaDetailWrapper({
   return (
     <div className="relative flex flex-col overflow-hidden bg-dark min-h-full">
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(at_25%_35%,rgb(26,42,74)_0%,rgba(26,42,74,0.333)_35%,rgb(13,13,16)_68%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_65%,rgba(168,230,207,0.04)_0%,transparent_55%)]" />
-        <div className="absolute inset-0 z-1 bg-[linear-gradient(to_bottom,rgba(13,13,16,0.55)_0%,rgba(13,13,16,0.05)_40%,rgba(13,13,16,0.65)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(at_25%_35%,rgb(26,42,74)_0%,rgba(26,42,74,0.333)_15%,rgb(13,13,16)_68%)]" />
         <div className="absolute inset-0 z-1 bg-[linear-gradient(to_right,rgba(13,13,16,0)_35%,rgba(13,13,16,0.72)_100%)]" />
       </div>
       <div className="relative z-2 flex flex-1">

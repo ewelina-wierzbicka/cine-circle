@@ -95,8 +95,8 @@ export default function Select<T extends string = string>({
               aria-selected={option.value === value}
               onClick={() => handleChange(option.value)}
               className={twMerge(
-                'px-3.5 py-4 text-sm cursor-pointer transition-colors hover:bg-bg3 select-none text-secondary',
-                option.value === value && 'text-primary bg-white/3',
+                'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary',
+                option.value === value && 'text-primary bg-bg3',
               )}
             >
               {option.label}

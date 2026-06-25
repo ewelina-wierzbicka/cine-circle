@@ -119,6 +119,11 @@ export const colors = {
 
 > Star ratings use Tailwind's built-in `text-amber-400` — not a custom token.
 
+**Gradient utility (defined in `globals.css`):**
+
+- `--gradient-blue`: `linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`
+- `bg-gradient-blue` — applies `--gradient-blue` as background-image via `@utility`
+
 **Animation utilities (defined in `globals.css`):**
 
 - `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring

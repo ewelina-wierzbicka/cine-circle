@@ -1,3 +1,4 @@
+import { twMerge } from '@/lib/cn';
 import { TrendingMovie } from '@/types';
 import Image from 'next/image';
 
@@ -16,14 +17,11 @@ export function CinematicPoster({
 
   return (
     <div
-      className={`relative overflow-hidden flex flex-col justify-end p-3 bg-dark ${className}`}
-      style={
-        !hasRealPoster
-          ? {
-              background: `linear-gradient(160deg, #1A3A5CED 0%,  #1a3a5c66 45%, #0d0d10 100%)`,
-            }
-          : undefined
-      }
+      className={twMerge(
+        'relative overflow-hidden flex flex-col justify-end p-3 bg-dark',
+        !hasRealPoster && 'bg-gradient-blue',
+        className,
+      )}
     >
       {item.posterUrl && (
         <Image

@@ -1,3 +1,4 @@
+import { twMerge } from '@/lib/cn';
 import Image from 'next/image';
 
 type Props = {
@@ -13,12 +14,11 @@ export default function MediaPoster({
 }: Props) {
   return (
     <div
-      className={`relative w-full max-w-120 aspect-2/3 rounded-2xl overflow-hidden -rotate-[1.5deg] origin-center shadow-[rgba(0,0,0,0.8)_0px_40px_100px,rgba(255,255,255,0.07)_0px_0px_0px_1px] ${className}`}
-      style={{
-        ...(!posterPath && {
-          background: `linear-gradient(160deg, #1A3A5CED 0%,  #1a3a5c66 45%, #0d0d10 100%)`,
-        }),
-      }}
+      className={twMerge(
+        'relative w-full max-w-120 aspect-2/3 rounded-2xl overflow-hidden -rotate-[1.5deg] origin-center shadow-[rgba(0,0,0,0.8)_0px_40px_100px,rgba(255,255,255,0.07)_0px_0px_0px_1px]',
+        !posterPath && 'bg-gradient-blue',
+        className,
+      )}
     >
       {posterPath && (
         <Image

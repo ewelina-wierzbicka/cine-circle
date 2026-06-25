@@ -35,6 +35,7 @@ export const colors = {
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-mint`).
 > - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-mint`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`.
+> - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `mint` → `--color-mint`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
 > - Note: `src/globals.css` sets `body { overflow: hidden }` and `#root { position: fixed; inset: 0 }`.

@@ -15,8 +15,8 @@ export default function MediaCardOverlay({ children }: Props) {
         e.stopPropagation();
       }}
     >
-      <div className="absolute inset-0 bg-linear-to-t from-dark/95 via-dark/60 to-transparent pointer-events-none" />
-      <div className="relative z-10 flex flex-col w-full gap-1.5 p-2.5">
+      <div className="absolute inset-0 bg-linear-to-t from-dark via-dark/70 to-transparent pointer-events-none" />
+      <div className="relative z-10 flex flex-col w-full gap-2 p-2.5">
         {children}
       </div>
     </div>

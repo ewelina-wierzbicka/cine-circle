@@ -7,7 +7,7 @@ import { useGetMediaDetails } from '@/hooks/useGetMediaDetails';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import { twMerge } from '@/lib/cn';
 import { FilterMediaType } from '@/types';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
@@ -29,6 +29,8 @@ export function SearchBox({
   hintTitles,
 }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isSearchResultsPage = pathname === '/search';
   const [mediaType, setMediaType] = useState<FilterMediaType>(initialType);
   const [focused, setFocused] = useState(false);
   const [query, setQuery] = useState(initialQuery);
@@ -53,9 +55,8 @@ export function SearchBox({
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useGetMedia({
-      query: debouncedQuery,
+      query: isSearchResultsPage ? '' : debouncedQuery,
       type: mediaType,
-      staleTime: 1000 * 60 * 5,
     });
 
   const allResults = data?.pages.flatMap((page) => page.results) ?? [];
@@ -67,7 +68,8 @@ export function SearchBox({
   });
 
   const displayResults = detailedResults ?? visibleResults;
-  const showDropdown = debouncedQuery.trim().length > 0 && showResults;
+  const showDropdown =
+    !isSearchResultsPage && debouncedQuery.trim().length > 0 && showResults;
 
   // Click outside handler to close dropdown
   useEffect(() => {
@@ -85,10 +87,18 @@ export function SearchBox({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navigate = (q: string) => {
+  const navigate = (q: string, t?: FilterMediaType) => {
     if (!q.trim()) return;
-    router.push(`/search?query=${encodeURIComponent(q)}&type=${mediaType}`);
+    router.push(
+      `/search?query=${encodeURIComponent(q)}&type=${t ?? mediaType}`,
+    );
   };
+
+  useEffect(() => {
+    if (isSearchResultsPage && debouncedQuery.trim()) {
+      navigate(debouncedQuery, mediaType);
+    }
+  }, [debouncedQuery, mediaType, pathname]);
 
   // Keyboard navigation for dropdown
   useEffect(() => {
@@ -242,7 +252,7 @@ export function SearchBox({
             : 'border-secondary/50',
         )}
       >
-        <SearchIcon className="w-4 h-4 text-primary/40 shrink-0 mr-3" />
+        <SearchIcon className="w-4 h-4 text-secondary shrink-0 mr-3" />
         <Input
           id="search-input"
           type="text"

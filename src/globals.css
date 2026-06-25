@@ -13,6 +13,16 @@
   --color-bg2: #18181f;
   --color-bg3: #21212a;
   --color-mint: oklch(82% 0.1 165);
+  --gradient-blue: linear-gradient(
+    160deg,
+    #1a3a5ced 0%,
+    #1a3a5c66 45%,
+    #0d0d10 100%
+  );
+}
+
+@utility bg-gradient-blue {
+  background-image: var(--gradient-blue);
 }
 
 html,

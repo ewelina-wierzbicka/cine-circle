@@ -1,8 +1,8 @@
 'use client';
 
+import type { NormalizedMedia } from '@/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import type { NormalizedMedia } from '@/types';
 import { forwardRef } from 'react';
 
 type Props = {
@@ -43,21 +43,7 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
             className="w-8 h-12 object-cover rounded-md bg-bg3"
           />
         ) : (
-          <div
-            className="w-8 h-12 relative rounded-sm"
-            style={{
-              background:
-                'linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)',
-            }}
-          >
-            <div
-              className="absolute inset-0 rounded-sm pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.25)]"
-              style={{
-                background:
-                  'linear-gradient(to top, rgba(13,13,16,0.92) 0%, rgba(13,13,16,0.5) 40%, transparent 75%)',
-              }}
-            />
-          </div>
+          <div className="w-8 h-12 relative rounded-sm bg-gradient-blue"></div>
         )}
 
         <span className="flex-1 min-w-0">
