@@ -19,7 +19,6 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
     {
       user_id: user.id,
       display_name: displayName,
-      updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },
   );
@@ -69,7 +68,6 @@ export const updateAvatarUrl = async (avatarUrl: string): Promise<void> => {
     {
       user_id: user.id,
       avatar_url: avatarUrl,
-      updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },
   );
