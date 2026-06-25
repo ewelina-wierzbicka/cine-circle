@@ -71,6 +71,16 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
             {displayValue}/10
           </span>
         )}
+        {value > 0 && (
+          <button
+            type="button"
+            className="ml-2 text-xs text-secondary hover:text-primary transition-colors"
+            onClick={() => onChange(0)}
+            aria-label="Clear rating"
+          >
+            ✕
+          </button>
+        )}
       </div>
       {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
     </div>
