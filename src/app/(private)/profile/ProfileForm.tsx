@@ -10,7 +10,7 @@ import {
 } from '@/services/updateProfile';
 import { updateEmail, updatePassword, deleteAccount } from '@/services/account';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +22,7 @@ type Props = {
 export function ProfileForm({ profile, email }: Props) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const confirmRef = useRef<HTMLDivElement>(null);
 
   const [displayName, setDisplayName] = useState(profile.display_name ?? '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
@@ -32,6 +33,10 @@ export function ProfileForm({ profile, email }: Props) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [saving, setSaving] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (confirmDelete) confirmRef.current?.focus();
+  }, [confirmDelete]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -136,6 +141,7 @@ export function ProfileForm({ profile, email }: Props) {
           onClick={() => fileInputRef.current?.click()}
           className="relative w-20 h-20 rounded-full overflow-hidden bg-bg2 border border-white/[0.07] cursor-pointer shrink-0 group"
           disabled={saving === 'avatar'}
+          aria-label="Change avatar"
         >
           {avatarUrl ? (
             <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
@@ -159,6 +165,7 @@ export function ProfileForm({ profile, email }: Props) {
           accept="image/jpeg,image/png,image/webp"
           className="hidden"
           onChange={handleAvatarChange}
+          aria-label="Upload avatar image"
         />
         <div>
           <p className="text-sm text-secondary">Click to change avatar</p>
@@ -166,7 +173,7 @@ export function ProfileForm({ profile, email }: Props) {
       </section>
 
       {/* Display Name */}
-      <Section title="Display name">
+      <Section title="Display name" labelFor="displayName">
         <Input
           id="displayName"
           value={displayName}
@@ -187,7 +194,7 @@ export function ProfileForm({ profile, email }: Props) {
       </Section>
 
       {/* Email */}
-      <Section title="Email">
+      <Section title="Email" labelFor="email">
         <Input
           id="email"
           type="email"
@@ -210,27 +217,42 @@ export function ProfileForm({ profile, email }: Props) {
       {/* Password */}
       <Section title="Change password">
         <div className="flex flex-col gap-3">
-          <Input
-            id="currentPassword"
-            type="password"
-            value={currentPassword}
-            handleChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Current password"
-          />
-          <Input
-            id="newPassword"
-            type="password"
-            value={newPassword}
-            handleChange={(e) => setNewPassword(e.target.value)}
-            placeholder="New password"
-          />
-          <Input
-            id="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            handleChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm new password"
-          />
+          <div>
+            <label htmlFor="currentPassword" className="sr-only">
+              Current password
+            </label>
+            <Input
+              id="currentPassword"
+              type="password"
+              value={currentPassword}
+              handleChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Current password"
+            />
+          </div>
+          <div>
+            <label htmlFor="newPassword" className="sr-only">
+              New password
+            </label>
+            <Input
+              id="newPassword"
+              type="password"
+              value={newPassword}
+              handleChange={(e) => setNewPassword(e.target.value)}
+              placeholder="New password"
+            />
+          </div>
+          <div>
+            <label htmlFor="confirmPassword" className="sr-only">
+              Confirm new password
+            </label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              handleChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+            />
+          </div>
         </div>
         <Button
           handleClick={handleChangePassword}
@@ -264,7 +286,16 @@ export function ProfileForm({ profile, email }: Props) {
               </Button>
             </>
           ) : (
-            <>
+            <div
+              ref={confirmRef}
+              tabIndex={-1}
+              role="alertdialog"
+              aria-label="Confirm account deletion"
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setConfirmDelete(false);
+              }}
+              className="outline-none"
+            >
               <p className="text-sm text-red-400 mb-3 font-medium">
                 Are you sure? This cannot be undone.
               </p>
@@ -286,7 +317,7 @@ export function ProfileForm({ profile, email }: Props) {
                   Cancel
                 </Button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </Section>
@@ -296,16 +327,24 @@ export function ProfileForm({ profile, email }: Props) {
 
 function Section({
   title,
+  labelFor,
   children,
 }: {
   title: string;
+  labelFor?: string;
   children: React.ReactNode;
 }) {
+  const cls =
+    'font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-3';
   return (
     <section>
-      <h2 className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-3">
-        {title}
-      </h2>
+      {labelFor ? (
+        <label htmlFor={labelFor} className={`block ${cls}`}>
+          {title}
+        </label>
+      ) : (
+        <h2 className={cls}>{title}</h2>
+      )}
       {children}
     </section>
   );
