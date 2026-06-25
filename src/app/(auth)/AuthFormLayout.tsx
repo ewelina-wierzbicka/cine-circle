@@ -28,6 +28,7 @@ export default async function AuthFormLayout({
             backgroundImage: `linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)`,
           }}
         />
+        <div className="absolute -bottom-30 left-1/2 w-120 h-120 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.82_0.1_165/0.1)_0%,transparent_65%)]" />
         <div className="absolute top-7 left-6 flex items-center gap-2.5">
           <Image
             src="/logo.png"

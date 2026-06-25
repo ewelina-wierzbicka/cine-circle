@@ -37,12 +37,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-full flex flex-col relative">
-      <div className="absolute inset-0">
-        <div className="absolute rounded-full blur-[55px] opacity-35 top-[-30%] left-[-5%] w-[60%] h-[130%] bg-[radial-gradient(ellipse,#1a3a5c_0%,transparent_65%)]" />
-        <div className="absolute rounded-full blur-[55px] opacity-25 top-[10%] right-[-10%] w-[50%] h-[80%] bg-[radial-gradient(ellipse,#6b4a10_0%,transparent_65%)]" />
-        <div className="absolute rounded-full blur-2xl bottom-[-20%] left-[30%] w-[40%] h-[80%] bg-[radial-gradient(ellipse,oklch(82%_0.10_165/0.15)_0%,transparent_65%)]" />
-      </div>
-
       <div className="flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10">
         <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
           What will you
