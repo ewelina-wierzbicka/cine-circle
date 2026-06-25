@@ -37,6 +37,19 @@ export function ProfileForm({ profile, email }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_SIZE = 2 * 1024 * 1024;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Avatar must be a JPEG, PNG, or WebP image');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      toast.error('Avatar must be 2MB or smaller');
+      e.target.value = '';
+      return;
+    }
+
     setSaving('avatar');
     try {
       const { signedUrl, publicUrl } = await getAvatarUploadUrl(file.name);
@@ -143,7 +156,7 @@ export function ProfileForm({ profile, email }: Props) {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           className="hidden"
           onChange={handleAvatarChange}
         />
