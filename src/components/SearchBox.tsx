@@ -276,7 +276,7 @@ export function SearchBox({
               : undefined
           }
         />
-        <div className="flex gap-1 ml-2 shrink-0">
+        <div className="hidden sm:flex gap-1 ml-2 shrink-0">
           {FILTER_CHIPS.map(({ label, value }) => (
             <button
               key={value}
@@ -293,6 +293,24 @@ export function SearchBox({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="flex sm:hidden gap-2 mt-3">
+        {FILTER_CHIPS.map(({ label, value }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setMediaType(value)}
+            className={twMerge(
+              'flex-1 py-2.5 rounded-xl text-sm font-mono tracking-[0.05em] transition-all duration-150 cursor-pointer',
+              mediaType === value
+                ? 'bg-mint text-dark font-medium'
+                : 'bg-bg3 text-secondary border border-secondary/20',
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {showDropdown && (
@@ -334,7 +352,7 @@ export function SearchBox({
 
       {hintTitles && (
         <div className="absolute flex justify-center w-full">
-          <div className="flex gap-2 mt-7 flex-wrap animate-fade-in">
+          <div className="flex justify-center gap-2 mt-7 flex-wrap animate-fade-in">
             {hintTitles.map((title) => (
               <button
                 key={title}
