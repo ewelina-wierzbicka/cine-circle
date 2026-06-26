@@ -27,8 +27,8 @@ export default function MediaDetailWrapper({
           <MediaPoster
             src={posterSrc}
             title={posterTitle}
-            rotate={true}
-            className="rounded-2xl"
+            className="rounded-2xl -rotate-[1.5deg] origin-center',
+"
           />
         </div>
         <div className="flex-1 flex flex-col justify-center py-8 px-6 md:px-12 md:pl-10 overflow-y-auto">

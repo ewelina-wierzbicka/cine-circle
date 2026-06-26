@@ -7,7 +7,6 @@ type Props = {
   className?: string;
   sizes?: string;
   priority?: boolean;
-  rotate?: boolean;
 };
 
 export default function MediaPoster({
@@ -16,13 +15,11 @@ export default function MediaPoster({
   className = '',
   sizes = '(max-width: 767px) 340px, 500px',
   priority = false,
-  rotate = false,
 }: Props) {
   return (
     <div
       className={twMerge(
         'relative w-full max-w-120 aspect-2/3 overflow-hidden',
-        rotate && '-rotate-[1.5deg] origin-center',
         !src && 'bg-gradient-blue',
         className,
       )}
