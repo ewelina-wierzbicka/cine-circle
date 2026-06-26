@@ -4,6 +4,7 @@ import Image from 'next/image';
 type Props = {
   title: string;
   posterPath?: string;
+  src?: string;
   className?: string;
   imageWidth?: string;
   sizes?: string;
@@ -14,18 +15,25 @@ type Props = {
 export default function MediaPoster({
   title,
   posterPath,
+  src,
   className = '',
   imageWidth = 'w780',
-  sizes = '(max-width: 767px) 340px, 480px',
+  sizes = '(max-width: 767px) 340px, 500px',
   priority = false,
-  rotate = true,
+  rotate = false,
 }: Props) {
+  const imageSrc =
+    src ??
+    (posterPath
+      ? `https://image.tmdb.org/t/p/${imageWidth}${posterPath}`
+      : undefined);
+
   return (
     <div
       className={twMerge(
         'relative w-full max-w-120 aspect-2/3 overflow-hidden rounded-2xl',
         rotate && '-rotate-[1.5deg] origin-center',
-        !posterPath && 'bg-gradient-blue',
+        !imageSrc && 'bg-gradient-blue',
         className,
       )}
       style={{
@@ -33,7 +41,7 @@ export default function MediaPoster({
           'rgba(0, 0, 0, 0.8) 0px 40px 100px, rgba(255, 255, 255, 0.07) 0px 0px 0px 1px',
       }}
     >
-      {!posterPath && (
+      {!imageSrc && (
         <div
           className="absolute inset-0 h-1/2"
           style={{
@@ -41,11 +49,11 @@ export default function MediaPoster({
           }}
         />
       )}
-      {posterPath && (
+      {imageSrc && (
         <Image
           className="object-cover object-top"
           fill
-          src={`https://image.tmdb.org/t/p/${imageWidth}${posterPath}`}
+          src={imageSrc}
           sizes={sizes}
           alt={title}
           priority={priority}
