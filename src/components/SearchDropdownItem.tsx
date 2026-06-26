@@ -1,7 +1,7 @@
 'use client';
 
+import MediaPoster from '@/components/MediaPoster';
 import type { NormalizedMedia } from '@/types';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { forwardRef } from 'react';
 
@@ -34,17 +34,18 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
           isActive ? 'bg-bg3' : 'hover:bg-bg3'
         }`}
       >
-        {item.poster_path ? (
-          <Image
-            src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
-            alt={item.title}
-            width={32}
-            height={48}
-            className="w-8 h-12 object-cover rounded-md bg-bg3"
-          />
-        ) : (
-          <div className="w-8 h-12 relative rounded-sm bg-gradient-blue"></div>
-        )}
+        <MediaPoster
+          title={item.title}
+          posterPath={item.poster_path}
+          className="w-8 h-12 rounded-md bg-bg3"
+          fill={false}
+          width={32}
+          height={48}
+          imageWidth="w92"
+          rotate={false}
+          shadow={false}
+          innerShadow={false}
+        />
 
         <span className="flex-1 min-w-0">
           <span className="block line-clamp-1">{item.title}</span>
