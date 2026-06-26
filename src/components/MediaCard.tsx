@@ -97,10 +97,6 @@ export default function MediaCard({
     router.push(`${href}?step=2`);
   };
 
-  const handleSeeDetails = () => {
-    router.push(href);
-  };
-
   return (
     <div className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3">
       <div
@@ -166,11 +162,11 @@ export default function MediaCard({
         {userMediaId && watchStatus === 'watched' && (
           <MediaCardOverlay>
             <Button
-              handleClick={handleSeeDetails}
+              handleClick={handleAddToWatched}
               size="small"
               variant="outlined"
             >
-              See details
+              Update
             </Button>
             <Button
               handleClick={handleDelete}

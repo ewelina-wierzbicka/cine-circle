@@ -2,10 +2,11 @@
 
 import Loader from '@/components/Loader';
 import MediaList from '@/components/MediaList';
+import { useCollectionStatus } from '@/hooks/useCollectionStatus';
 import { SearchMediaResponse, useGetMedia } from '@/hooks/useGetMedia';
 import { toSearchMediaListProps } from '@/lib/mediaUtils';
 import { FilterMediaType } from '@/types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 
 const TYPE_LABELS: Record<FilterMediaType, string> = {
@@ -40,13 +41,36 @@ export default function SearchResults({ query, type, initialData }: Props) {
     }
   }, [error]);
 
-  const allMedia = data?.pages.flatMap((page) => page.results) ?? [];
+  const allMedia = useMemo(
+    () => data?.pages.flatMap((page) => page.results) ?? [],
+    [data],
+  );
+
+  const collectionItems = useMemo(
+    () => allMedia.map((m) => ({ tmdbId: m.id, mediaType: m.media_type })),
+    [allMedia],
+  );
+  const { data: statusMap } = useCollectionStatus(collectionItems);
+
+  const enrichedMedia = useMemo(() => {
+    return allMedia.map((media) => {
+      const base = toSearchMediaListProps(media);
+      const status = statusMap?.get(`${media.id}-${media.media_type}`);
+      if (!status) return base;
+      return {
+        ...base,
+        tmdb_id: media.id,
+        id: status.userMediaId,
+        watchStatus: status.watchStatus,
+      };
+    });
+  }, [allMedia, statusMap]);
 
   return (
     <>
       {isLoading && <Loader fullScreen={true} />}
       <MediaList
-        media={allMedia.map(toSearchMediaListProps)}
+        media={enrichedMedia}
         heading={
           <div>
             <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
