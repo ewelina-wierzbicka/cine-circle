@@ -1,4 +1,4 @@
-import { CinematicPoster } from '@/components/CinematicPoster';
+import MediaPoster from '@/components/MediaPoster';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
 import Image from 'next/image';
@@ -50,10 +50,12 @@ export default async function AuthFormLayout({
         <div className="hidden lg:block flex-1 relative bg-dark">
           <div className="grid grid-cols-3 grid-rows-2 gap-0.75 h-full w-full">
             {posters.map((poster) => (
-              <CinematicPoster
+              <MediaPoster
                 key={poster.title}
-                item={poster}
-                className="h-full w-full"
+                title={poster.title}
+                src={poster.posterUrl}
+                className="h-full shadow-none!"
+                sizes="16vw"
               />
             ))}
           </div>

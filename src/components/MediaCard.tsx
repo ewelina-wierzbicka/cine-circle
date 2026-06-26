@@ -5,13 +5,13 @@ import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from './Button';
 import MediaCardOverlay from './MediaCardOverlay';
+import MediaPoster from './MediaPoster';
 import StarRating from './StarRating';
 
 type Props = {
@@ -110,20 +110,16 @@ export default function MediaCard({
         )}
       >
         <Link href={href} className="absolute inset-0" tabIndex={-1}>
-          {poster_path && (
-            <Image
-              className="object-cover object-top"
-              fill={true}
-              src={
-                poster_path
-                  ? `https://image.tmdb.org/t/p/w342${poster_path}`
-                  : '/no-image.jpg'
-              }
-              sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
-              alt={title}
-              priority={priority}
-            />
-          )}
+          <MediaPoster
+            title={title}
+            src={
+              poster_path
+                ? `https://image.tmdb.org/t/p/w342${poster_path}`
+                : undefined
+            }
+            sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
+            priority={priority}
+          />
         </Link>
         {!userMediaId && (
           <MediaCardOverlay>

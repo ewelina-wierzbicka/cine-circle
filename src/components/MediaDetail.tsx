@@ -76,7 +76,11 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
 
   return (
     <MediaDetailWrapper
-      posterPath={media.poster_path}
+      posterSrc={
+        media.poster_path
+          ? `https://image.tmdb.org/t/p/w780${media.poster_path}`
+          : undefined
+      }
       posterTitle={media.title}
       step={step}
       infoSlot={infoSlot}

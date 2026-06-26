@@ -3,33 +3,52 @@ import Image from 'next/image';
 
 type Props = {
   title: string;
-  posterPath?: string;
+  src?: string;
   className?: string;
+  sizes?: string;
+  priority?: boolean;
 };
 
 export default function MediaPoster({
   title,
-  posterPath,
+  src,
   className = '',
+  sizes = '(max-width: 767px) 340px, 500px',
+  priority = false,
 }: Props) {
   return (
     <div
       className={twMerge(
-        'relative w-full max-w-120 aspect-2/3 rounded-2xl overflow-hidden -rotate-[1.5deg] origin-center shadow-[rgba(0,0,0,0.8)_0px_40px_100px,rgba(255,255,255,0.07)_0px_0px_0px_1px]',
-        !posterPath && 'bg-gradient-blue',
+        'relative w-full max-w-120 aspect-2/3 overflow-hidden',
+        !src && 'bg-gradient-blue',
         className,
       )}
+      style={{
+        boxShadow:
+          'rgba(0, 0, 0, 0.8) 0px 40px 100px, rgba(255, 255, 255, 0.07) 0px 0px 0px 1px',
+      }}
     >
-      {posterPath && (
+      {src ? (
         <Image
           className="object-cover object-top"
-          fill={true}
-          src={`https://image.tmdb.org/t/p/w780${posterPath}`}
-          sizes="(max-width: 767px) 340px, 480px"
+          fill
+          src={src}
+          sizes={sizes}
           alt={title}
+          priority={priority}
+        />
+      ) : (
+        <div
+          className="absolute inset-0 h-1/2"
+          style={{
+            background: 'linear-gradient(rgba(0, 0, 0, 0.25), transparent)',
+          }}
         />
       )}
-      <div className="absolute inset-0 rounded-2xl pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.25)]" />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.25)' }}
+      />
     </div>
   );
 }

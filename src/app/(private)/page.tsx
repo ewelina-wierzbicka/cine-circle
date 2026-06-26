@@ -1,4 +1,4 @@
-import { CinematicPoster } from '@/components/CinematicPoster';
+import MediaPoster from '@/components/MediaPoster';
 import SearchBox from '@/components/SearchBox';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { getUserMediaList } from '@/services/getUserMedia';
@@ -76,11 +76,12 @@ export default async function Home() {
                 <Link
                   key={i}
                   href={href}
-                  className="shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
+                  className="shrink-0 rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
                 >
-                  <CinematicPoster
-                    item={poster}
-                    className="w-full h-full"
+                  <MediaPoster
+                    title={poster.title}
+                    src={poster.posterUrl}
+                    className="w-full h-full max-w-none rounded-xl"
                     sizes="110px"
                   />
                 </Link>
