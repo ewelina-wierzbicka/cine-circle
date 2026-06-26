@@ -112,12 +112,14 @@ export default function MediaCard({
         <Link href={href} className="absolute inset-0" tabIndex={-1}>
           <MediaPoster
             title={title}
-            posterPath={poster_path}
+            src={
+              poster_path
+                ? `https://image.tmdb.org/t/p/w342${poster_path}`
+                : undefined
+            }
             className="w-full h-full max-w-none rounded-none"
-            imageWidth="w342"
             sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
             priority={priority}
-            rotate={false}
           />
         </Link>
         {!userMediaId && (

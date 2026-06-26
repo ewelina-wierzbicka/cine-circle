@@ -36,11 +36,13 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
       >
         <MediaPoster
           title={item.title}
-          posterPath={item.poster_path}
-          className="w-8 h-12 max-w-none rounded-md bg-bg3"
-          imageWidth="w92"
+          src={
+            item.poster_path
+              ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+              : undefined
+          }
+          className="w-8 h-12 max-w-none rounded-md"
           sizes="32px"
-          rotate={false}
         />
 
         <span className="flex-1 min-w-0">
