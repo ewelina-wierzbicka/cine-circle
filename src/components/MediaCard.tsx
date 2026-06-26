@@ -117,7 +117,6 @@ export default function MediaCard({
                 ? `https://image.tmdb.org/t/p/w342${poster_path}`
                 : undefined
             }
-            className="w-full h-full max-w-none rounded-none"
             sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
             priority={priority}
           />

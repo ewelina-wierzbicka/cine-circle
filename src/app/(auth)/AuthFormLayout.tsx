@@ -54,7 +54,8 @@ export default async function AuthFormLayout({
                 key={poster.title}
                 title={poster.title}
                 src={poster.posterUrl}
-                className="h-full w-full max-w-none rounded-none"
+                className="h-full shadow-none!"
+                sizes="16vw"
               />
             ))}
           </div>

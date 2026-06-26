@@ -76,12 +76,12 @@ export default async function Home() {
                 <Link
                   key={i}
                   href={href}
-                  className="shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
+                  className="shrink-0 rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
                 >
                   <MediaPoster
                     title={poster.title}
                     src={poster.posterUrl}
-                    className="w-full h-full max-w-none rounded-none"
+                    className="w-full h-full max-w-none rounded-xl"
                     sizes="110px"
                   />
                 </Link>

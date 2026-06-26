@@ -41,7 +41,7 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
               ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
               : undefined
           }
-          className="w-8 h-12 max-w-none rounded-md"
+          className="w-8 h-12 rounded-md shadow-none!"
           sizes="32px"
         />
 

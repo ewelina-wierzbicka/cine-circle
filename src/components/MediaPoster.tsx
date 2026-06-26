@@ -21,7 +21,7 @@ export default function MediaPoster({
   return (
     <div
       className={twMerge(
-        'relative w-full max-w-120 aspect-2/3 overflow-hidden rounded-2xl',
+        'relative w-full max-w-120 aspect-2/3 overflow-hidden',
         rotate && '-rotate-[1.5deg] origin-center',
         !src && 'bg-gradient-blue',
         className,
@@ -49,7 +49,7 @@ export default function MediaPoster({
         />
       )}
       <div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.25)' }}
       />
     </div>

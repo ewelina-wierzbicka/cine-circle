@@ -24,7 +24,12 @@ export default function MediaDetailWrapper({
       </div>
       <div className="relative z-2 flex flex-1">
         <div className="hidden md:flex w-1/2 shrink-0 items-center justify-center py-8 px-6 md:px-12 pr-4">
-          <MediaPoster src={posterSrc} title={posterTitle} rotate={true} />
+          <MediaPoster
+            src={posterSrc}
+            title={posterTitle}
+            rotate={true}
+            className="rounded-2xl"
+          />
         </div>
         <div className="flex-1 flex flex-col justify-center py-8 px-6 md:px-12 md:pl-10 overflow-y-auto">
           {step === 1 ? infoSlot : formSlot}
