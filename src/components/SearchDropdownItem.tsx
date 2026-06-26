@@ -37,14 +37,10 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
         <MediaPoster
           title={item.title}
           posterPath={item.poster_path}
-          className="w-8 h-12 rounded-md bg-bg3"
-          fill={false}
-          width={32}
-          height={48}
+          className="w-8 h-12 max-w-none rounded-md bg-bg3"
           imageWidth="w92"
+          sizes="32px"
           rotate={false}
-          shadow={false}
-          innerShadow={false}
         />
 
         <span className="flex-1 min-w-0">

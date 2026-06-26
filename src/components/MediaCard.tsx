@@ -118,8 +118,6 @@ export default function MediaCard({
             sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
             priority={priority}
             rotate={false}
-            shadow={false}
-            innerShadow={false}
           />
         </Link>
         {!userMediaId && (
