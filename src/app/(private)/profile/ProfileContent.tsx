@@ -55,9 +55,30 @@ export function ProfileContent({ profile, email }: Props) {
     setIsEditingName(false);
   };
 
+  const [avatarError, setAvatarError] = useState('');
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setAvatarError('');
+
+    const MAX_SIZE = 1024 * 1024;
+    const ALLOWED_TYPES = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+    ];
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setAvatarError('Only JPEG, PNG, WebP, and GIF images are allowed.');
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setAvatarError('Image must be under 1 MB.');
+      return;
+    }
+
     const { signedUrl, publicUrl } = await getAvatarUploadUrl(file.name);
     await fetch(signedUrl, {
       method: 'PUT',
@@ -152,7 +173,10 @@ export function ProfileContent({ profile, email }: Props) {
             onChange={(e) => void handleAvatarChange(e)}
           />
         </div>
-        <div>
+        <div className="flex-1 min-w-0">
+          {avatarError && (
+            <p className="text-red-400 text-xs mb-2">{avatarError}</p>
+          )}
           <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
             Display name
           </p>
@@ -355,7 +379,7 @@ export function ProfileContent({ profile, email }: Props) {
             <p className="font-mono text-sm uppercase tracking-[0.15em] text-red-400">
               Delete account
             </p>
-            <p className="text-secondary text-sm mt-2">
+            <p className="text-secondary text-sm mt-4">
               Permanently remove your account and data
             </p>
           </div>
@@ -368,13 +392,13 @@ export function ProfileContent({ profile, email }: Props) {
         </button>
 
         {deleteOpen && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-2 space-y-3">
             <p className="text-sm text-secondary">
               This will permanently erase your profile, collection, ratings and
               notes.
-              <p className="text-primary font-semibold">
-                This cannot be undone.
-              </p>
+            </p>
+            <p className="text-primary font-semibold text-sm">
+              This cannot be undone.
             </p>
             <div className="mt-6">
               <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
