@@ -27,28 +27,6 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
   if (error) throw error;
 };
 
-export const getAvatarUploadUrl = async (
-  fileName: string,
-): Promise<{ signedUrl: string; path: string }> => {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error('Not authenticated');
-
-  const path = `${user.id}/${fileName}`;
-
-  const { data, error } = await supabase.storage
-    .from('avatar')
-    .createSignedUploadUrl(path);
-
-  if (error) throw error;
-
-  return { signedUrl: data.signedUrl, path };
-};
-
 export const updateAvatarUrl = async (
   filePath: string,
 ): Promise<{ avatarUrl: string }> => {

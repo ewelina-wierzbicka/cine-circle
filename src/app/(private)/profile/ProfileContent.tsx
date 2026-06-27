@@ -6,11 +6,8 @@ import ChevronIcon from '@/icons/Chevron';
 import { twMerge } from '@/lib/cn';
 import { deleteAccount, updateEmail, updatePassword } from '@/services/account';
 import { logout } from '@/services/auth';
-import {
-  getAvatarUploadUrl,
-  updateAvatarUrl,
-  updateDisplayName,
-} from '@/services/updateProfile';
+import { createClient } from '@/lib/supabase/client';
+import { updateAvatarUrl, updateDisplayName } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 import { useRef, useState } from 'react';
 
@@ -79,12 +76,24 @@ export function ProfileContent({ profile, email }: Props) {
       return;
     }
 
-    const { signedUrl, path } = await getAvatarUploadUrl(file.name);
-    await fetch(signedUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': file.type },
-      body: file,
-    });
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const ext = file.name.split('.').pop() ?? 'jpg';
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatar')
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) {
+      setAvatarError(uploadError.message);
+      return;
+    }
+
     const { avatarUrl: newUrl } = await updateAvatarUrl(path);
     setAvatarUrl(newUrl);
   };
