@@ -28,7 +28,9 @@ export default function Button({
       disabled={disabled}
       className={twMerge(
         'w-full rounded-xl font-semibold uppercase tracking-[0.08em] cursor-pointer transition-opacity',
-        size === 'medium' ? 'h-12 text-base' : 'h-10 text-sm',
+        size === 'medium'
+          ? 'py-3 text-base md:text-sm lg:text-base'
+          : 'py-2 text-sm',
         variant === 'outlined'
           ? 'text-primary border border-white/50 hover:bg-white/5'
           : 'bg-mint text-dark hover:opacity-[0.82]',

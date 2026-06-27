@@ -74,7 +74,7 @@ export default function Select<T extends string = string>({
         aria-expanded={open}
         className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-mint transition-colors"
       >
-        <span className="text-sm text-primary">{selectedLabel}</span>
+        <span className="text-sm text-secondary">{selectedLabel}</span>
         <ChevronIcon
           className={twMerge(
             'w-3.5 h-3.5 text-secondary transition-transform duration-200 shrink-0',

@@ -18,7 +18,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
   const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
-  const typeLabel = media_type === 'series' ? 'SERIES' : 'FILM';
+  const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
 
   const formattedDate = watched_date
     ? new Date(watched_date).toLocaleDateString('en-GB', {
@@ -29,7 +29,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
     : null;
 
   return (
-    <div className="flex flex-col w-full animate-fade-up max-w-full sm:max-w-120">
+    <div className="flex flex-col w-full animate-fade-up max-w-full md:max-w-140">
       <Link
         href="/my-media"
         className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
@@ -70,7 +70,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
             </p>
             <div className="flex items-center gap-3">
               <StarRating rating={rating} />
-              <span className="font-mono text-sm tracking-[0.06em] text-secondary">
+              <span className="font-mono text-sm tracking-[0.06em] text-primary">
                 {rating}/10
               </span>
             </div>
@@ -89,7 +89,7 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
             <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
               Review
             </p>
-            <p className="text-sm text-secondary leading-relaxed whitespace-pre-wrap">
+            <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap">
               {review}
             </p>
           </div>

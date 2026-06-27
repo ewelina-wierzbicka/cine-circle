@@ -24,7 +24,7 @@ export default function MyMedia({ tab, initialData }: Props) {
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-10 pb-12">
-        <div>
+        <div className="w-full sm:w-[25%]">
           <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
             My Collection
           </p>
@@ -38,19 +38,11 @@ export default function MyMedia({ tab, initialData }: Props) {
             )}
           </h1>
         </div>
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap md:flex-nowrap">
-          <Input
-            type="text"
-            placeholder="Filter…"
-            onChange={handleChange}
-            className="w-48 h-10"
-            id="filter"
-            variant="search"
-          />
-          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0">
+        <div className="flex items-center justify-end gap-2.5 shrink-0 flex-wrap w-full sm:w-[75%]">
+          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0 w-full sm:w-auto ">
             <Link
               href="?tab=watched"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 ${
+              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
                 tab === 'watched'
                   ? 'bg-mint text-dark'
                   : 'text-secondary hover:text-primary'
@@ -60,7 +52,7 @@ export default function MyMedia({ tab, initialData }: Props) {
             </Link>
             <Link
               href="?tab=to_watch"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 ${
+              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
                 tab === 'to_watch'
                   ? 'bg-mint text-dark'
                   : 'text-secondary hover:text-primary'
@@ -69,12 +61,25 @@ export default function MyMedia({ tab, initialData }: Props) {
               To Watch
             </Link>
           </div>
-          <Select
-            value={mediaType}
-            options={MEDIA_TYPE_OPTIONS}
-            onChange={setMediaType}
-            className="w-48"
-          />
+          <div className="flex gap-2.5 w-full sm:w-auto flex-wrap justify-end">
+            <div className="w-full sm:w-53.25">
+              <Input
+                type="text"
+                placeholder="Filter…"
+                onChange={handleChange}
+                id="filter"
+                className="h-10"
+                variant="search"
+              />
+            </div>
+
+            <Select
+              value={mediaType}
+              options={MEDIA_TYPE_OPTIONS}
+              onChange={setMediaType}
+              className="w-full sm:w-53.25"
+            />
+          </div>
         </div>
       </div>
 
