@@ -46,13 +46,15 @@ export const getAvatarUploadUrl = async (
 
   if (error) throw error;
 
-  const { data: publicData } = supabase.storage
+  const { data: downloadData, error: downloadError } = await supabase.storage
     .from('avatar')
-    .getPublicUrl(path);
+    .createSignedUrl(path, 60 * 60 * 24 * 365);
+
+  if (downloadError) throw downloadError;
 
   return {
     signedUrl: data.signedUrl,
-    publicUrl: publicData.publicUrl,
+    publicUrl: downloadData.signedUrl,
   };
 };
 
