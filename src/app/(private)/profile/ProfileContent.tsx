@@ -13,10 +13,9 @@ import { useState } from 'react';
 type Props = {
   profile: UserProfile | null;
   email: string;
-  watchedCount: number;
 };
 
-export function ProfileContent({ profile, email, watchedCount }: Props) {
+export function ProfileContent({ profile, email }: Props) {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
   const [isEditingName, setIsEditingName] = useState(false);
 
@@ -147,9 +146,6 @@ export function ProfileContent({ profile, email, watchedCount }: Props) {
               </svg>
             </button>
           )}
-          <p className="font-mono text-xs text-secondary mt-1">
-            {watchedCount} films watched
-          </p>
         </div>
       </div>
 
