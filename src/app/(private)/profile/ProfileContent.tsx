@@ -6,9 +6,14 @@ import ChevronIcon from '@/icons/Chevron';
 import { twMerge } from '@/lib/cn';
 import { deleteAccount, updateEmail, updatePassword } from '@/services/account';
 import { logout } from '@/services/auth';
-import { updateDisplayName } from '@/services/updateProfile';
+import {
+  getAvatarUploadUrl,
+  updateAvatarUrl,
+  updateDisplayName,
+} from '@/services/updateProfile';
 import { UserProfile } from '@/types';
-import { useState } from 'react';
+import Image from 'next/image';
+import { useRef, useState } from 'react';
 
 type Props = {
   profile: UserProfile | null;
@@ -18,6 +23,8 @@ type Props = {
 export function ProfileContent({ profile, email }: Props) {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
   const [isEditingName, setIsEditingName] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [emailOpen, setEmailOpen] = useState(false);
   const [newEmail, setNewEmail] = useState('');
@@ -47,6 +54,19 @@ export function ProfileContent({ profile, email }: Props) {
   const handleSaveName = async () => {
     await updateDisplayName(displayName);
     setIsEditingName(false);
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const { signedUrl, publicUrl } = await getAvatarUploadUrl(file.name);
+    await fetch(signedUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+    await updateAvatarUrl(publicUrl);
+    setAvatarUrl(publicUrl);
   };
 
   const handleUpdateEmail = async () => {
@@ -96,8 +116,44 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Profile Card */}
       <div className="bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6">
-        <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center shrink-0">
-          <span className="font-serif text-3xl text-primary">{initials}</span>
+        <div className="relative shrink-0">
+          <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center overflow-hidden">
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt="Avatar"
+                width={88}
+                height={88}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="font-serif text-3xl text-primary">
+                {initials}
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-white/[0.07] flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
+            aria-label="Change avatar"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-3.5 h-3.5 text-mint"
+            >
+              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+            </svg>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => void handleAvatarChange(e)}
+          />
         </div>
         <div>
           <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
@@ -129,7 +185,7 @@ export function ProfileContent({ profile, email }: Props) {
                   setDisplayName(profile?.display_name ?? '');
                   setIsEditingName(false);
                 }}
-                className="ml-2 text-xs text-secondary hover:text-primary transition-colors"
+                className="ml-2 text-sm text-secondary hover:text-primary transition-colors cursor-pointer"
                 aria-label="Cancel editing"
               >
                 ✕
@@ -159,7 +215,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Account Card */}
       <div className="bg-bg2 border border-white/[0.07] rounded-2xl p-6 mb-4">
-        <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-4">
+        <p className="font-mono text-base uppercase tracking-[0.15em] text-secondary mb-6">
           Account
         </p>
 
@@ -170,11 +226,11 @@ export function ProfileContent({ profile, email }: Props) {
             onClick={() => setEmailOpen(!emailOpen)}
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
-            <div className="text-left">
-              <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary">
+            <div className="text-left pr-2">
+              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
                 Email address
               </p>
-              <p className="text-primary text-sm mt-0.5">{email}</p>
+              <p className="text-primary text-sm mt-2">{email}</p>
             </div>
             <ChevronIcon
               className={twMerge(
@@ -185,9 +241,9 @@ export function ProfileContent({ profile, email }: Props) {
           </button>
 
           {emailOpen && (
-            <div className="mt-4 space-y-3">
+            <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
                   New email
                 </p>
                 <Input
@@ -195,14 +251,13 @@ export function ProfileContent({ profile, email }: Props) {
                   type="email"
                   value={newEmail}
                   handleChange={(e) => setNewEmail(e.target.value)}
-                  placeholder={email}
                   error={emailError}
                 />
               </div>
               <Button
                 handleClick={() => void handleUpdateEmail()}
                 disabled={!newEmail || emailLoading}
-                className="w-auto px-8"
+                className="w-auto"
               >
                 Update email
               </Button>
@@ -218,10 +273,10 @@ export function ProfileContent({ profile, email }: Props) {
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
             <div className="text-left">
-              <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary">
+              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
                 Password
               </p>
-              <p className="text-secondary text-sm mt-0.5 tracking-widest">
+              <p className="text-secondary text-sm mt-2 tracking-widest">
                 ••••••••
               </p>
             </div>
@@ -234,9 +289,9 @@ export function ProfileContent({ profile, email }: Props) {
           </button>
 
           {passwordOpen && (
-            <div className="mt-4 space-y-3">
+            <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
                   Current password
                 </p>
                 <Input
@@ -247,7 +302,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
                   New password
                 </p>
                 <Input
@@ -258,7 +313,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
                   Confirm new password
                 </p>
                 <Input
@@ -277,8 +332,7 @@ export function ProfileContent({ profile, email }: Props) {
                   !confirmPassword ||
                   passwordLoading
                 }
-                variant="outlined"
-                className="w-auto px-8"
+                className="w-auto"
               >
                 Update password
               </Button>
@@ -289,7 +343,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Danger Zone Card */}
       <div className="bg-bg2 border border-red-400/20 rounded-2xl p-6 mb-8">
-        <p className="font-mono text-xs uppercase tracking-[0.15em] text-red-400 mb-4">
+        <p className="font-mono text-base uppercase tracking-[0.15em] text-red-400 mb-6">
           Danger zone
         </p>
 
@@ -299,10 +353,10 @@ export function ProfileContent({ profile, email }: Props) {
           className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
         >
           <div className="text-left">
-            <p className="font-mono text-xs uppercase tracking-[0.15em] text-red-400">
+            <p className="font-mono text-sm uppercase tracking-[0.15em] text-red-400">
               Delete account
             </p>
-            <p className="text-secondary text-sm mt-0.5">
+            <p className="text-secondary text-sm mt-2">
               Permanently remove your account and data
             </p>
           </div>
@@ -318,11 +372,13 @@ export function ProfileContent({ profile, email }: Props) {
           <div className="mt-4 space-y-3">
             <p className="text-sm text-secondary">
               This will permanently erase your profile, collection, ratings and
-              notes.{' '}
-              <strong className="text-primary">This cannot be undone.</strong>
+              notes.
+              <p className="text-primary font-semibold">
+                This cannot be undone.
+              </p>
             </p>
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-2">
+            <div className="mt-6">
+              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
                 Type <span className="text-red-400 font-semibold">DELETE</span>{' '}
                 to confirm
               </p>
@@ -336,8 +392,7 @@ export function ProfileContent({ profile, email }: Props) {
             <Button
               handleClick={() => void handleDeleteAccount()}
               disabled={deleteConfirm !== 'DELETE' || deleteLoading}
-              variant="outlined"
-              className="w-auto px-8 border-red-400/50 text-red-400 hover:bg-red-400/5"
+              className="w-auto text-primary bg-red-800 hover:bg-red-900 mt-2 "
             >
               Delete my account
             </Button>
