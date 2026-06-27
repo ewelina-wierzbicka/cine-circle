@@ -12,7 +12,6 @@ import {
   updateDisplayName,
 } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
-import Image from 'next/image';
 import { useRef, useState } from 'react';
 
 type Props = {
@@ -119,11 +118,9 @@ export function ProfileContent({ profile, email }: Props) {
         <div className="relative shrink-0">
           <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center overflow-hidden">
             {avatarUrl ? (
-              <Image
+              <img
                 src={avatarUrl}
                 alt="Avatar"
-                width={88}
-                height={88}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -135,7 +132,7 @@ export function ProfileContent({ profile, email }: Props) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-white/[0.07] flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
+            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-secondary/50 flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
             aria-label="Change avatar"
           >
             <svg
@@ -276,9 +273,11 @@ export function ProfileContent({ profile, email }: Props) {
               <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
                 Password
               </p>
-              <p className="text-secondary text-sm mt-2 tracking-widest">
-                ••••••••
-              </p>
+              {!passwordOpen && (
+                <p className="text-secondary text-sm mt-2 tracking-widest">
+                  ••••••••
+                </p>
+              )}
             </div>
             <ChevronIcon
               className={twMerge(
