@@ -38,7 +38,7 @@ export default function MediaInfo({
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
   const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
-  const typeLabel = media_type === 'series' ? 'SERIES' : 'FILM';
+  const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
@@ -125,7 +125,7 @@ export default function MediaInfo({
         </span>
       </div>
       <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
-      <div className="flex gap-2.5 max-w-110">
+      <div className="flex gap-2.5 flex-col md:flex-row">
         {isToWatch ? (
           <>
             <Button handleClick={addToWatched} className="flex-1">

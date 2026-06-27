@@ -109,13 +109,13 @@ export default function UserEntryForm({
 
   return (
     <div className="w-full py-4 animate-fade-up">
-      <p className="font-serif text-[32px] lg:text-[48px] tracking-[-0.02em] leading-[1.1] mb-10">
+      <p className="font-serif text-[40px] lg:text-[48px] tracking-[-0.02em] leading-[1.1] mb-10 md:max-w-140">
         {isUpdateMode ? 'Update' : 'Add'}{' '}
         <em className="text-mint">&ldquo;{title}&rdquo;</em>
       </p>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-7 max-w-full md:max-w-120"
+        className="flex flex-col gap-7 max-w-full md:max-w-140"
       >
         <div>
           <label
@@ -160,7 +160,7 @@ export default function UserEntryForm({
             error={errors.review?.message}
           />
         </div>
-        <div className="pt-2">
+        <div className="pt-6">
           <Button type="submit" disabled={isSaving}>
             {isSaving ? 'SAVING…' : isUpdateMode ? 'UPDATE' : 'SAVE'}
           </Button>
