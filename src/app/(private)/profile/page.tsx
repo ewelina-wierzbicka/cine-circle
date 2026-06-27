@@ -4,8 +4,6 @@ import { ProfileContent } from './ProfileContent';
 
 export default async function ProfilePage() {
   const profile = await getProfile();
-
-  // getProfile handles auth, but we still need user.email which it doesn't return
   const supabase = await createClient();
   const {
     data: { user },

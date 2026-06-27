@@ -97,10 +97,10 @@ export function ProfileContent({ profile, email }: Props) {
       {/* Profile Card */}
       <div className="bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6">
         <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center shrink-0">
-          <span className="font-serif text-3xl text-mint">{initials}</span>
+          <span className="font-serif text-3xl text-primary">{initials}</span>
         </div>
-        <div className="min-w-0">
-          <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-1">
+        <div>
+          <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
             Display name
           </p>
           {isEditingName ? (
@@ -123,14 +123,25 @@ export function ProfileContent({ profile, email }: Props) {
               >
                 Save
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDisplayName(profile?.display_name ?? '');
+                  setIsEditingName(false);
+                }}
+                className="ml-2 text-xs text-secondary hover:text-primary transition-colors"
+                aria-label="Cancel editing"
+              >
+                ✕
+              </button>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => setIsEditingName(true)}
-              className="flex items-center gap-2 cursor-pointer bg-transparent border-none p-0 group"
+              className="flex items-center gap-4 cursor-pointer bg-transparent border-none p-0 group"
             >
-              <span className="text-xl font-sans text-primary">
+              <span className="text-2xl font-sans font-semibold text-primary">
                 {displayName || 'Set name'}
               </span>
               <svg

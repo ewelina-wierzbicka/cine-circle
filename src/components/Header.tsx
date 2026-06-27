@@ -21,11 +21,6 @@ const NAV_ITEMS = [
   },
 ];
 
-const DROPDOWN_ITEMS = [
-  { label: 'My Media', href: '/my-media' },
-  { label: 'Profile', href: '/profile' },
-];
-
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -95,32 +90,29 @@ export default function Header() {
             role="menu"
             aria-label="User menu"
           >
-            {DROPDOWN_ITEMS.map(({ label, href }) => (
-              <li
-                key={href}
-                role="menuitem"
-                tabIndex={0}
-                className={twMerge(
-                  'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
-                  pathname === href && 'text-primary font-medium',
-                )}
-                onClick={() => {
-                  router.push(href);
+            <li
+              role="menuitem"
+              tabIndex={0}
+              className={twMerge(
+                'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
+                pathname === '/profile' && 'text-primary font-medium',
+              )}
+              onClick={() => {
+                router.push('/profile');
+                setDropdownOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  router.push('/profile');
                   setDropdownOpen(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    router.push(href);
-                    setDropdownOpen(false);
-                  } else if (e.key === 'Escape') {
-                    setDropdownOpen(false);
-                  }
-                }}
-              >
-                {label}
-              </li>
-            ))}
+                } else if (e.key === 'Escape') {
+                  setDropdownOpen(false);
+                }
+              }}
+            >
+              Profile
+            </li>
             <li
               role="menuitem"
               tabIndex={0}
