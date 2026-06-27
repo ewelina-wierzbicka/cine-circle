@@ -88,19 +88,16 @@ export function ProfileContent({ profile, email }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-xl px-6 py-10 md:py-16 animate-fade-up">
-      <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-1">
-        Settings
-      </p>
-      <h1 className="text-4xl md:text-5xl mb-8">
-        <span className="font-sans font-light">Your </span>
-        <span className="font-serif italic">Profile</span>
+    <div className="mx-auto max-w-xl px-6 py-10 md:py-16 animate-fade-up min-h-full flex flex-col justify-center">
+      <h1 className="text-4xl md:text-5xl mb-8 font-serif">
+        <span>Your </span>
+        <em className="text-mint">Profile</em>
       </h1>
 
       {/* Profile Card */}
-      <div className="bg-bg2 border border-white/[0.07] rounded-2xl p-6 mb-4 flex items-center gap-6">
-        <div className="w-20 h-20 rounded-full border-2 border-mint flex items-center justify-center shrink-0">
-          <span className="font-serif text-2xl text-mint">{initials}</span>
+      <div className="bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6">
+        <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center shrink-0">
+          <span className="font-serif text-3xl text-mint">{initials}</span>
         </div>
         <div className="min-w-0">
           <p className="font-mono text-xs uppercase tracking-[0.15em] text-secondary mb-1">
