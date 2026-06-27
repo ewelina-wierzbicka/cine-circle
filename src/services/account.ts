@@ -44,7 +44,12 @@ export const updatePassword = async (
 
   const { error } = await supabase.auth.updateUser({ password: newPassword });
 
-  if (error) return { error: error.message };
+  if (error) {
+    const msg = error.message.includes('at least one character of each')
+      ? 'Password should be at least 8 characters. It must contain uppercase, lowercase, number, and special character.'
+      : error.message;
+    return { error: msg };
+  }
 
   return {};
 };
