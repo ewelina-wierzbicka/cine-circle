@@ -41,13 +41,13 @@ export const getAvatarUploadUrl = async (
   const path = `${user.id}/${fileName}`;
 
   const { data, error } = await supabase.storage
-    .from('avatars')
+    .from('avatar')
     .createSignedUploadUrl(path);
 
   if (error) throw error;
 
   const { data: publicData } = supabase.storage
-    .from('avatars')
+    .from('avatar')
     .getPublicUrl(path);
 
   return {
