@@ -79,14 +79,14 @@ export function ProfileContent({ profile, email }: Props) {
       return;
     }
 
-    const { signedUrl, publicUrl } = await getAvatarUploadUrl(file.name);
+    const { signedUrl, path } = await getAvatarUploadUrl(file.name);
     await fetch(signedUrl, {
       method: 'PUT',
       headers: { 'Content-Type': file.type },
       body: file,
     });
-    await updateAvatarUrl(publicUrl);
-    setAvatarUrl(publicUrl);
+    const { avatarUrl: newUrl } = await updateAvatarUrl(path);
+    setAvatarUrl(newUrl);
   };
 
   const handleUpdateEmail = async () => {
@@ -136,47 +136,51 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Profile Card */}
       <div className="bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6">
-        <div className="relative shrink-0">
-          <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center overflow-hidden">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="font-serif text-3xl text-primary">
-                {initials}
-              </span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-secondary/50 flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
-            aria-label="Change avatar"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-3.5 h-3.5 text-mint"
+        <div>
+          <div className="relative shrink-0">
+            <div className="w-22 h-22 rounded-full border-2 border-mint flex items-center justify-center overflow-hidden">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="font-serif text-3xl text-primary">
+                  {initials}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-secondary/50 flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
+              aria-label="Change avatar"
             >
-              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-            </svg>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => void handleAvatarChange(e)}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="w-3.5 h-3.5 text-mint"
+              >
+                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+              </svg>
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => void handleAvatarChange(e)}
+            />
+          </div>
           {avatarError && (
             <p className="text-red-400 text-xs mb-2">{avatarError}</p>
           )}
+        </div>
+
+        <div className="flex-1 min-w-0">
           <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
             Display name
           </p>
