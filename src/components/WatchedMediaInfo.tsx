@@ -1,17 +1,47 @@
+'use client';
+
 import StarRating from '@/components/StarRating';
+import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, UserEntry } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 import Button from './Button';
 
 type Props = {
   media: NormalizedMedia;
+  userMediaId: number;
   userEntry: Pick<UserEntry, 'watched_date' | 'rating' | 'review'>;
   onEdit: () => void;
 };
 
-export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
+export default function WatchedMediaInfo({
+  media,
+  userMediaId,
+  userEntry,
+  onEdit,
+}: Props) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
   const { title, director, release_date, last_air_date, media_type } = media;
   const { watched_date, rating, review } = userEntry;
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteUserMedia(userMediaId);
+      await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
+      router.push('/my-media?tab=watched');
+    } catch (err) {
+      toast.error(
+        (err as Error).message || 'Failed to delete. Please try again.',
+      );
+      setIsDeleting(false);
+    }
+  };
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
   const dateDisplay = lastAirYear
@@ -95,8 +125,18 @@ export default function WatchedMediaInfo({ media, userEntry, onEdit }: Props) {
           </div>
         )}
       </div>
-      <div>
-        <Button handleClick={onEdit}>UPDATE</Button>
+      <div className="flex gap-2.5 flex-col md:flex-row">
+        <Button handleClick={onEdit} className="flex-1">
+          UPDATE
+        </Button>
+        <Button
+          variant="outlined"
+          handleClick={handleDelete}
+          disabled={isDeleting}
+          className="flex-1"
+        >
+          {isDeleting ? 'DELETING…' : 'DELETE'}
+        </Button>
       </div>
     </div>
   );
