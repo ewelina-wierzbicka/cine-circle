@@ -50,7 +50,10 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
           cineCircle
         </span>
       </Link>
-      <nav className="flex items-center gap-1" aria-label="Main navigation">
+      <nav
+        className="hidden md:flex items-center gap-1"
+        aria-label="Main navigation"
+      >
         {NAV_ITEMS.map(({ label, href, match }) => (
           <Link
             key={href}
@@ -111,6 +114,32 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
               role="menu"
               aria-label="User menu"
             >
+              {NAV_ITEMS.map(({ label, href, match }) => (
+                <li
+                  key={href}
+                  role="menuitem"
+                  tabIndex={0}
+                  className={twMerge(
+                    'md:hidden px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
+                    match(pathname) && 'text-primary bg-bg3',
+                  )}
+                  onClick={() => {
+                    router.push(href);
+                    setDropdownOpen(false);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      router.push(href);
+                      setDropdownOpen(false);
+                    } else if (e.key === 'Escape') {
+                      setDropdownOpen(false);
+                    }
+                  }}
+                >
+                  {label}
+                </li>
+              ))}
               <li
                 role="menuitem"
                 tabIndex={0}
