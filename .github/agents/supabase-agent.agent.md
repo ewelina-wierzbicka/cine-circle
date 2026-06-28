@@ -169,3 +169,10 @@ When a schema change affects TypeScript types:
 - Update any affected service functions in `services/`
 - Keep types derived from the Supabase schema — do not duplicate type definitions
 - Run `npm run type-check` after changes to catch regressions
+
+---
+
+## After Completing a Task
+
+- Update `AGENTS.md` if the task changed schema, added tables, or modified project structure
+- Update `DESIGN.md` if the task affects any page or visual design

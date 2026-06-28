@@ -63,7 +63,10 @@ Always read AGENTS.md before starting any task. It contains the project structur
   - `text-mint` / `bg-mint` — mint accent (`oklch(82% 0.10 165)`)
   - `text-dark` — text on mint backgrounds
 - Before building new UI, check `components/` for existing patterns to stay consistent
+- Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
+- SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
 - Feature works as described
 - `npm run lint` passes with no errors
 - PR is open and ready for review
+- `AGENTS.md` and `DESIGN.md` updated if the task changed project structure, schema, pages, or visual design
