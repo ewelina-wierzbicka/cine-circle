@@ -21,12 +21,14 @@ type Props = {
   initialQuery?: string;
   initialType?: FilterMediaType;
   hintTitles?: string[];
+  onDropdownVisibleChange?: (visible: boolean) => void;
 };
 
 export function SearchBox({
   initialQuery = '',
   initialType = 'all',
   hintTitles,
+  onDropdownVisibleChange,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -70,6 +72,10 @@ export function SearchBox({
   const displayResults = detailedResults ?? visibleResults;
   const showDropdown =
     !isSearchResultsPage && debouncedQuery.trim().length > 0 && showResults;
+
+  useEffect(() => {
+    onDropdownVisibleChange?.(showDropdown);
+  }, [showDropdown, onDropdownVisibleChange]);
 
   // Click outside handler to close dropdown
   useEffect(() => {

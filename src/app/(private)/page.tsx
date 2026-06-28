@@ -1,5 +1,5 @@
+import { HomeHero } from '@/components/HomeHero';
 import MediaPoster from '@/components/MediaPoster';
-import SearchBox from '@/components/SearchBox';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { TrendingMovie, UserMedia } from '@/types';
@@ -37,21 +37,9 @@ export default async function Home() {
 
   return (
     <div className="min-h-full flex flex-col relative">
-      <div className="flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10">
-        <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
-          What will you
-          <br />
-          <em className="text-mint">watch next?</em>
-        </h2>
-        <p className="text-secondary text-md text-center mb-12 animate-fade-in [animation-delay:80ms]">
-          Search any title to add it to your circle
-        </p>
-        <div className="w-full max-w-160 animate-fade-up [animation-delay:120ms]">
-          <SearchBox
-            hintTitles={trendingTitles.length > 0 ? trendingTitles : undefined}
-          />
-        </div>
-      </div>
+      <HomeHero
+        hintTitles={trendingTitles.length > 0 ? trendingTitles : undefined}
+      />
 
       {recentPosters.length > 0 && (
         <div className="px-6 md:px-12 pb-8 relative">
