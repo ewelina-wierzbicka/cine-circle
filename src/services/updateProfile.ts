@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 
 export const updateDisplayName = async (displayName: string): Promise<void> => {
   if (displayName.length > 50) {
@@ -25,6 +26,8 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
   );
 
   if (error) throw error;
+
+  revalidatePath('/', 'layout');
 };
 
 export const updateAvatarPath = async (
@@ -48,6 +51,8 @@ export const updateAvatarPath = async (
   );
 
   if (error) throw error;
+
+  revalidatePath('/', 'layout');
 
   return { avatarUrl: await getSignedAvatarUrl(supabase, filePath) };
 };
