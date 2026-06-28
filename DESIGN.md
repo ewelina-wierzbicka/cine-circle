@@ -163,13 +163,6 @@ export const motion = {
 - Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
 - Right: avatar button with accessible dropdown, keyboard support and route handlers.
 
-### CinematicPoster
-
-- `src/components/CinematicPoster.tsx`.
-- Shows poster image or gradient placeholder.
-- Top fade overlay and optional vignette.
-- Bottom textual metadata is commented out; callers provide layout and aspect ratio (typically 2/3).
-
 ### StarRating
 
 - `src/components/StarRating.tsx`.
@@ -293,7 +286,7 @@ export const motion = {
 ## Login/Register
 
 - Implemented by `src/app/(auth)/AuthFormLayout.tsx` with `LoginForm` and `RegisterForm` as children.
-- Layout: fixed two-column auth shell (`fixed inset-0 flex`). Left column contains the form; right column (desktop) shows a 3×2 grid of `CinematicPoster` tiles fetched from `getTrendingMovies()`.
+- Layout: fixed two-column auth shell (`fixed inset-0 flex`). Left column contains the form; right column (desktop) shows a 3×2 grid of `MediaPoster` tiles fetched from `getTrendingMovies()`.
 
 Left column (Form)
 
@@ -308,7 +301,7 @@ Left column (Form)
 Right column (Visuals)
 
 - Rendered only on `lg` and up (`hidden lg:block`).
-- 3×2 grid of `CinematicPoster` components; each tile fills its cell.
+- 3×2 grid of `MediaPoster` components; each tile fills its cell.
 - Two overlay gradients: a right-to-left dark fade and a top/bottom vignette applied via absolute layers.
 - Top-left logo (26×26) and `font-mono` wordmark are positioned absolutely.
 
@@ -338,12 +331,12 @@ Search
 
 Recently Watched
 
-- Uses `getUserMediaList('watched')` to build `recentPosters` and renders a horizontal `overflow-x-auto` strip of `CinematicPoster` links.
+- Uses `getUserMediaList('watched')` to build `recentPosters` and renders a horizontal `overflow-x-auto` strip of `MediaPoster` links.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
 - Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-mint tracking-[0.08em]`.
 
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" mint
-- Horizontal scroll of `110×165px` CinematicPoster cards, `border-radius: 10px`, `gap: 12px`
+- Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
 
 ---
 
