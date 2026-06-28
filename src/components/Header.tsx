@@ -8,6 +8,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+type HeaderProps = {
+  displayName?: string | null;
+  avatarUrl?: string | null;
+};
+
 const NAV_ITEMS = [
   {
     label: 'Search',
@@ -21,7 +26,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Header() {
+export default function Header({ displayName, avatarUrl }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -80,7 +85,22 @@ export default function Header() {
           aria-controls="user-dropdown-menu"
           onClick={() => setDropdownOpen((p) => !p)}
         >
-          <AvatarIcon className="w-8 h-8 text-primary" />
+          {displayName && (
+            <span className="hidden sm:inline text-sm font-sans text-secondary">
+              Hello {displayName}!
+            </span>
+          )}
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt="User avatar"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <AvatarIcon className="w-8 h-8 text-primary" />
+          )}
         </button>
 
         {dropdownOpen && (
