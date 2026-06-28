@@ -311,7 +311,7 @@ export function ProfileContent({ profile, email }: Props) {
               <Button
                 handleClick={() => void handleUpdateEmail()}
                 disabled={!newEmail || emailLoading}
-                className="w-auto"
+                className="w-auto px-8"
               >
                 Update email
               </Button>
@@ -388,7 +388,7 @@ export function ProfileContent({ profile, email }: Props) {
                   !confirmPassword ||
                   passwordLoading
                 }
-                className="w-auto"
+                className="w-auto px-8"
               >
                 Update password
               </Button>
@@ -448,7 +448,7 @@ export function ProfileContent({ profile, email }: Props) {
             <Button
               handleClick={() => void handleDeleteAccount()}
               disabled={deleteConfirm !== 'DELETE' || deleteLoading}
-              className="w-auto text-primary bg-red-800 hover:bg-red-900 mt-2 "
+              className="w-auto px-8 text-primary bg-red-800 hover:bg-red-900 mt-2 "
             >
               Delete my account
             </Button>

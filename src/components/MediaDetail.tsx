@@ -40,6 +40,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
     watchStatus === 'watched' ? (
       <WatchedMediaInfo
         media={media}
+        userMediaId={userMediaId!}
         userEntry={{
           watched_date: saved!.watched_date,
           rating: saved!.rating,
