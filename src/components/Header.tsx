@@ -71,8 +71,6 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
       </nav>
       <div
         className="relative"
-        onMouseEnter={() => setDropdownOpen(true)}
-        onMouseLeave={() => setDropdownOpen(false)}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget)) {
             setDropdownOpen(false);
