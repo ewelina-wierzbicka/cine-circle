@@ -86,7 +86,7 @@ export default function Header() {
         {dropdownOpen && (
           <ul
             id="user-dropdown-menu"
-            className="absolute right-0 top-full mt-2 w-40 rounded-xl bg-bg2 border border-white/[0.07] overflow-hidden shadow-xl z-50"
+            className="absolute right-0 top-full mt-1.5 w-40 rounded-xl bg-bg2 border border-white/[0.07] overflow-hidden shadow-xl z-50"
             role="menu"
             aria-label="User menu"
           >
@@ -94,8 +94,8 @@ export default function Header() {
               role="menuitem"
               tabIndex={0}
               className={twMerge(
-                'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
-                pathname === '/profile' && 'text-primary font-medium',
+                'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary',
+                pathname === '/profile' && 'text-primary bg-bg3',
               )}
               onClick={() => {
                 router.push('/profile');
@@ -116,7 +116,7 @@ export default function Header() {
             <li
               role="menuitem"
               tabIndex={0}
-              className="px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary border-t border-white/[0.07]"
+              className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary"
               onClick={handleLogout}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
