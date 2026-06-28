@@ -66,6 +66,9 @@ src/
         page.tsx
         MyMedia.tsx
         UserMediaList.tsx
+      profile/                # /profile
+        page.tsx
+        ProfileContent.tsx
       series/[id]/            # /series/:id
         page.tsx
       layout.tsx
@@ -136,6 +139,8 @@ export const colors = {
 - Before adding a new color, check if an existing token fits
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
+- Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
+- SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
 ---
 
@@ -276,3 +281,10 @@ Project-specific skills are in `.agents/skills/`. Consult them before working on
 - Adding a new npm dependency → confirm first
 - Changing Supabase schema or RLS policies → confirm first
 - Deleting or renaming files → confirm first
+
+---
+
+## After Completing a Task
+
+- Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components
+- Update `DESIGN.md` if the task added or changed any page, layout, or visual design

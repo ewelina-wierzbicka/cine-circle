@@ -77,6 +77,8 @@ The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`
 - No hardcoded colors — use design tokens above
 - Spacing and sizing: use Tailwind's scale (`p-4`, `gap-2`, `w-full`) — don't reach for arbitrary values (`w-[137px]`) unless there's a genuine design constraint
 - **Never use arbitrary values when a named utility exists.** Tailwind v4 uses a 1 unit = 4px numeric scale — any pixel value divisible by 4 maps to an exact utility (`h-[600px]` → `h-150`, `w-[18px]` → `w-4.5`, `max-w-[1280px]` → `max-w-7xl`). Always use the named utility.
+- Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
+- SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
 ---
 
@@ -116,3 +118,5 @@ Familiarize yourself with these before adding anything new:
 - Run `npm run lint` — fix all errors before finishing
 - Run `npm run type-check` if you touched any TypeScript types
 - Visually verify mobile layout is correct before calling a component done
+- Update `AGENTS.md` if the task changed project structure, conventions, or added new shared components
+- Update `DESIGN.md` if the task added or changed any page, layout, or visual design
