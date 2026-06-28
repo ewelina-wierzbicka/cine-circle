@@ -27,7 +27,7 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
   if (error) throw error;
 };
 
-export const updateAvatarUrl = async (
+export const updateAvatarPath = async (
   filePath: string,
 ): Promise<{ avatarUrl: string }> => {
   const supabase = await createClient();
@@ -38,16 +38,10 @@ export const updateAvatarUrl = async (
 
   if (!user) throw new Error('Not authenticated');
 
-  const { data, error: urlError } = await supabase.storage
-    .from('avatar')
-    .createSignedUrl(filePath, 60 * 60 * 24 * 365);
-
-  if (urlError) throw urlError;
-
   const { error } = await supabase.from('profiles').upsert(
     {
       user_id: user.id,
-      avatar_url: data.signedUrl,
+      avatar_url: filePath,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },
@@ -55,5 +49,17 @@ export const updateAvatarUrl = async (
 
   if (error) throw error;
 
-  return { avatarUrl: data.signedUrl };
+  return { avatarUrl: await getSignedAvatarUrl(supabase, filePath) };
+};
+
+export const getSignedAvatarUrl = async (
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  path: string,
+): Promise<string> => {
+  const { data, error } = await supabase.storage
+    .from('avatar')
+    .createSignedUrl(path, 60 * 60);
+
+  if (error) throw error;
+  return data.signedUrl;
 };

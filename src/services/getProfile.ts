@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getSignedAvatarUrl } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 
 export const getProfile = async (): Promise<UserProfile | null> => {
@@ -20,9 +21,8 @@ export const getProfile = async (): Promise<UserProfile | null> => {
 
   if (error) throw error;
 
-  if (data) return data as UserProfile;
+  if (data) return resolveAvatarUrl(supabase, data as UserProfile);
 
-  // No profile row yet — create a blank one and return it.
   const { data: created, error: insertError } = await supabase
     .from('profiles')
     .upsert({ user_id: user.id }, { onConflict: 'user_id' })
@@ -31,5 +31,16 @@ export const getProfile = async (): Promise<UserProfile | null> => {
 
   if (insertError) throw insertError;
 
-  return created as UserProfile;
+  return resolveAvatarUrl(supabase, created as UserProfile);
+};
+
+const resolveAvatarUrl = async (
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  profile: UserProfile,
+): Promise<UserProfile> => {
+  if (!profile.avatar_url || profile.avatar_url.startsWith('http')) {
+    return profile;
+  }
+  const signedUrl = await getSignedAvatarUrl(supabase, profile.avatar_url);
+  return { ...profile, avatar_url: signedUrl };
 };

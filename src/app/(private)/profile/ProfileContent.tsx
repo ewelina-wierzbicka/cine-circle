@@ -7,7 +7,7 @@ import { twMerge } from '@/lib/cn';
 import { deleteAccount, updateEmail, updatePassword } from '@/services/account';
 import { logout } from '@/services/auth';
 import { createClient } from '@/lib/supabase/client';
-import { updateAvatarUrl, updateDisplayName } from '@/services/updateProfile';
+import { updateAvatarPath, updateDisplayName } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 import { useRef, useState } from 'react';
 
@@ -94,7 +94,7 @@ export function ProfileContent({ profile, email }: Props) {
       return;
     }
 
-    const { avatarUrl: newUrl } = await updateAvatarUrl(path);
+    const { avatarUrl: newUrl } = await updateAvatarPath(path);
     setAvatarUrl(newUrl);
   };
 
