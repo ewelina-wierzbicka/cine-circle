@@ -1,10 +1,13 @@
 import Header from '@/components/Header';
+import { getProfile } from '@/services/getProfile';
 
-export default function PrivateLayout({
+export default async function PrivateLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const profile = await getProfile();
+
   return (
     <div className="h-screen flex flex-col bg-dark">
       <div className="absolute inset-0 pointer-events-none">
@@ -12,7 +15,10 @@ export default function PrivateLayout({
         <div className="absolute rounded-full blur-[55px] opacity-25 top-[10%] right-[-10%] w-[50%] h-[80%] bg-[radial-gradient(#755214_0%,transparent_65%)]" />
         <div className="absolute rounded-full blur-2xl bottom-[-20%] left-[30%] w-[40%] h-[80%] bg-[radial-gradient(oklch(82%_0.10_165/0.15)_0%,transparent_65%)]" />
       </div>
-      <Header />
+      <Header
+        displayName={profile?.display_name}
+        avatarUrl={profile?.avatar_url}
+      />
       <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
     </div>
   );

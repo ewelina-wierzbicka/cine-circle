@@ -8,6 +8,11 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+type HeaderProps = {
+  displayName?: string | null;
+  avatarUrl?: string | null;
+};
+
 const NAV_ITEMS = [
   {
     label: 'Search',
@@ -21,7 +26,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Header() {
+export default function Header({ displayName, avatarUrl }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -73,63 +78,80 @@ export default function Header() {
       >
         <button
           type="button"
-          className="flex items-center gap-2 bg-transparent border-none cursor-pointer p-0"
+          className="flex items-center gap-4 bg-transparent border-none cursor-pointer p-0"
           aria-label="User menu"
           aria-haspopup="menu"
           aria-expanded={dropdownOpen}
           aria-controls="user-dropdown-menu"
           onClick={() => setDropdownOpen((p) => !p)}
         >
-          <AvatarIcon className="w-8 h-8 text-primary" />
+          {displayName && (
+            <span className="hidden sm:inline text-[20px] font-serif text-primary tracking-[0.06em]">
+              Hello <em className="text-mint">{displayName}</em>!
+            </span>
+          )}
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt="User avatar"
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <AvatarIcon className="w-8 h-8 text-primary" />
+          )}
         </button>
 
         {dropdownOpen && (
-          <ul
-            id="user-dropdown-menu"
-            className="absolute right-0 top-full mt-2 w-40 rounded-xl bg-bg2 border border-white/[0.07] overflow-hidden shadow-xl z-50"
-            role="menu"
-            aria-label="User menu"
-          >
-            <li
-              role="menuitem"
-              tabIndex={0}
-              className={twMerge(
-                'px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary',
-                pathname === '/profile' && 'text-primary font-medium',
-              )}
-              onClick={() => {
-                router.push('/profile');
-                setDropdownOpen(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
+          <div className="absolute right-0 top-full pt-3 w-40 z-50">
+            <ul
+              id="user-dropdown-menu"
+              className="rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"
+              role="menu"
+              aria-label="User menu"
+            >
+              <li
+                role="menuitem"
+                tabIndex={0}
+                className={twMerge(
+                  'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
+                  pathname === '/profile' && 'text-primary bg-bg3',
+                )}
+                onClick={() => {
                   router.push('/profile');
                   setDropdownOpen(false);
-                } else if (e.key === 'Escape') {
-                  setDropdownOpen(false);
-                }
-              }}
-            >
-              Profile
-            </li>
-            <li
-              role="menuitem"
-              tabIndex={0}
-              className="px-4 py-2.5 text-sm cursor-pointer transition-colors hover:bg-white/4 select-none text-secondary border-t border-white/[0.07]"
-              onClick={handleLogout}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  void handleLogout();
-                } else if (e.key === 'Escape') {
-                  setDropdownOpen(false);
-                }
-              }}
-            >
-              Logout
-            </li>
-          </ul>
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    router.push('/profile');
+                    setDropdownOpen(false);
+                  } else if (e.key === 'Escape') {
+                    setDropdownOpen(false);
+                  }
+                }}
+              >
+                Profile
+              </li>
+              <li
+                role="menuitem"
+                tabIndex={0}
+                className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0"
+                onClick={handleLogout}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    void handleLogout();
+                  } else if (e.key === 'Escape') {
+                    setDropdownOpen(false);
+                  }
+                }}
+              >
+                Logout
+              </li>
+            </ul>
+          </div>
         )}
       </div>
     </header>
