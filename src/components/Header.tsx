@@ -78,7 +78,7 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
       >
         <button
           type="button"
-          className="flex items-center gap-2 bg-transparent border-none cursor-pointer p-0"
+          className="flex items-center gap-4 bg-transparent border-none cursor-pointer p-0"
           aria-label="User menu"
           aria-haspopup="menu"
           aria-expanded={dropdownOpen}
@@ -86,8 +86,8 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
           onClick={() => setDropdownOpen((p) => !p)}
         >
           {displayName && (
-            <span className="hidden sm:inline text-sm font-sans text-secondary">
-              Hello {displayName}!
+            <span className="hidden sm:inline text-[20px] font-serif text-primary tracking-[0.06em]">
+              Hello <em className="text-mint">{displayName}</em>!
             </span>
           )}
           {avatarUrl ? (
@@ -104,7 +104,7 @@ export default function Header({ displayName, avatarUrl }: HeaderProps) {
         </button>
 
         {dropdownOpen && (
-          <div className="absolute right-0 top-full pt-1.5 w-40 z-50">
+          <div className="absolute right-0 top-full pt-3 w-40 z-50">
             <ul
               id="user-dropdown-menu"
               className="rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"

@@ -86,7 +86,7 @@ export default function Select<T extends string = string>({
       {open && (
         <ul
           role="listbox"
-          className="absolute z-50 mt-1.5 w-full min-w-max rounded-xl bg-bg2 border border-white/[0.07] overflow-hidden shadow-xl"
+          className="absolute z-50 mt-1.5 w-full min-w-max rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"
         >
           {options.map((option) => (
             <li
@@ -95,7 +95,7 @@ export default function Select<T extends string = string>({
               aria-selected={option.value === value}
               onClick={() => handleChange(option.value)}
               className={twMerge(
-                'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary',
+                'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
                 option.value === value && 'text-primary bg-bg3',
               )}
             >
