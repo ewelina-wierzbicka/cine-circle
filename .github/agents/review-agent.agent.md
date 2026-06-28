@@ -53,12 +53,15 @@ You review code only — you do not implement features or make changes. Your job
 - Design tokens used — no hardcoded hex colors
 - Mobile-first — base styles for mobile, responsive breakpoints for larger screens
 - Consistent with existing components in `components/`
+- No text smaller than `text-sm` — flag any use of `text-xs` or smaller
+- SVG icons in `src/icons/` as named-export components — flag any inline `<svg>` in component files
 
 ### Project structure
 
 - New shared components in `components/` — not colocated if used across route groups
 - Data fetching logic in `services/` — not inlined in components
 - New routes placed inside `(private)/` — all protected routes live directly under this group
+- `AGENTS.md` and `DESIGN.md` updated when the PR changes project structure, schema, pages, or visual design
 
 ### Performance
 

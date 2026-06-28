@@ -402,3 +402,52 @@ Interactions & Accessibility
 
 - `MediaCard` and detail actions use Links/Buttons with clear focus and hover states.
 - Keyboard and mouse interactions are handled in dropdowns and selects (accessible listbox behavior in `Select`).
+
+---
+
+## Profile
+
+- Implemented via `src/app/(private)/profile/page.tsx` (server) → `ProfileContent.tsx` (client).
+- Route: `/profile` (private, auth required).
+
+Layout
+
+- Centered single column `max-w-xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center`.
+- Entry animation: `animate-fade-up`.
+- Heading: `font-serif text-4xl md:text-5xl` with mint emphasis (`<em class="text-mint">`): "Your _Profile_".
+
+Profile Card
+
+- `bg-bg2 border border-secondary/25 rounded-2xl p-6`, horizontal flex with `gap-6`.
+- Avatar: `w-22 h-22 rounded-full border-2 border-mint` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
+- Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with mint pencil SVG icon. Triggers hidden file input.
+- Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
+- Display name: `font-mono text-sm uppercase tracking-[0.15em] text-secondary` label. Name shown as `text-2xl font-sans font-semibold` with pencil edit icon.
+- Inline edit mode: `Input` component with Save (`text-mint font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
+
+Account Card
+
+- `bg-bg2 border border-white/[0.07] rounded-2xl p-6`.
+- Section header: `font-mono text-base uppercase tracking-[0.15em] text-secondary`.
+- Collapsible rows use `ChevronIcon` that rotates on open/close (`rotate-90` / `-rotate-90`).
+
+- **Email row**: shows current email, expands to `Input` for new email + `Button` "Update email". Calls `updateEmail` service.
+- **Password row**: shows `••••••••` when collapsed. Expands to three inputs (current, new, confirm) + `Button` "Update password". Calls `updatePassword` service.
+
+Danger Zone Card
+
+- `bg-bg2 border border-red-400/20 rounded-2xl p-6`.
+- Header: `font-mono text-base uppercase tracking-[0.15em] text-red-400`.
+- Collapsible delete section with confirmation: user must type "DELETE" in input.
+- Delete button: `bg-red-800 hover:bg-red-900 text-primary`. Calls `deleteAccount` service.
+
+Sign Out
+
+- Centered `Button` with `variant="outlined"` and `px-16`. Calls `logout` service.
+
+Services
+
+- `services/getProfile.ts` — fetches user profile (server-side).
+- `services/updateProfile.ts` — `updateDisplayName` and `updateAvatarPath` functions.
+- `services/account.ts` — `updateEmail`, `updatePassword`, `deleteAccount` functions.
+- `services/auth.ts` — `logout` function (shared with other pages).
