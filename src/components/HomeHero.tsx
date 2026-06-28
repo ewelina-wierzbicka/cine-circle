@@ -14,7 +14,7 @@ export function HomeHero({ hintTitles }: Props) {
   return (
     <div
       className={twMerge(
-        'flex-1 flex flex-col justify-start pt-20 sm:justify-center sm:pt-0 items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out',
+        'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out',
         dropdownOpen && 'max-sm:-translate-y-24',
       )}
     >
