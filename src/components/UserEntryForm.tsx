@@ -126,10 +126,16 @@ export default function UserEntryForm({
           </label>
           <DatePicker
             id="watched_date"
-            handleChange={(date) =>
-              setValue('watched_date', date?.toISOString().split('T')[0])
+            handleChange={(date) => {
+              if (!date) return setValue('watched_date', undefined);
+              const y = date.getFullYear();
+              const m = String(date.getMonth() + 1).padStart(2, '0');
+              const d = String(date.getDate()).padStart(2, '0');
+              setValue('watched_date', `${y}-${m}-${d}`);
+            }}
+            selected={
+              selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined
             }
-            selected={selectedDate ? new Date(selectedDate) : undefined}
           />
         </div>
         <div>

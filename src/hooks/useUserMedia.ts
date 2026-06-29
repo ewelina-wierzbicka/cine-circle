@@ -29,6 +29,7 @@ const fetchUserMediaPage = async ({
     .from('user_media')
     .select(`*, media${search || mediaType ? '!inner' : ''}(*)`)
     .eq('user_id', user.id)
+    .order('watched_date', { ascending: false, nullsFirst: false })
     .order('added_at', { ascending: false })
     .range(from, to);
 
