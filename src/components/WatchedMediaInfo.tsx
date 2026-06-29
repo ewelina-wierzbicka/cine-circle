@@ -63,7 +63,7 @@ export default function WatchedMediaInfo({
   return (
     <div className="flex flex-col w-full animate-fade-up max-w-full md:max-w-120">
       <Link
-        href={fromSearch ? '/search' : '/my-media'}
+        href={fromSearch ? '/' : '/my-media'}
         className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
       >
         {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
