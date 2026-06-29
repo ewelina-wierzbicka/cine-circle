@@ -18,8 +18,8 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
 
     const href =
       item.media_type === 'series'
-        ? `/series/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
-        : `/movie/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        ? `/series/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`
+        : `/movie/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`;
 
     return (
       <button
