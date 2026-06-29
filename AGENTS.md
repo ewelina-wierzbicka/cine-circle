@@ -224,7 +224,7 @@ export async function updatePost(id: string) {
 
 Always create a PR
 
-- **One branch per task, branched from `main`.** Before starting any task, create a fresh branch from `main` named `agent/<short-description>` (e.g. `agent/add-movie-search`). Never stack unrelated work on an existing feature branch.
+- **One branch per task, branched from `main`.** Before starting any task, run `git checkout main && git pull origin main`, then create a fresh branch named `agent/<short-description>` (e.g. `agent/add-movie-search`). Never commit to an existing feature branch that belongs to another task.
 - **One PR per task.** Each PR must contain only the changes for its task. Do not mix changes from multiple tasks into a single PR.
 - Keep commits small and focused
 - Commit message format: `type: short description` (e.g. `feat: add movie search`, `fix: correct rating display`)
