@@ -6,7 +6,7 @@ import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -40,6 +40,8 @@ export default function MediaInfo({
   const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
   const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromSearch = searchParams.get('from') === 'search';
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -93,10 +95,10 @@ export default function MediaInfo({
   return (
     <div className="flex flex-col w-full animate-fade-up max-w-120">
       <Link
-        href="/my-media"
+        href={fromSearch ? '/search' : '/my-media'}
         className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
       >
-        ← BACK TO COLLECTION
+        {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
       </Link>
       <p className="font-mono text-xs tracking-[0.22em] text-mint uppercase mb-3.5">
         {typeLabel}
