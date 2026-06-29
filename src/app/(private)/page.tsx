@@ -39,6 +39,7 @@ export default async function Home() {
     <div className="min-h-full flex flex-col relative">
       <HomeHero
         hintTitles={trendingTitles.length > 0 ? trendingTitles : undefined}
+        hasRecentMedia={recentPosters.length > 0}
       />
 
       {recentPosters.length > 0 && (

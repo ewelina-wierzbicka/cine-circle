@@ -6,16 +6,19 @@ import { useState } from 'react';
 
 type Props = {
   hintTitles?: string[];
+  hasRecentMedia?: boolean;
 };
 
-export function HomeHero({ hintTitles }: Props) {
+export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const shouldShift = dropdownOpen && !hasRecentMedia;
 
   return (
     <div
       className={twMerge(
         'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out',
-        dropdownOpen && 'max-sm:-translate-y-[calc(50dvh-78px-50%)]',
+        shouldShift && 'max-sm:-translate-y-[calc(50dvh-78px-50%)]',
       )}
     >
       <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
