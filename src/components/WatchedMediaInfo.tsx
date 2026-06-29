@@ -28,7 +28,15 @@ export default function WatchedMediaInfo({
   const fromSearch = searchParams.get('from') === 'search';
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { title, director, release_date, last_air_date, media_type } = media;
+  const {
+    title,
+    director,
+    release_date,
+    last_air_date,
+    media_type,
+    genres,
+    overview,
+  } = media;
   const { watched_date, rating, review } = userEntry;
 
   const handleDelete = async () => {
@@ -71,6 +79,18 @@ export default function WatchedMediaInfo({
       <p className="font-mono text-sm tracking-[0.22em] text-mint uppercase mb-3.5">
         {typeLabel}
       </p>
+      {genres && genres.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {genres.map((g) => (
+            <span
+              key={g.id}
+              className="font-mono text-xs tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-white/10 text-mint"
+            >
+              {g.name}
+            </span>
+          ))}
+        </div>
+      )}
       <h1
         className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
         style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
@@ -94,6 +114,11 @@ export default function WatchedMediaInfo({
         </span>
       </div>
       <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
+      {overview && (
+        <p className="text-sm text-secondary leading-relaxed mb-8">
+          {overview}
+        </p>
+      )}
       <div className="flex flex-col gap-8 mb-8">
         {rating != null && (
           <div>

@@ -86,6 +86,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
       step={step}
       infoSlot={infoSlot}
       formSlot={formSlot}
+      recommendations={media.recommendations}
     />
   );
 }
