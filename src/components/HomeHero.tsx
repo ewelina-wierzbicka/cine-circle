@@ -17,8 +17,9 @@ export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
   return (
     <div
       className={twMerge(
-        'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out',
-        shouldShift && 'max-sm:-translate-y-[calc(50dvh-78px-50%)]',
+        'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out pb-44 pt-7.5 sm:pb-23',
+        shouldShift &&
+          '-translate-y-[calc(50dvh-42%)] md:-translate-y-[calc(50dvh-30%)]',
       )}
     >
       <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
