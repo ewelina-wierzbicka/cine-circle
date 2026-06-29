@@ -25,11 +25,24 @@ export type Series = {
   poster_path?: string;
   popularity?: number;
   created_by?: { name: string }[];
+  overview?: string;
+  genres?: { id: number; name: string }[];
+};
+
+export type RecommendedMedia = {
+  id: number;
+  title: string;
+  poster_path?: string;
+  media_type: MediaType;
+  genre?: string;
 };
 
 export type NormalizedMedia = Movie & {
   media_type: MediaType;
   last_air_date?: string;
+  overview?: string;
+  genres?: { id: number; name: string }[];
+  recommendations?: RecommendedMedia[];
 };
 
 export type UserEntry = {

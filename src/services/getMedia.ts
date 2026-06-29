@@ -1,4 +1,10 @@
-import { FilterMediaType, Movie, NormalizedMedia, Series } from '@/types';
+import {
+  FilterMediaType,
+  Movie,
+  NormalizedMedia,
+  RecommendedMedia,
+  Series,
+} from '@/types';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -20,7 +26,11 @@ async function tmdbFetch<T>(
   return res.json() as Promise<T>;
 }
 
-function normalizeSeriesResult(raw: Series): NormalizedMedia {
+function normalizeSeriesResult(
+  raw: Series & {
+    recommendations?: { results?: TmdbRecommendation[] };
+  },
+): NormalizedMedia {
   const {
     id,
     name,
@@ -29,7 +39,21 @@ function normalizeSeriesResult(raw: Series): NormalizedMedia {
     poster_path,
     popularity,
     created_by,
+    overview,
+    genres,
   } = raw;
+
+  const recommendations: RecommendedMedia[] | undefined =
+    raw.recommendations?.results?.slice(0, 10).map((r) => ({
+      id: r.id,
+      title: r.name ?? r.title ?? '',
+      poster_path: r.poster_path ?? undefined,
+      media_type: 'series' as const,
+      genre: r.genre_ids?.[0]
+        ? genres?.find((g) => g.id === r.genre_ids![0])?.name
+        : undefined,
+    }));
+
   return {
     id,
     title: name,
@@ -39,8 +63,19 @@ function normalizeSeriesResult(raw: Series): NormalizedMedia {
     popularity,
     director: created_by?.[0]?.name,
     media_type: 'series',
+    overview,
+    genres,
+    recommendations,
   };
 }
+
+type TmdbRecommendation = {
+  id: number;
+  title?: string;
+  name?: string;
+  poster_path?: string | null;
+  genre_ids?: number[];
+};
 
 interface SearchMediaResponse {
   results: NormalizedMedia[];
@@ -101,8 +136,9 @@ export const getMovieDetails = async (id: string): Promise<NormalizedMedia> => {
   const data = await tmdbFetch<
     NormalizedMedia & {
       credits?: { crew?: { job: string; name: string }[] };
+      recommendations?: { results?: TmdbRecommendation[] };
     }
-  >(`/movie/${id}?append_to_response=credits`, {
+  >(`/movie/${id}?append_to_response=credits,recommendations`, {
     revalidate: 86400,
   });
 
@@ -110,16 +146,32 @@ export const getMovieDetails = async (id: string): Promise<NormalizedMedia> => {
     (person) => person.job === 'Director',
   )?.name;
 
+  const recommendations: RecommendedMedia[] | undefined =
+    data.recommendations?.results?.slice(0, 10).map((r) => ({
+      id: r.id,
+      title: r.title ?? r.name ?? '',
+      poster_path: r.poster_path ?? undefined,
+      media_type: 'movie' as const,
+      genre: r.genre_ids?.[0]
+        ? data.genres?.find((g) => g.id === r.genre_ids![0])?.name
+        : undefined,
+    }));
+
   return {
     ...data,
     director,
+    overview: data.overview,
+    genres: data.genres,
+    recommendations,
   };
 };
 
 export const getSeriesDetails = async (
   id: string,
 ): Promise<NormalizedMedia> => {
-  const data = await tmdbFetch<Series>(`/tv/${id}?append_to_response=credits`, {
+  const data = await tmdbFetch<
+    Series & { recommendations?: { results?: TmdbRecommendation[] } }
+  >(`/tv/${id}?append_to_response=credits,recommendations`, {
     revalidate: 86400,
   });
 

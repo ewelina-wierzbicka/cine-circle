@@ -39,6 +39,9 @@ export async function getMediaPageData(
       poster_path,
       director,
       media_type,
+      overview,
+      genres,
+      recommendations,
     } = media;
     const data = {
       tmdb_id,
@@ -48,6 +51,9 @@ export async function getMediaPageData(
       poster_path,
       director,
       media_type,
+      overview,
+      genres,
+      recommendations,
       id,
       watchStatus,
       watched_date,
