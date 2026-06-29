@@ -94,7 +94,8 @@ export default function MediaCard({
   };
 
   const handleAddToWatched = () => {
-    router.push(`${href}?step=2`);
+    const separator = href.includes('?') ? '&' : '?';
+    router.push(`${href}${separator}step=2`);
   };
 
   const handleSeeDetails = () => {

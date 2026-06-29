@@ -25,7 +25,7 @@ export function toSearchMediaListProps(media: NormalizedMedia) {
     last_air_date,
     poster_path,
     media_type,
-    href: toHref(id, title, media_type),
+    href: `${toHref(id, title, media_type)}?from=search`,
   };
 }
 
