@@ -54,8 +54,8 @@ export default function MediaDetailWrapper({
         </div>
       </div>
       {recommendations && recommendations.length > 0 && step === 1 && (
-        <div className="relative z-2 px-6 md:px-12 pb-8">
-          <span className="font-mono text-sm tracking-[0.2em] text-secondary uppercase mb-4 block">
+        <div className="relative z-2 px-6 md:px-12 pb-8 pt-12">
+          <span className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-4 block">
             More like this
           </span>
           <div className="flex gap-3 overflow-x-auto pb-1">
