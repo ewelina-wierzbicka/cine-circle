@@ -76,7 +76,7 @@ export default function WatchedMediaInfo({
       >
         {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
       </Link>
-      <p className="font-mono text-sm tracking-[0.22em] text-mint uppercase mb-3.5">
+      <p className="font-mono text-sm tracking-[0.22em] text-secondary uppercase mb-3.5">
         {typeLabel}
       </p>
       {genres && genres.length > 0 && (
