@@ -59,7 +59,7 @@ export default function MediaInfo({
         toast.info(`"${title}" is already in your list.`);
       } else {
         toast.success(`"${title}" saved to your "to watch" list!`);
-        router.push('/my-media?tab=to_watch');
+        router.push('/collection?tab=to_watch');
       }
     } catch (err) {
       toast.error(
@@ -76,7 +76,7 @@ export default function MediaInfo({
     try {
       await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-      router.push('/my-media?tab=to_watch');
+      router.push('/collection?tab=to_watch');
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to delete. Please try again.',

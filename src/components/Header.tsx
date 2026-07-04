@@ -21,8 +21,8 @@ const NAV_ITEMS = [
   },
   {
     label: 'Collection',
-    href: '/my-media',
-    match: (p: string) => p.startsWith('/my-media'),
+    href: '/collection',
+    match: (p: string) => p.startsWith('/collection'),
   },
 ];
 

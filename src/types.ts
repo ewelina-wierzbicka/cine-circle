@@ -89,7 +89,8 @@ export type UserProfile = {
 export type TrendingMovie = {
   title: string;
   year: string;
-  genre: string;
+  type: MediaType;
+  genres?: { id: number; name: string }[];
   posterUrl?: string;
-  id?: number;
+  id: number;
 };

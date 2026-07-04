@@ -82,7 +82,7 @@ export default function MediaCard({
         toast.info(`"${title}" is already in your list.`);
       } else {
         toast.success(`"${title}" saved to your "to watch" list!`);
-        router.push('/my-media?tab=to_watch');
+        router.push('/collection?tab=to_watch');
       }
     } catch (err) {
       toast.error(

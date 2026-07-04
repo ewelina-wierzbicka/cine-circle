@@ -33,7 +33,7 @@ export default function WatchedMediaInfo({
     try {
       await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-      router.push('/my-media?tab=watched');
+      router.push('/collection?tab=watched');
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to delete. Please try again.',

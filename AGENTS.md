@@ -62,7 +62,7 @@ src/
         SearchResults.tsx
       movie/[id]/             # /movie/:id
         page.tsx
-      my-media/               # /my-media
+      collection/               # /collection
         page.tsx
         MyMedia.tsx
         UserMediaList.tsx

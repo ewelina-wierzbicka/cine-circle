@@ -10,7 +10,11 @@ function toSlug(title: string): string {
     .replace(/[\s-]+/g, '-');
 }
 
-function toHref(tmdbId: number, title: string, mediaType: MediaType): string {
+export function toHref(
+  tmdbId: number,
+  title: string,
+  mediaType: MediaType,
+): string {
   const base = mediaType === 'series' ? 'series' : 'movie';
   return `/${base}/${tmdbId}-${toSlug(title)}`;
 }

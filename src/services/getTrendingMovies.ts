@@ -84,6 +84,8 @@ export async function getTrendingMovies(): Promise<TrendingMovie[]> {
       year: (item.release_date ?? item.first_air_date ?? '').slice(0, 4),
       genre:
         item.genre_ids?.[0] != null ? (genreMap[item.genre_ids[0]] ?? '') : '',
+      type: item.media_type === 'movie' ? 'movie' : 'series',
       posterUrl: `${TMDB_IMAGE_BASE}${item.poster_path}`,
+      id: item.id,
     }));
 }

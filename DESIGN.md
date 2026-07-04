@@ -342,7 +342,7 @@ Recently Watched
 
 ## Collection
 
-- Implemented under `src/app/(private)/my-media/` via `Page` (server component) and `MyMedia` (client component).
+- Implemented under `src/app/(private)/collection/` via `Page` (server component) and `MyMedia` (client component).
 
 Layout & Header
 

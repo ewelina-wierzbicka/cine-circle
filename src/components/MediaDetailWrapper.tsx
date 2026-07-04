@@ -1,5 +1,6 @@
 import MediaPoster from '@/components/MediaPoster';
 import { twMerge } from '@/lib/cn';
+import { toHref } from '@/lib/mediaUtils';
 import { RecommendedMedia } from '@/types';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -14,13 +15,6 @@ type Props = {
 };
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
-
-function slugify(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
 
 export default function MediaDetailWrapper({
   posterSrc,
@@ -60,11 +54,7 @@ export default function MediaDetailWrapper({
           </span>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {recommendations.map((rec) => {
-              const slug = slugify(rec.title);
-              const href =
-                rec.media_type === 'series'
-                  ? `/series/${rec.id}-${slug}`
-                  : `/movie/${rec.id}-${slug}`;
+              const href = toHref(rec.id, rec.title, rec.media_type);
               return (
                 <Link key={rec.id} href={href} className="shrink-0 group">
                   <div className="rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25 relative">

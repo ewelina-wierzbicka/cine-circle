@@ -41,7 +41,7 @@ export default function MediaInfoHeader({ media }: Props) {
   return (
     <>
       <Link
-        href={fromSearch ? '/' : '/my-media'}
+        href={fromSearch ? '/' : '/collection'}
         className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
       >
         {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
