@@ -1,4 +1,5 @@
 import Header from '@/components/Header';
+import ScrollReset from '@/components/ScrollReset';
 import { getProfile } from '@/services/getProfile';
 
 export default async function PrivateLayout({
@@ -19,6 +20,7 @@ export default async function PrivateLayout({
         displayName={profile?.display_name}
         avatarUrl={profile?.avatar_url}
       />
+      <ScrollReset />
       <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
     </div>
   );
