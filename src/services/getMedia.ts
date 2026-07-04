@@ -4,6 +4,7 @@ import {
   NormalizedMedia,
   RecommendedMedia,
   Series,
+  TmdbRecommendation,
 } from '@/types';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -68,14 +69,6 @@ function normalizeSeriesResult(
     recommendations,
   };
 }
-
-type TmdbRecommendation = {
-  id: number;
-  title?: string;
-  name?: string;
-  poster_path?: string | null;
-  genre_ids?: number[];
-};
 
 interface SearchMediaResponse {
   results: NormalizedMedia[];

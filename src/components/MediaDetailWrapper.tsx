@@ -39,7 +39,7 @@ export default function MediaDetailWrapper({
       <div className="relative z-2 flex flex-col md:flex-row flex-1">
         <div
           className={twMerge(
-            'h-[50vh] md:flex md:h-auto md:w-1/2 shrink-0 items-center justify-center py-8 px-6 md:px-12 pr-4',
+            'h-[50vh] md:flex md:h-auto md:w-1/2 shrink-0 items-center justify-center py-12 px-6 md:px-12 pr-4',
             step === 2 ? 'hidden' : 'flex',
           )}
         >
@@ -49,7 +49,7 @@ export default function MediaDetailWrapper({
             className="rounded-2xl -rotate-[1.5deg] origin-center w-auto md:w-full h-full md:h-auto"
           />
         </div>
-        <div className="flex-1 flex flex-col justify-center py-8 px-6 md:pl-6 lg:pl-12 overflow-y-auto">
+        <div className="flex-1 flex flex-col justify-center py-12 px-6 md:pl-6 lg:pl-12 overflow-y-auto">
           {step === 1 ? infoSlot : formSlot}
         </div>
       </div>

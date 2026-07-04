@@ -29,6 +29,14 @@ export type Series = {
   genres?: { id: number; name: string }[];
 };
 
+export type TmdbRecommendation = {
+  id: number;
+  title?: string;
+  name?: string;
+  poster_path?: string | null;
+  genre_ids?: number[];
+};
+
 export type RecommendedMedia = {
   id: number;
   title: string;
