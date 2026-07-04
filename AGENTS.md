@@ -77,8 +77,8 @@ src/
   globals.css
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts)
-  types.ts                    # app-wide TypeScript types
-  components/                 # shared components (SearchBox, Header, etc.)
+  types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
+  components/                 # shared components (SearchBox, Header, MediaInfoHeader, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
