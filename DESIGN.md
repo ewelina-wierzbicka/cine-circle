@@ -342,7 +342,7 @@ Recently Watched
 
 ## Collection
 
-- Implemented under `src/app/(private)/my-media/` via `Page` (server component) and `MyMedia` (client component).
+- Implemented under `src/app/(private)/collection/` via `Page` (server component) and `MyMedia` (client component).
 
 Layout & Header
 
@@ -384,10 +384,12 @@ Info & Form
 
 - Info view (`MediaInfo` or `WatchedMediaInfo`) shows:
   - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
-  - Eyebrow (type) using `font-mono text-xs tracking-[0.22em] text-mint uppercase`.
+  - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-mint` spans. Placed above the type label.
+  - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
-  - Meta row: director label `font-mono text-xs tracking-[0.08em]` and date `font-mono text-[13px]`.
+  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
   - Mint divider `w-12 h-px bg-mint opacity-60`.
+  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the mint divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
   - Action buttons: `Button` (mint filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
 - Watched view (`WatchedMediaInfo`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
@@ -397,6 +399,17 @@ Info & Form
   - Rating input (`Input` variant `rating`) validated 0–10.
   - Review textarea (`Textarea`) with maxLength 1000.
   - Submit calls `addUserMedia` (create) or `updateUserMedia` (update) and invalidates user media queries. On success it navigates or toggles back to info.
+
+Recommendations ("More Like This")
+
+- Rendered in `MediaDetailWrapper` below the two-column layout, only on step 1 and when `recommendations` array is non-empty.
+- Section label: `font-mono text-sm tracking-[0.2em] text-secondary uppercase`.
+- Horizontal scroll row (`flex gap-3 overflow-x-auto pb-1`) matching the home page "Recently Watched" pattern.
+- Each card: `w-27.5 h-41.25 rounded-xl overflow-hidden border border-white/[0.07]` with `MediaPoster` inside.
+- Genre badge overlay: `font-mono text-sm` in a `bg-dark/70 text-mint` pill at bottom-left of the card.
+- Title below card: `text-sm text-secondary truncate`, transitions to `text-primary` on hover.
+- Cards link to `/movie/{id}-{slug}` or `/series/{id}-{slug}`.
+- Padding: `px-6 md:px-12 pb-8`.
 
 Interactions & Accessibility
 

@@ -47,7 +47,7 @@ The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`
 | `font-serif`                  | DM Serif Display — headings, display text            |
 | `font-mono`                   | DM Mono — labels, nav items                          |
 
-> For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
+> For borders and overlays without a named token, use Tailwind opacity utilities: `border-secondary/25`, `bg-white/4`, etc.
 > Star ratings use `text-amber-400` (Tailwind built-in — not a custom token).
 
 ---
@@ -103,6 +103,7 @@ Familiarize yourself with these before adding anything new:
 | `MediaList`                                      | Responsive grid list of `MediaCard` components                                       |
 | `MediaPage`                                      | Full media detail page composition (page-level wrapper)                              |
 | `MediaDetail`, `MediaDetailWrapper`, `MediaInfo` | Detail layout and metadata regions used on media pages                               |
+| `MediaInfoHeader`                                | Shared header block for detail pages (genre pills, title, director, date, overview)  |
 | `WatchedMediaInfo`                               | Displays user's watched entry (rating, date, notes)                                  |
 | `UserEntryForm`                                  | Add / edit watched entry form (uses `Input`, `Textarea`, `DatePicker`, `Select`)     |
 | `Header`                                         | App header with navigation, search affordance, and responsive behavior               |

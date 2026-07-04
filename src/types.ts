@@ -25,11 +25,33 @@ export type Series = {
   poster_path?: string;
   popularity?: number;
   created_by?: { name: string }[];
+  overview?: string;
+  genres?: { id: number; name: string }[];
+};
+
+export type TmdbRecommendation = {
+  id: number;
+  title?: string;
+  name?: string;
+  poster_path?: string | null;
+  genre_ids?: number[];
+  media_type?: 'movie' | 'tv';
+};
+
+export type RecommendedMedia = {
+  id: number;
+  title: string;
+  poster_path?: string;
+  media_type: MediaType;
+  genre?: string;
 };
 
 export type NormalizedMedia = Movie & {
   media_type: MediaType;
   last_air_date?: string;
+  overview?: string;
+  genres?: { id: number; name: string }[];
+  recommendations?: RecommendedMedia[];
 };
 
 export type UserEntry = {
@@ -67,7 +89,8 @@ export type UserProfile = {
 export type TrendingMovie = {
   title: string;
   year: string;
-  genre: string;
+  type: MediaType;
+  genres?: { id: number; name: string }[];
   posterUrl?: string;
-  id?: number;
+  id: number;
 };

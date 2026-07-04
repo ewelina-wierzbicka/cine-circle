@@ -1,5 +1,6 @@
 import { HomeHero } from '@/components/HomeHero';
 import MediaPoster from '@/components/MediaPoster';
+import { toHref } from '@/lib/mediaUtils';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { TrendingMovie, UserMedia } from '@/types';
@@ -11,7 +12,8 @@ function toRecentPoster(item: UserMedia) {
   return {
     title: item.media.title,
     year: (item.media.release_date ?? '').slice(0, 4),
-    genre: item.media.media_type === 'movie' ? 'Movie' : 'Series',
+    type: item.media.media_type,
+    genres: item.media.genres,
     posterUrl: item.media.poster_path
       ? `${TMDB_IMAGE_BASE}${item.media.poster_path}`
       : undefined,
@@ -49,7 +51,7 @@ export default async function Home() {
               Recently Watched
             </span>
             <Link
-              href="/my-media"
+              href="/collection"
               className="font-mono text-sm text-mint tracking-[0.08em] hover:opacity-70 transition-opacity"
             >
               SEE ALL →
@@ -57,10 +59,7 @@ export default async function Home() {
           </div>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {recentPosters.map((poster, i) => {
-              const href =
-                poster.genre === 'Movie'
-                  ? `/movie/${poster.id}`
-                  : `/series/${poster.id}`;
+              const href = toHref(poster.id, poster.title, poster.type);
               return (
                 <Link
                   key={i}

@@ -1,11 +1,11 @@
 'use client';
 
+import MediaInfoHeader from '@/components/MediaInfoHeader';
 import StarRating from '@/components/StarRating';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, UserEntry } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from './Button';
@@ -24,11 +24,8 @@ export default function WatchedMediaInfo({
   onEdit,
 }: Props) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const fromSearch = searchParams.get('from') === 'search';
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { title, director, release_date, last_air_date, media_type } = media;
   const { watched_date, rating, review } = userEntry;
 
   const handleDelete = async () => {
@@ -36,7 +33,7 @@ export default function WatchedMediaInfo({
     try {
       await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-      router.push('/my-media?tab=watched');
+      router.push('/collection?tab=watched');
     } catch (err) {
       toast.error(
         (err as Error).message || 'Failed to delete. Please try again.',
@@ -44,13 +41,6 @@ export default function WatchedMediaInfo({
       setIsDeleting(false);
     }
   };
-  const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
-  const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
-  const dateDisplay = lastAirYear
-    ? `${releaseYear} – ${lastAirYear}`
-    : releaseYear;
-  const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
-  const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
 
   const formattedDate = watched_date
     ? new Date(watched_date).toLocaleDateString('en-GB', {
@@ -62,38 +52,7 @@ export default function WatchedMediaInfo({
 
   return (
     <div className="flex flex-col w-full animate-fade-up max-w-full md:max-w-120">
-      <Link
-        href={fromSearch ? '/' : '/my-media'}
-        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
-      >
-        {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
-      </Link>
-      <p className="font-mono text-sm tracking-[0.22em] text-mint uppercase mb-3.5">
-        {typeLabel}
-      </p>
-      <h1
-        className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
-        style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
-      >
-        {title}
-      </h1>
-      <div className="flex items-center gap-5 mb-7">
-        {director && (
-          <span className="text-sm text-secondary">
-            <span className="font-mono text-xs tracking-[0.08em] text-secondary mr-2">
-              {dirLabel}
-            </span>
-            {director}
-          </span>
-        )}
-        {director && (
-          <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
-        )}
-        <span className="font-mono text-sm tracking-[0.04em] text-secondary">
-          {dateDisplay}
-        </span>
-      </div>
-      <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
+      <MediaInfoHeader media={media} />
       <div className="flex flex-col gap-8 mb-8">
         {rating != null && (
           <div>

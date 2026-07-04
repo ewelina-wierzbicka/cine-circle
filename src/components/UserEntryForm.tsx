@@ -95,7 +95,7 @@ export default function UserEntryForm({
         } else {
           toast.success(`"${title}" was saved to your "watched" list!`);
           await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
-          router.push('/my-media?tab=watched');
+          router.push('/collection?tab=watched');
         }
       }
     } catch (err) {

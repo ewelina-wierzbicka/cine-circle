@@ -27,7 +27,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
   };
 
   const handleMoveToWatchedSuccess = () => {
-    router.push(`/my-media?tab=watched`);
+    router.push(`/collection?tab=watched`);
   };
 
   const onUpdateSuccess = !isSaved
@@ -86,6 +86,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
       step={step}
       infoSlot={infoSlot}
       formSlot={formSlot}
+      recommendations={media.recommendations}
     />
   );
 }

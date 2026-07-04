@@ -1,5 +1,5 @@
 import ErrorToast from '@/components/ErrorToast';
-import { getMediaPageData } from '@/lib/getMediaPageData';
+import { getMediaPageData } from '@/services/getMediaPageData';
 import { notFound } from 'next/navigation';
 import MediaDetail from './MediaDetail';
 
