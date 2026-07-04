@@ -35,6 +35,7 @@ export type TmdbRecommendation = {
   name?: string;
   poster_path?: string | null;
   genre_ids?: number[];
+  media_type?: 'movie' | 'tv';
 };
 
 export type RecommendedMedia = {

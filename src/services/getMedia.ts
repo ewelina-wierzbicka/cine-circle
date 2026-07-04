@@ -49,7 +49,8 @@ function normalizeSeriesResult(
       id: r.id,
       title: r.name ?? r.title ?? '',
       poster_path: r.poster_path ?? undefined,
-      media_type: 'series' as const,
+      media_type:
+        r.media_type === 'movie' ? ('movie' as const) : ('series' as const),
       genre: r.genre_ids?.[0]
         ? genres?.find((g) => g.id === r.genre_ids![0])?.name
         : undefined,
@@ -144,7 +145,8 @@ export const getMovieDetails = async (id: string): Promise<NormalizedMedia> => {
       id: r.id,
       title: r.title ?? r.name ?? '',
       poster_path: r.poster_path ?? undefined,
-      media_type: 'movie' as const,
+      media_type:
+        r.media_type === 'tv' ? ('series' as const) : ('movie' as const),
       genre: r.genre_ids?.[0]
         ? data.genres?.find((g) => g.id === r.genre_ids![0])?.name
         : undefined,
