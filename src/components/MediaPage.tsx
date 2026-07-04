@@ -24,6 +24,7 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
       {error && <ErrorToast message={error} />}
       {data && (
         <MediaDetail
+          key={slug}
           media={{ ...data, media_type: mediaType }}
           initialStep={initialStep}
         />
