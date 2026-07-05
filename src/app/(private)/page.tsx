@@ -22,7 +22,8 @@ function toRecentPoster(item: UserMedia) {
 
 export default async function Home() {
   let recentPosters: TrendingMovie[] = [];
-  let trendingTitles: string[] = [];
+  let hintTitles: { id: number; title: string; type: TrendingMovie['type'] }[] =
+    [];
   try {
     const result = await getUserMediaList('watched', 0);
     recentPosters = result.media.slice(0, 8).map(toRecentPoster);
@@ -31,7 +32,9 @@ export default async function Home() {
   }
   try {
     const trending = await getTrendingMovies();
-    trendingTitles = trending.slice(0, 4).map((p) => p.title);
+    hintTitles = trending
+      .slice(0, 4)
+      .map(({ id, title, type }) => ({ id, title, type }));
   } catch (err) {
     console.error(' Failed to fetch trending titles:', err);
   }
@@ -39,7 +42,7 @@ export default async function Home() {
   return (
     <div className="min-h-full flex flex-col relative">
       <HomeHero
-        hintTitles={trendingTitles.length > 0 ? trendingTitles : undefined}
+        hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
         hasRecentMedia={recentPosters.length > 0}
       />
 

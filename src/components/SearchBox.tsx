@@ -5,8 +5,9 @@ import SearchDropdownItem from '@/components/SearchDropdownItem';
 import { useGetMedia } from '@/hooks/useGetMedia';
 import { useGetMediaDetails } from '@/hooks/useGetMediaDetails';
 import SearchIcon from '@/icons/MagnifyingGlass';
+import { toHref } from '@/lib/mediaUtils';
 import { twMerge } from '@/lib/cn';
-import { FilterMediaType } from '@/types';
+import { FilterMediaType, MediaType } from '@/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
@@ -20,7 +21,7 @@ const FILTER_CHIPS: { label: string; value: FilterMediaType }[] = [
 type Props = {
   initialQuery?: string;
   initialType?: FilterMediaType;
-  hintTitles?: string[];
+  hintTitles?: { id: number; title: string; type: MediaType }[];
   onDropdownVisibleChange?: (visible: boolean) => void;
 };
 
@@ -359,14 +360,16 @@ export function SearchBox({
       {hintTitles && (
         <div className="absolute flex justify-center w-full">
           <div className="flex justify-center gap-2 mt-7 flex-wrap animate-fade-in">
-            {hintTitles.map((title) => (
+            {hintTitles.map((item) => (
               <button
-                key={title}
+                key={item.id}
                 type="button"
-                onClick={() => navigate(title)}
+                onClick={() =>
+                  router.push(toHref(item.id, item.title, item.type))
+                }
                 className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-mint hover:text-mint cursor-pointer"
               >
-                {title}
+                {item.title}
               </button>
             ))}
           </div>
