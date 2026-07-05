@@ -101,9 +101,12 @@ export default function MediaCard({
   };
 
   return (
-    <div className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3">
+    <Link
+      href={href}
+      className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3"
+    >
       <div className="relative rounded-xl overflow-hidden group-hover:border group-hover:border-mint transition-colors duration-200 aspect-2/3">
-        <Link href={href} className="absolute inset-0" tabIndex={-1}>
+        <div className="absolute inset-0">
           <MediaPoster
             title={title}
             src={
@@ -114,7 +117,7 @@ export default function MediaCard({
             sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
             priority={priority}
           />
-        </Link>
+        </div>
         {!userMediaId && (
           <MediaCardOverlay>
             <Button
@@ -174,18 +177,16 @@ export default function MediaCard({
         )}
       </div>
       <div className="px-0.5">
-        <Link href={href}>
-          <p className="text-sm font-medium text-primary leading-snug line-clamp-2">
-            {title}
-          </p>
-          <p className="text-sm text-secondary mt-0.5">{dateDisplay}</p>
-        </Link>
+        <p className="text-sm font-medium text-primary leading-snug line-clamp-2">
+          {title}
+        </p>
+        <p className="text-sm text-secondary mt-0.5">{dateDisplay}</p>
         {watchStatus === 'watched' && rating != null && (
           <div className="mt-1.5">
             <StarRating rating={rating} />
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
