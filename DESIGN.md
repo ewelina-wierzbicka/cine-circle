@@ -176,15 +176,17 @@ export const motion = {
 - Card: `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
 - Hover lift (`-translate-y-1.25`) and hover border tint to mint.
 - Poster image fills card; placeholder gradient when missing.
-- Hover overlay exposes actions or a `VIEW →` label (`font-mono text-sm text-mint`).
+- Clicking poster or title navigates to the movie/series page via `<Link href={href}>`.
+- Hover overlay exposes action buttons (add to watched, add to to-watch, delete, etc.).
 - Title/date use `text-sm`; title `font-medium`.
 - Shows `StarRating` when `watchStatus === 'watched'` and `rating` present.
 
 ### MediaCardOverlay
 
 - `src/components/MediaCardOverlay.tsx`.
-- Positioned overlay that slides up on hover.
-- Renders action buttons and prevents pointer event propagation to card link.
+- Positioned overlay (`absolute inset-0`, `z-10`) that slides up on hover (`translate-y-full` → `translate-y-0`).
+- Has `pointer-events-none` by default; `pointer-events-auto` on hover — prevents blocking the card link when not hovered.
+- Renders action buttons and stops propagation so overlay clicks do not trigger card navigation.
 
 ### MediaPoster
 
