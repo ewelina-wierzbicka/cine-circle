@@ -33,7 +33,6 @@ export default function MediaCard({
     poster_path,
     href,
     media_type,
-    director,
   } = media;
   const rating = 'rating' in media ? media.rating : undefined;
   const watchStatus = 'watchStatus' in media ? media.watchStatus : undefined;
@@ -72,7 +71,6 @@ export default function MediaCard({
           release_date,
           last_air_date,
           poster_path,
-          director,
           media_type,
         },
         { watchStatus: 'to_watch' },

@@ -23,15 +23,8 @@ export default function MediaInfo({
   isToWatch,
   addToWatched,
 }: Props) {
-  const {
-    id,
-    title,
-    release_date,
-    last_air_date,
-    poster_path,
-    director,
-    media_type,
-  } = media;
+  const { id, title, release_date, last_air_date, poster_path, media_type } =
+    media;
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromSearch = searchParams.get('from') === 'search';
@@ -49,7 +42,6 @@ export default function MediaInfo({
           release_date,
           last_air_date,
           poster_path,
-          director,
           media_type,
         },
         { watchStatus: 'to_watch' },

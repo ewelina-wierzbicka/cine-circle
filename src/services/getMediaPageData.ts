@@ -37,14 +37,13 @@ export async function getMediaPageData(
       release_date,
       last_air_date,
       poster_path,
-      director,
       media_type,
     } = media;
 
-    // Supabase media table doesn't store genres/overview/recommendations — fetch from TMDB
+    // Supabase media table doesn't store genres/overview/recommendations/director — fetch from TMDB
     let tmdbExtra: Pick<
       NormalizedMedia,
-      'genres' | 'overview' | 'recommendations'
+      'genres' | 'overview' | 'recommendations' | 'director'
     > = {};
     try {
       const tmdb =
@@ -55,6 +54,7 @@ export async function getMediaPageData(
         genres: tmdb.genres,
         overview: tmdb.overview,
         recommendations: tmdb.recommendations,
+        director: tmdb.director,
       };
     } catch {
       // non-fatal: detail page still works without these fields
@@ -66,7 +66,6 @@ export async function getMediaPageData(
       release_date,
       last_air_date,
       poster_path,
-      director,
       media_type,
       ...tmdbExtra,
       id,
