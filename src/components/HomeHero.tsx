@@ -2,10 +2,11 @@
 
 import SearchBox from '@/components/SearchBox';
 import { twMerge } from '@/lib/cn';
+import { MediaType } from '@/types';
 import { useState } from 'react';
 
 type Props = {
-  hintTitles?: string[];
+  hintTitles?: { id: number; title: string; type: MediaType }[];
   hasRecentMedia?: boolean;
 };
 
