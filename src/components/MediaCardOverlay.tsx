@@ -9,7 +9,7 @@ type Props = {
 export default function MediaCardOverlay({ children }: Props) {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-end justify-end translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-10"
+      className="absolute inset-0 flex flex-col items-end justify-end translate-y-full group-hover:translate-y-0 transition-transform duration-200 z-10 pointer-events-none group-hover:pointer-events-auto"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
