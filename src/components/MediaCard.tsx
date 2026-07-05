@@ -5,7 +5,6 @@ import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -101,9 +100,9 @@ export default function MediaCard({
   };
 
   return (
-    <Link
-      href={href}
-      className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3"
+    <div
+      onClick={() => router.push(href)}
+      className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3 cursor-pointer"
     >
       <div className="relative rounded-xl overflow-hidden group-hover:border group-hover:border-mint transition-colors duration-200 aspect-2/3">
         <div className="absolute inset-0">
@@ -187,6 +186,6 @@ export default function MediaCard({
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
