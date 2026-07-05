@@ -1,9 +1,10 @@
 'use client';
 
 import { twMerge } from '@/lib/cn';
+import { MouseEvent } from 'react';
 
 type Props = {
-  handleClick?: () => void;
+  handleClick?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   type?: 'submit' | 'button';
   variant?: 'filled' | 'outlined';
   size?: 'small' | 'medium';

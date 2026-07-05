@@ -1,13 +1,12 @@
 'use client';
 
-import { twMerge } from '@/lib/cn';
 import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from './Button';
 import MediaCardOverlay from './MediaCardOverlay';
@@ -46,7 +45,8 @@ export default function MediaCard({
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     if (!userMediaId) return;
     setIsDeleting(true);
     try {
@@ -61,7 +61,8 @@ export default function MediaCard({
     }
   };
 
-  const handleAddToToWatch = async () => {
+  const handleAddToToWatch = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setIsSaving(true);
     try {
       const result = await addUserMedia(
@@ -91,7 +92,8 @@ export default function MediaCard({
     }
   };
 
-  const handleAddToWatched = () => {
+  const handleAddToWatched = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     const separator = href.includes('?') ? '&' : '?';
     router.push(`${href}${separator}step=2`);
   };
@@ -116,7 +118,7 @@ export default function MediaCard({
           />
         </Link>
         {!userMediaId && (
-          <MediaCardOverlay>
+          <MediaCardOverlay href={href}>
             <Button
               handleClick={handleAddToWatched}
               size="small"
@@ -135,7 +137,7 @@ export default function MediaCard({
           </MediaCardOverlay>
         )}
         {userMediaId && watchStatus === 'to_watch' && (
-          <MediaCardOverlay>
+          <MediaCardOverlay href={href}>
             <Button
               handleClick={handleAddToWatched}
               size="small"
@@ -154,7 +156,7 @@ export default function MediaCard({
           </MediaCardOverlay>
         )}
         {userMediaId && watchStatus === 'watched' && (
-          <MediaCardOverlay>
+          <MediaCardOverlay href={href}>
             <Button
               handleClick={handleSeeDetails}
               size="small"

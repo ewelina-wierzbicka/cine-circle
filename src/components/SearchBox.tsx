@@ -5,8 +5,8 @@ import SearchDropdownItem from '@/components/SearchDropdownItem';
 import { useGetMedia } from '@/hooks/useGetMedia';
 import { useGetMediaDetails } from '@/hooks/useGetMediaDetails';
 import SearchIcon from '@/icons/MagnifyingGlass';
-import { toHref } from '@/lib/mediaUtils';
 import { twMerge } from '@/lib/cn';
+import { toHref } from '@/lib/mediaUtils';
 import { FilterMediaType, MediaType } from '@/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -365,7 +365,9 @@ export function SearchBox({
                 key={item.id}
                 type="button"
                 onClick={() =>
-                  router.push(toHref(item.id, item.title, item.type))
+                  router.push(
+                    `${toHref(item.id, item.title, item.type)}?from=search`,
+                  )
                 }
                 className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-mint hover:text-mint cursor-pointer"
               >

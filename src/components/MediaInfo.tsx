@@ -6,7 +6,7 @@ import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -26,8 +26,6 @@ export default function MediaInfo({
   const { id, title, release_date, last_air_date, poster_path, media_type } =
     media;
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const fromSearch = searchParams.get('from') === 'search';
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
