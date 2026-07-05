@@ -13,7 +13,6 @@ function toRecentPoster(item: UserMedia) {
     title: item.media.title,
     year: (item.media.release_date ?? '').slice(0, 4),
     type: item.media.media_type,
-    genres: item.media.genres,
     posterUrl: item.media.poster_path
       ? `${TMDB_IMAGE_BASE}${item.media.poster_path}`
       : undefined,
