@@ -13,7 +13,6 @@ export const addUserMedia = async (
     release_date,
     last_air_date,
     poster_path,
-    director,
     media_type,
   } = details;
   const { watchStatus } = userEntry;
@@ -39,7 +38,6 @@ export const addUserMedia = async (
         release_date,
         last_air_date,
         poster_path,
-        director,
         media_type,
       },
       { onConflict: 'tmdb_id,media_type' },
