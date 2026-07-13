@@ -18,9 +18,15 @@ type Props = {
   query: string;
   type: FilterMediaType;
   initialData: SearchMediaResponse | null;
+  isAuthenticated: boolean;
 };
 
-export default function SearchResults({ query, type, initialData }: Props) {
+export default function SearchResults({
+  query,
+  type,
+  initialData,
+  isAuthenticated,
+}: Props) {
   const {
     data,
     isLoading,
@@ -47,6 +53,7 @@ export default function SearchResults({ query, type, initialData }: Props) {
       {isLoading && <Loader fullScreen={true} />}
       <MediaList
         media={allMedia.map(toSearchMediaListProps)}
+        isAuthenticated={isAuthenticated}
         heading={
           <div>
             <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
