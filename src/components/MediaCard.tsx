@@ -5,7 +5,7 @@ import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { MouseEvent, useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from './Button';
@@ -45,7 +45,6 @@ export default function MediaCard({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
 
   const handleDelete = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -123,11 +122,11 @@ export default function MediaCard({
         {!userMediaId && !isAuthenticated && (
           <MediaCardOverlay href={href}>
             <Button
-              handleClick={() => router.push(`/login?rurl=${pathname}`)}
+              handleClick={() => router.push(`/login?rurl=${href}`)}
               size="small"
               variant="outlined"
             >
-              Sign in
+              Sign in to add to collection
             </Button>
           </MediaCardOverlay>
         )}
