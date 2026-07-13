@@ -82,9 +82,9 @@ export default function MediaInfo({
     <div className="flex flex-col w-full animate-fade-up md:max-w-120">
       <MediaInfoHeader media={media} />
       {!isAuthenticated ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 pt-3">
           <p className="font-mono text-sm text-secondary">
-            Sign in to add this to your collection
+            Sign in to add to collection
           </p>
           <Button handleClick={() => router.push(`/login?rurl=${pathname}`)}>
             SIGN IN
