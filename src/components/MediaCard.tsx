@@ -123,7 +123,10 @@ export default function MediaCard({
         {!userMediaId && !isAuthenticated && (
           <MediaCardOverlay href={href}>
             <Button
-              handleClick={() => router.push(`/login?rurl=${pathname}`)}
+              handleClick={(e) => {
+                e.stopPropagation();
+                router.push(`/login?rurl=${pathname}`);
+              }}
               size="small"
               variant="outlined"
             >
