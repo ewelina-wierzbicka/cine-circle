@@ -6,7 +6,7 @@ import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -15,6 +15,7 @@ type Props = {
   userMediaId?: number;
   isToWatch?: boolean;
   addToWatched: () => void;
+  isAuthenticated?: boolean;
 };
 
 export default function MediaInfo({
@@ -22,10 +23,12 @@ export default function MediaInfo({
   userMediaId,
   isToWatch,
   addToWatched,
+  isAuthenticated = true,
 }: Props) {
   const { id, title, release_date, last_air_date, poster_path, media_type } =
     media;
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -78,37 +81,48 @@ export default function MediaInfo({
   return (
     <div className="flex flex-col w-full animate-fade-up md:max-w-120">
       <MediaInfoHeader media={media} />
-      <div className="flex gap-2.5 flex-col md:flex-row">
-        {isToWatch ? (
-          <>
-            <Button handleClick={addToWatched} className="flex-1">
-              MOVE TO WATCHED
-            </Button>
-            <Button
-              variant="outlined"
-              handleClick={handleDelete}
-              disabled={isDeleting}
-              className="flex-1"
-            >
-              {isDeleting ? 'DELETING…' : 'DELETE'}
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              variant="outlined"
-              handleClick={addToToWatch}
-              disabled={isSaving}
-              className="flex-1"
-            >
-              {isSaving ? 'SAVING…' : 'I WANT TO WATCH'}
-            </Button>
-            <Button handleClick={addToWatched} className="flex-1">
-              I WATCHED
-            </Button>
-          </>
-        )}
-      </div>
+      {!isAuthenticated ? (
+        <div className="flex flex-col gap-3">
+          <p className="font-mono text-sm text-secondary">
+            Sign in to add this to your collection
+          </p>
+          <Button handleClick={() => router.push(`/login?rurl=${pathname}`)}>
+            SIGN IN
+          </Button>
+        </div>
+      ) : (
+        <div className="flex gap-2.5 flex-col md:flex-row">
+          {isToWatch ? (
+            <>
+              <Button handleClick={addToWatched} className="flex-1">
+                MOVE TO WATCHED
+              </Button>
+              <Button
+                variant="outlined"
+                handleClick={handleDelete}
+                disabled={isDeleting}
+                className="flex-1"
+              >
+                {isDeleting ? 'DELETING…' : 'DELETE'}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                handleClick={addToToWatch}
+                disabled={isSaving}
+                className="flex-1"
+              >
+                {isSaving ? 'SAVING…' : 'I WANT TO WATCH'}
+              </Button>
+              <Button handleClick={addToWatched} className="flex-1">
+                I WATCHED
+              </Button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

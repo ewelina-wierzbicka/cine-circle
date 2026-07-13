@@ -1,4 +1,5 @@
 import ErrorToast from '@/components/ErrorToast';
+import { createClient } from '@/lib/supabase/server';
 import { getMediaPageData } from '@/services/getMediaPageData';
 import { notFound } from 'next/navigation';
 import MediaDetail from './MediaDetail';
@@ -13,10 +14,17 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isAuthenticated = !!user;
+
   const { data, error, initialStep } = await getMediaPageData(
     slug,
     mediaType,
     step,
+    isAuthenticated,
   );
 
   return (
@@ -27,6 +35,7 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
           key={slug}
           media={{ ...data, media_type: mediaType }}
           initialStep={initialStep}
+          isAuthenticated={isAuthenticated}
         />
       )}
     </>
