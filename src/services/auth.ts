@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string, rurl?: string) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -12,7 +12,8 @@ export async function login(email: string, password: string) {
     return { error: error.message };
   }
 
-  redirect('/');
+  const destination = rurl?.startsWith('/') ? rurl : '/';
+  redirect(destination);
 }
 
 export async function register(email: string, password: string) {

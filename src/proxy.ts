@@ -2,7 +2,10 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseConfig } from './lib/supabase/config';
 
-const PUBLIC_ROUTES = ['/login', '/register', '/confirm-email'];
+// Auth-only routes: authenticated users are redirected away from these
+const AUTH_ROUTES = ['/login', '/register', '/confirm-email'];
+// Routes that are public but not auth-only (authenticated users can stay)
+const EXTRA_PUBLIC_ROUTES = ['/'];
 
 export default async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -33,15 +36,16 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.some((route) =>
-    pathname.startsWith(route),
-  );
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isPublicRoute = isAuthRoute || EXTRA_PUBLIC_ROUTES.includes(pathname);
 
   if (!user && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('rurl', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (user && isPublicRoute) {
+  if (user && isAuthRoute) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
