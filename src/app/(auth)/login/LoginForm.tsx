@@ -5,11 +5,14 @@ import Input from '@/components/Input';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 export function LoginForm() {
+  const searchParams = useSearchParams();
+  const rurl = searchParams.get('rurl') ?? undefined;
   const [isPending, setIsPending] = useState(false);
   const {
     register,
@@ -19,7 +22,7 @@ export function LoginForm() {
 
   const onSubmit = async (data: RegistrationData) => {
     setIsPending(true);
-    const result = await login(data.email, data.password);
+    const result = await login(data.email, data.password, rurl);
     if (result?.error) {
       toast.error(result.error);
       setIsPending(false);

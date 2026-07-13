@@ -1,6 +1,7 @@
 import { HomeHero } from '@/components/HomeHero';
 import MediaPoster from '@/components/MediaPoster';
 import { toHref } from '@/lib/mediaUtils';
+import { createClient } from '@/lib/supabase/server';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { TrendingMovie, UserMedia } from '@/types';
@@ -21,22 +22,31 @@ function toRecentPoster(item: UserMedia) {
 }
 
 export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   let recentPosters: TrendingMovie[] = [];
   let hintTitles: { id: number; title: string; type: TrendingMovie['type'] }[] =
     [];
-  try {
-    const result = await getUserMediaList('watched', 0);
-    recentPosters = result.media.slice(0, 8).map(toRecentPoster);
-  } catch (err) {
-    console.error(' Failed to fetch recent Posters:', err);
+
+  if (user) {
+    try {
+      const result = await getUserMediaList('watched', 0);
+      recentPosters = result.media.slice(0, 8).map(toRecentPoster);
+    } catch (err) {
+      console.error('Failed to fetch recent posters:', err);
+    }
   }
+
   try {
     const trending = await getTrendingMovies();
     hintTitles = trending
       .slice(0, 4)
       .map(({ id, title, type }) => ({ id, title, type }));
   } catch (err) {
-    console.error(' Failed to fetch trending titles:', err);
+    console.error('Failed to fetch trending titles:', err);
   }
 
   return (

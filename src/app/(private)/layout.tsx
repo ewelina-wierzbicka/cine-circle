@@ -1,5 +1,6 @@
 import Header from '@/components/Header';
 import ScrollReset from '@/components/ScrollReset';
+import { createClient } from '@/lib/supabase/server';
 import { getProfile } from '@/services/getProfile';
 
 export default async function PrivateLayout({
@@ -7,7 +8,12 @@ export default async function PrivateLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const profile = await getProfile();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const profile = user ? await getProfile() : null;
 
   return (
     <div className="relative h-screen flex flex-col bg-dark">
@@ -16,10 +22,7 @@ export default async function PrivateLayout({
         <div className="absolute rounded-full blur-[55px] opacity-25 top-[10%] right-[-10%] w-[50%] h-[80%] bg-[radial-gradient(#755214_0%,transparent_65%)]" />
         <div className="absolute rounded-full blur-2xl bottom-[-20%] left-[30%] w-[40%] h-[80%] bg-[radial-gradient(oklch(82%_0.10_165/0.15)_0%,transparent_65%)]" />
       </div>
-      <Header
-        displayName={profile?.display_name}
-        avatarUrl={profile?.avatar_url}
-      />
+      <Header profile={profile} />
       <ScrollReset />
       <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
     </div>
