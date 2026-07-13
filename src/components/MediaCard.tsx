@@ -125,7 +125,9 @@ export default function MediaCard({
             <Button
               handleClick={(e) => {
                 e.stopPropagation();
-                router.push(`/login?rurl=${pathname}`);
+                router.push(
+                  `/login?rurl=${encodeURIComponent(`${href}?from=${pathname.slice(1)}`)}`,
+                );
               }}
               size="small"
               variant="outlined"
