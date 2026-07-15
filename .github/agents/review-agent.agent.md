@@ -25,7 +25,8 @@ You review code only — you do not implement features or make changes. Your job
 - `params`, `searchParams`, `cookies()`, `headers()` must be awaited — flag any synchronous access
 - Server Components used by default — flag unnecessary `"use client"` directives
 - Data fetching in Server Components or Route Handlers, not in Client Components
-- New public routes must be added to `PUBLIC_ROUTES` in `proxy.ts`
+- New open routes must be added to `OPEN_ROUTES_EXACT`/`OPEN_ROUTE_PREFIXES` in `proxy.ts`
+- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) redirect logged-in users to `/`
 
 ### Supabase
 
@@ -60,7 +61,7 @@ You review code only — you do not implement features or make changes. Your job
 
 - New shared components in `components/` — not colocated if used across route groups
 - Data fetching logic in `services/` — not inlined in components
-- New routes placed inside `(private)/` — all protected routes live directly under this group
+- New routes placed inside `(app)/` — all protected routes live directly under this group
 - `AGENTS.md` and `DESIGN.md` updated when the PR changes project structure, schema, pages, or visual design
 
 ### Performance

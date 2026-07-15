@@ -309,7 +309,7 @@ Right column (Visuals)
 
 ## Search / Home
 
-- Implemented in `src/app/(private)/page.tsx`.
+- Implemented in `src/app/(app)/page.tsx`.
 
 Layout & Ambient
 
@@ -342,7 +342,7 @@ Recently Watched
 
 ## Collection
 
-- Implemented under `src/app/(private)/collection/` via `Page` (server component) and `MyMedia` (client component).
+- Implemented under `src/app/(app)/collection/` via `Page` (server component) and `MyMedia` (client component).
 
 Layout & Header
 
@@ -420,7 +420,7 @@ Interactions & Accessibility
 
 ## Profile
 
-- Implemented via `src/app/(private)/profile/page.tsx` (server) → `ProfileContent.tsx` (client).
+- Implemented via `src/app/(app)/profile/page.tsx` (server) → `ProfileContent.tsx` (client).
 - Route: `/profile` (private, auth required).
 
 Layout

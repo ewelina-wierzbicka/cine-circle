@@ -12,6 +12,7 @@ export async function getMediaPageData(
   slug: string,
   mediaType: 'movie' | 'series',
   stepParam?: string,
+  isAuthenticated = false,
 ): Promise<MediaPageData> {
   const id = slug.split('-')[0];
   const tmdbId = Number(id);
@@ -20,12 +21,14 @@ export async function getMediaPageData(
   let error: string | null = null;
   let userMedia = null;
 
-  try {
-    userMedia = await getUserMedia(tmdbId, mediaType);
-  } catch (err) {
-    const isNotFound = (err as { code?: string }).code === 'PGRST116';
-    if (!isNotFound) {
-      error = (err as Error).message || 'Failed to load saved data.';
+  if (isAuthenticated) {
+    try {
+      userMedia = await getUserMedia(tmdbId, mediaType);
+    } catch (err) {
+      const isNotFound = (err as { code?: string }).code === 'PGRST116';
+      if (!isNotFound) {
+        error = (err as Error).message || 'Failed to load saved data.';
+      }
     }
   }
 

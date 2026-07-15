@@ -13,6 +13,7 @@ type Props = {
   isFetchingNextPage?: boolean;
   fetchNextPage?: () => void;
   className?: string;
+  isAuthenticated?: boolean;
 };
 
 export default function MediaList({
@@ -22,6 +23,7 @@ export default function MediaList({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
+  isAuthenticated = true,
 }: Props) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -71,6 +73,7 @@ export default function MediaList({
               media={item}
               priority={index < 12}
               userMediaId={userMediaId}
+              isAuthenticated={isAuthenticated}
             />
           );
         })}

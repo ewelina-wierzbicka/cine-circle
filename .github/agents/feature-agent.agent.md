@@ -38,7 +38,7 @@ Always read AGENTS.md before starting any task. It contains the project structur
 - Install a new npm dependency
 - Change Supabase schema or RLS policies
 - Delete or rename existing files
-- Add a new public route (requires updating `PUBLIC_ROUTES` in `proxy.ts`)
+- Add a new open route (requires updating `OPEN_ROUTES_EXACT`/`OPEN_ROUTE_PREFIXES` in `proxy.ts`)
 
 ## Code rules
 

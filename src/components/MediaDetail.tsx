@@ -11,9 +11,14 @@ import WatchedMediaInfo from './WatchedMediaInfo';
 type Props = {
   media: NormalizedMedia | SavedMedia;
   initialStep?: number;
+  isAuthenticated?: boolean;
 };
 
-export default function MediaDetail({ media, initialStep = 1 }: Props) {
+export default function MediaDetail({
+  media,
+  initialStep = 1,
+  isAuthenticated = false,
+}: Props) {
   const { step, goToForm, goToInfo } = useDetailStep(initialStep);
   const router = useRouter();
   const isSaved = 'watchStatus' in media;
@@ -54,6 +59,7 @@ export default function MediaDetail({ media, initialStep = 1 }: Props) {
         userMediaId={userMediaId}
         isToWatch={watchStatus === 'to_watch'}
         addToWatched={goToForm}
+        isAuthenticated={isAuthenticated}
       />
     );
 
