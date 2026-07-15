@@ -89,33 +89,6 @@ body {
   border-radius: 2px;
 }
 
-/* ── React Toastify ── */
-
-:root {
-  --toastify-color-dark: #18181f;
-  --toastify-text-color-dark: #ece9e3;
-  --toastify-color-success: oklch(82% 0.1 165);
-  --toastify-color-error: oklch(65% 0.19 20);
-  --toastify-color-info: oklch(70% 0.12 250);
-  --toastify-color-warning: oklch(82% 0.15 85);
-  --toastify-font-family: var(--font-dm-sans);
-  --toastify-toast-bd-radius: 10px;
-  --toastify-toast-min-height: 52px;
-}
-
-.Toastify__toast--dark {
-  background: #21212a;
-  border: 1px solid rgba(236, 233, 227, 0.07);
-}
-
-.Toastify__progress-bar--success {
-  background: oklch(82% 0.1 165);
-}
-
-.Toastify__progress-bar--error {
-  background: oklch(65% 0.19 20);
-}
-
 /* ── React Day Picker ── */
 
 .rdp-today:not(.rdp-outside) {
