@@ -50,7 +50,7 @@ Not every feature needs all four agents. A pure UI change may only need ui-agent
 | Business logic not tied to a UI component       | feature-agent                               |
 | React components, layouts, Tailwind styling     | ui-agent                                    |
 | Wiring components to existing service functions | ui-agent                                    |
-| `PUBLIC_ROUTES` changes in `proxy.ts`           | feature-agent (flag as open question first) |
+| Open route changes in `proxy.ts`                | feature-agent (flag as open question first) |
 | Code review, convention audits                  | review-agent                                |
 
 ## Output format
@@ -78,7 +78,7 @@ For each task:
 
 Anything that needs a decision before work starts. Always flag these — do not guess or assume:
 
-- New public routes (requires `PUBLIC_ROUTES` update in `proxy.ts`)
+- New open routes (requires `OPEN_ROUTES_EXACT`/`OPEN_ROUTE_PREFIXES` update in `proxy.ts`)
 - New npm dependencies
 - Schema changes or new tables
 - UX decisions not specified in the request

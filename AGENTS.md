@@ -44,7 +44,7 @@ ESLint + Prettier are configured — follow them strictly. Do not disable rules 
 ```
 src/
   app/
-    (auth)/                   # public routes — login, register, confirm-email
+    (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
       layout.tsx
       login/
@@ -55,7 +55,7 @@ src/
         RegisterForm.tsx
       confirm-email/
         page.tsx
-    (private)/                # all protected routes (single layout, no sub-groups)
+    (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
         page.tsx
@@ -86,8 +86,11 @@ src/
 ```
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
-- To add a new public route, add it to the `PUBLIC_ROUTES` array in `proxy.ts`
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
+- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`
+- To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
+- All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
 
 ---
