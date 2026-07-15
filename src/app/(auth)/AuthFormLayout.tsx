@@ -32,7 +32,7 @@ export default async function AuthFormLayout({
         <div className="absolute -bottom-30 left-1/2 w-120 h-120 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.82_0.1_165/0.1)_0%,transparent_65%)]" />
         <Link
           href="/"
-          className="absolute top-7 left-6 flex items-center gap-2.5"
+          className="absolute top-7 left-6 z-10 flex items-center gap-2.5"
         >
           <Image
             src="/logo.png"
