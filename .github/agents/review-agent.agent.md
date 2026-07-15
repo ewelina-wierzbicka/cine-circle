@@ -61,7 +61,7 @@ You review code only — you do not implement features or make changes. Your job
 
 - New shared components in `components/` — not colocated if used across route groups
 - Data fetching logic in `services/` — not inlined in components
-- New routes placed inside `(private)/` — all protected routes live directly under this group
+- New routes placed inside `(app)/` — all protected routes live directly under this group
 - `AGENTS.md` and `DESIGN.md` updated when the PR changes project structure, schema, pages, or visual design
 
 ### Performance
