@@ -2,6 +2,7 @@ import MediaPoster from '@/components/MediaPoster';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 
 type AuthFormLayoutProps = {
@@ -29,7 +30,10 @@ export default async function AuthFormLayout({
           }}
         />
         <div className="absolute -bottom-30 left-1/2 w-120 h-120 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.82_0.1_165/0.1)_0%,transparent_65%)]" />
-        <div className="absolute top-7 left-6 flex items-center gap-2.5">
+        <Link
+          href="/"
+          className="absolute top-7 left-6 z-10 flex items-center gap-2.5"
+        >
           <Image
             src="/logo.png"
             alt="cineCircle logo"
@@ -40,7 +44,7 @@ export default async function AuthFormLayout({
           <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
             cineCircle
           </span>
-        </div>
+        </Link>
 
         <div className="relative flex items-center justify-center h-full px-12">
           <div className="w-full max-w-90 animate-fade-up">{children}</div>
