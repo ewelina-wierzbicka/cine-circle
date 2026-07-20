@@ -68,7 +68,8 @@ export const deleteAccount = async (): Promise<void> => {
     user.id,
   );
 
-  if (deleteError) throw deleteError;
+  if (deleteError)
+    throw new Error('Failed to delete account. Please try again.');
 
   redirect('/login');
 };

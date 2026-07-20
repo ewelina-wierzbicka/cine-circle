@@ -5,6 +5,8 @@ import MediaList from '@/components/MediaList';
 import { useUserMedia } from '@/hooks/useUserMedia';
 import { toUserMediaListProps } from '@/lib/mediaUtils';
 import { FilterMediaType, UserMediaPage } from '@/types';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 type Props = {
   watchStatus: 'to_watch' | 'watched';
@@ -19,8 +21,21 @@ export default function UserMediaList({
   searchQuery = '',
   mediaType,
 }: Props) {
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
-    useUserMedia(watchStatus, initialData, searchQuery, mediaType);
+  const {
+    data,
+    error,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isLoading,
+  } = useUserMedia(watchStatus, initialData, searchQuery, mediaType);
+
+  useEffect(() => {
+    if (error) {
+      const message = (error as Error).message;
+      toast.error(message, { toastId: message });
+    }
+  }, [error]);
 
   const media = data?.pages.flatMap((page) => page.media) ?? [];
 

@@ -9,7 +9,7 @@ type Props = {
 
 export default function ErrorToast({ message }: Props) {
   useEffect(() => {
-    toast.error(message);
+    toast.error(message, { toastId: message });
   }, [message]);
 
   return null;

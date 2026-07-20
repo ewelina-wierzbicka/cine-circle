@@ -10,6 +10,7 @@ import { logout } from '@/services/auth';
 import { updateAvatarPath, updateDisplayName } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 import { useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 type Props = {
   profile: UserProfile | null;
@@ -55,8 +56,12 @@ export function ProfileContent({ profile, email }: Props) {
       return;
     }
     setNameError('');
-    await updateDisplayName(displayName);
-    setIsEditingName(false);
+    try {
+      await updateDisplayName(displayName);
+      setIsEditingName(false);
+    } catch {
+      toast.error('Failed to update name. Please try again.');
+    }
   };
 
   const [avatarError, setAvatarError] = useState('');
@@ -101,8 +106,12 @@ export function ProfileContent({ profile, email }: Props) {
       return;
     }
 
-    const { avatarUrl: newUrl } = await updateAvatarPath(path);
-    setAvatarUrl(newUrl);
+    try {
+      const { avatarUrl: newUrl } = await updateAvatarPath(path);
+      setAvatarUrl(newUrl);
+    } catch {
+      setAvatarError('Failed to update avatar. Please try again.');
+    }
   };
 
   const handleUpdateEmail = async () => {
@@ -140,7 +149,12 @@ export function ProfileContent({ profile, email }: Props) {
   const handleDeleteAccount = async () => {
     if (deleteConfirm !== 'DELETE') return;
     setDeleteLoading(true);
-    await deleteAccount();
+    try {
+      await deleteAccount();
+    } catch {
+      toast.error('Failed to delete account. Please try again.');
+      setDeleteLoading(false);
+    }
   };
 
   return (

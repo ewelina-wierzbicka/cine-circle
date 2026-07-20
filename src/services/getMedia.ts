@@ -23,7 +23,7 @@ async function tmdbFetch<T>(
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
     next: nextConfig,
   });
-  if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
+  if (!res.ok) throw new Error('Failed to load data. Please try again.');
   return res.json() as Promise<T>;
 }
 

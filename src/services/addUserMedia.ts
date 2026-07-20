@@ -45,7 +45,7 @@ export const addUserMedia = async (
     .select('id')
     .single();
 
-  if (mediaError) throw mediaError;
+  if (mediaError) throw new Error('Failed to save. Please try again.');
 
   const { data: existingEntry, error: checkError } = await supabase
     .from('user_media')
@@ -54,7 +54,7 @@ export const addUserMedia = async (
     .eq('media_id', media.id)
     .maybeSingle();
 
-  if (checkError) throw checkError;
+  if (checkError) throw new Error('Failed to save. Please try again.');
 
   if (existingEntry) {
     return { status: 'duplicate' as const };
@@ -68,7 +68,7 @@ export const addUserMedia = async (
     rating,
     review,
   });
-  if (entryError) throw entryError;
+  if (entryError) throw new Error('Failed to save. Please try again.');
 
   return { status: 'inserted' as const };
 };
@@ -92,5 +92,5 @@ export const updateUserMedia = async (
     .eq('id', id)
     .eq('user_id', user.id);
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to save changes. Please try again.');
 };

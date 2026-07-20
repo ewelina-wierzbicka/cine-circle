@@ -42,7 +42,8 @@ export default function SearchResults({
 
   useEffect(() => {
     if (error) {
-      toast.error((error as Error).message);
+      const message = (error as Error).message;
+      toast.error(message, { toastId: message });
     }
   }, [error]);
 

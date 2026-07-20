@@ -25,7 +25,7 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
     { onConflict: 'user_id' },
   );
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to update name. Please try again.');
 
   revalidatePath('/', 'layout');
 };
@@ -50,7 +50,7 @@ export const updateAvatarPath = async (
     { onConflict: 'user_id' },
   );
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to update avatar. Please try again.');
 
   revalidatePath('/', 'layout');
 
@@ -65,6 +65,6 @@ export const getSignedAvatarUrl = async (
     .from('avatar')
     .createSignedUrl(path, 60 * 60);
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to load avatar image.');
   return data.signedUrl;
 };

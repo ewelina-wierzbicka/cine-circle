@@ -36,7 +36,7 @@ export const getUserMediaList = async (
 
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to load your media.');
 
   return {
     media: data as UserMedia[],
@@ -65,7 +65,11 @@ export const getUserMedia = async (
     .eq('user_id', user.id)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    const friendly = new Error('Failed to load saved data.');
+    Object.assign(friendly, { code: error.code });
+    throw friendly;
+  }
 
   return data as UserMedia;
 };

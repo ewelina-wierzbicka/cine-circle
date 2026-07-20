@@ -18,5 +18,5 @@ export const deleteUserMedia = async (id: number): Promise<void> => {
     .eq('id', id)
     .eq('user_id', user.id);
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to delete. Please try again.');
 };

@@ -47,7 +47,7 @@ const fetchUserMediaPage = async ({
 
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) throw new Error('Failed to load your media.');
 
   return {
     media: data as UserMedia[],
