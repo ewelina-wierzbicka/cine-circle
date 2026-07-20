@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'react-toastify/dist/ReactToastify.css';
 
 @theme inline {
   /* Fonts */
@@ -13,6 +14,7 @@
   --color-bg2: #18181f;
   --color-bg3: #21212a;
   --color-mint: oklch(82% 0.1 165);
+  --color-error: var(--color-red-400);
   --gradient-blue: linear-gradient(
     160deg,
     rgba(26, 58, 92, 0.933) 0%,
@@ -98,4 +100,11 @@ body {
 
 .rdp-selected .rdp-day_button {
   border: 2px solid var(--color-mint) !important;
+}
+
+/* ── React Toastify ── */
+
+:root {
+  --toastify-color-success: var(--color-mint);
+  --toastify-color-error: var(--color-error);
 }

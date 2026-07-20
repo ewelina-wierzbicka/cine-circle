@@ -82,7 +82,7 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
           </button>
         )}
       </div>
-      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+      {error && <p className="text-error text-sm mt-2">{error}</p>}
     </div>
   );
 }

@@ -196,7 +196,7 @@ export function ProfileContent({ profile, email }: Props) {
           />
         </div>
         {avatarError && (
-          <p className="text-red-400 text-sm mt-4 text-center absolute bottom-2">
+          <p className="text-error text-sm mt-4 text-center absolute bottom-2">
             {avatarError}
           </p>
         )}
@@ -398,8 +398,8 @@ export function ProfileContent({ profile, email }: Props) {
       </div>
 
       {/* Danger Zone Card */}
-      <div className="bg-bg2 border border-red-400/20 rounded-2xl p-6 mb-8">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-red-400 mb-6">
+      <div className="bg-bg2 border border-error/20 rounded-2xl p-6 mb-8">
+        <p className="font-mono text-base uppercase tracking-[0.15em] text-error mb-6">
           Danger zone
         </p>
 
@@ -409,7 +409,7 @@ export function ProfileContent({ profile, email }: Props) {
           className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
         >
           <div className="text-left">
-            <p className="font-mono text-sm uppercase tracking-[0.15em] text-red-400">
+            <p className="font-mono text-sm uppercase tracking-[0.15em] text-error">
               Delete account
             </p>
             <p className="text-secondary text-sm mt-4">
@@ -418,7 +418,7 @@ export function ProfileContent({ profile, email }: Props) {
           </div>
           <ChevronIcon
             className={twMerge(
-              'w-5 h-5 text-red-400 transition-transform duration-200',
+              'w-5 h-5 text-error transition-transform duration-200',
               deleteOpen ? 'rotate-90' : '-rotate-90',
             )}
           />
@@ -435,8 +435,8 @@ export function ProfileContent({ profile, email }: Props) {
             </p>
             <div className="mt-6">
               <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
-                Type <span className="text-red-400 font-semibold">DELETE</span>{' '}
-                to confirm
+                Type <span className="text-error font-semibold">DELETE</span> to
+                confirm
               </p>
               <Input
                 id="delete-confirm"
