@@ -46,7 +46,7 @@ export default async function AuthFormLayout({
           </span>
         </Link>
 
-        <div className="relative flex items-center justify-center h-full px-12">
+        <div className="relative flex items-center justify-center h-full px-6 md:px-12">
           <div className="w-full max-w-90 animate-fade-up">{children}</div>
         </div>
       </div>

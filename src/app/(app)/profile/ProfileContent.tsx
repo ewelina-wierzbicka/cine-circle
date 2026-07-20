@@ -167,7 +167,7 @@ export function ProfileContent({ profile, email }: Props) {
       {/* Profile Card */}
       <div
         className={twMerge(
-          'bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6 relative',
+          'bg-bg2 border border-secondary/25 rounded-2xl p-6 mb-4 flex items-center gap-6 relative flex-col sm:flex-row',
           avatarError ? 'pb-10' : '',
         )}
       >
@@ -475,7 +475,7 @@ export function ProfileContent({ profile, email }: Props) {
         <Button
           handleClick={() => void logout()}
           variant="outlined"
-          className="w-auto px-16"
+          className="w-full sm:w-auto px-16"
         >
           Sign out
         </Button>

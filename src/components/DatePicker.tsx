@@ -58,7 +58,11 @@ export default function DatePicker({
         id={id}
         name={id}
         readOnly
-        value={selected ? selected.toLocaleDateString('en-US') : ''}
+        value={
+          selected && !isNaN(selected.getTime())
+            ? selected.toLocaleDateString('en-US')
+            : ''
+        }
         placeholder="Select a date"
         className={`cursor-pointer ${className ?? ''}`}
         onClick={toggleDayPicker}

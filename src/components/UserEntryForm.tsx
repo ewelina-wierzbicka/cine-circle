@@ -126,7 +126,9 @@ export default function UserEntryForm({
               setValue('watched_date', `${y}-${m}-${d}`);
             }}
             selected={
-              selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined
+              selectedDate
+                ? new Date(selectedDate.slice(0, 10) + 'T00:00:00')
+                : undefined
             }
           />
         </div>
