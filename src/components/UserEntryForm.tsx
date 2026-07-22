@@ -171,7 +171,7 @@ export default function UserEntryForm({
           />
         </div>
         <div className="pt-6">
-          <Button type="submit" disabled={isSaving}>
+          <Button type="submit" disabled={isSaving} className="w-auto px-10">
             {isSaving ? 'SAVING…' : isUpdateMode ? 'UPDATE' : 'SAVE'}
           </Button>
         </div>
