@@ -1,7 +1,21 @@
 'use client';
 
-import UserEntryForm from '@/components/UserEntryForm';
+import dynamic from 'next/dynamic';
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
+
+const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full py-4 animate-fade-up">
+      <div className="h-12 w-64 rounded-xl bg-bg2 mb-10" />
+      <div className="flex flex-col gap-7 max-w-full md:max-w-140">
+        <div className="h-11.5 rounded-xl bg-bg2" />
+        <div className="h-11.5 rounded-xl bg-bg2" />
+        <div className="h-24 rounded-xl bg-bg2" />
+      </div>
+    </div>
+  ),
+});
 import { useDetailStep } from '@/hooks/useDetailStep';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { useRouter } from 'next/navigation';
