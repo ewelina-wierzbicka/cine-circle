@@ -12,7 +12,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Button from './Button';
 
-// Lazy-load DatePicker so react-day-picker stays out of the initial JS chunk.
 const DatePicker = dynamic(() => import('@/components/DatePicker'), {
   ssr: false,
   loading: () => (
