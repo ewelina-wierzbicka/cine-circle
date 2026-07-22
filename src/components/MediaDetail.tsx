@@ -1,7 +1,12 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
+import { useDetailStep } from '@/hooks/useDetailStep';
+import { NormalizedMedia, SavedMedia } from '@/types';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import MediaInfo from './MediaInfo';
+import WatchedMediaInfo from './WatchedMediaInfo';
 
 const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
   ssr: false,
@@ -22,17 +27,12 @@ const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
           <div className="h-30 rounded-xl bg-bg2" />
         </div>
         <div className="pt-6">
-          <div className="h-11 w-32 rounded-xl bg-bg3" />
+          <div className="h-11 w-full rounded-xl bg-bg3" />
         </div>
       </div>
     </div>
   ),
 });
-import { useDetailStep } from '@/hooks/useDetailStep';
-import { NormalizedMedia, SavedMedia } from '@/types';
-import { useRouter } from 'next/navigation';
-import MediaInfo from './MediaInfo';
-import WatchedMediaInfo from './WatchedMediaInfo';
 
 type Props = {
   media: NormalizedMedia | SavedMedia;
