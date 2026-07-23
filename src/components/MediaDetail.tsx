@@ -1,12 +1,18 @@
 'use client';
 
-import UserEntryForm from '@/components/UserEntryForm';
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
 import { useDetailStep } from '@/hooks/useDetailStep';
 import { NormalizedMedia, SavedMedia } from '@/types';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import MediaInfo from './MediaInfo';
 import WatchedMediaInfo from './WatchedMediaInfo';
+import UserEntryFormSkeleton from './UserEntryFormSkeleton';
+
+const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
+  ssr: false,
+  loading: () => <UserEntryFormSkeleton />,
+});
 
 type Props = {
   media: NormalizedMedia | SavedMedia;

@@ -1,16 +1,22 @@
 'use client';
 
-import DatePicker from '@/components/DatePicker';
 import StarRatingInput from '@/components/StarRatingInput';
 import Textarea from '@/components/Textarea';
 import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
 import { NormalizedMedia, UserEntry } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Button from './Button';
+import Skeleton from './Skeleton';
+
+const DatePicker = dynamic(() => import('@/components/DatePicker'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-11.5 rounded-xl w-full" />,
+});
 
 type Props = {
   media: NormalizedMedia;
