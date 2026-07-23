@@ -273,15 +273,18 @@ export function SearchBox({
           handleKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          role="combobox"
-          aria-expanded={showDropdown}
-          aria-controls="search-results"
-          aria-autocomplete="list"
-          aria-activedescendant={
-            activeIndex >= 0
-              ? `search-result-${displayResults[activeIndex]?.id}`
-              : undefined
-          }
+          {...(showDropdown
+            ? {
+                role: 'combobox',
+                'aria-expanded': true,
+                'aria-controls': 'search-results',
+                'aria-autocomplete': 'list',
+                'aria-activedescendant':
+                  activeIndex >= 0
+                    ? `search-result-${displayResults[activeIndex]?.id}`
+                    : undefined,
+              }
+            : {})}
         />
         <div className="hidden sm:flex gap-1 ml-2 shrink-0">
           {FILTER_CHIPS.map(({ label, value }) => (
@@ -323,6 +326,7 @@ export function SearchBox({
       {showDropdown && (
         <div
           ref={dropdownRef}
+          id="search-results"
           role="listbox"
           aria-label="Search results"
           className="absolute left-0 right-0 top-full z-30 bg-bg2 border border-secondary/30 rounded-xl mt-2 shadow-lg animate-fade-in max-h-96 overflow-y-auto"

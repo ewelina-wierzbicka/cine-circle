@@ -50,6 +50,8 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
               {/* Left half — odd rating values */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={value === leftVal}
                 className="absolute left-0 top-0 w-1/2 h-full opacity-0"
                 onMouseEnter={() => setHoverValue(leftVal)}
                 onClick={() => onChange(value === leftVal ? 0 : leftVal)}
@@ -58,6 +60,8 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
               {/* Right half — even rating values */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={value === rightVal}
                 className="absolute right-0 top-0 w-1/2 h-full opacity-0"
                 onMouseEnter={() => setHoverValue(rightVal)}
                 onClick={() => onChange(value === rightVal ? 0 : rightVal)}
