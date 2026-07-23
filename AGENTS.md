@@ -59,18 +59,22 @@ src/
       page.tsx                # / (home page)
       search/                 # /search
         page.tsx
+        loading.tsx           # streams SearchBox + results grid skeleton
         SearchResults.tsx
       movie/[id]/             # /movie/:id
         page.tsx
+        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       collection/               # /collection
         page.tsx
+        loading.tsx           # streams MyMedia header + grid skeleton
         MyMedia.tsx
         UserMediaList.tsx
       profile/                # /profile
         page.tsx
         ProfileContent.tsx
-      series/[id]/            # /series/:id
+      series/[id]/             # /series/:id
         page.tsx
+        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       layout.tsx
     api/                      # Route Handlers
     layout.tsx                # root layout
