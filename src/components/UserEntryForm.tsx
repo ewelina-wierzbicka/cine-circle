@@ -133,13 +133,17 @@ export default function UserEntryForm({
           />
         </div>
         <div>
-          <label className="block font-mono text-sm tracking-[0.18em] text-secondary uppercase my-3">
+          <span
+            id="rating-label"
+            className="block font-mono text-sm tracking-[0.18em] text-secondary uppercase my-3"
+          >
             How did you like it?
-          </label>
+          </span>
           <StarRatingInput
             value={watch('rating') ?? 0}
             onChange={(v) => setValue('rating', v)}
             error={errors.rating?.message}
+            ariaLabelledby="rating-label"
           />
         </div>
         <div>

@@ -8,9 +8,15 @@ type Props = {
   value?: number;
   onChange: (value: number) => void;
   error?: string;
+  ariaLabelledby?: string;
 };
 
-export default function StarRatingInput({ value = 0, onChange, error }: Props) {
+export default function StarRatingInput({
+  value = 0,
+  onChange,
+  error,
+  ariaLabelledby,
+}: Props) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const displayValue = hoverValue ?? value;
   const stars = displayValue / 2;
@@ -58,6 +64,7 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
         onKeyDown={handleKeyDown}
         role="radiogroup"
         aria-label="Rating out of 5 stars"
+        {...(ariaLabelledby ? { 'aria-labelledby': ariaLabelledby } : {})}
       >
         {Array.from({ length: 5 }).map((_, i) => {
           const leftVal = i * 2 + 1;
@@ -121,7 +128,7 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
         {value > 0 && (
           <button
             type="button"
-            className="ml-2 text-xs text-secondary hover:text-primary transition-colors"
+            className="ml-2 inline-flex items-center justify-center min-w-6 min-h-6 rounded text-sm text-secondary hover:text-primary hover:bg-bg3 transition-colors"
             onClick={() => onChange(0)}
             aria-label="Clear rating"
           >
