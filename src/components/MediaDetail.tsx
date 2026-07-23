@@ -7,11 +7,11 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import MediaInfo from './MediaInfo';
 import WatchedMediaInfo from './WatchedMediaInfo';
-import UserEntryFormLoader from './UserEntryFormLoader';
+import UserEntryFormSkeleton from './UserEntryFormSkeleton';
 
 const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
   ssr: false,
-  loading: () => <UserEntryFormLoader />,
+  loading: () => <UserEntryFormSkeleton />,
 });
 
 type Props = {

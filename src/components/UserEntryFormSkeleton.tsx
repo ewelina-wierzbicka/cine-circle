@@ -1,4 +1,4 @@
-export default function UserEntryFormLoader() {
+export function UserEntryFormSkeleton() {
   return (
     <div className="w-full py-4 animate-fade-up">
       <div className="h-11 w-72 rounded-xl bg-bg3 mb-10" />
@@ -22,3 +22,5 @@ export default function UserEntryFormLoader() {
     </div>
   );
 }
+
+export default UserEntryFormSkeleton;
