@@ -86,31 +86,32 @@ The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`
 
 Familiarize yourself with these before adding anything new:
 
-| Component                                        | Purpose                                                                                     |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `CinematicPoster`                                | Gradient poster placeholder used in listings and hero views                                 |
-| `Button`                                         | Primary and secondary actions; supports `color`, `variant`, and `size`                      |
-| `SearchBox`                                      | Search input with filter chips, debounced queries, and dropdown with infinite scroll        |
-| `SearchDropdownItem`                             | Single item renderer used by `SearchBox` dropdown                                           |
-| `Input`                                          | Text input component with shared styling                                                    |
-| `Textarea`                                       | Multiline input with shared validation styles                                               |
-| `Select`                                         | Select control used in forms                                                                |
-| `DatePicker`                                     | Date selection control used in user entry forms                                             |
-| `StarRating`                                     | Read-only star display (supports half-stars via overlay clipping)                           |
-| `MediaCard`                                      | Movie/series card with poster, title, and metadata                                          |
-| `MediaCardOverlay`                               | Overlay content for `MediaCard` (hover/focus states)                                        |
-| `MediaPoster`                                    | Standalone poster image component; handles sizing and `next/image` usage                    |
-| `MediaList`                                      | Responsive grid list of `MediaCard` components                                              |
-| `MediaPage`                                      | Full media detail page composition (page-level wrapper)                                     |
-| `MediaDetail`, `MediaDetailWrapper`, `MediaInfo` | Detail layout and metadata regions used on media pages                                      |
-| `MediaInfoHeader`                                | Shared header block for detail pages (genre pills, title, director, date, overview)         |
-| `WatchedMediaInfo`                               | Displays user's watched entry (rating, date, notes)                                         |
-| `UserEntryForm`                                  | Add / edit watched entry form (uses `Input`, `Textarea`, `DatePicker`, `Select`)            |
-| `Header`                                         | App header with navigation, search affordance, and responsive behavior                      |
-| `Loader`                                         | Spinner / skeleton loader used across pages                                                 |
-| `Skeleton`                                       | Reusable pulsing skeleton block (`animate-pulse bg-bg3/60`) used by loading.tsx files       |
-| `MediaDetailSkeleton`                            | Full movie/series detail page skeleton rendered by `movie/[id]` & `series/[id]` loading.tsx |
-| `ErrorToast`                                     | Transient error notification component                                                      |
+| Component                                        | Purpose                                                                                                          |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `CinematicPoster`                                | Gradient poster placeholder used in listings and hero views                                                      |
+| `Button`                                         | Primary and secondary actions; supports `color`, `variant`, and `size`                                           |
+| `SearchBox`                                      | Search input with filter chips, debounced queries, and dropdown with infinite scroll                             |
+| `SearchDropdownItem`                             | Single item renderer used by `SearchBox` dropdown                                                                |
+| `Input`                                          | Text input component with shared styling                                                                         |
+| `Textarea`                                       | Multiline input with shared validation styles                                                                    |
+| `Select`                                         | Select control used in forms                                                                                     |
+| `DatePicker`                                     | Date selection control used in user entry forms                                                                  |
+| `StarRating`                                     | Read-only star display (supports half-stars via overlay clipping)                                                |
+| `MediaCard`                                      | Movie/series card with poster, title, and metadata                                                               |
+| `MediaCardOverlay`                               | Overlay content for `MediaCard` (hover/focus states)                                                             |
+| `MediaPoster`                                    | Standalone poster image component; handles sizing and `next/image` usage                                         |
+| `MediaList`                                      | Responsive grid list of `MediaCard` components                                                                   |
+| `MediaPage`                                      | Full media detail page composition (page-level wrapper)                                                          |
+| `MediaDetail`, `MediaDetailWrapper`, `MediaInfo` | Detail layout and metadata regions used on media pages                                                           |
+| `MediaInfoHeader`                                | Shared header block for detail pages (genre pills, title, director, date, overview)                              |
+| `WatchedMediaInfo`                               | Displays user's watched entry (rating, date, notes)                                                              |
+| `UserEntryForm`                                  | Add / edit watched entry form (uses `Input`, `Textarea`, `DatePicker`, `Select`)                                 |
+| `Header`                                         | App header with navigation, search affordance, and responsive behavior                                           |
+| `Loader`                                         | Spinner / skeleton loader used across pages                                                                      |
+| `Skeleton`                                       | Reusable pulsing skeleton block (`animate-pulse bg-bg3/60`) used by loading.tsx files                            |
+| `MediaDetailSkeleton`                            | Full movie/series detail page skeleton rendered by `movie/[id]` & `series/[id]` loading.tsx                      |
+| `MediaCardSkeleton`                              | Single `MediaCard`-shaped skeleton (poster + title/meta lines) used by `search` & `collection` loading.tsx grids |
+| `ErrorToast`                                     | Transient error notification component                                                                           |
 
 ---
 

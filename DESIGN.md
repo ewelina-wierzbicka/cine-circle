@@ -283,6 +283,7 @@ export const motion = {
 
 - `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files for React Suspense streaming.
 - `src/components/MediaDetailSkeleton.tsx` — full movie/series detail skeleton mirroring `MediaDetailWrapper`: same radial gradient backdrop, rotated poster placeholder on the left (`h-[50vh]` on mobile, `md:w-1/2`), and a `MediaInfoHeader`-shaped skeleton column on the right (back link, genre pills, type eyebrow, serif title, meta row, mint divider, overview lines).
+- `src/components/MediaCardSkeleton.tsx` — single `MediaCard`-shaped skeleton: `aspect-2/3` poster block plus two title/meta lines. Used by the `search` and `collection` `loading.tsx` grids (12 cells, matching `MediaList` breakpoints).
 - Route skeletons:
   - `src/app/(app)/movie/[id]/loading.tsx` renders `<MediaDetailSkeleton />`.
   - `src/app/(app)/series/[id]/loading.tsx` renders `<MediaDetailSkeleton />` (identical layout to the movie route).
