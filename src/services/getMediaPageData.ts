@@ -1,12 +1,17 @@
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getUserMedia } from '@/services/getUserMedia';
-import { NormalizedMedia, SavedMedia } from '@/types';
+import { NormalizedMedia, SavedMedia, UserMedia } from '@/types';
 
 type MediaPageData = {
   data: SavedMedia | NormalizedMedia | null;
   error: string | null;
   initialStep: number;
 };
+
+type TmdbExtra = Pick<
+  NormalizedMedia,
+  'genres' | 'overview' | 'recommendations' | 'director'
+>;
 
 export async function getMediaPageData(
   slug: string,
@@ -18,22 +23,48 @@ export async function getMediaPageData(
   const tmdbId = Number(id);
   const initialStep = stepParam === '2' ? 2 : 1;
 
+  // TMDB details are needed whether or not the user has saved this media:
+  // saved rows enrich TMDB extras; unsaved rows return the full detail.
+  // Kick the fetch off immediately so it runs in parallel with Supabase.
+  const tmdbPromise: Promise<NormalizedMedia> =
+    mediaType === 'series' ? getSeriesDetails(id) : getMovieDetails(id);
+
+  // Only hit Supabase when authenticated. Mirror the original behaviour:
+  // a not-found row (PGRST116) is treated as "not saved" rather than an error.
+  const userMediaPromise: Promise<UserMedia | null> = isAuthenticated
+    ? getUserMedia(tmdbId, mediaType).catch((err) => {
+        const isNotFound = (err as { code?: string }).code === 'PGRST116';
+        if (isNotFound) return null;
+        throw err;
+      })
+    : Promise.resolve(null);
+
+  let userMedia: UserMedia | null = null;
   let error: string | null = null;
-  let userMedia = null;
 
   if (isAuthenticated) {
     try {
-      userMedia = await getUserMedia(tmdbId, mediaType);
+      userMedia = await userMediaPromise;
     } catch (err) {
-      const isNotFound = (err as { code?: string }).code === 'PGRST116';
-      if (!isNotFound) {
-        error = (err as Error).message || 'Failed to load saved data.';
-      }
+      error = (err as Error).message || 'Failed to load saved data.';
     }
   }
 
+  // Preserve prior behaviour: a hard Supabase error short-circuits even if
+  // TMDB would have succeeded.
+  if (error) {
+    return { data: null, error, initialStep };
+  }
+
   if (userMedia) {
-    const { id, watchStatus, watched_date, rating, review, media } = userMedia;
+    const {
+      id: savedId,
+      watchStatus,
+      watched_date,
+      rating,
+      review,
+      media,
+    } = userMedia;
     const {
       tmdb_id,
       title,
@@ -43,16 +74,9 @@ export async function getMediaPageData(
       media_type,
     } = media;
 
-    // Supabase media table doesn't store genres/overview/recommendations/director — fetch from TMDB
-    let tmdbExtra: Pick<
-      NormalizedMedia,
-      'genres' | 'overview' | 'recommendations' | 'director'
-    > = {};
+    let tmdbExtra: TmdbExtra = {};
     try {
-      const tmdb =
-        mediaType === 'series'
-          ? await getSeriesDetails(tmdb_id.toString())
-          : await getMovieDetails(tmdb_id.toString());
+      const tmdb = await tmdbPromise;
       tmdbExtra = {
         genres: tmdb.genres,
         overview: tmdb.overview,
@@ -71,7 +95,7 @@ export async function getMediaPageData(
       poster_path,
       media_type,
       ...tmdbExtra,
-      id,
+      id: savedId,
       watchStatus,
       watched_date,
       rating,
@@ -80,15 +104,8 @@ export async function getMediaPageData(
     return { data, error: null, initialStep };
   }
 
-  if (error) {
-    return { data: null, error, initialStep };
-  }
-
   try {
-    const data =
-      mediaType === 'series'
-        ? await getSeriesDetails(id)
-        : await getMovieDetails(id);
+    const data = await tmdbPromise;
     return { data, error: null, initialStep };
   } catch (err) {
     return {
