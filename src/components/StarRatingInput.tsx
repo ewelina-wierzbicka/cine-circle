@@ -73,10 +73,7 @@ export default function StarRatingInput({
             stars >= i + 1 ? 'full' : stars >= i + 0.5 ? 'half' : 'empty';
 
           return (
-            <div
-              key={i}
-              className="relative size-8 cursor-pointer rounded focus-within:ring-2 focus-within:ring-primary/40"
-            >
+            <div key={i} className="relative size-8 cursor-pointer rounded">
               <StarIcon
                 className={twMerge(
                   'absolute size-8',
