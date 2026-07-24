@@ -20,8 +20,6 @@ export default function StarRatingInput({
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const displayValue = hoverValue ?? value;
   const stars = displayValue / 2;
-  // The radio that lives in the tab order: the checked one, or the first
-  // when nothing is selected so keyboard users can enter the group.
   const tabbableValue = value > 0 ? value : 1;
   const radioRefs = useRef<Record<number, HTMLButtonElement | null>>({});
 
@@ -41,13 +39,11 @@ export default function StarRatingInput({
       case 'ArrowLeft':
       case 'ArrowDown':
         e.preventDefault();
-        // Allow decrement all the way to 0 so keyboard users can clear
-        // the rating, matching the click-to-clear behavior on each star.
         setValueAndFocus(Math.max(0, current - 1));
         break;
       case 'Home':
         e.preventDefault();
-        setValueAndFocus(1);
+        setValueAndFocus(0);
         break;
       case 'End':
         e.preventDefault();
