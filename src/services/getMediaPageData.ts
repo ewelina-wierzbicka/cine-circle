@@ -17,44 +17,51 @@ export async function getMediaPageData(
   slug: string,
   mediaType: 'movie' | 'series',
   stepParam?: string,
-  isAuthenticated = false,
+  userId?: string | null,
 ): Promise<MediaPageData> {
   const id = slug.split('-')[0];
   const tmdbId = Number(id);
   const initialStep = stepParam === '2' ? 2 : 1;
 
-  // TMDB details are needed whether or not the user has saved this media:
-  // saved rows enrich TMDB extras; unsaved rows return the full detail.
-  // Kick the fetch off immediately so it runs in parallel with Supabase.
+  // TMDB details are needed in every branch, so kick the fetch off in
+  // parallel with the Supabase query.
   const tmdbPromise: Promise<NormalizedMedia> =
     mediaType === 'series' ? getSeriesDetails(id) : getMovieDetails(id);
 
-  // Only hit Supabase when authenticated. Mirror the original behaviour:
-  // a not-found row (PGRST116) is treated as "not saved" rather than an error.
-  const userMediaPromise: Promise<UserMedia | null> = isAuthenticated
-    ? getUserMedia(tmdbId, mediaType).catch((err) => {
+  // Pass the already-resolved userId so getUserMedia skips auth.getUser().
+  // PGRST116 (not found) is treated as "not saved" rather than an error.
+  const userMediaPromise: Promise<UserMedia | null> = userId
+    ? getUserMedia(tmdbId, mediaType, userId).catch((err) => {
         const isNotFound = (err as { code?: string }).code === 'PGRST116';
         if (isNotFound) return null;
         throw err;
       })
     : Promise.resolve(null);
 
-  let userMedia: UserMedia | null = null;
-  let error: string | null = null;
+  const [tmdbSettled, userMediaSettled] = await Promise.allSettled([
+    tmdbPromise,
+    userMediaPromise,
+  ]);
 
-  if (isAuthenticated) {
-    try {
-      userMedia = await userMediaPromise;
-    } catch (err) {
-      error = (err as Error).message || 'Failed to load saved data.';
-    }
-  }
-
-  // Preserve prior behaviour: a hard Supabase error short-circuits even if
+  // Preserve prior behaviour: a hard Supabase error short-circuits even when
   // TMDB would have succeeded.
-  if (error) {
-    return { data: null, error, initialStep };
+  if (userMediaSettled.status === 'rejected') {
+    return {
+      data: null,
+      error:
+        (userMediaSettled.reason as Error).message ||
+        'Failed to load saved data.',
+      initialStep,
+    };
   }
+
+  const userMedia =
+    userMediaSettled.status === 'fulfilled' ? userMediaSettled.value : null;
+  const tmdb = tmdbSettled.status === 'fulfilled' ? tmdbSettled.value : null;
+  const tmdbError =
+    tmdbSettled.status === 'rejected'
+      ? (tmdbSettled.reason as Error).message || 'Failed to load data.'
+      : null;
 
   if (userMedia) {
     const {
@@ -74,18 +81,16 @@ export async function getMediaPageData(
       media_type,
     } = media;
 
-    let tmdbExtra: TmdbExtra = {};
-    try {
-      const tmdb = await tmdbPromise;
-      tmdbExtra = {
-        genres: tmdb.genres,
-        overview: tmdb.overview,
-        recommendations: tmdb.recommendations,
-        director: tmdb.director,
-      };
-    } catch {
-      // non-fatal: detail page still works without these fields
-    }
+    // TMDB failure in the saved branch is non-fatal: the page still renders
+    // from the saved row without genres/overview/extras.
+    const tmdbExtra: TmdbExtra = tmdb
+      ? {
+          genres: tmdb.genres,
+          overview: tmdb.overview,
+          recommendations: tmdb.recommendations,
+          director: tmdb.director,
+        }
+      : {};
 
     const data = {
       tmdb_id,
@@ -104,14 +109,7 @@ export async function getMediaPageData(
     return { data, error: null, initialStep };
   }
 
-  try {
-    const data = await tmdbPromise;
-    return { data, error: null, initialStep };
-  } catch (err) {
-    return {
-      data: null,
-      error: (err as Error).message || 'Failed to load data.',
-      initialStep,
-    };
-  }
+  // Unsaved branch: TMDB is the primary payload, so its failure is fatal.
+  if (tmdb) return { data: tmdb, error: null, initialStep };
+  return { data: null, error: tmdbError, initialStep };
 }
