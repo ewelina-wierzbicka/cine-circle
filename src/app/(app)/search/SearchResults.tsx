@@ -68,7 +68,11 @@ export default function SearchResults({
             </p>
           </div>
         }
-        emptyMessage={`No ${TYPE_LABELS[type]} found for: "${query}"`}
+        emptyMessage={
+          query.trim()
+            ? `No ${TYPE_LABELS[type]} found for: "${query}"`
+            : 'No entries found'
+        }
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}

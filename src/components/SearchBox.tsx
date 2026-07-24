@@ -102,10 +102,15 @@ export function SearchBox({
   };
 
   useEffect(() => {
-    if (isSearchResultsPage && debouncedQuery.trim()) {
-      navigate(debouncedQuery, mediaType);
+    if (!isSearchResultsPage) return;
+    if (debouncedQuery.trim()) {
+      router.push(
+        `/search?query=${encodeURIComponent(debouncedQuery)}&type=${mediaType}`,
+      );
+    } else {
+      router.replace(`/search?type=${mediaType}`);
     }
-  }, [debouncedQuery, mediaType, pathname]);
+  }, [debouncedQuery, mediaType, isSearchResultsPage, router]);
 
   // Keyboard navigation for dropdown
   useEffect(() => {
