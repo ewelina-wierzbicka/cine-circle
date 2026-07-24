@@ -47,22 +47,28 @@ export const getUserMediaList = async (
 export const getUserMedia = async (
   tmdbId: number,
   mediaType: MediaType = 'movie',
+  knownUserId?: string,
 ): Promise<UserMedia> => {
+  // Callers that already resolved the authed user can pass it in to skip the
+  // redundant auth.getUser() round-trip; falls back to resolving here.
+  if (!knownUserId) {
+    const authClient = await createClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await authClient.auth.getUser();
+    if (userError || !user) throw new Error('Not authenticated');
+    knownUserId = user.id;
+  }
+
   const supabase = await createClient();
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) throw new Error('Not authenticated');
 
   const { data, error } = await supabase
     .from('user_media')
     .select('*, media!inner(*)')
     .eq('media.tmdb_id', tmdbId)
     .eq('media.media_type', mediaType)
-    .eq('user_id', user.id)
+    .eq('user_id', knownUserId)
     .single();
 
   if (error) {
