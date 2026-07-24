@@ -48,6 +48,7 @@ export default function UserMediaList({
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
+        isLoading={isLoading}
       />
     </>
   );

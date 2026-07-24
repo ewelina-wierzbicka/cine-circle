@@ -55,6 +55,7 @@ export default function SearchResults({
       <MediaList
         media={allMedia.map(toSearchMediaListProps)}
         isAuthenticated={isAuthenticated}
+        isLoading={isLoading}
         heading={
           <div>
             <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
