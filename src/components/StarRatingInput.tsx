@@ -41,7 +41,9 @@ export default function StarRatingInput({
       case 'ArrowLeft':
       case 'ArrowDown':
         e.preventDefault();
-        setValueAndFocus(Math.max(1, current - 1));
+        // Allow decrement all the way to 0 so keyboard users can clear
+        // the rating, matching the click-to-clear behavior on each star.
+        setValueAndFocus(Math.max(0, current - 1));
         break;
       case 'Home':
         e.preventDefault();
