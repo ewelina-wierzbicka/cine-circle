@@ -2,26 +2,71 @@
 
 import StarIcon from '@/icons/Star';
 import { twMerge } from '@/lib/cn';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Props = {
   value?: number;
   onChange: (value: number) => void;
   error?: string;
+  ariaLabelledby?: string;
 };
 
-export default function StarRatingInput({ value = 0, onChange, error }: Props) {
+export default function StarRatingInput({
+  value = 0,
+  onChange,
+  error,
+  ariaLabelledby,
+}: Props) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const displayValue = hoverValue ?? value;
   const stars = displayValue / 2;
+  // The radio that lives in the tab order: the checked one, or the first
+  // when nothing is selected so keyboard users can enter the group.
+  const tabbableValue = value > 0 ? value : 1;
+  const radioRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+
+  const setValueAndFocus = (next: number) => {
+    onChange(next);
+    radioRefs.current[next]?.focus();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const current = value > 0 ? value : 1;
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowUp':
+        e.preventDefault();
+        setValueAndFocus(Math.min(10, current + 1));
+        break;
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        e.preventDefault();
+        // Allow decrement all the way to 0 so keyboard users can clear
+        // the rating, matching the click-to-clear behavior on each star.
+        setValueAndFocus(Math.max(0, current - 1));
+        break;
+      case 'Home':
+        e.preventDefault();
+        setValueAndFocus(1);
+        break;
+      case 'End':
+        e.preventDefault();
+        setValueAndFocus(10);
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div>
       <div
         className="flex items-center gap-1"
         onMouseLeave={() => setHoverValue(null)}
+        onKeyDown={handleKeyDown}
         role="radiogroup"
-        aria-label="Rating"
+        aria-label="Rating out of 5 stars"
+        {...(ariaLabelledby ? { 'aria-labelledby': ariaLabelledby } : {})}
       >
         {Array.from({ length: 5 }).map((_, i) => {
           const leftVal = i * 2 + 1;
@@ -30,15 +75,14 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
             stars >= i + 1 ? 'full' : stars >= i + 0.5 ? 'half' : 'empty';
 
           return (
-            <div key={i} className="relative size-8 cursor-pointer">
+            <div
+              key={i}
+              className="relative size-8 cursor-pointer rounded focus-within:outline-none"
+            >
               <StarIcon
                 className={twMerge(
                   'absolute size-8',
-                  fillLevel === 'full'
-                    ? 'text-amber-400'
-                    : fillLevel === 'half'
-                      ? 'text-white/15'
-                      : 'text-white/15',
+                  fillLevel === 'empty' ? 'text-white/15' : 'text-amber-400',
                 )}
                 filled={fillLevel === 'full'}
               />
@@ -50,6 +94,12 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
               {/* Left half — odd rating values */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={value === leftVal}
+                tabIndex={leftVal === tabbableValue ? 0 : -1}
+                ref={(el) => {
+                  radioRefs.current[leftVal] = el;
+                }}
                 className="absolute left-0 top-0 w-1/2 h-full opacity-0"
                 onMouseEnter={() => setHoverValue(leftVal)}
                 onClick={() => onChange(value === leftVal ? 0 : leftVal)}
@@ -58,6 +108,12 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
               {/* Right half — even rating values */}
               <button
                 type="button"
+                role="radio"
+                aria-checked={value === rightVal}
+                tabIndex={rightVal === tabbableValue ? 0 : -1}
+                ref={(el) => {
+                  radioRefs.current[rightVal] = el;
+                }}
                 className="absolute right-0 top-0 w-1/2 h-full opacity-0"
                 onMouseEnter={() => setHoverValue(rightVal)}
                 onClick={() => onChange(value === rightVal ? 0 : rightVal)}
@@ -74,7 +130,7 @@ export default function StarRatingInput({ value = 0, onChange, error }: Props) {
         {value > 0 && (
           <button
             type="button"
-            className="ml-2 text-xs text-secondary hover:text-primary transition-colors"
+            className="ml-2 inline-flex items-center justify-center min-w-6 min-h-6 rounded text-sm text-secondary hover:text-primary hover:bg-bg3 transition-colors"
             onClick={() => onChange(0)}
             aria-label="Clear rating"
           >
