@@ -14,6 +14,7 @@ type Props = {
   fetchNextPage?: () => void;
   className?: string;
   isAuthenticated?: boolean;
+  isLoading?: boolean;
 };
 
 export default function MediaList({
@@ -24,6 +25,7 @@ export default function MediaList({
   isFetchingNextPage,
   fetchNextPage,
   isAuthenticated = true,
+  isLoading = false,
 }: Props) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,6 +53,9 @@ export default function MediaList({
   }, [handleObserver]);
 
   if (media.length === 0) {
+    if (isLoading) {
+      return null;
+    }
     return (
       <div className="flex items-center justify-center h-48 w-full">
         <p className="font-mono text-sm tracking-[0.12em] text-secondary uppercase">
