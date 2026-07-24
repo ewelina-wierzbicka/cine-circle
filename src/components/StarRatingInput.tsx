@@ -75,7 +75,7 @@ export default function StarRatingInput({
           return (
             <div
               key={i}
-              className="relative size-8 cursor-pointer rounded focus-within:ring-2 focus-within:ring-mint focus-within:ring-offset-1 focus-within:ring-offset-bg2"
+              className="relative size-8 cursor-pointer rounded focus-within:ring-2 focus-within:ring-primary/40"
             >
               <StarIcon
                 className={twMerge(
