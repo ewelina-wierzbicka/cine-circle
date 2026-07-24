@@ -9,7 +9,7 @@ import { twMerge } from '@/lib/cn';
 import { toHref } from '@/lib/mediaUtils';
 import { FilterMediaType, MediaType } from '@/types';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 
 const FILTER_CHIPS: { label: string; value: FilterMediaType }[] = [
@@ -94,23 +94,24 @@ export function SearchBox({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const navigate = (q: string, t?: FilterMediaType) => {
-    if (!q.trim()) return;
-    router.push(
-      `/search?query=${encodeURIComponent(q)}&type=${t ?? mediaType}`,
-    );
-  };
+  const navigate = useCallback(
+    (q: string, t?: FilterMediaType) => {
+      if (!q.trim()) return;
+      router.push(
+        `/search?query=${encodeURIComponent(q)}&type=${t ?? mediaType}`,
+      );
+    },
+    [router, mediaType],
+  );
 
   useEffect(() => {
     if (!isSearchResultsPage) return;
     if (debouncedQuery.trim()) {
-      router.push(
-        `/search?query=${encodeURIComponent(debouncedQuery)}&type=${mediaType}`,
-      );
+      navigate(debouncedQuery, mediaType);
     } else {
       router.replace(`/search?type=${mediaType}`);
     }
-  }, [debouncedQuery, mediaType, isSearchResultsPage, router]);
+  }, [debouncedQuery, mediaType, isSearchResultsPage, router, navigate]);
 
   // Keyboard navigation for dropdown
   useEffect(() => {

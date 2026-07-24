@@ -71,7 +71,7 @@ export default function SearchResults({
         emptyMessage={
           query.trim()
             ? `No ${TYPE_LABELS[type]} found for: "${query}"`
-            : 'No entries found'
+            : 'Enter a title to search for movies or series.'
         }
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
