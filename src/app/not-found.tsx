@@ -29,8 +29,7 @@ export default function NotFound() {
         </p>
         <Button
           handleClick={() => router.push('/')}
-          size="small"
-          className="w-auto px-8"
+          className="h-12 w-auto rounded-full px-8 py-0 text-sm normal-case tracking-[0.02em] transition-transform hover:scale-[1.04]"
         >
           Back to home
         </Button>
