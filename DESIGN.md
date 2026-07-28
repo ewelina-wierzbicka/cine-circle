@@ -481,11 +481,15 @@ Services
 ## Error & Not-Found Pages
 
 - Implemented by `src/app/(app)/error.tsx` (client component) and `src/app/(app)/not-found.tsx` (server component).
-- Both render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `flex min-h-full items-center justify-center px-6 py-16`, matching the `ProfileContent` centering pattern.
-- Content sits in a single cinematic "poster" panel: `max-w-sm rounded-2xl bg-gradient-blue border border-white/10 p-10 text-center animate-fade-up`.
-- Eyebrow: `font-mono text-sm tracking-[0.2em] text-mint uppercase` (`Error` / `404`).
-- Title: `font-serif text-5xl md:text-6xl leading-none tracking-[-0.03em]` with a mint italic second line via `<em class="text-mint">` (`The reel snapped.` / `Lost in the credits.`).
-- Mint divider `mx-auto h-px w-12 bg-mint/60` separates title from message.
-- Message: `text-sm text-secondary leading-relaxed`.
-- Error page actions use the `Button` component: filled `Try again` (calls `reset()`) and `outlined` `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs text-secondary/50`.
-- Not-found page action is a `next/link` styled to match the `Button` filled variant (`bg-mint text-dark ... uppercase tracking-[0.08em] hover:opacity-[0.82]`).
+- Both render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `relative flex min-h-full items-center justify-center px-6 py-16`.
+- Design matches the standalone reference: no card/panel. A single soft radial glow sits behind the content as an absolute layer pinned to the top center: `pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full blur-[40px] bg-[radial-gradient(...)]` (mint `oklch(82% 0.10 165/0.07)` for 404, red `oklch(65% 0.18 25/0.08)` for error).
+- Content column: `relative z-10 max-w-[420px] animate-fade-up text-center`.
+- A 56px line icon (opacitied) sits above the eyebrow:
+  - 404 uses `ClapperboardIcon` (`src/icons/Clapperboard.tsx`) with `text-mint opacity-50`.
+  - Error uses `AlertCircleIcon` (`src/icons/AlertCircle.tsx`) with `text-error opacity-55`.
+- Eyebrow: `font-mono text-sm tracking-[0.22em] uppercase` — `Error 404` in `text-mint`, `Something went wrong` in `text-error`.
+- Title: `font-serif text-[clamp(34px,5vw,52px)] leading-none tracking-[-0.03em]` with a single mint/red italicized word via `<em class="text-mint">` / `<em class="text-error">` (`This scene doesn't exist` / `We hit a glitch`).
+- Message: `mt-3.5 mb-8 text-sm leading-relaxed text-secondary`.
+- Actions are pill buttons (`rounded-full h-12 px-7/8 font-sans text-sm font-semibold tracking-[0.02em] normal-case`, `hover:scale-[1.04]`):
+  - 404: a single mint filled `next/link` (`Back to home` → `/`) styled to match the pill look (server component cannot use the client `Button`).
+  - Error: the `Button` component with pill overrides — filled `Try again` (`reset()`) and outlined `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs tracking-[0.08em] text-secondary/50`.

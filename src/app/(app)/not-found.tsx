@@ -1,27 +1,27 @@
 import Link from 'next/link';
+import { ClapperboardIcon } from '@/icons/Clapperboard';
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-full items-center justify-center px-6 py-16">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-gradient-blue border border-white/10 p-10 text-center animate-fade-up">
-        <span className="font-mono text-sm tracking-[0.2em] text-mint uppercase">
-          404
-        </span>
-        <h1 className="mt-6 font-serif text-5xl leading-none tracking-[-0.03em] md:text-6xl">
-          Lost in
-          <br />
-          <em className="text-mint">the credits.</em>
+    <div className="relative flex min-h-full items-center justify-center px-6 py-16">
+      <div className="pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full bg-[radial-gradient(oklch(82%_0.10_165/0.07)_0%,transparent_65%)] blur-[40px]" />
+      <div className="relative z-10 max-w-[420px] animate-fade-up text-center">
+        <ClapperboardIcon className="mx-auto mb-5 h-14 w-14 text-mint opacity-50" />
+        <p className="mb-2.5 font-mono text-sm uppercase tracking-[0.22em] text-mint">
+          Error 404
+        </p>
+        <h1 className="font-serif text-[clamp(38px,5vw,52px)] leading-none tracking-[-0.03em]">
+          This <em className="text-mint">scene</em> doesn&rsquo;t exist
         </h1>
-        <div className="mx-auto mt-6 mb-6 h-px w-12 bg-mint/60" />
-        <p className="text-sm text-secondary leading-relaxed mb-8">
-          The page you&rsquo;re looking for isn&rsquo;t in this circle.
-          Let&rsquo;s get you back home.
+        <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">
+          The page you&rsquo;re looking for was cut from the final edit.
+          Let&rsquo;s get you back to the story.
         </p>
         <Link
           href="/"
-          className="inline-flex w-full items-center justify-center rounded-xl bg-mint text-dark py-3 text-base font-semibold uppercase tracking-[0.08em] transition-opacity hover:opacity-[0.82] md:text-sm lg:text-base"
+          className="inline-flex h-12 items-center justify-center rounded-full bg-mint px-8 font-sans text-sm font-semibold tracking-[0.02em] text-dark transition-transform hover:scale-[1.04]"
         >
-          Go home
+          Back to home
         </Link>
       </div>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/Button';
+import { AlertCircleIcon } from '@/icons/AlertCircle';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -17,28 +18,31 @@ export default function Error({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <div className="flex min-h-full items-center justify-center px-6 py-16">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-gradient-blue border border-white/10 p-10 text-center animate-fade-up">
-        <span className="font-mono text-sm tracking-[0.2em] text-mint uppercase">
-          Error
-        </span>
-        <h1 className="mt-6 font-serif text-5xl leading-none tracking-[-0.03em] md:text-6xl">
-          The reel
-          <br />
-          <em className="text-mint">snapped.</em>
-        </h1>
-        <div className="mx-auto mt-6 mb-6 h-px w-12 bg-mint/60" />
-        <p className="text-sm text-secondary leading-relaxed mb-8">
-          Something interrupted the show. Try again, or head back home.
+    <div className="relative flex min-h-full items-center justify-center px-6 py-16">
+      <div className="pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full bg-[radial-gradient(oklch(65%_0.18_25/0.08)_0%,transparent_65%)] blur-[40px]" />
+      <div className="relative z-10 max-w-[420px] animate-fade-up text-center">
+        <AlertCircleIcon className="mx-auto mb-5 h-14 w-14 text-error opacity-55" />
+        <p className="mb-2.5 font-mono text-sm uppercase tracking-[0.22em] text-error">
+          Something went wrong
         </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button handleClick={() => reset()} className="sm:flex-1">
+        <h1 className="font-serif text-[clamp(34px,5vw,46px)] leading-none tracking-[-0.03em]">
+          We hit a <em className="text-error">glitch</em>
+        </h1>
+        <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">
+          Something on our end failed to load. Try again, or head back and pick
+          up where you left off.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button
+            handleClick={() => reset()}
+            className="h-12 w-auto rounded-full px-7 py-0 text-sm normal-case tracking-[0.02em] transition-transform hover:scale-[1.04]"
+          >
             Try again
           </Button>
           <Button
             variant="outlined"
             handleClick={() => router.push('/')}
-            className="sm:flex-1"
+            className="h-12 w-auto rounded-full px-7 py-0 text-sm normal-case tracking-[0.02em] text-secondary border-white/15 transition-colors hover:bg-transparent hover:border-mint hover:text-primary"
           >
             Go home
           </Button>
