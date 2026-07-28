@@ -35,23 +35,20 @@ export default function Error({ error, reset }: Props) {
         <div className="flex flex-wrap justify-center gap-3">
           <Button
             handleClick={() => reset()}
-            className="h-12 w-auto rounded-full px-7 py-0 text-sm normal-case tracking-[0.02em] transition-transform hover:scale-[1.04]"
+            size="small"
+            className="w-auto px-7"
           >
             Try again
           </Button>
           <Button
             variant="outlined"
+            size="small"
             handleClick={() => router.push('/')}
-            className="h-12 w-auto rounded-full px-7 py-0 text-sm normal-case tracking-[0.02em] text-secondary border-white/15 transition-colors hover:bg-transparent hover:border-mint hover:text-primary"
+            className="w-auto px-7"
           >
             Go home
           </Button>
         </div>
-        {error.digest && (
-          <p className="mt-8 font-mono text-xs tracking-[0.08em] text-secondary/50">
-            {error.digest}
-          </p>
-        )}
       </div>
     </div>
   );
