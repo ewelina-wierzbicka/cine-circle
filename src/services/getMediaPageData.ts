@@ -1,6 +1,6 @@
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getUserMedia } from '@/services/getUserMedia';
-import { NormalizedMedia, SavedMedia } from '@/types';
+import { NormalizedMedia, SavedMedia, UserMedia } from '@/types';
 
 type MediaPageData = {
   data: SavedMedia | NormalizedMedia | null;
@@ -8,32 +8,64 @@ type MediaPageData = {
   initialStep: number;
 };
 
+type TmdbExtra = Pick<
+  NormalizedMedia,
+  'genres' | 'overview' | 'recommendations' | 'director'
+>;
+
 export async function getMediaPageData(
   slug: string,
   mediaType: 'movie' | 'series',
   stepParam?: string,
-  isAuthenticated = false,
+  userId?: string | null,
 ): Promise<MediaPageData> {
   const id = slug.split('-')[0];
   const tmdbId = Number(id);
   const initialStep = stepParam === '2' ? 2 : 1;
 
-  let error: string | null = null;
-  let userMedia = null;
+  const tmdbPromise: Promise<NormalizedMedia> =
+    mediaType === 'series' ? getSeriesDetails(id) : getMovieDetails(id);
 
-  if (isAuthenticated) {
-    try {
-      userMedia = await getUserMedia(tmdbId, mediaType);
-    } catch (err) {
-      const isNotFound = (err as { code?: string }).code === 'PGRST116';
-      if (!isNotFound) {
-        error = (err as Error).message || 'Failed to load saved data.';
-      }
-    }
+  const userMediaPromise: Promise<UserMedia | null> = userId
+    ? getUserMedia(tmdbId, mediaType, userId).catch((err) => {
+        const isNotFound = (err as { code?: string }).code === 'PGRST116';
+        if (isNotFound) return null;
+        throw err;
+      })
+    : Promise.resolve(null);
+
+  const [tmdbSettled, userMediaSettled] = await Promise.allSettled([
+    tmdbPromise,
+    userMediaPromise,
+  ]);
+
+  if (userMediaSettled.status === 'rejected') {
+    return {
+      data: null,
+      error:
+        (userMediaSettled.reason as Error).message ||
+        'Failed to load saved data.',
+      initialStep,
+    };
   }
 
+  const userMedia =
+    userMediaSettled.status === 'fulfilled' ? userMediaSettled.value : null;
+  const tmdb = tmdbSettled.status === 'fulfilled' ? tmdbSettled.value : null;
+  const tmdbError =
+    tmdbSettled.status === 'rejected'
+      ? (tmdbSettled.reason as Error).message || 'Failed to load data.'
+      : null;
+
   if (userMedia) {
-    const { id, watchStatus, watched_date, rating, review, media } = userMedia;
+    const {
+      id: savedId,
+      watchStatus,
+      watched_date,
+      rating,
+      review,
+      media,
+    } = userMedia;
     const {
       tmdb_id,
       title,
@@ -43,25 +75,14 @@ export async function getMediaPageData(
       media_type,
     } = media;
 
-    // Supabase media table doesn't store genres/overview/recommendations/director — fetch from TMDB
-    let tmdbExtra: Pick<
-      NormalizedMedia,
-      'genres' | 'overview' | 'recommendations' | 'director'
-    > = {};
-    try {
-      const tmdb =
-        mediaType === 'series'
-          ? await getSeriesDetails(tmdb_id.toString())
-          : await getMovieDetails(tmdb_id.toString());
-      tmdbExtra = {
-        genres: tmdb.genres,
-        overview: tmdb.overview,
-        recommendations: tmdb.recommendations,
-        director: tmdb.director,
-      };
-    } catch {
-      // non-fatal: detail page still works without these fields
-    }
+    const tmdbExtra: TmdbExtra = tmdb
+      ? {
+          genres: tmdb.genres,
+          overview: tmdb.overview,
+          recommendations: tmdb.recommendations,
+          director: tmdb.director,
+        }
+      : {};
 
     const data = {
       tmdb_id,
@@ -71,7 +92,7 @@ export async function getMediaPageData(
       poster_path,
       media_type,
       ...tmdbExtra,
-      id,
+      id: savedId,
       watchStatus,
       watched_date,
       rating,
@@ -80,21 +101,6 @@ export async function getMediaPageData(
     return { data, error: null, initialStep };
   }
 
-  if (error) {
-    return { data: null, error, initialStep };
-  }
-
-  try {
-    const data =
-      mediaType === 'series'
-        ? await getSeriesDetails(id)
-        : await getMovieDetails(id);
-    return { data, error: null, initialStep };
-  } catch (err) {
-    return {
-      data: null,
-      error: (err as Error).message || 'Failed to load data.',
-      initialStep,
-    };
-  }
+  if (tmdb) return { data: tmdb, error: null, initialStep };
+  return { data: null, error: tmdbError, initialStep };
 }

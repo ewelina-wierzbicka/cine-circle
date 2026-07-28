@@ -24,7 +24,7 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
     slug,
     mediaType,
     step,
-    isAuthenticated,
+    user?.id ?? null,
   );
 
   return (

@@ -47,22 +47,25 @@ export const getUserMediaList = async (
 export const getUserMedia = async (
   tmdbId: number,
   mediaType: MediaType = 'movie',
+  knownUserId?: string,
 ): Promise<UserMedia> => {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) throw new Error('Not authenticated');
+  if (!knownUserId) {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) throw new Error('Not authenticated');
+    knownUserId = user.id;
+  }
 
   const { data, error } = await supabase
     .from('user_media')
     .select('*, media!inner(*)')
     .eq('media.tmdb_id', tmdbId)
     .eq('media.media_type', mediaType)
-    .eq('user_id', user.id)
+    .eq('user_id', knownUserId)
     .single();
 
   if (error) {
