@@ -1,7 +1,12 @@
-import Link from 'next/link';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import Button from '@/components/Button';
 import { ClapperboardIcon } from '@/icons/Clapperboard';
 
 export default function NotFound() {
+  const router = useRouter();
+
   return (
     <div className="relative flex min-h-full items-center justify-center px-6 py-16">
       <div className="pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full bg-[radial-gradient(oklch(82%_0.10_165/0.07)_0%,transparent_65%)] blur-[40px]" />
@@ -17,12 +22,12 @@ export default function NotFound() {
           The page you&rsquo;re looking for was cut from the final edit.
           Let&rsquo;s get you back to the story.
         </p>
-        <Link
-          href="/"
-          className="inline-flex h-12 items-center justify-center rounded-full bg-mint px-8 font-sans text-sm font-semibold tracking-[0.02em] text-dark transition-transform hover:scale-[1.04]"
+        <Button
+          handleClick={() => router.push('/')}
+          className="h-12 w-auto rounded-full px-8 py-0 text-sm normal-case tracking-[0.02em] transition-transform hover:scale-[1.04]"
         >
           Back to home
-        </Link>
+        </Button>
       </div>
     </div>
   );
