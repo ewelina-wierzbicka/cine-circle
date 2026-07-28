@@ -480,8 +480,9 @@ Services
 
 ## Error & Not-Found Pages
 
-- Implemented by `src/app/(app)/error.tsx` (client component) and `src/app/(app)/not-found.tsx` (server component).
-- Both render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `relative flex min-h-full items-center justify-center px-6 py-16`.
+- Implemented by `src/app/(app)/error.tsx` (client component), `src/app/(app)/not-found.tsx` (client component), and `src/app/not-found.tsx` (client component, root 404).
+- `(app)` entries render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `relative flex min-h-full items-center justify-center px-6 py-16`.
+- The root `src/app/not-found.tsx` handles routes that do not match any segment (e.g. `/dafda`). It does NOT render inside the `(app)` layout, so it carries its own full-screen `h-screen bg-dark` wrapper and replicates the (app) ambient gradients so the page stays visually consistent. The `(app)` not-found still handles `notFound()` calls thrown from within (app) routes (e.g. `/movie/dafda` when the movie isn't found).
 - Design matches the standalone reference: no card/panel. A single soft radial glow sits behind the content as an absolute layer pinned to the top center: `pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full blur-[40px] bg-[radial-gradient(...)]` (mint `oklch(82% 0.10 165/0.07)` for 404, red `oklch(65% 0.18 25/0.08)` for error).
 - Content column: `relative z-10 max-w-[420px] animate-fade-up text-center`.
 - A 56px line icon (opacitied) sits above the eyebrow:

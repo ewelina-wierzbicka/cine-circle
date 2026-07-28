@@ -76,10 +76,11 @@ series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
-      not-found.tsx           # (app) 404 page (server) — renders inside (app) layout (Header kept)
+      not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
     api/                      # Route Handlers
     layout.tsx                # root layout
+    not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
   globals.css
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts)
