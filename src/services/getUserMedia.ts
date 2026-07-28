@@ -51,17 +51,16 @@ export const getUserMedia = async (
 ): Promise<UserMedia> => {
   // Callers that already resolved the authed user can pass it in to skip the
   // redundant auth.getUser() round-trip; falls back to resolving here.
+  const supabase = await createClient();
+
   if (!knownUserId) {
-    const authClient = await createClient();
     const {
       data: { user },
       error: userError,
-    } = await authClient.auth.getUser();
+    } = await supabase.auth.getUser();
     if (userError || !user) throw new Error('Not authenticated');
     knownUserId = user.id;
   }
-
-  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('user_media')
