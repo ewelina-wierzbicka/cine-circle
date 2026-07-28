@@ -49,8 +49,6 @@ export const getUserMedia = async (
   mediaType: MediaType = 'movie',
   knownUserId?: string,
 ): Promise<UserMedia> => {
-  // Callers that already resolved the authed user can pass it in to skip the
-  // redundant auth.getUser() round-trip; falls back to resolving here.
   const supabase = await createClient();
 
   if (!knownUserId) {

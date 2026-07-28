@@ -23,13 +23,9 @@ export async function getMediaPageData(
   const tmdbId = Number(id);
   const initialStep = stepParam === '2' ? 2 : 1;
 
-  // TMDB details are needed in every branch, so kick the fetch off in
-  // parallel with the Supabase query.
   const tmdbPromise: Promise<NormalizedMedia> =
     mediaType === 'series' ? getSeriesDetails(id) : getMovieDetails(id);
 
-  // Pass the already-resolved userId so getUserMedia skips auth.getUser().
-  // PGRST116 (not found) is treated as "not saved" rather than an error.
   const userMediaPromise: Promise<UserMedia | null> = userId
     ? getUserMedia(tmdbId, mediaType, userId).catch((err) => {
         const isNotFound = (err as { code?: string }).code === 'PGRST116';
@@ -43,8 +39,6 @@ export async function getMediaPageData(
     userMediaPromise,
   ]);
 
-  // Preserve prior behaviour: a hard Supabase error short-circuits even when
-  // TMDB would have succeeded.
   if (userMediaSettled.status === 'rejected') {
     return {
       data: null,
@@ -81,8 +75,6 @@ export async function getMediaPageData(
       media_type,
     } = media;
 
-    // TMDB failure in the saved branch is non-fatal: the page still renders
-    // from the saved row without genres/overview/extras.
     const tmdbExtra: TmdbExtra = tmdb
       ? {
           genres: tmdb.genres,
@@ -109,7 +101,6 @@ export async function getMediaPageData(
     return { data, error: null, initialStep };
   }
 
-  // Unsaved branch: TMDB is the primary payload, so its failure is fatal.
   if (tmdb) return { data: tmdb, error: null, initialStep };
   return { data: null, error: tmdbError, initialStep };
 }
