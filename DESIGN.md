@@ -475,3 +475,17 @@ Services
 - `services/updateProfile.ts` — `updateDisplayName` and `updateAvatarPath` functions.
 - `services/account.ts` — `updateEmail`, `updatePassword`, `deleteAccount` functions.
 - `services/auth.ts` — `logout` function (shared with other pages).
+
+---
+
+## Error & Not-Found Pages
+
+- Implemented by `src/app/(app)/error.tsx` (client component) and `src/app/(app)/not-found.tsx` (server component).
+- Both render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `flex min-h-full items-center justify-center px-6 py-16`, matching the `ProfileContent` centering pattern.
+- Content sits in a single cinematic "poster" panel: `max-w-sm rounded-2xl bg-gradient-blue border border-white/10 p-10 text-center animate-fade-up`.
+- Eyebrow: `font-mono text-sm tracking-[0.2em] text-mint uppercase` (`Error` / `404`).
+- Title: `font-serif text-5xl md:text-6xl leading-none tracking-[-0.03em]` with a mint italic second line via `<em class="text-mint">` (`The reel snapped.` / `Lost in the credits.`).
+- Mint divider `mx-auto h-px w-12 bg-mint/60` separates title from message.
+- Message: `text-sm text-secondary leading-relaxed`.
+- Error page actions use the `Button` component: filled `Try again` (calls `reset()`) and `outlined` `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs text-secondary/50`.
+- Not-found page action is a `next/link` styled to match the `Button` filled variant (`bg-mint text-dark ... uppercase tracking-[0.08em] hover:opacity-[0.82]`).

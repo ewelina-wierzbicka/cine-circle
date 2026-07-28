@@ -72,9 +72,11 @@ src/
       profile/                # /profile
         page.tsx
         ProfileContent.tsx
-      series/[id]/             # /series/:id
+series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+      error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
+      not-found.tsx           # (app) 404 page (server) — renders inside (app) layout (Header kept)
       layout.tsx
     api/                      # Route Handlers
     layout.tsx                # root layout
