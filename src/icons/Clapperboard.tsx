@@ -9,6 +9,8 @@ export function ClapperboardIcon({ className }: Props) {
       viewBox="0 0 56 56"
       fill="none"
       stroke="currentColor"
+      aria-hidden="true"
+      focusable="false"
       className={className}
     >
       <rect x="6" y="14" width="44" height="32" rx="6" strokeWidth="1.6" />

@@ -9,6 +9,8 @@ export function AlertCircleIcon({ className }: Props) {
       viewBox="0 0 56 56"
       fill="none"
       stroke="currentColor"
+      aria-hidden="true"
+      focusable="false"
       className={className}
     >
       <circle cx="28" cy="28" r="22" strokeWidth="1.6" />
