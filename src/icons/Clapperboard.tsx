@@ -18,7 +18,7 @@ export function ClapperboardIcon({ className }: Props) {
         strokeLinecap="round"
       />
       <path
-        d="M20 32l16 6-16 6z"
+        d="M20 24l16 6-16 6z"
         fill="currentColor"
         stroke="none"
         opacity="0.7"
