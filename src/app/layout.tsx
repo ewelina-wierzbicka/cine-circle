@@ -1,5 +1,6 @@
 import '@/globals.css';
 import { Providers } from '@/providers';
+import { RouteProgress } from '@/components/RouteProgress';
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
 
@@ -42,7 +43,10 @@ export default function RootLayout({
         className={`${dmSans.variable} ${dmSerifDisplay.variable} ${dmMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <RouteProgress />
+          {children}
+        </Providers>
       </body>
     </html>
   );

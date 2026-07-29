@@ -279,6 +279,16 @@ export const motion = {
 - `src/components/ErrorToast.tsx`.
 - Shows a toast.error when mounted via `react-toastify`.
 
+### RouteProgress
+
+- `src/components/RouteProgress.tsx`.
+- Thin top loading bar shown during client-side route transitions. Complements existing `loading.tsx` skeletons.
+- Fixed mint bar: `fixed left-0 top-0 z-[60] h-0.5 bg-mint` with width + opacity transitions (no new dependency).
+- Starts on link clicks, `popstate`, and patched `history.pushState`/`replaceState`; trickles toward ~90%.
+- Completes on route commit via `usePathname` + `useSearchParams` (wrapped in `<Suspense>`): snaps to 100%, then fades out and resets.
+- Honors `prefers-reduced-motion`: skips the trickle, snaps show/hide. Bar is `aria-hidden` and `pointer-events-none`.
+- Mounted once in `src/app/layout.tsx` inside `<Providers>`, above children, so it covers both `(app)` and `(auth)` routes.
+
 ### Skeleton (loading.tsx skeletons)
 
 - `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files for React Suspense streaming.
