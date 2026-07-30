@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache';
 import {
   FilterMediaType,
   Movie,
@@ -127,14 +128,16 @@ export const getMedia = async (
 };
 
 export const getMovieDetails = async (id: string): Promise<NormalizedMedia> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`movie-${id}`);
+
   const data = await tmdbFetch<
     NormalizedMedia & {
       credits?: { crew?: { job: string; name: string }[] };
       recommendations?: { results?: TmdbRecommendation[] };
     }
-  >(`/movie/${id}?append_to_response=credits,recommendations`, {
-    revalidate: 86400,
-  });
+  >(`/movie/${id}?append_to_response=credits,recommendations`);
 
   const director = data.credits?.crew?.find(
     (person) => person.job === 'Director',
@@ -164,11 +167,13 @@ export const getMovieDetails = async (id: string): Promise<NormalizedMedia> => {
 export const getSeriesDetails = async (
   id: string,
 ): Promise<NormalizedMedia> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`series-${id}`);
+
   const data = await tmdbFetch<
     Series & { recommendations?: { results?: TmdbRecommendation[] } }
-  >(`/tv/${id}?append_to_response=credits,recommendations`, {
-    revalidate: 86400,
-  });
+  >(`/tv/${id}?append_to_response=credits,recommendations`);
 
   return normalizeSeriesResult(data);
 };
