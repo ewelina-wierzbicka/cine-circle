@@ -19,7 +19,6 @@ export default function StarRatingInput({
 }: Props) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const displayValue = hoverValue ?? value;
-  const stars = displayValue / 2;
   // The radio that lives in the tab order: the checked one, or the first
   // when nothing is selected so keyboard users can enter the group.
   const tabbableValue = value > 0 ? value : 1;
@@ -71,54 +70,40 @@ export default function StarRatingInput({
         {Array.from({ length: 5 }).map((_, i) => {
           const leftVal = i * 2 + 1;
           const rightVal = i * 2 + 2;
-          const fillLevel =
-            stars >= i + 1 ? 'full' : stars >= i + 0.5 ? 'half' : 'empty';
-
+          const halves: Array<[number, 'left' | 'right']> = [
+            [leftVal, 'left'],
+            [rightVal, 'right'],
+          ];
           return (
-            <div
-              key={i}
-              className="relative size-8 cursor-pointer rounded focus-within:outline-none"
-            >
-              <StarIcon
-                className={twMerge(
-                  'absolute size-8',
-                  fillLevel === 'empty' ? 'text-white/15' : 'text-amber-400',
-                )}
-                filled={fillLevel === 'full'}
-              />
-              {fillLevel === 'half' && (
-                <div className="absolute w-[50%] overflow-hidden">
-                  <StarIcon className="size-8 text-amber-400" filled />
-                </div>
-              )}
-              {/* Left half — odd rating values */}
-              <button
-                type="button"
-                role="radio"
-                aria-checked={value === leftVal}
-                tabIndex={leftVal === tabbableValue ? 0 : -1}
-                ref={(el) => {
-                  radioRefs.current[leftVal] = el;
-                }}
-                className="absolute left-0 top-0 w-1/2 h-full opacity-0"
-                onMouseEnter={() => setHoverValue(leftVal)}
-                onClick={() => onChange(value === leftVal ? 0 : leftVal)}
-                aria-label={`${leftVal / 2} out of 5`}
-              />
-              {/* Right half — even rating values */}
-              <button
-                type="button"
-                role="radio"
-                aria-checked={value === rightVal}
-                tabIndex={rightVal === tabbableValue ? 0 : -1}
-                ref={(el) => {
-                  radioRefs.current[rightVal] = el;
-                }}
-                className="absolute right-0 top-0 w-1/2 h-full opacity-0"
-                onMouseEnter={() => setHoverValue(rightVal)}
-                onClick={() => onChange(value === rightVal ? 0 : rightVal)}
-                aria-label={`${rightVal / 2} out of 5`}
-              />
+            <div key={i} className="flex">
+              {halves.map(([val, side]) => {
+                const filled = displayValue >= val;
+                return (
+                  <button
+                    key={val}
+                    type="button"
+                    role="radio"
+                    aria-checked={value === val}
+                    tabIndex={val === tabbableValue ? 0 : -1}
+                    ref={(el) => {
+                      radioRefs.current[val] = el;
+                    }}
+                    onMouseEnter={() => setHoverValue(val)}
+                    onClick={() => onChange(value === val ? 0 : val)}
+                    aria-label={`${val / 2} out of 5`}
+                    className="relative w-4 h-8 overflow-hidden cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-offset-1 focus-visible:ring-offset-dark"
+                  >
+                    <StarIcon
+                      className={twMerge(
+                        'absolute top-0 size-8',
+                        side === 'left' ? 'left-0' : '-left-4',
+                        filled ? 'text-amber-400' : 'text-white/15',
+                      )}
+                      filled={filled}
+                    />
+                  </button>
+                );
+              })}
             </div>
           );
         })}
