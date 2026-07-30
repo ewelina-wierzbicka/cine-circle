@@ -108,7 +108,12 @@ export default function MediaCard({
   return (
     <div className="group w-full flex flex-col gap-2.5 hover:-translate-y-1.25 transition-transform duration-220 ease-[cubic-bezier(.22,.68,0,1.2)] mb-3">
       <div className="relative rounded-xl overflow-hidden group-hover:border group-hover:border-mint transition-colors duration-200 aspect-2/3">
-        <Link href={href} className="absolute inset-0" tabIndex={-1} aria-label={title}>
+        <Link
+          href={href}
+          className="absolute inset-0"
+          tabIndex={-1}
+          aria-label={title}
+        >
           <MediaPoster
             title={title}
             src={
@@ -161,6 +166,7 @@ export default function MediaCard({
               handleClick={handleAddToWatched}
               size="small"
               variant="outlined"
+              className="px-0"
             >
               Move to watched
             </Button>

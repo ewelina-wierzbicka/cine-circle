@@ -30,7 +30,7 @@ export default function NotFound() {
         <Button
           size="small"
           handleClick={() => router.push('/')}
-          className="w-auto px-8"
+          className="w-auto"
         >
           Back to home
         </Button>

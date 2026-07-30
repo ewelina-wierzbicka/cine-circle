@@ -94,14 +94,13 @@ export default function MediaInfo({
         <div className="flex gap-2.5 flex-col md:flex-row">
           {isToWatch ? (
             <>
-              <Button handleClick={addToWatched} className="flex-1">
+              <Button handleClick={addToWatched} className="px-0">
                 MOVE TO WATCHED
               </Button>
               <Button
                 variant="outlined"
                 handleClick={handleDelete}
                 disabled={isDeleting}
-                className="flex-1"
               >
                 {isDeleting ? 'DELETING…' : 'DELETE'}
               </Button>
@@ -112,13 +111,10 @@ export default function MediaInfo({
                 variant="outlined"
                 handleClick={addToToWatch}
                 disabled={isSaving}
-                className="flex-1"
               >
                 {isSaving ? 'SAVING…' : 'I WANT TO WATCH'}
               </Button>
-              <Button handleClick={addToWatched} className="flex-1">
-                I WATCHED
-              </Button>
+              <Button handleClick={addToWatched}>I WATCHED</Button>
             </>
           )}
         </div>
