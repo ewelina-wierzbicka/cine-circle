@@ -283,11 +283,14 @@ export const motion = {
 
 - `src/components/RouteProgress.tsx`.
 - Thin top loading bar shown during client-side route transitions. Complements existing `loading.tsx` skeletons.
-- Fixed mint bar: `fixed left-0 top-0 z-[60] h-0.5 bg-mint` with width + opacity transitions (no new dependency).
+- Exports:
+  - `RouteProgressProvider` — client provider mounted once in `src/app/layout.tsx` inside `<Providers>`, wrapping `{children}` so its context spans `(app)` and `(auth)` routes. Holds the mint bar (`fixed left-0 top-0 z-[60] h-0.5 bg-mint`, width + opacity transitions — no new dependency).
+  - `RouteProgressShell` — tiny client sentinel rendered at the top of each `loading.tsx`; signals "loading shell mounted" on mount and "real page committed" on unmount so the bar stays visible across the entire loading-shell display, not just the click-to-shell gap.
+  - `useRouteProgress` — context hook used by the sentinel.
 - Starts on link clicks, `popstate`, and patched `history.pushState`/`replaceState`; trickles toward ~90%.
-- Completes on route commit via `usePathname` + `useSearchParams` (wrapped in `<Suspense>`): snaps to 100%, then fades out and resets.
+- Completes on route commit: when a navigation has no `loading.tsx` (shell count == 0) it finishes on `usePathname` + `useSearchParams` change (wrapped in `<Suspense>`); when a `loading.tsx` shell mounts it keeps trickling and finishes only when the shell unmounts (real page commits). Snaps to 100%, then fades out and resets.
 - Honors `prefers-reduced-motion`: skips the trickle, snaps show/hide. Bar is `aria-hidden` and `pointer-events-none`.
-- Mounted once in `src/app/layout.tsx` inside `<Providers>`, above children, so it covers both `(app)` and `(auth)` routes.
+- `loading.tsx` files that mount the sentinel: `src/app/(app)/movie/[id]/loading.tsx`, `src/app/(app)/series/[id]/loading.tsx`, `src/app/(app)/search/loading.tsx`, `src/app/(app)/collection/loading.tsx`.
 
 ### Skeleton (loading.tsx skeletons)
 

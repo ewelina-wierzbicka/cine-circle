@@ -1,6 +1,6 @@
 import '@/globals.css';
 import { Providers } from '@/providers';
-import { RouteProgress } from '@/components/RouteProgress';
+import { RouteProgressProvider } from '@/components/RouteProgress';
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
 
@@ -44,8 +44,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <RouteProgress />
-          {children}
+          <RouteProgressProvider>{children}</RouteProgressProvider>
         </Providers>
       </body>
     </html>

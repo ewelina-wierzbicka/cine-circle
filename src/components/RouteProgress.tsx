@@ -1,7 +1,29 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  Suspense,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+
+type RouteProgressApi = {
+  markLoadingShell: () => void;
+  markRealPageReady: () => void;
+};
+
+const RouteProgressContext = createContext<RouteProgressApi | null>(null);
+
+export function useRouteProgress(): RouteProgressApi | null {
+  return useContext(RouteProgressContext);
+}
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -15,24 +37,33 @@ function useReducedMotion() {
   return reduced;
 }
 
-function RouteProgressInner() {
+function RouteProgressSync({ onRouteChange }: { onRouteChange: () => void }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const routeKey = pathname + (searchParams?.toString() ?? '');
+  useEffect(() => {
+    onRouteChange();
+  }, [routeKey, onRouteChange]);
+  return null;
+}
+
+function RouteProgressProviderInner({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
 
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
 
   const activeRef = useRef(false);
+  const shellCountRef = useRef(0);
   const timersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const trickleRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearTimers = () => {
+  const clearTimers = useCallback(() => {
     timersRef.current.forEach((t) => clearTimeout(t));
     timersRef.current = [];
-  };
+  }, []);
 
-  const startProgress = () => {
+  const startProgress = useCallback(() => {
     clearTimers();
     if (trickleRef.current) {
       clearInterval(trickleRef.current);
@@ -44,13 +75,13 @@ function RouteProgressInner() {
       setProgress(40);
       return;
     }
-    setProgress(12);
+    setProgress(14);
     trickleRef.current = setInterval(() => {
       setProgress((p) => (p >= 90 ? p : p + (90 - p) * 0.12));
     }, 220);
-  };
+  }, [clearTimers, reduced]);
 
-  const finishProgress = () => {
+  const finishProgress = useCallback(() => {
     if (!activeRef.current) return;
     activeRef.current = false;
     if (trickleRef.current) {
@@ -65,7 +96,24 @@ function RouteProgressInner() {
         timersRef.current.push(setTimeout(() => setProgress(0), delay));
       }, delay),
     );
-  };
+  }, [reduced]);
+
+  const markLoadingShell = useCallback(() => {
+    shellCountRef.current += 1;
+  }, []);
+
+  const markRealPageReady = useCallback(() => {
+    shellCountRef.current = Math.max(0, shellCountRef.current - 1);
+    if (shellCountRef.current > 0) return;
+    const t = setTimeout(() => {
+      if (shellCountRef.current === 0) finishProgress();
+    }, 0);
+    timersRef.current.push(t);
+  }, [finishProgress]);
+
+  const handleRouteChange = useCallback(() => {
+    if (shellCountRef.current === 0) finishProgress();
+  }, [finishProgress]);
 
   useEffect(() => {
     const currentHref = () => window.location.pathname + window.location.search;
@@ -135,12 +183,9 @@ function RouteProgressInner() {
       document.removeEventListener('click', onClick, true);
       window.removeEventListener('popstate', onPopState);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [startProgress]);
 
-  const routeKey = pathname + (searchParams?.toString() ?? '');
   useEffect(() => {
-    finishProgress();
     return () => {
       clearTimers();
       if (trickleRef.current) {
@@ -148,26 +193,41 @@ function RouteProgressInner() {
         trickleRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeKey]);
+  }, [clearTimers]);
+
+  const api = useMemo<RouteProgressApi>(
+    () => ({ markLoadingShell, markRealPageReady }),
+    [markLoadingShell, markRealPageReady],
+  );
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[60] h-0.5 bg-mint transition-[width,opacity] ease-out"
-      style={{
-        width: `${progress}%`,
-        opacity: visible ? 1 : 0,
-        transitionDuration: reduced ? '0ms' : '280ms',
-      }}
-    />
+    <RouteProgressContext.Provider value={api}>
+      <Suspense fallback={null}>
+        <RouteProgressSync onRouteChange={handleRouteChange} />
+      </Suspense>
+      <div
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-[60] h-0.5 bg-mint transition-[width,opacity] ease-out"
+        style={{
+          width: `${progress}%`,
+          opacity: visible ? 1 : 0,
+          transitionDuration: reduced ? '0ms' : '220ms',
+        }}
+      />
+      {children}
+    </RouteProgressContext.Provider>
   );
 }
 
-export function RouteProgress() {
-  return (
-    <Suspense fallback={null}>
-      <RouteProgressInner />
-    </Suspense>
-  );
+export function RouteProgressProvider({ children }: { children: ReactNode }) {
+  return <RouteProgressProviderInner>{children}</RouteProgressProviderInner>;
+}
+
+export function RouteProgressShell() {
+  const api = useRouteProgress();
+  useLayoutEffect(() => {
+    api?.markLoadingShell();
+    return () => api?.markRealPageReady();
+  }, [api]);
+  return null;
 }
