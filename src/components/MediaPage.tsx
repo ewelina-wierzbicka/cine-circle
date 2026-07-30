@@ -1,4 +1,3 @@
-import ErrorToast from '@/components/ErrorToast';
 import { createClient } from '@/lib/supabase/server';
 import { getMediaPageData } from '@/services/getMediaPageData';
 import { notFound } from 'next/navigation';
@@ -27,9 +26,10 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
     user?.id ?? null,
   );
 
+  if (error && !data) throw new Error(error);
+
   return (
     <>
-      {error && <ErrorToast message={error} />}
       {data && (
         <MediaDetail
           key={slug}
