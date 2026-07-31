@@ -63,6 +63,30 @@ export const deleteAccount = async (): Promise<void> => {
 
   if (!user) throw new Error('Not authenticated');
 
+  // Fetch avatar path before deleting the user so we can queue storage cleanup.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('avatar_url')
+    .eq('user_id', user.id)
+    .single();
+
+  const avatarUrl = profile?.avatar_url;
+
+  if (avatarUrl) {
+    // Extract the storage object path from the full URL.
+    const url = new URL(avatarUrl);
+    const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
+    const objectPath = pathMatch?.[1];
+
+    if (objectPath) {
+      await adminSupabase.from('pending_deletions').insert({
+        user_id: user.id,
+        bucket_id: 'avatars',
+        object_path: objectPath,
+      });
+    }
+  }
+
   // Deleting the auth.users row cascades to both profiles and user_media.
   const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(
     user.id,
@@ -70,6 +94,30 @@ export const deleteAccount = async (): Promise<void> => {
 
   if (deleteError)
     throw new Error('Failed to delete account. Please try again.');
+
+  // Best-effort inline cleanup: process any queued storage deletions now.
+  // Rows that fail to delete here remain in pending_deletions for future sweeps.
+  if (avatarUrl) {
+    const { data: pending } = await adminSupabase
+      .from('pending_deletions')
+      .select('id, bucket_id, object_path')
+      .eq('user_id', user.id);
+
+    if (pending?.length) {
+      for (const row of pending) {
+        const { error: storageError } = await adminSupabase.storage
+          .from(row.bucket_id)
+          .remove([row.object_path]);
+
+        if (!storageError) {
+          await adminSupabase
+            .from('pending_deletions')
+            .delete()
+            .eq('id', row.id);
+        }
+      }
+    }
+  }
 
   redirect('/login');
 };
