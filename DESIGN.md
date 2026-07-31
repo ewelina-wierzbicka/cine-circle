@@ -309,6 +309,17 @@ Left column (Form)
 - Buttons: use `Button` component (color `mint`, medium size → `h-12 text-base`). Disabled/pending states handled.
 - Footer link toggles between Login and Register using `text-mint` links.
 
+Inline error tile (AuthErrorTile)
+
+- Shared component `src/app/(auth)/AuthErrorTile.tsx` (named export), used by `LoginForm`, `RegisterForm`, and the runtime `(auth)/error.tsx` boundary.
+- Renders above the inputs (after the heading block, before the form fields) whenever there is an error to surface.
+- Tile: `rounded-xl`, `border-[oklch(65%_0.18_25/0.3)]`, `bg-[oklch(65%_0.18_25/0.1)]`, `px-3.5 py-3`, `gap-2.5`, `animate-fade-in`, `role="alert"`.
+- Icon: `AlertCircleSmallIcon` from `src/icons/AlertCircleSmall.tsx` (viewBox `0 0 15 15`, `stroke="currentColor"`), sized `h-[15px] w-[15px]`, colored `text-[oklch(65%_0.18_25)]`.
+- Message: `text-sm leading-[1.5] text-[oklch(88%_0.05_25)]`.
+- Login copy: missing fields → "Enter your email and password.", bad email format → "That email address doesn't look right." Server auth failures render their service-returned message in the same tile (previously toasted).
+- Register copy: missing fields → "Fill in every field to create your account.", bad email format → "That email address doesn't look right.", short password → "Password must be at least 8 characters.", password mismatch → "Passwords don't match.".
+- Per-input red text below inputs removed for these forms — only the top tile surfaces errors.
+
 Right column (Visuals)
 
 - Rendered only on `lg` and up (`hidden lg:block`).

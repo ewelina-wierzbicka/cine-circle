@@ -118,6 +118,24 @@ export function RegisterForm() {
         </Button>
       </form>
 
+      <p className="mt-2 text-center text-sm text-secondary">
+        By creating an account, you agree to our{' '}
+        <Link
+          href="/terms"
+          className="text-mint hover:opacity-80 transition-opacity"
+        >
+          Terms of Service
+        </Link>{' '}
+        and{' '}
+        <Link
+          href="/privacy"
+          className="text-mint hover:opacity-80 transition-opacity"
+        >
+          Privacy Policy
+        </Link>
+        .
+      </p>
+
       <p className="mt-6 text-center text-sm text-secondary">
         Already have an account?{' '}
         <Link
