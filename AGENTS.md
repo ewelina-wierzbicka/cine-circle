@@ -77,10 +77,8 @@ series/[id]/             # /series/:id
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       terms/                  # /terms — static Terms and Conditions page (open route)
         page.tsx
-        loading.tsx
       privacy/                # /privacy — static Privacy Policy page (open route)
         page.tsx
-        loading.tsx
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx

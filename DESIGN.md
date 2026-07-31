@@ -486,7 +486,7 @@ Static legal pages, open routes (no auth required).
 
 - `src/app/(app)/terms/page.tsx` — server component, no data fetching.
 - Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
-- Title: `font-serif text-3xl text-primary`.
+- Title: `font-serif text-3xl sm:text-4xl text-primary`.
 - Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
 - Section headings: `font-mono text-sm tracking-[0.15em] text-mint uppercase`.
 - Body text: `font-sans text-base text-secondary leading-relaxed`.
