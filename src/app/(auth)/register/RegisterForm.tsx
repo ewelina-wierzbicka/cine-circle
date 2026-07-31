@@ -116,6 +116,23 @@ export function RegisterForm() {
         <Button type="submit" className="mt-3" disabled={isPending}>
           CREATE ACCOUNT
         </Button>
+        <p className="text-sm text-secondary text-center mt-2">
+          By creating an account, you agree to our{' '}
+          <Link
+            href="/terms"
+            className="text-mint hover:opacity-80 transition-opacity"
+          >
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link
+            href="/privacy"
+            className="text-mint hover:opacity-80 transition-opacity"
+          >
+            Privacy Policy
+          </Link>
+          .
+        </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary">
