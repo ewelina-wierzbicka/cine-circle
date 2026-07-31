@@ -14,6 +14,7 @@ export default function StarRating({ rating, className }: Props) {
   return (
     <div
       className={twMerge('flex items-center gap-0.5', className)}
+      role="img"
       aria-label={`Rating: ${raw} out of 5`}
     >
       {Array.from({ length: 5 }).map((_, i) => {

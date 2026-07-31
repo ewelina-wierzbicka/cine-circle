@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import NotFoundContent from '@/components/NotFoundContent';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Page not found — CineCircle',

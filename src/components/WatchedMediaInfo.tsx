@@ -87,14 +87,11 @@ export default function WatchedMediaInfo({
         )}
       </div>
       <div className="flex gap-2.5 flex-col md:flex-row">
-        <Button handleClick={onEdit} className="flex-1">
-          UPDATE
-        </Button>
+        <Button handleClick={onEdit}>UPDATE</Button>
         <Button
           variant="outlined"
           handleClick={handleDelete}
           disabled={isDeleting}
-          className="flex-1"
         >
           {isDeleting ? 'DELETING…' : 'DELETE'}
         </Button>

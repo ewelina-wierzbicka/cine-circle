@@ -264,7 +264,7 @@ export const motion = {
 
 - `src/components/Button.tsx`.
 - Variants: `filled` (default) and `outlined`.
-- Colors: `mint` (default), `primary`, `secondary`.
+- Colors: `mint` (default) and `error`. Only affects the `filled` variant — `error` filled uses `bg-red-800 text-primary hover:bg-red-900`, `mint` filled uses `bg-mint text-dark hover:opacity-[0.82]`. `outlined` is unaffected by `color`.
 - Sizes: `medium` (h-12 text-base) and `small` (h-10 text-sm).
 - Uses `uppercase tracking-[0.08em] font-semibold` and merges custom classes via `twMerge`.
 
@@ -484,6 +484,30 @@ Services
 
 ---
 
+## Terms and Privacy
+
+Static legal pages, open routes (no auth required).
+
+### Terms (`/terms`)
+
+- `src/app/(app)/terms/page.tsx` — server component, no data fetching.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
+- Title: `font-serif text-3xl sm:text-4xl text-primary`.
+- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
+- Section headings: `font-mono text-sm tracking-[0.15em] text-mint uppercase`.
+- Body text: `font-sans text-base text-secondary leading-relaxed`.
+- Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
+
+### Privacy (`/privacy`)
+
+- `src/app/(app)/privacy/page.tsx` — server component, no data fetching.
+- Same layout and typography as `/terms`.
+- Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
+
+---
+
+## Error & Not-Found Pages
+
 ## Error & Not-Found Pages
 
 - Implemented by `src/app/(app)/error.tsx` (client component), `src/app/(app)/not-found.tsx` (server component), and `src/app/not-found.tsx` (server component, root 404). Both not-found routes export `metadata` (`title: 'Page not found — CineCircle'`) and render the shared `NotFoundContent` client component for the inner UI.
@@ -492,11 +516,11 @@ Services
 - Design matches the standalone reference: no card/panel. A single soft radial glow sits behind the content as an absolute layer pinned to the top center: `pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full blur-[40px] bg-[radial-gradient(...)]` (mint `oklch(82% 0.10 165/0.07)` for 404, red `oklch(65% 0.18 25/0.08)` for error). Decorative ambient gradient layers are marked `aria-hidden="true"`.
 - Content column: `relative z-10 max-w-[420px] animate-fade-up text-center`.
 - A 56px line icon (opacitied) sits above the eyebrow. Icons are decorative and the SVGs carry `aria-hidden="true"` + `focusable="false"` so they are not announced by screen readers (the eyebrow text conveys the meaning):
-  - 404 uses `ClapperboardIcon` (`src/icons/Clapperboard.tsx`) with `text-mint opacity-50`.
-  - Error uses `AlertCircleIcon` (`src/icons/AlertCircle.tsx`) with `text-error opacity-55`.
+- 404 uses `ClapperboardIcon` (`src/icons/Clapperboard.tsx`) with `text-mint opacity-50`.
+- Error uses `AlertCircleIcon` (`src/icons/AlertCircle.tsx`) with `text-error opacity-55`.
 - Eyebrow: `font-mono text-sm tracking-[0.22em] uppercase` — `Error 404` in `text-mint`, `Something went wrong` in `text-error`.
 - Title: `font-serif text-[clamp(34px,5vw,52px)] leading-none tracking-[-0.03em]` with a single mint/red italicized word via `<em class="text-mint">` / `<em class="text-error">` (`This scene doesn't exist` / `We hit a glitch`).
 - Message: `mt-3.5 mb-8 text-sm leading-relaxed text-secondary`.
 - Actions use the shared `Button` component, which renders a `focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-offset-2 focus-visible:ring-offset-dark` focus ring so keyboard users can see focus:
-  - 404: a single mint filled `Button` (`Back to home` → `router.push('/')`) rendered by `NotFoundContent`.
-  - Error: the `Button` component — filled `Try again` (`reset()`) and outlined `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs tracking-[0.08em] text-secondary/50`.
+- 404: a single mint filled `Button` (`Back to home` → `router.push('/')`) rendered by `NotFoundContent`.
+- Error: the `Button` component — filled `Try again` (`reset()`) and outlined `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs tracking-[0.08em] text-secondary/50`.

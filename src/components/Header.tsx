@@ -95,8 +95,8 @@ export default function Header({ profile }: HeaderProps) {
           onClick={() => setDropdownOpen((p) => !p)}
         >
           {displayName && (
-            <span className="hidden sm:inline text-[20px] font-serif text-primary tracking-[0.06em]">
-              Hello <em className="text-mint">{displayName}</em>!
+            <span className="hidden sm:inline text-[14px] font-sans text-primary tracking-[0.02em]">
+              Hello <span className="text-mint">{displayName}</span>!
             </span>
           )}
           {avatarUrl ? (
