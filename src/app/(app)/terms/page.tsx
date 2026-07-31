@@ -35,11 +35,11 @@ export default function TermsPage() {
   return (
     <div className="min-h-full px-6 md:px-12 py-12">
       <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl text-primary mb-2">
+        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
           Terms and Conditions
         </h1>
         <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          Last updated: July 2025
+          Last updated: July 2026
         </p>
 
         <div className="space-y-8">

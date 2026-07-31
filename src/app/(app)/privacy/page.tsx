@@ -7,7 +7,7 @@ type Section = { heading: string; body: string };
 const sections: Section[] = [
   {
     heading: 'What We Collect',
-    body: 'When you register, we collect your email address and a display name. If you upload a profile picture, we store that avatar. As you use the app, we store your movie and series watch history, ratings, and any notes you add.',
+    body: 'When you register, we collect your email address. If you upload a profile picture, we store that avatar. We store your display name if you add it. As you use the app, we store your movie and series watch history, ratings, and any notes you add.',
   },
   {
     heading: 'How We Use It',
@@ -31,7 +31,7 @@ const sections: Section[] = [
   },
   {
     heading: 'Contact',
-    body: 'For any privacy questions, reach us at privacy@cinecircle.app.',
+    body: 'For any privacy questions, reach us at info.cineCircle@gmail.com',
   },
 ];
 
@@ -39,11 +39,11 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-full px-6 md:px-12 py-12">
       <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl text-primary mb-2">
+        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
           Privacy Policy
         </h1>
         <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          Last updated: July 2025
+          Last updated: July 2026
         </p>
 
         <div className="space-y-8">
