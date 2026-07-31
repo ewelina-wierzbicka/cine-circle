@@ -5,7 +5,7 @@ import { supabaseConfig } from './lib/supabase/config';
 // Auth-only routes: redirect authenticated users away
 const AUTH_ROUTES = ['/login', '/register', '/confirm-email'];
 // Open routes: accessible to everyone (no redirect for unauthenticated users)
-const OPEN_ROUTES_EXACT = ['/'];
+const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
 export default async function proxy(request: NextRequest) {

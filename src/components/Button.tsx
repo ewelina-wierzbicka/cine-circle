@@ -7,6 +7,7 @@ type Props = {
   handleClick?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   type?: 'submit' | 'button';
   variant?: 'filled' | 'outlined';
+  color?: 'mint' | 'error';
   size?: 'small' | 'medium';
   className?: string;
   disabled?: boolean;
@@ -17,11 +18,17 @@ export default function Button({
   handleClick,
   type = 'button',
   variant = 'filled',
+  color = 'mint',
   size = 'medium',
   className,
   disabled,
   children,
 }: Props) {
+  const filledColors =
+    color === 'error'
+      ? 'bg-red-800 text-primary hover:bg-red-900'
+      : 'bg-mint text-dark hover:opacity-[0.82]';
+
   return (
     <button
       type={type}
@@ -34,7 +41,7 @@ export default function Button({
           : 'py-2 text-sm',
         variant === 'outlined'
           ? 'text-primary border border-white/50 hover:bg-white/5'
-          : 'bg-mint text-dark hover:opacity-[0.82]',
+          : filledColors,
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}

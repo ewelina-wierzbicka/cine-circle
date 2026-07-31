@@ -460,9 +460,10 @@ export function ProfileContent({ profile, email }: Props) {
               />
             </div>
             <Button
+              color="error"
               handleClick={() => void handleDeleteAccount()}
               disabled={deleteConfirm !== 'DELETE' || deleteLoading}
-              className="w-auto text-primary bg-red-800 hover:bg-red-900 mt-2"
+              className="w-auto mt-2"
             >
               Delete my account
             </Button>
