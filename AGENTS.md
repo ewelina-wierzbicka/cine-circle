@@ -55,6 +55,7 @@ src/
         RegisterForm.tsx
       confirm-email/
         page.tsx
+      error.tsx               # (auth) error boundary (client) — auth-styled error page (grid backdrop, mint accent, matches AuthFormLayout)
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
