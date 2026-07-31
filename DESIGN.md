@@ -264,7 +264,7 @@ export const motion = {
 
 - `src/components/Button.tsx`.
 - Variants: `filled` (default) and `outlined`.
-- Colors: `mint` (default), `primary`, `secondary`.
+- Colors: `mint` (default) and `error`. Only affects the `filled` variant — `error` filled uses `bg-red-800 text-primary hover:bg-red-900`, `mint` filled uses `bg-mint text-dark hover:opacity-[0.82]`. `outlined` is unaffected by `color`.
 - Sizes: `medium` (h-12 text-base) and `small` (h-10 text-sm).
 - Uses `uppercase tracking-[0.08em] font-semibold` and merges custom classes via `twMerge`.
 
