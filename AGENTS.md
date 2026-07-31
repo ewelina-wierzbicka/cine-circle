@@ -75,6 +75,12 @@ src/
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+      terms/                  # /terms — static Terms and Conditions page (open route)
+        page.tsx
+        loading.tsx
+      privacy/                # /privacy — static Privacy Policy page (open route)
+        page.tsx
+        loading.tsx
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
@@ -95,7 +101,7 @@ series/[id]/             # /series/:id
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`
-- Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`, `/terms`, `/privacy`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
