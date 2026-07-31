@@ -478,6 +478,28 @@ Services
 
 ---
 
+## Terms and Privacy
+
+Static legal pages, open routes (no auth required).
+
+### Terms (`/terms`)
+
+- `src/app/(app)/terms/page.tsx` — server component, no data fetching.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
+- Title: `font-serif text-3xl sm:text-4xl text-primary`.
+- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
+- Section headings: `font-mono text-sm tracking-[0.15em] text-mint uppercase`.
+- Body text: `font-sans text-base text-secondary leading-relaxed`.
+- Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
+
+### Privacy (`/privacy`)
+
+- `src/app/(app)/privacy/page.tsx` — server component, no data fetching.
+- Same layout and typography as `/terms`.
+- Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
+
+---
+
 ## Error & Not-Found Pages
 
 - Implemented by `src/app/(app)/error.tsx` (client component), `src/app/(app)/not-found.tsx` (client component), and `src/app/not-found.tsx` (client component, root 404).
