@@ -1,8 +1,15 @@
+'use client';
+
 import { LockXIcon } from '@/icons/LockX';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function LoginErrorPage() {
+type Props = {
+  error: Error & { digest?: string };
+  reset: () => void;
+};
+
+export default function LoginError({ reset }: Props) {
   return (
     <div className="fixed inset-0 flex items-center justify-center overflow-hidden p-6 bg-dark">
       <div
@@ -43,12 +50,12 @@ export default function LoginErrorPage() {
           were made.
         </p>
         <div className="flex flex-col gap-2.5">
-          <Link
-            href="/login"
+          <button
+            onClick={reset}
             className="flex h-12 w-full items-center justify-center rounded-xl bg-mint font-sans text-sm font-semibold uppercase tracking-[0.06em] text-dark transition-opacity hover:opacity-[0.82]"
           >
             Return to sign in
-          </Link>
+          </button>
           <Link
             href="/"
             className="text-sm text-secondary transition-colors hover:text-primary"
