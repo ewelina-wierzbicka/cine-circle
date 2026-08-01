@@ -38,7 +38,7 @@ export default function LoginError({ reset }: Props) {
 
       <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
         <LockXIcon className="mx-auto mb-5 text-error" />
-        <p className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.22em] text-error">
+        <p className="mb-2.5 font-mono text-sm uppercase tracking-[0.22em] text-error">
           Sign-in failed
         </p>
         <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
