@@ -2,6 +2,7 @@ import '@/globals.css';
 import { Providers } from '@/providers';
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -42,6 +43,11 @@ export default function RootLayout({
         className={`${dmSans.variable} ${dmSerifDisplay.variable} ${dmMono.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
+        <NextTopLoader
+          color="oklch(82% 0.1 165)"
+          height={2}
+          showSpinner={false}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
