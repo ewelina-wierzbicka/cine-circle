@@ -22,11 +22,7 @@ export default function NotFound() {
           The page you&rsquo;re looking for was cut from the final edit.
           Let&rsquo;s get you back to the story.
         </p>
-        <Button
-          size="small"
-          handleClick={() => router.push('/')}
-          className="w-auto"
-        >
+        <Button handleClick={() => router.push('/')} className="w-auto">
           Back to home
         </Button>
       </div>

@@ -38,7 +38,6 @@ export default function Error({ error, reset }: Props) {
           </Button>
           <Button
             variant="outlined"
-            size="small"
             handleClick={() => router.push('/')}
             className="w-auto"
           >

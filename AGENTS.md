@@ -50,9 +50,11 @@ src/
       login/
         page.tsx
         LoginForm.tsx
+        error.tsx              # error boundary for /login — auth failure UI
       register/
         page.tsx
         RegisterForm.tsx
+        error.tsx              # error boundary for /register — registration failure UI
       confirm-email/
         page.tsx
     (app)/                # private and public routes (single layout, no sub-groups)
