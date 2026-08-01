@@ -1,6 +1,6 @@
 import { EnvelopeIcon } from '@/icons/Envelope';
-import Link from 'next/link';
 import AuthFormLayout from '../AuthFormLayout';
+import { Link } from '@/components/Link';
 
 export default function ConfirmEmailPage() {
   return (
@@ -37,13 +37,7 @@ export default function ConfirmEmailPage() {
       </div>
 
       <p className="mt-8 text-center text-sm text-secondary">
-        Back to{' '}
-        <Link
-          href="/login"
-          className="text-mint hover:opacity-80 transition-opacity"
-        >
-          Sign in
-        </Link>
+        Back to <Link href="/login">Sign in</Link>
       </p>
     </AuthFormLayout>
   );
