@@ -8,7 +8,7 @@ export default function NotFound() {
   const router = useRouter();
 
   return (
-    <div className="relative flex min-h-full items-center justify-center px-6 py-16">
+    <main className="relative flex min-h-full items-center justify-center px-6 py-16">
       <div className="pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full bg-[radial-gradient(oklch(82%_0.10_165/0.07)_0%,transparent_65%)] blur-[40px]" />
       <div className="relative z-10 max-w-[420px] animate-fade-up text-center">
         <ClapperboardIcon className="mx-auto mb-5 h-14 w-14 text-mint opacity-50" />
@@ -30,6 +30,6 @@ export default function NotFound() {
           Back to home
         </Button>
       </div>
-    </div>
+    </main>
   );
 }
