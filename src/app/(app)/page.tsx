@@ -23,23 +23,25 @@ function toRecentPoster(item: UserMedia) {
 }
 
 export default async function Home() {
-  // getTrendingMovies is cached — safe to await outside Suspense
-  let hintTitles: { id: number; title: string; type: TrendingMovie['type'] }[] =
-    [];
-  try {
-    const trending = await getTrendingMovies();
-    hintTitles = trending
-      .slice(0, 4)
-      .map(({ id, title, type }) => ({ id, title, type }));
-  } catch (err) {
-    console.error('Failed to fetch trending titles:', err);
-  }
+  const [trending, supabase] = await Promise.all([
+    getTrendingMovies().catch(() => []),
+    createClient(),
+  ]);
+
+  const hintTitles = (trending as TrendingMovie[])
+    .slice(0, 4)
+    .map(({ id, title, type }) => ({ id, title, type }));
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-full flex flex-col relative">
       <HomeHero
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        hasRecentMedia={false}
+        // ponytail: optimistic — logged-in users almost always have recent media
+        hasRecentMedia={!!user}
       />
       <Suspense fallback={null}>
         <RecentWatched />

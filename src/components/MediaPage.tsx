@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import MediaDetailSkeleton from '@/components/MediaDetailSkeleton';
 import { createClient } from '@/lib/supabase/server';
-import { getCachedTmdbData } from '@/services/getMediaPageData';
+import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getUserMedia } from '@/services/getUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import { notFound } from 'next/navigation';
@@ -17,8 +17,16 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
-  // TMDB data is cached — fast, served from edge cache
-  const tmdbData = await getCachedTmdbData(id, mediaType);
+  let tmdbData: NormalizedMedia;
+  try {
+    tmdbData =
+      mediaType === 'series'
+        ? await getSeriesDetails(id)
+        : await getMovieDetails(id);
+  } catch (err) {
+    if ((err as { status?: number }).status === 404) notFound();
+    throw err;
+  }
 
   return (
     <Suspense fallback={<MediaDetailSkeleton />}>

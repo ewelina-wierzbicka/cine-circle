@@ -24,6 +24,11 @@ async function tmdbFetch<T>(
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
     next: nextConfig,
   });
+  if (res.status === 404) {
+    const err = new Error('Not found') as Error & { status: number };
+    err.status = 404;
+    throw err;
+  }
   if (!res.ok) throw new Error('Failed to load data. Please try again.');
   return res.json() as Promise<T>;
 }
