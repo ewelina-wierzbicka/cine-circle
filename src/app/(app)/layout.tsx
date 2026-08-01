@@ -20,7 +20,9 @@ export default function PrivateLayout({
       <Suspense fallback={<HeaderSkeleton />}>
         <AuthenticatedHeader />
       </Suspense>
-      <ScrollReset />
+      <Suspense fallback={null}>
+        <ScrollReset />
+      </Suspense>
       <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
     </div>
   );

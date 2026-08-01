@@ -23,25 +23,18 @@ function toRecentPoster(item: UserMedia) {
 }
 
 export default async function Home() {
-  const [trending, supabase] = await Promise.all([
-    getTrendingMovies().catch(() => []),
-    createClient(),
-  ]);
+  const trending = await getTrendingMovies().catch(() => []);
 
   const hintTitles = (trending as TrendingMovie[])
     .slice(0, 4)
     .map(({ id, title, type }) => ({ id, title, type }));
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   return (
     <div className="min-h-full flex flex-col relative">
       <HomeHero
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        // ponytail: optimistic — logged-in users almost always have recent media
-        hasRecentMedia={!!user}
+        // ponytail: optimistic — RecentWatched Suspense handles the real check
+        hasRecentMedia={true}
       />
       <Suspense fallback={null}>
         <RecentWatched />
