@@ -63,13 +63,28 @@ export const deleteAccount = async (): Promise<void> => {
 
   if (!user) throw new Error('Not authenticated');
 
-  // Deleting the auth.users row cascades to both profiles and user_media.
-  const { error: deleteError } = await adminSupabase.auth.admin.deleteUser(
-    user.id,
-  );
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('avatar_url')
+    .eq('user_id', user.id)
+    .single();
 
-  if (deleteError)
-    throw new Error('Failed to delete account. Please try again.');
+  const avatarUrl = profile?.avatar_url;
+  if (avatarUrl) {
+    const url = new URL(avatarUrl);
+    const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
+    const objectPath = pathMatch?.[1];
+    if (objectPath) {
+      const { error: storageError } = await adminSupabase.storage
+        .from('avatars')
+        .remove([objectPath]);
+      if (storageError)
+        throw new Error('Failed to delete account. Please try again.');
+    }
+  }
+
+  const { error } = await adminSupabase.auth.admin.deleteUser(user.id);
+  if (error) throw new Error('Failed to delete account. Please try again.');
 
   redirect('/login');
 };
