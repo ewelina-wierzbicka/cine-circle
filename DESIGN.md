@@ -294,6 +294,28 @@ export const motion = {
 
 ---
 
+## Auth Error Pages
+
+- Routes: `/login/error` and `/register/error` — auth failure pages within the `(auth)` route group.
+- Server components — no client interactivity; CTA and secondary link use `next/link`.
+- Layout: full-screen `fixed inset-0`, centered content column `max-w-[380px] text-center`, `animate-fade-up`.
+- Background: `bg-dark` + 48px grid overlay (`rgba(255,255,255,0.07)`, `opacity-40`) + bottom-center radial glow in error-red (`oklch(65% 0.18 25 / 0.10)`).
+- Logo: absolute top-left (`top-7 left-6`), identical to `AuthFormLayout`.
+- Icon: `LockXIcon` (`src/icons/LockX.tsx`) 52×52, `text-error`, centered with `mb-5`.
+- Eyebrow: `font-mono text-sm uppercase tracking-[0.22em] text-error mb-6`.
+  - Login: "SIGN-IN FAILED"
+  - Register: "ACCOUNT NOT CREATED"
+- Title: `font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em] mb-3.5` with `<em class="text-error">` for the key word.
+  - Login: "Couldn't _verify_ you"
+  - Register: "Couldn't _create_ your account"
+- Body: `text-sm leading-relaxed text-secondary mb-7`.
+- CTA button: `Button` component.
+  - Login: "RETURN TO SIGN IN" → `/login`
+  - Register: "RETURN TO REGISTER" → `/register`
+- Secondary: `Link` "Continue as guest" → `/`, `text-sm text-secondary hover:text-primary`.
+
+---
+
 ## Login/Register
 
 - Implemented by `src/app/(auth)/AuthFormLayout.tsx` with `LoginForm` and `RegisterForm` as children.
