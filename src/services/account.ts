@@ -79,7 +79,7 @@ export const deleteAccount = async (): Promise<void> => {
         .from('avatars')
         .remove([objectPath]);
       if (storageError)
-        throw new Error('Failed to delete avatar. Please try again.');
+        throw new Error('Failed to delete account. Please try again.');
     }
   }
 
