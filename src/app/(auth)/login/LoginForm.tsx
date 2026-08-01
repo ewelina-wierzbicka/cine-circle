@@ -2,9 +2,9 @@
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { Link } from '@/components/Link';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -81,13 +81,7 @@ export function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary">
-        Don&apos;t have an account?{' '}
-        <Link
-          href="/register"
-          className="text-mint hover:opacity-80 transition-opacity"
-        >
-          Register
-        </Link>
+        Don&apos;t have an account? <Link href="/register">Register</Link>
       </p>
     </>
   );

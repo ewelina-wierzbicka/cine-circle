@@ -33,7 +33,7 @@ export default function Error({ error, reset }: Props) {
           up where you left off.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button handleClick={() => reset()} size="small" className="w-auto">
+          <Button handleClick={() => reset()} className="w-auto">
             Try again
           </Button>
           <Button

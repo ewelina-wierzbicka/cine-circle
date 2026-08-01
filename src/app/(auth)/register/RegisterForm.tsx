@@ -2,9 +2,9 @@
 
 import Button from '@/components/Button';
 import Input from '@/components/Input';
+import { Link } from '@/components/Link';
 import { register as registerAction } from '@/services/auth';
 import { RegistrationData } from '@/types';
-import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -118,31 +118,13 @@ export function RegisterForm() {
         </Button>
         <p className="text-sm text-secondary text-center mt-2">
           By creating an account, you agree to our{' '}
-          <Link
-            href="/terms"
-            className="text-mint hover:opacity-80 transition-opacity"
-          >
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link
-            href="/privacy"
-            className="text-mint hover:opacity-80 transition-opacity"
-          >
-            Privacy Policy
-          </Link>
-          .
+          <Link href="/terms">Terms of Service</Link> and{' '}
+          <Link href="/privacy">Privacy Policy</Link>.
         </p>
       </form>
 
       <p className="mt-6 text-center text-sm text-secondary">
-        Already have an account?{' '}
-        <Link
-          href="/login"
-          className="text-mint hover:opacity-80 transition-opacity"
-        >
-          Sign in
-        </Link>
+        Already have an account? <Link href="/login">Sign in</Link>
       </p>
     </>
   );
