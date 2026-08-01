@@ -41,6 +41,20 @@ export const updateAvatarPath = async (
 
   if (!user) throw new Error('Not authenticated');
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('avatar_url')
+    .eq('user_id', user.id)
+    .single();
+
+  if (profile?.avatar_url && profile.avatar_url !== filePath) {
+    const { error: deleteError } = await supabase.storage
+      .from('avatar')
+      .remove([profile.avatar_url]);
+    if (deleteError)
+      throw new Error('Failed to update avatar. Please try again.');
+  }
+
   const { error } = await supabase.from('profiles').upsert(
     {
       user_id: user.id,
