@@ -75,8 +75,11 @@ export const deleteAccount = async (): Promise<void> => {
     const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
     const objectPath = pathMatch?.[1];
     if (objectPath) {
-      // ponytail: best-effort; user deletion proceeds regardless of storage failure
-      await adminSupabase.storage.from('avatars').remove([objectPath]);
+      const { error: storageError } = await adminSupabase.storage
+        .from('avatars')
+        .remove([objectPath]);
+      if (storageError)
+        throw new Error('Failed to delete avatar. Please try again.');
     }
   }
 
