@@ -1,5 +1,6 @@
 'use client';
 
+import Button from '@/components/Button';
 import { LockXIcon } from '@/icons/LockX';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,24 +39,19 @@ export default function RegisterError({ reset }: Props) {
 
       <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
         <LockXIcon className="mx-auto mb-5 text-error" />
-        <p className="mb-2.5 font-mono text-sm uppercase tracking-[0.22em] text-error">
+        <p className="mb-6 font-mono text-sm uppercase tracking-[0.22em] text-error">
           Account not created
         </p>
         <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
           Couldn&rsquo;t <em className="text-error">create</em> your account
         </h1>
         <p className="mb-7 text-sm leading-relaxed text-secondary">
-          Your account couldn&rsquo;t be set up — this can happen if that email
-          is already registered or the connection dropped mid-request. No
-          account was created.
+          Something on our end failed. Try again, or continue as a guest.
         </p>
         <div className="flex flex-col gap-2.5">
-          <button
-            onClick={reset}
-            className="flex h-12 w-full items-center justify-center rounded-xl bg-mint font-sans text-sm font-semibold uppercase tracking-[0.06em] text-dark transition-opacity hover:opacity-[0.82]"
-          >
+          <Button handleClick={reset} className="w-auto">
             Return to register
-          </button>
+          </Button>
           <Link
             href="/"
             className="text-sm text-secondary transition-colors hover:text-primary"

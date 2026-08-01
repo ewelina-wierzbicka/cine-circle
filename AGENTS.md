@@ -100,7 +100,7 @@ series/[id]/             # /series/:id
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
-- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`. Sub-paths inherit this behaviour via `startsWith`
+- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`
 - Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`, `/terms`, `/privacy`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`

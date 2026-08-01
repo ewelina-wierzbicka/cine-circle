@@ -1,5 +1,6 @@
 'use client';
 
+import Button from '@/components/Button';
 import { LockXIcon } from '@/icons/LockX';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,24 +39,19 @@ export default function LoginError({ reset }: Props) {
 
       <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
         <LockXIcon className="mx-auto mb-5 text-error" />
-        <p className="mb-2.5 font-mono text-sm uppercase tracking-[0.22em] text-error">
+        <p className="mb-6 font-mono text-sm uppercase tracking-[0.22em] text-error">
           Sign-in failed
         </p>
         <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
           Couldn&rsquo;t <em className="text-error">verify</em> you
         </h1>
         <p className="mb-7 text-sm leading-relaxed text-secondary">
-          Your session couldn&rsquo;t be authenticated — this can happen if a
-          link expired or the connection dropped mid-request. No account changes
-          were made.
+          Something on our end failed. Try again, or continue as a guest.
         </p>
         <div className="flex flex-col gap-2.5">
-          <button
-            onClick={reset}
-            className="flex h-12 w-full items-center justify-center rounded-xl bg-mint font-sans text-sm font-semibold uppercase tracking-[0.06em] text-dark transition-opacity hover:opacity-[0.82]"
-          >
+          <Button handleClick={reset} className="w-auto">
             Return to sign in
-          </button>
+          </Button>
           <Link
             href="/"
             className="text-sm text-secondary transition-colors hover:text-primary"
