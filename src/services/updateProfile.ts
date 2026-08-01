@@ -51,7 +51,8 @@ export const updateAvatarPath = async (
     const { error: deleteError } = await supabase.storage
       .from('avatar')
       .remove([profile.avatar_url]);
-    if (deleteError) throw new Error('Failed to remove old avatar.');
+    if (deleteError)
+      throw new Error('Failed to update avatar. Please try again.');
   }
 
   const { error } = await supabase.from('profiles').upsert(
