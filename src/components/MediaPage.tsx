@@ -17,16 +17,11 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
-  let tmdbData: NormalizedMedia;
-  try {
-    tmdbData =
-      mediaType === 'series'
-        ? await getSeriesDetails(id)
-        : await getMovieDetails(id);
-  } catch (err) {
-    if ((err as { status?: number }).status === 404) notFound();
-    throw err;
-  }
+  const tmdbData =
+    mediaType === 'series'
+      ? await getSeriesDetails(id)
+      : await getMovieDetails(id);
+  if (!tmdbData) notFound();
 
   return (
     <Suspense fallback={<MediaDetailSkeleton />}>
