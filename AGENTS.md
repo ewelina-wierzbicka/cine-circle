@@ -240,8 +240,15 @@ export async function updatePost(id: string) {
 
 Always create a PR
 
-- **One branch per task, branched from `main`.** Before starting any task, run `git checkout main && git pull origin main`, then create a fresh branch named `agent/<short-description>` (e.g. `agent/add-movie-search`). Never commit to an existing feature branch that belongs to another task.
+- **One branch per task, branched from `main`.** Before starting any task, run:
+  ```bash
+  git checkout main && git pull origin main
+  git checkout -b agent/cin-XX-short-description
+  ```
+  Never branch from another feature branch. Never commit to a branch that belongs to a different task.
+- **Verify your branch before every commit.** Run `git branch --show-current` and confirm it matches your current task. If you are on the wrong branch, stash your changes and switch before committing.
 - **One PR per task.** Each PR must contain only the changes for its task. Do not mix changes from multiple tasks into a single PR.
+- **Detect contamination before opening a PR.** Run `bash scripts/check-branch.sh` to list all commits on the branch and verify every commit belongs to the current task.
 - Keep commits small and focused
 - Commit message format: `type: short description` (e.g. `feat: add movie search`, `fix: correct rating display`)
 - Types: `feat`, `fix`, `chore`, `refactor`, `docs`, `style`, `test`
