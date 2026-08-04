@@ -3,7 +3,7 @@ import Skeleton from '@/components/Skeleton';
 export function MediaDetailSkeleton() {
   return (
     <div className="relative flex flex-col overflow-hidden bg-dark min-h-full">
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none bg-dark">
         <div className="absolute inset-0 bg-[radial-gradient(at_25%_35%,rgb(26,58,92)_0%,rgba(26,58,92,0.333)_35%,rgb(13,13,16)_68%)]" />
         <div className="absolute inset-0 z-1 bg-[linear-gradient(rgba(13,13,16,0.55)_0%,rgba(13,13,16,0.1)_40%,rgba(13,13,16,0.75)_100%)]" />
       </div>
