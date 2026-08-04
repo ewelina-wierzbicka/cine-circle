@@ -151,7 +151,18 @@ export function ProfileContent({ profile, email }: Props) {
     setDeleteLoading(true);
     try {
       await deleteAccount();
-    } catch {
+    } catch (error) {
+      // redirect() throws a NEXT_REDIRECT error that must propagate
+      // to Next.js so it actually navigates — do not swallow it.
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'digest' in error &&
+        typeof (error as { digest: unknown }).digest === 'string' &&
+        (error as { digest: string }).digest.startsWith('NEXT_REDIRECT')
+      ) {
+        throw error;
+      }
       toast.error('Failed to delete account. Please try again.');
       setDeleteLoading(false);
     }
