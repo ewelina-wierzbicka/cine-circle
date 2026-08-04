@@ -23,27 +23,15 @@ function toRecentPoster(item: UserMedia) {
 }
 
 export default async function Home() {
-  const supabase = await createClient();
-  const [
-    trending,
-    {
-      data: { user },
-    },
-  ] = await Promise.all([
-    getTrendingMovies().catch(() => []),
-    supabase.auth.getUser(),
-  ]);
+  const trending = await getTrendingMovies().catch(() => [] as TrendingMovie[]);
 
-  const hintTitles = (trending as TrendingMovie[])
+  const hintTitles = trending
     .slice(0, 4)
     .map(({ id, title, type }) => ({ id, title, type }));
 
   return (
     <div className="min-h-full flex flex-col relative">
-      <HomeHero
-        hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        hasRecentMedia={!!user}
-      />
+      <HomeHero hintTitles={hintTitles.length > 0 ? hintTitles : undefined} />
       <Suspense fallback={null}>
         <RecentWatched />
       </Suspense>
@@ -69,7 +57,7 @@ async function RecentWatched() {
   if (recentPosters.length === 0) return null;
 
   return (
-    <div className="px-6 md:px-12 pb-8 relative">
+    <div data-has-recent-media className="px-6 md:px-12 pb-8 relative">
       <div className="flex justify-between mb-4">
         <span className="font-mono text-sm tracking-[0.2em] text-secondary uppercase">
           Recently Watched

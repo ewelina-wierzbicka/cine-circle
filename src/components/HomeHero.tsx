@@ -5,13 +5,22 @@ import { twMerge } from '@/lib/cn';
 import { MediaType } from '@/types';
 import { useState } from 'react';
 
+const RECENT_MEDIA_SELECTOR = '[data-has-recent-media]';
+
 type Props = {
   hintTitles?: { id: number; title: string; type: MediaType }[];
-  hasRecentMedia?: boolean;
 };
 
-export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
+export function HomeHero({ hintTitles }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [hasRecentMedia, setHasRecentMedia] = useState(true);
+
+  const handleDropdownVisibleChange = (open: boolean) => {
+    setDropdownOpen(open);
+    if (open) {
+      setHasRecentMedia(Boolean(document.querySelector(RECENT_MEDIA_SELECTOR)));
+    }
+  };
 
   const shouldShift = dropdownOpen && !hasRecentMedia;
 
@@ -34,7 +43,7 @@ export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
       <div className="w-full max-w-160 animate-fade-up [animation-delay:120ms]">
         <SearchBox
           hintTitles={hintTitles}
-          onDropdownVisibleChange={setDropdownOpen}
+          onDropdownVisibleChange={handleDropdownVisibleChange}
         />
       </div>
     </div>
