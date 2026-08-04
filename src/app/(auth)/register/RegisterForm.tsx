@@ -36,7 +36,7 @@ export function RegisterForm() {
           <em className="text-mint">circle</em>
         </h1>
         <p className="text-base text-secondary">
-          Track every movie. Share your taste.
+          Track every movie. Build your list.
         </p>
       </div>
 

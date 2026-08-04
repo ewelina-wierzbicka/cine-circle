@@ -16,7 +16,7 @@ export default function ConfirmEmailPage() {
           <em className="text-mint">inbox</em>
         </h1>
         <p className="text-sm text-secondary">
-          One step left to join the circle.
+          One step left to activate your account.
         </p>
       </div>
 
