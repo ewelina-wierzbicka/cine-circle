@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import MediaDetailSkeleton from '@/components/MediaDetailSkeleton';
 import { createClient } from '@/lib/supabase/server';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getUserMedia } from '@/services/getUserMedia';
@@ -23,8 +22,19 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
       : await getMovieDetails(id);
   if (!tmdbData) notFound();
 
+  const initialStep = step === '2' ? 2 : 1;
+  const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
+
   return (
-    <Suspense fallback={<MediaDetailSkeleton />}>
+    <Suspense
+      fallback={
+        <MediaDetail
+          media={baseMedia}
+          initialStep={initialStep}
+          isAuthenticated={false}
+        />
+      }
+    >
       <UserEnrichedMedia
         tmdbData={tmdbData}
         tmdbId={Number(id)}

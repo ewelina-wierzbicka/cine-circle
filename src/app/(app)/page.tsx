@@ -23,7 +23,16 @@ function toRecentPoster(item: UserMedia) {
 }
 
 export default async function Home() {
-  const trending = await getTrendingMovies().catch(() => []);
+  const supabase = await createClient();
+  const [
+    trending,
+    {
+      data: { user },
+    },
+  ] = await Promise.all([
+    getTrendingMovies().catch(() => []),
+    supabase.auth.getUser(),
+  ]);
 
   const hintTitles = (trending as TrendingMovie[])
     .slice(0, 4)
@@ -33,8 +42,7 @@ export default async function Home() {
     <div className="min-h-full flex flex-col relative">
       <HomeHero
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        // ponytail: optimistic — RecentWatched Suspense handles the real check
-        hasRecentMedia={true}
+        hasRecentMedia={!!user}
       />
       <Suspense fallback={null}>
         <RecentWatched />
@@ -54,8 +62,8 @@ async function RecentWatched() {
   try {
     const result = await getUserMediaList('watched', 0);
     recentPosters = result.media.slice(0, 8).map(toRecentPoster);
-  } catch (err) {
-    console.error('Failed to fetch recent posters:', err);
+  } catch {
+    // silently fail — no recent posters shown
   }
 
   if (recentPosters.length === 0) return null;
