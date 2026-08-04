@@ -44,7 +44,7 @@ async function RecentWatched() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user) return <div data-no-recent-media aria-hidden />;
 
   let recentPosters: TrendingMovie[] = [];
   try {
@@ -54,7 +54,8 @@ async function RecentWatched() {
     // silently fail — no recent posters shown
   }
 
-  if (recentPosters.length === 0) return null;
+  if (recentPosters.length === 0)
+    return <div data-no-recent-media aria-hidden />;
 
   return (
     <div data-has-recent-media className="px-6 md:px-12 pb-8 relative">

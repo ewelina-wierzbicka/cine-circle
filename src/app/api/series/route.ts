@@ -10,6 +10,7 @@ export async function GET(request: Request) {
 
   try {
     const data = await getSeriesDetails(id);
+    if (data === null) return apiError('Series not found', 404);
     return Response.json(data);
   } catch (error) {
     console.error('Get series details error:', error);

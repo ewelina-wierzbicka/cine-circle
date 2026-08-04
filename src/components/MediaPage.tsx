@@ -36,42 +36,38 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
       }
     >
       <UserEnrichedMedia
-        tmdbData={tmdbData}
+        baseMedia={baseMedia}
         tmdbId={Number(id)}
         mediaType={mediaType}
         slug={slug}
-        step={step}
+        initialStep={initialStep}
       />
     </Suspense>
   );
 }
 
 type UserEnrichedMediaProps = {
-  tmdbData: NormalizedMedia;
+  baseMedia: NormalizedMedia;
   tmdbId: number;
   mediaType: 'movie' | 'series';
   slug: string;
-  step?: string;
+  initialStep: 1 | 2;
 };
 
 async function UserEnrichedMedia({
-  tmdbData,
+  baseMedia,
   tmdbId,
   mediaType,
   slug,
-  step,
+  initialStep,
 }: UserEnrichedMediaProps) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const isAuthenticated = !!user;
-  const initialStep = step === '2' ? 2 : 1;
 
-  let media: NormalizedMedia | SavedMedia = {
-    ...tmdbData,
-    media_type: mediaType,
-  };
+  let media: NormalizedMedia | SavedMedia = baseMedia;
 
   if (user) {
     const userMedia = await getUserMedia(tmdbId, mediaType, user.id).catch(
@@ -104,10 +100,10 @@ async function UserEnrichedMedia({
         last_air_date,
         poster_path,
         media_type,
-        genres: tmdbData.genres,
-        overview: tmdbData.overview,
-        recommendations: tmdbData.recommendations,
-        director: tmdbData.director,
+        genres: baseMedia.genres,
+        overview: baseMedia.overview,
+        recommendations: baseMedia.recommendations,
+        director: baseMedia.director,
         id: savedId,
         watchStatus,
         watched_date,

@@ -3,22 +3,47 @@
 import SearchBox from '@/components/SearchBox';
 import { twMerge } from '@/lib/cn';
 import { MediaType } from '@/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const RECENT_MEDIA_SELECTOR = '[data-has-recent-media]';
+const HAS_RECENT_SELECTOR = '[data-has-recent-media]';
+const NO_RECENT_SELECTOR = '[data-no-recent-media]';
 
 type Props = {
   hintTitles?: { id: number; title: string; type: MediaType }[];
 };
 
+function readHasRecentMedia(): boolean | null {
+  if (typeof document === 'undefined') return null;
+  if (document.querySelector(HAS_RECENT_SELECTOR)) return true;
+  if (document.querySelector(NO_RECENT_SELECTOR)) return false;
+  return null;
+}
+
 export function HomeHero({ hintTitles }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [hasRecentMedia, setHasRecentMedia] = useState(true);
 
+  useEffect(() => {
+    let resolved = false;
+    const update = () => {
+      const value = readHasRecentMedia();
+      if (value !== null) {
+        resolved = true;
+        setHasRecentMedia(value);
+      }
+    };
+    update();
+    if (resolved) return;
+    const observer = new MutationObserver(update);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   const handleDropdownVisibleChange = (open: boolean) => {
     setDropdownOpen(open);
     if (open) {
-      setHasRecentMedia(Boolean(document.querySelector(RECENT_MEDIA_SELECTOR)));
+      const value = readHasRecentMedia();
+      if (value !== null) setHasRecentMedia(value);
     }
   };
 
