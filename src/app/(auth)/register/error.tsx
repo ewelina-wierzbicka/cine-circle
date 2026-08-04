@@ -35,7 +35,6 @@ export default function RegisterError({ reset }: Props) {
           </span>
         </Link>
       </header>
-
       <main className="relative flex h-full items-center justify-center p-6">
         <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
           <LockXIcon className="mx-auto mb-5 text-error" />
