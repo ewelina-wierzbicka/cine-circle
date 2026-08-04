@@ -2,6 +2,7 @@ import '@/globals.css';
 import { Providers } from '@/providers';
 import type { Metadata } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -43,6 +44,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
