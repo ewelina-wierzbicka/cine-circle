@@ -25,18 +25,23 @@ export function HomeHero({ hintTitles }: Props) {
 
   useEffect(() => {
     let resolved = false;
+    let observer: MutationObserver | null = null;
     const update = () => {
       const value = readHasRecentMedia();
       if (value !== null) {
-        resolved = true;
-        setHasRecentMedia(value);
+        if (!resolved) {
+          resolved = true;
+          setHasRecentMedia(value);
+          observer?.disconnect();
+          observer = null;
+        }
       }
     };
     update();
     if (resolved) return;
-    const observer = new MutationObserver(update);
+    observer = new MutationObserver(update);
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    return () => observer?.disconnect();
   }, []);
 
   const handleDropdownVisibleChange = (open: boolean) => {
