@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
-import { createClient } from '@/lib/supabase/server';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
-import { getUserMedia } from '@/services/getUserMedia';
-import { NormalizedMedia, SavedMedia } from '@/types';
+import { getEnrichedMedia } from '@/services/getEnrichedMedia';
+import { NormalizedMedia } from '@/types';
 import { notFound } from 'next/navigation';
 import MediaDetail from './MediaDetail';
 
@@ -61,57 +60,11 @@ async function UserEnrichedMedia({
   slug,
   initialStep,
 }: UserEnrichedMediaProps) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isAuthenticated = !!user;
-
-  let media: NormalizedMedia | SavedMedia = baseMedia;
-
-  if (user) {
-    const userMedia = await getUserMedia(tmdbId, mediaType, user.id).catch(
-      (err: unknown) => {
-        if ((err as { code?: string }).code === 'PGRST116') return null;
-        throw err;
-      },
-    );
-    if (userMedia) {
-      const {
-        id: savedId,
-        watchStatus,
-        watched_date,
-        rating,
-        review,
-        media: savedMedia,
-      } = userMedia;
-      const {
-        tmdb_id,
-        title,
-        release_date,
-        last_air_date,
-        poster_path,
-        media_type,
-      } = savedMedia;
-      media = {
-        tmdb_id,
-        title,
-        release_date,
-        last_air_date,
-        poster_path,
-        media_type,
-        genres: baseMedia.genres,
-        overview: baseMedia.overview,
-        recommendations: baseMedia.recommendations,
-        director: baseMedia.director,
-        id: savedId,
-        watchStatus,
-        watched_date,
-        rating,
-        review,
-      } satisfies SavedMedia;
-    }
-  }
+  const { media, isAuthenticated } = await getEnrichedMedia(
+    baseMedia,
+    tmdbId,
+    mediaType,
+  );
 
   return (
     <MediaDetail
