@@ -95,15 +95,6 @@ export const deleteAccount = async (): Promise<void> => {
     }
   }
 
-  // Delete user_media explicitly so cleanup works even if the
-  // auth.users → user_media CASCADE FK has not been applied yet.
-  const { error: mediaError } = await adminSupabase
-    .from('user_media')
-    .delete()
-    .eq('user_id', user.id);
-  if (mediaError)
-    throw new Error('Failed to delete account. Please try again.');
-
   const { error } = await adminSupabase.auth.admin.deleteUser(user.id);
   if (error) throw new Error('Failed to delete account. Please try again.');
 
