@@ -27,7 +27,7 @@ type TmdbTrendingResponse = {
 export async function getTrendingMovies(): Promise<TrendingMovie[]> {
   'use cache';
   cacheLife('days');
-  cacheTag('trending');
+  cacheTag('trending-movies');
 
   const headers = { Authorization: `Bearer ${getTmdbToken()}` };
 

@@ -2,55 +2,17 @@
 
 import SearchBox from '@/components/SearchBox';
 import { twMerge } from '@/lib/cn';
-import { MediaType } from '@/types';
-import { useEffect, useState } from 'react';
-
-const HAS_RECENT_SELECTOR = '[data-has-recent-media]';
-const NO_RECENT_SELECTOR = '[data-no-recent-media]';
+import { MediaType, TrendingMovie } from '@/types';
+import { Suspense, useEffect, useState, use } from 'react';
 
 type Props = {
   hintTitles?: { id: number; title: string; type: MediaType }[];
+  recentPostersPromise: Promise<TrendingMovie[]>;
 };
 
-function readHasRecentMedia(): boolean | null {
-  if (typeof document === 'undefined') return null;
-  if (document.querySelector(HAS_RECENT_SELECTOR)) return true;
-  if (document.querySelector(NO_RECENT_SELECTOR)) return false;
-  return null;
-}
-
-export function HomeHero({ hintTitles }: Props) {
+export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [hasRecentMedia, setHasRecentMedia] = useState(true);
-
-  useEffect(() => {
-    let resolved = false;
-    let observer: MutationObserver | null = null;
-    const update = () => {
-      const value = readHasRecentMedia();
-      if (value !== null) {
-        if (!resolved) {
-          resolved = true;
-          setHasRecentMedia(value);
-          observer?.disconnect();
-          observer = null;
-        }
-      }
-    };
-    update();
-    if (resolved) return;
-    observer = new MutationObserver(update);
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer?.disconnect();
-  }, []);
-
-  const handleDropdownVisibleChange = (open: boolean) => {
-    setDropdownOpen(open);
-    if (open) {
-      const value = readHasRecentMedia();
-      if (value !== null) setHasRecentMedia(value);
-    }
-  };
 
   const shouldShift = dropdownOpen && !hasRecentMedia;
 
@@ -73,9 +35,29 @@ export function HomeHero({ hintTitles }: Props) {
       <div className="w-full max-w-160 animate-fade-up [animation-delay:120ms]">
         <SearchBox
           hintTitles={hintTitles}
-          onDropdownVisibleChange={handleDropdownVisibleChange}
+          onDropdownVisibleChange={setDropdownOpen}
         />
       </div>
+      <Suspense fallback={null}>
+        <RecentMediaState
+          promise={recentPostersPromise}
+          onResolved={setHasRecentMedia}
+        />
+      </Suspense>
     </div>
   );
+}
+
+function RecentMediaState({
+  promise,
+  onResolved,
+}: {
+  promise: Promise<TrendingMovie[]>;
+  onResolved: (hasRecent: boolean) => void;
+}) {
+  const items = use(promise);
+  useEffect(() => {
+    onResolved(items.length > 0);
+  }, [items, onResolved]);
+  return null;
 }

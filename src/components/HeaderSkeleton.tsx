@@ -21,10 +21,10 @@ export function HeaderSkeleton() {
         className="hidden md:flex items-center gap-1"
         aria-label="Main navigation"
       >
-        <span className="px-3 py-1.5 text-sm font-sans font-medium tracking-[0.02em] text-secondary">
+        <span className="px-3 py-1.5 rounded-full border border-transparent text-sm font-sans font-medium tracking-[0.02em] text-secondary">
           Search
         </span>
-        <span className="px-3 py-1.5 text-sm font-sans font-medium tracking-[0.02em] text-secondary">
+        <span className="px-3 py-1.5 rounded-full border border-transparent text-sm font-sans font-medium tracking-[0.02em] text-secondary">
           Collection
         </span>
       </nav>

@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
+import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
 
@@ -11,11 +12,16 @@ export default async function Home() {
     .slice(0, 4)
     .map(({ id, title, type }) => ({ id, title, type }));
 
+  const recentPostersPromise = getRecentWatched();
+
   return (
     <div className="min-h-full flex flex-col relative">
-      <HomeHero hintTitles={hintTitles.length > 0 ? hintTitles : undefined} />
+      <HomeHero
+        hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
+        recentPostersPromise={recentPostersPromise}
+      />
       <Suspense fallback={null}>
-        <RecentWatched />
+        <RecentWatched recentPostersPromise={recentPostersPromise} />
       </Suspense>
     </div>
   );

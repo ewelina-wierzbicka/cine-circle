@@ -27,11 +27,7 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   return (
     <Suspense
       fallback={
-        <MediaDetail
-          media={baseMedia}
-          initialStep={initialStep}
-          isAuthenticated={false}
-        />
+        <MediaDetail media={baseMedia} initialStep={initialStep} pending />
       }
     >
       <UserEnrichedMedia

@@ -28,13 +28,9 @@ async function tmdbFetch<T>(
   return res.json() as Promise<T>;
 }
 
-async function tmdbFetchOrNull<T>(
-  path: string,
-  nextConfig: { revalidate?: number; tags?: string[] } = {},
-): Promise<T | null> {
+async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
   const res = await fetch(`${TMDB_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
-    next: nextConfig,
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load data. Please try again.');

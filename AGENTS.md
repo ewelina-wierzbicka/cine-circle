@@ -73,6 +73,7 @@ src/
         UserMediaList.tsx
       profile/                # /profile
         page.tsx
+        loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
 series/[id]/             # /series/:id
         page.tsx
