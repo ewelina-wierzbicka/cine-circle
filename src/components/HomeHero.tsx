@@ -29,7 +29,7 @@ export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
         <em className="text-mint">watch next?</em>
       </h2>
       <p className="text-secondary text-md text-center mb-12 animate-fade-in [animation-delay:80ms]">
-        Search any title to add it to your circle
+        Search any title to add it to your list
       </p>
       <div className="w-full max-w-160 animate-fade-up [animation-delay:120ms]">
         <SearchBox
