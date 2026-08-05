@@ -67,16 +67,28 @@ export const deleteAccount = async (): Promise<void> => {
     .from('profiles')
     .select('avatar_url')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
-  const avatarUrl = profile?.avatar_url;
-  if (avatarUrl) {
-    const url = new URL(avatarUrl);
-    const pathMatch = url.pathname.match(/\/object\/public\/avatars\/(.+)/);
-    const objectPath = pathMatch?.[1];
+  const storedAvatar = profile?.avatar_url;
+  if (storedAvatar) {
+    let objectPath: string | undefined;
+    if (storedAvatar.startsWith('http')) {
+      try {
+        const url = new URL(storedAvatar);
+        const pathMatch = url.pathname.match(
+          /\/object\/(?:public|sign)\/avatar\/(.+)$/,
+        );
+        objectPath = pathMatch?.[1];
+      } catch {
+        objectPath = undefined;
+      }
+    } else {
+      objectPath = storedAvatar;
+    }
+
     if (objectPath) {
       const { error: storageError } = await adminSupabase.storage
-        .from('avatars')
+        .from('avatar')
         .remove([objectPath]);
       if (storageError)
         throw new Error('Failed to delete account. Please try again.');
