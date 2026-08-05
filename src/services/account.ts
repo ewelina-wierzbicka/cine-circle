@@ -17,7 +17,16 @@ export const updateEmail = async (
 
   const { error } = await supabase.auth.updateUser({ email: newEmail });
 
-  if (error) return { error: error.message };
+  if (error) {
+    const msg = error.message;
+    if (msg === 'Error sending email change email') {
+      return {
+        error:
+          'Could not send the confirmation email. Try again in a few minutes.',
+      };
+    }
+    return { error: msg };
+  }
 
   return {};
 };

@@ -186,7 +186,11 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+# Raised from the default of 2: signup confirmation + email change with
+# `double_confirm_changes = true` (sends to both old and new address) easily
+# exhausts 2/hour and surfaces the opaque "Error sending email change email"
+# message returned by GoTrue.
+email_sent = 30
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
