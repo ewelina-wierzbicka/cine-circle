@@ -117,7 +117,17 @@ Familiarize yourself with these before adding anything new:
 
 ---
 
-## After Making Changes
+## Cache Components (PPR) — UI side
+
+`cacheComponents: true` is on. The static shell prerenders at build time; user-specific data streams in via `<Suspense>`. See the "Cache Components (PPR)" section of `AGENTS.md` and the `next-cache-components` skill.
+
+- Wrap user-specific Supabase subtrees in `<Suspense>` with a sized skeleton fallback. Match the surrounding layout so the stream-in doesn't shift.
+- `MediaDetail` and `MediaInfo` accept a `pending` prop — render `Skeleton` blocks for action buttons while user data streams. Always pass `pending` from the Suspense fallback; the streamed-in real `MediaDetail` replaces it.
+- Route-level `loading.tsx` and Suspense fallbacks use the `Skeleton` component (`animate-pulse bg-bg3/60`), sized via `className`. Prefer the existing skeletons: `MediaDetailSkeleton`, `MediaCardSkeleton`, `HeaderSkeleton`, and the profile skeleton in `profile/loading.tsx`.
+- Layouts must stay render-sync (no top-level `await cookies()`/`await headers()`) so the static shell prerenders. Put cookie/Supabase reads inside a `<Suspense>` child instead.
+- Do not add `export const dynamic` / `force-dynamic` to a page to "fix" streaming — add or fix a Suspense boundary.
+
+---
 
 - Run `npm run lint` — fix all errors before finishing
 - Run `npm run type-check` if you touched any TypeScript types
