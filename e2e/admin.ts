@@ -7,7 +7,7 @@ export const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 });
 
 export async function findUserByEmail(email: string) {
-  // ponytail: linear scan of first page. Test project has few users.
+  // linear scan of first page. Test project has few users.
   const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 });
   if (error) throw error;
   return data.users.find((u) => u.email === email) ?? null;

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// ponytail: tiny .env loader so we avoid adding dotenv just for the test runner.
+// tiny .env loader so we avoid adding dotenv just for the test runner.
 // Precedence: real process.env > .env.test.local > .env.local
 function loadFile(file: string) {
   let raw: string;
