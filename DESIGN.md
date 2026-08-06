@@ -279,9 +279,21 @@ export const motion = {
 - `src/components/ErrorToast.tsx`.
 - Shows a toast.error when mounted via `react-toastify`.
 
+### HeaderSkeleton
+
+- `src/components/HeaderSkeleton.tsx`.
+- Static skeleton for the `(app)` layout `Header`, shown while the authed `Header` (which reads cookies/Supabase) streams in under PPR.
+- Matches `Header` geometry: `h-14 px-6 md:px-12`, logo + wordmark, two pill-shaped nav placeholders, and `AvatarIcon` on the right.
+
+### RecentWatched
+
+- `src/components/RecentWatched.tsx` — async Server Component rendering the "Recently Watched" strip on the home page.
+- Receives a `Promise<TrendingMovie[]>` (resolved by `getRecentWatched`) and `await`s it; renders `null` when empty.
+- Hosts the section header ("RECENTLY WATCHED" + "SEE ALL →") and the horizontal `MediaPoster` scroll. Lifted out of `page.tsx` so the home shell prerenders with the hero and the strip streams in via Suspense.
+
 ### Skeleton (loading.tsx skeletons)
 
-- `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files for React Suspense streaming.
+- `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files and by Suspense fallbacks (e.g. `MediaInfo` action buttons while user data streams under PPR).
 - `src/components/MediaDetailSkeleton.tsx` — full movie/series detail skeleton mirroring `MediaDetailWrapper`: same radial gradient backdrop, rotated poster placeholder on the left (`h-[50vh]` on mobile, `md:w-1/2`), and a `MediaInfoHeader`-shaped skeleton column on the right (back link, genre pills, type eyebrow, serif title, meta row, mint divider, overview lines).
 - `src/components/MediaCardSkeleton.tsx` — single `MediaCard`-shaped skeleton: `aspect-2/3` poster block plus two title/meta lines. Used by the `search` and `collection` `loading.tsx` grids (12 cells, matching `MediaList` breakpoints).
 - Route skeletons:
@@ -289,6 +301,7 @@ export const motion = {
   - `src/app/(app)/series/[id]/loading.tsx` renders `<MediaDetailSkeleton />` (identical layout to the movie route).
   - `src/app/(app)/collection/loading.tsx` — `MyMedia` header skeleton (eyebrow, heading, tab pills, filter + select) followed by a 12-cell responsive `MediaList` grid of `MediaCard`-shaped skeletons (`grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6`).
   - `src/app/(app)/search/loading.tsx` — keeps the `max-w-160` SearchBox area as a single skeleton bar, then a "Search Results" heading skeleton and a 12-cell results grid matching `MediaList`.
+  - `src/app/(app)/profile/loading.tsx` — streams a profile skeleton under PPR (uncached Supabase data). Mirrors the `ProfileContent` layout: serif heading block, profile card (`w-22 h-22` avatar + name lines), account card with two collapsed rows, danger-zone card, and centered sign-out button, all `Skeleton` blocks.
 
 ---
 
@@ -364,7 +377,9 @@ Search
 
 Recently Watched
 
-- Uses `getUserMediaList('watched')` to build `recentPosters` and renders a horizontal `overflow-x-auto` strip of `MediaPoster` links.
+- Streams in via Suspense under PPR. `page.tsx` awaits `getTrendingMovies()` (cached `use cache`) to build the hero `hintTitles`, then hands `getRecentWatched()` (Supabase, per-user) as a promise to `RecentWatched`.
+- `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
+- `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
 - Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-mint tracking-[0.08em]`.
 
@@ -404,7 +419,8 @@ Notes
 
 Overall structure
 
-- `MediaPage` is an async route loader that calls `getMediaPageData` and renders `ErrorToast` on error or `MediaDetail` on success.
+- `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data. It then wraps the user-enriched subtree in `<Suspense>` while `getEnrichedMedia` reads cookies + Supabase.
+- The Suspense fallback renders `<MediaDetail media={baseMedia} pending />` — the full detail UI with the action buttons replaced by `Skeleton` blocks (`MediaInfo` `pending` prop, `aria-busy="true"`). Once `UserEnrichedMedia` resolves, the real `MediaDetail` (with `watchStatus` if saved) replaces it.
 - `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = info, 2 = form). It detects saved state by checking `watchStatus` in the media object.
 - `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
