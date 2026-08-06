@@ -2,6 +2,7 @@
 
 import Button from '@/components/Button';
 import MediaInfoHeader from '@/components/MediaInfoHeader';
+import Skeleton from '@/components/Skeleton';
 import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia } from '@/types';
@@ -16,6 +17,7 @@ type Props = {
   isToWatch?: boolean;
   addToWatched: () => void;
   isAuthenticated?: boolean;
+  pending?: boolean;
 };
 
 export default function MediaInfo({
@@ -24,6 +26,7 @@ export default function MediaInfo({
   isToWatch,
   addToWatched,
   isAuthenticated = true,
+  pending = false,
 }: Props) {
   const { id, title, release_date, last_air_date, poster_path, media_type } =
     media;
@@ -81,7 +84,16 @@ export default function MediaInfo({
   return (
     <div className="flex flex-col w-full animate-fade-up md:max-w-120">
       <MediaInfoHeader media={media} />
-      {!isAuthenticated ? (
+      {pending ? (
+        <div
+          className="flex gap-2.5 flex-col md:flex-row"
+          aria-busy="true"
+          aria-live="polite"
+        >
+          <Skeleton className="h-12 w-full sm:w-44 rounded-xl" />
+          <Skeleton className="h-12 w-full sm:w-36 rounded-xl" />
+        </div>
+      ) : !isAuthenticated ? (
         <div className="flex flex-col gap-3 pt-3">
           <p className="font-mono text-sm text-secondary">
             Sign in to add to collection

@@ -2,16 +2,17 @@
 
 import SearchBox from '@/components/SearchBox';
 import { twMerge } from '@/lib/cn';
-import { MediaType } from '@/types';
-import { useState } from 'react';
+import { MediaType, TrendingMovie } from '@/types';
+import { Suspense, useEffect, useState, use } from 'react';
 
 type Props = {
   hintTitles?: { id: number; title: string; type: MediaType }[];
-  hasRecentMedia?: boolean;
+  recentPostersPromise: Promise<TrendingMovie[]>;
 };
 
-export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
+export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [hasRecentMedia, setHasRecentMedia] = useState(true);
 
   const shouldShift = dropdownOpen && !hasRecentMedia;
 
@@ -37,6 +38,26 @@ export function HomeHero({ hintTitles, hasRecentMedia }: Props) {
           onDropdownVisibleChange={setDropdownOpen}
         />
       </div>
+      <Suspense fallback={null}>
+        <RecentMediaState
+          promise={recentPostersPromise}
+          onResolved={setHasRecentMedia}
+        />
+      </Suspense>
     </div>
   );
+}
+
+function RecentMediaState({
+  promise,
+  onResolved,
+}: {
+  promise: Promise<TrendingMovie[]>;
+  onResolved: (hasRecent: boolean) => void;
+}) {
+  const items = use(promise);
+  useEffect(() => {
+    onResolved(items.length > 0);
+  }, [items, onResolved]);
+  return null;
 }

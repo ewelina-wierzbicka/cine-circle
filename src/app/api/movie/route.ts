@@ -10,6 +10,7 @@ export async function GET(request: Request) {
 
   try {
     const data = await getMovieDetails(id);
+    if (data === null) return apiError('Movie not found', 404);
     return Response.json(data);
   } catch (error) {
     console.error('Get movie details error:', error);

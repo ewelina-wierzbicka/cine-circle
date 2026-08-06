@@ -27,6 +27,20 @@ You review code only — you do not implement features or make changes. Your job
 - Data fetching in Server Components or Route Handlers, not in Client Components
 - New open routes must be added to `OPEN_ROUTES_EXACT`/`OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) redirect logged-in users to `/`
+- Middleware lives in `proxy.ts` (not `middleware.ts`) — flag any `middleware.ts`
+
+### Cache Components (PPR)
+
+`cacheComponents: true` is on. Review against the "Cache Components (PPR)" section of `AGENTS.md` and the `next-cache-components` skill. Flag:
+
+- Any `next: { revalidate }` on fetch calls — TMDB data uses `'use cache'` + `cacheLife` / `cacheTag`
+- Missing `'use cache'` (or missing `cacheLife`/`cacheTag`) on TMDB service functions: `getTrendingMovies`, `getMovieDetails`, `getSeriesDetails`
+- User-specific Supabase data (anything reading cookies/headers) placed inside a `'use cache'` function — it must stream via `<Suspense>` instead
+- Missing `<Suspense>` boundary around user-enriched subtrees on movie/series/home/profile routes
+- `export const dynamic` / `force-dynamic` on routes — PPR handles dynamicity; `connection()` only when opting out entirely
+- `revalidateTag` called without a `cacheLife` profile argument
+- Removal of an approved Suspense boundary (`(app)/layout.tsx` Header, `page.tsx` RecentWatched, `MediaPage` UserEnrichedMedia)
+- `MediaDetail` / `MediaInfo` `pending` prop not passed from a Suspense fallback when the surrounding subtree streams
 
 ### Supabase
 
