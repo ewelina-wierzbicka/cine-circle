@@ -3,7 +3,7 @@
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
-import { updatePasswordAfterReset } from '@/services/auth';
+import { signOutOnly, updatePasswordAfterReset } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,7 +17,7 @@ export function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors },
   } = useForm<FormData>();
 
@@ -29,6 +29,7 @@ export function ResetPasswordForm() {
       setIsPending(false);
     } else {
       toast.success('Password updated. Please sign in.');
+      await signOutOnly();
       router.push('/login');
     }
   };
@@ -42,7 +43,8 @@ export function ResetPasswordForm() {
           <em className="text-mint">password</em>
         </h1>
         <p className="text-base text-secondary">
-          Must be at least 8 characters.
+          At least 8 characters with uppercase, lowercase, number, and special
+          character.
         </p>
       </div>
 
@@ -84,7 +86,7 @@ export function ResetPasswordForm() {
             {...register('confirmPassword', {
               required: 'Please confirm your password',
               validate: (value) =>
-                value === watch('password') || 'Passwords do not match',
+                value === getValues('password') || 'Passwords do not match',
             })}
             error={errors.confirmPassword?.message}
           />

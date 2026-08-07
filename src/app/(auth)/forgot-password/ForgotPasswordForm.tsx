@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
           </p>
 
           <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-            <p className="font-mono text-xs uppercase tracking-[0.14em] text-secondary mb-1">
+            <p className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-1">
               Didn&apos;t receive it?
             </p>
             <p className="text-sm text-secondary leading-relaxed">

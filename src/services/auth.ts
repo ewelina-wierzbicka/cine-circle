@@ -79,3 +79,8 @@ export async function updatePasswordAfterReset(
 
   return {};
 }
+
+export async function signOutOnly(): Promise<void> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+}

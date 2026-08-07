@@ -57,6 +57,12 @@ src/
         error.tsx              # error boundary for /register — registration failure UI
       confirm-email/
         page.tsx
+      forgot-password/         # /forgot-password — request a reset link
+        page.tsx
+        ForgotPasswordForm.tsx
+      reset-password/          # /reset-password — set a new password (reached via email link → reset-callback)
+        page.tsx
+        ResetPasswordForm.tsx
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
@@ -101,7 +107,8 @@ series/[id]/             # /series/:id
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
-- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`
+- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`) — logged-in users are redirected away from these to `/`
+- `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
 - Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`, `/terms`, `/privacy`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`

@@ -6,14 +6,21 @@ import { Link } from '@/components/Link';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
   const rurl = searchParams.get('rurl') ?? undefined;
+  const errorParam = searchParams.get('error');
   const [isPending, setIsPending] = useState(false);
+
+  useEffect(() => {
+    if (errorParam === 'reset_failed') {
+      toast.error('Password reset failed. Please try again.');
+    }
+  }, [errorParam]);
   const {
     register,
     handleSubmit,
