@@ -40,19 +40,23 @@ export async function sendPasswordReset(
   email: string,
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
-  const headersList = await headers();
 
-  const proto = headersList.get('x-forwarded-proto') ?? 'https';
-  const host = headersList.get('host') ?? '';
-  const origin = host
-    ? `${proto}://${host}`
-    : (process.env.NEXT_PUBLIC_SITE_URL ?? '');
+  let origin = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+  if (!origin) {
+    const headersList = await headers();
+    const proto = headersList.get('x-forwarded-proto') ?? 'https';
+    const host = headersList.get('host') ?? '';
+    if (host) origin = `${proto}://${host}`;
+  }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/auth/reset-callback`,
   });
 
-  if (error) return { error: error.message };
+  // ponytail: treat user-not-found as success to prevent account enumeration
+  if (error && !error.message.toLowerCase().includes('user not found')) {
+    return { error: error.message };
+  }
 
   return {};
 }
