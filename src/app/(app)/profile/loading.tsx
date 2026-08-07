@@ -5,34 +5,11 @@ export default function ProfileLoading() {
     <div className="mx-auto max-w-xl px-6 py-10 md:py-16 min-h-full flex flex-col justify-center">
       <Skeleton className="h-12 w-44 mb-8" />
 
-      <div className="p-6 mb-4 flex flex-col sm:flex-row items-center gap-6">
-        <Skeleton className="w-22 h-22 rounded-full shrink-0" />
-        <div className="flex-1 w-full">
-          <Skeleton className="h-4 w-28 mb-3" />
-          <Skeleton className="h-7 w-40" />
-        </div>
-      </div>
-
-      <div className="p-6 mb-4">
-        <Skeleton className="h-5 w-24 mb-6" />
-        <div className="pb-4 mb-4">
-          <Skeleton className="h-4 w-32 mb-2" />
-          <Skeleton className="h-4 w-56" />
-        </div>
-        <div>
-          <Skeleton className="h-4 w-24 mb-2" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-      </div>
-
-      <div className="p-6 mb-8">
-        <Skeleton className="h-5 w-28 mb-6" />
-        <Skeleton className="h-4 w-32 mb-4" />
-        <Skeleton className="h-4 w-56" />
-      </div>
-
+      <Skeleton className="w-full sm:w-132 h-56.5 sm:h-34.5 mb-4 rounded-2xl" />
+      <Skeleton className="w-full sm:w-132 h-56.75 mb-4" rounded-2xl />
+      <Skeleton className="w-full sm:w-132 h-38.5 mb-8" rounded-2xl />
       <div className="flex justify-center">
-        <Skeleton className="h-12 w-full sm:w-48 rounded-xl" />
+        <Skeleton className="h-12.5 w-full sm:w-37.5 rounded-xl" />
       </div>
     </div>
   );
