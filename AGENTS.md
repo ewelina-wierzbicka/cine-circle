@@ -82,10 +82,18 @@ series/[id]/             # /series/:id
         page.tsx
       privacy/                # /privacy — static Privacy Policy page (open route)
         page.tsx
+      forgot-password/        # /forgot-password — request password reset email
+        page.tsx
+        ForgotPasswordForm.tsx
+      reset-password/         # /reset-password — set new password after reset link
+        page.tsx
+        ResetPasswordForm.tsx
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
     api/                      # Route Handlers
+      auth/
+        reset-callback/       # GET — exchanges Supabase reset code for session; redirects to /reset-password on success or /login?error=reset_failed on error
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
   globals.css
@@ -101,7 +109,7 @@ series/[id]/             # /series/:id
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
-- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`) — logged-in users are redirected away from these to `/`
+- `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`) — logged-in users are redirected away from these to `/`
 - Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`, `/terms`, `/privacy`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`

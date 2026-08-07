@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     const url = new URL('/login', request.url);
-    url.searchParams.set('rurl', '/');
     url.searchParams.set('error', 'reset_failed');
     return NextResponse.redirect(url);
   }
