@@ -65,10 +65,10 @@ export default function Header({ profile }: HeaderProps) {
             key={href}
             href={href}
             className={twMerge(
-              'px-3 py-1.5 rounded-full text-sm font-sans font-medium tracking-[0.02em] transition-all duration-150',
+              'px-3 py-1.5 rounded-full border text-sm font-sans font-medium tracking-[0.02em] transition-all duration-150',
               match(pathname)
-                ? 'bg-white/4 border border-secondary/50 text-primary'
-                : 'text-secondary hover:text-primary',
+                ? 'border-secondary/50 bg-white/4 text-primary'
+                : 'border-transparent text-secondary hover:text-primary',
             )}
           >
             {label}

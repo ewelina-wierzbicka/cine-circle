@@ -28,7 +28,7 @@ Always read AGENTS.md before starting any task. It contains the project structur
 
 - Read any file in the project
 - Create or edit files following existing conventions
-- Add new routes inside the correct route group (`(with-header-search)` or `(without-header-search)`)
+- Add new routes directly inside the `(app)/` route group (single layout, no sub-groups)
 - Add components to `components/` when shared, colocate when page-specific
 - Add data fetching logic to `services/`
 - Create a PR when done
@@ -50,6 +50,16 @@ Always read AGENTS.md before starting any task. It contains the project structur
 - `params`, `searchParams`, `cookies()`, `headers()` are async in Next.js 16 — always await them
 - No `console.log` — use `console.warn` or `console.error` only when intentional
 - Named exports preferred over default exports (except Next.js page/layout files)
+
+## Cache Components (PPR)
+
+`cacheComponents: true` is set in `next.config.ts`. Partial Prerendering is active. See the "Cache Components (PPR)" section of `AGENTS.md` for the full rules and approved Suspense boundaries; load the `next-cache-components` skill before touching cache boundaries.
+
+- Never use `next: { revalidate }` on fetch calls. Cache TMDB data with the `'use cache'` directive at function level plus `cacheLife` / `cacheTag` from `next/cache`.
+- Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), all `cacheLife('days')`.
+- User-specific Supabase data (cookies/headers) cannot live inside `use cache`. Await the cached TMDB fetch directly in the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`.
+- Use `revalidateTag` with a `cacheLife` profile (e.g. `revalidateTag('posts', 'max')`), or `updateTag()` in Server Actions for immediate invalidation.
+- Do not add `export const dynamic` / `force-dynamic`. PPR handles dynamicity per Suspense boundary. Use `connection()` only when a subtree must opt out of prerendering entirely.
 
 ## Styling rules
 

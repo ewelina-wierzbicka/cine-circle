@@ -159,6 +159,14 @@ All Supabase data fetching and mutation logic lives in `services/`. When adding 
 - Use explicit `.select()` column lists — avoid `select('*')`
 - Co-locate the TypeScript types needed by a service function in `src/types.ts` (or import from there)
 
+### Cache boundaries (PPR)
+
+`cacheComponents: true` is on (see "Cache Components (PPR)" in `AGENTS.md` and the `next-cache-components` skill).
+
+- Service functions that read per-user Supabase data (anything using the server client, which reads cookies/auth) **must not** use the `'use cache'` directive — cookies/headers are forbidden inside `use cache`. They stream to the client via a `<Suspense>` boundary in the page.
+- Only fully public, cacheable data (e.g. TMDB) may use `'use cache'` + `cacheLife` + `cacheTag`. TMDB services (`getTrendingMovies`, `getMovieDetails`, `getSeriesDetails`) are already cached — do not re-add `next: { revalidate }`.
+- `updateTag()` / `revalidateTag('<tag>', '<profile>')` invalidates a cached TMDB entry after a related Supabase mutation (e.g. refresh `movie-<id>` if a mutation affects derived display data) — but reach for this only when the cached data actually depends on the change.
+
 ---
 
 ## TypeScript Integration

@@ -73,6 +73,7 @@ src/
         UserMediaList.tsx
       profile/                # /profile
         page.tsx
+        loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
 series/[id]/             # /series/:id
         page.tsx
@@ -233,6 +234,49 @@ export async function updatePost(id: string) {
   updateTag(`post-${id}`);
 }
 ```
+
+### Cache Components (PPR) — enabled
+
+`cacheComponents: true` is set in `next.config.ts`. Partial Prerendering is active: every route renders a static shell at build time, cached data streams from the edge, and per-request user data streams in via Suspense.
+
+Read `.agents/skills/next-cache-components/SKILL.md` before touching cache boundaries.
+
+**TMDB data is cached with `use cache`** — never use `next: { revalidate }` on fetch calls. The old pattern is gone. Use the directive at function level:
+
+```ts
+import { cacheLife, cacheTag } from 'next/cache';
+
+export async function getMovieDetails(id: string) {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`movie-${id}`);
+  // fetch without next: { revalidate }
+}
+```
+
+Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`). All use `cacheLife('days')`.
+
+**User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
+
+```tsx
+// MediaPage pattern: cached TMDB awaited directly, user data streams
+const tmdbData = await getMovieDetails(id);          // cached, fast
+return (
+  <Suspense fallback={<MediaDetail media={tmdbData} pending />}>
+    <UserEnrichedMedia baseMedia={tmdbData} ... />   // reads cookies, Supabase
+  </Suspense>
+);
+```
+
+**Approved Suspense boundaries (do not remove):**
+
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
+- `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
+- `components/MediaPage.tsx` — TMDB cached fetch awaited directly; `UserEnrichedMedia` (Supabase enrichment via `getEnrichedMedia`) streams via Suspense with a `pending` skeleton.
+
+**`pending` prop** — `MediaDetail` and `MediaInfo` accept `pending` to render a `Skeleton` block for action buttons while user data streams. Pass it from the Suspense fallback.
+
+**Do not add `export const dynamic` / `force-dynamic`** to routes. PPR handles dynamicity per Suspense boundary. Use `connection()` only when a subtree must opt out of prerendering entirely (not currently needed).
 
 ---
 

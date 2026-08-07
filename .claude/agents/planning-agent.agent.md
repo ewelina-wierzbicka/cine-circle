@@ -39,6 +39,14 @@ Assign a task to an agent when the work clearly falls in their domain. A single 
 
 Not every feature needs all four agents. A pure UI change may only need ui-agent. A query optimisation may only need supabase-agent. Assign only what the task actually requires.
 
+### Cache boundaries (PPR)
+
+`cacheComponents: true` is on (see "Cache Components (PPR)" in `AGENTS.md` and the `next-cache-components` skill). When a task adds a route or service that fetches data, keep the cache boundary in the plan:
+
+- **Public cacheable data** (e.g. TMDB) → `'use cache'` + `cacheLife` + `cacheTag`, awaited directly in the parent Server Component. Owner: the agent that owns the service function (TMDB stays with feature-agent; Supabase services stay with supabase-agent).
+- **User-specific Supabase data** (cookies/auth) → must NOT use `'use cache'`; it streams via a `<Suspense>` boundary with a skeleton fallback. Flag which page needs the Suspense boundary and which skeletons are involved (`MediaDetailSkeleton`, `MediaCardSkeleton`, `HeaderSkeleton`, profile skeleton).
+- Never use `next: { revalidate }`. Flag any plan that introduces it.
+
 ## Ownership boundaries
 
 | Concern                                         | Owner                                       |

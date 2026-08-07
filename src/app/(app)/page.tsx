@@ -1,95 +1,28 @@
+import { Suspense } from 'react';
 import { HomeHero } from '@/components/HomeHero';
-import MediaPoster from '@/components/MediaPoster';
-import { toHref } from '@/lib/mediaUtils';
-import { createClient } from '@/lib/supabase/server';
+import { RecentWatched } from '@/components/RecentWatched';
+import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
-import { getUserMediaList } from '@/services/getUserMedia';
-import { TrendingMovie, UserMedia } from '@/types';
-import Link from 'next/link';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
-
-function toRecentPoster(item: UserMedia) {
-  return {
-    title: item.media.title,
-    year: (item.media.release_date ?? '').slice(0, 4),
-    type: item.media.media_type,
-    posterUrl: item.media.poster_path
-      ? `${TMDB_IMAGE_BASE}${item.media.poster_path}`
-      : undefined,
-    id: item.media.tmdb_id,
-  };
-}
+import { TrendingMovie } from '@/types';
 
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const trending = await getTrendingMovies().catch(() => [] as TrendingMovie[]);
 
-  let recentPosters: TrendingMovie[] = [];
-  let hintTitles: { id: number; title: string; type: TrendingMovie['type'] }[] =
-    [];
+  const hintTitles = trending
+    .slice(0, 4)
+    .map(({ id, title, type }) => ({ id, title, type }));
 
-  if (user) {
-    try {
-      const result = await getUserMediaList('watched', 0);
-      recentPosters = result.media.slice(0, 8).map(toRecentPoster);
-    } catch (err) {
-      console.error('Failed to fetch recent posters:', err);
-    }
-  }
-
-  try {
-    const trending = await getTrendingMovies();
-    hintTitles = trending
-      .slice(0, 4)
-      .map(({ id, title, type }) => ({ id, title, type }));
-  } catch (err) {
-    console.error('Failed to fetch trending titles:', err);
-  }
+  const recentPostersPromise = getRecentWatched();
 
   return (
     <div className="min-h-full flex flex-col relative">
       <HomeHero
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        hasRecentMedia={recentPosters.length > 0}
+        recentPostersPromise={recentPostersPromise}
       />
-
-      {recentPosters.length > 0 && (
-        <div className="px-6 md:px-12 pb-8 relative">
-          <div className="flex justify-between mb-4">
-            <span className="font-mono text-sm tracking-[0.2em] text-secondary uppercase">
-              Recently Watched
-            </span>
-            <Link
-              href="/collection"
-              className="font-mono text-sm text-mint tracking-[0.08em] hover:opacity-70 transition-opacity"
-            >
-              SEE ALL →
-            </Link>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {recentPosters.map((poster, i) => {
-              const href = toHref(poster.id, poster.title, poster.type);
-              return (
-                <Link
-                  key={i}
-                  href={href}
-                  className="shrink-0 rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
-                >
-                  <MediaPoster
-                    title={poster.title}
-                    src={poster.posterUrl}
-                    className="w-full h-full max-w-none rounded-xl"
-                    sizes="110px"
-                  />
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <Suspense fallback={null}>
+        <RecentWatched recentPostersPromise={recentPostersPromise} />
+      </Suspense>
     </div>
   );
 }

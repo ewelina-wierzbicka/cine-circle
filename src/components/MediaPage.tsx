@@ -1,5 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { getMediaPageData } from '@/services/getMediaPageData';
+import { Suspense } from 'react';
+import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
+import { getEnrichedMedia } from '@/services/getEnrichedMedia';
+import { NormalizedMedia } from '@/types';
 import { notFound } from 'next/navigation';
 import MediaDetail from './MediaDetail';
 
@@ -13,31 +15,59 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isAuthenticated = !!user;
+  const tmdbData =
+    mediaType === 'series'
+      ? await getSeriesDetails(id)
+      : await getMovieDetails(id);
+  if (!tmdbData) notFound();
 
-  const { data, error, initialStep } = await getMediaPageData(
-    slug,
-    mediaType,
-    step,
-    user?.id ?? null,
-  );
-
-  if (error && !data) throw new Error(error);
+  const initialStep = step === '2' ? 2 : 1;
+  const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
 
   return (
-    <>
-      {data && (
-        <MediaDetail
-          key={slug}
-          media={{ ...data, media_type: mediaType }}
-          initialStep={initialStep}
-          isAuthenticated={isAuthenticated}
-        />
-      )}
-    </>
+    <Suspense
+      fallback={
+        <MediaDetail media={baseMedia} initialStep={initialStep} pending />
+      }
+    >
+      <UserEnrichedMedia
+        baseMedia={baseMedia}
+        tmdbId={Number(id)}
+        mediaType={mediaType}
+        slug={slug}
+        initialStep={initialStep}
+      />
+    </Suspense>
+  );
+}
+
+type UserEnrichedMediaProps = {
+  baseMedia: NormalizedMedia;
+  tmdbId: number;
+  mediaType: 'movie' | 'series';
+  slug: string;
+  initialStep: 1 | 2;
+};
+
+async function UserEnrichedMedia({
+  baseMedia,
+  tmdbId,
+  mediaType,
+  slug,
+  initialStep,
+}: UserEnrichedMediaProps) {
+  const { media, isAuthenticated } = await getEnrichedMedia(
+    baseMedia,
+    tmdbId,
+    mediaType,
+  );
+
+  return (
+    <MediaDetail
+      key={slug}
+      media={media}
+      initialStep={initialStep}
+      isAuthenticated={isAuthenticated}
+    />
   );
 }

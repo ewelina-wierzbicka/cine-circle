@@ -1,3 +1,4 @@
+import { cacheLife, cacheTag } from 'next/cache';
 import { TrendingMovie } from '@/types';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -24,14 +25,15 @@ type TmdbTrendingResponse = {
 };
 
 export async function getTrendingMovies(): Promise<TrendingMovie[]> {
+  'use cache';
+  cacheLife('days');
+  cacheTag('trending-movies');
+
   const headers = { Authorization: `Bearer ${getTmdbToken()}` };
 
   const trendingRes = await fetch(
     `${TMDB_BASE_URL}/trending/all/week?language=en-US`,
-    {
-      headers,
-      next: { revalidate: 86400, tags: ['trending-movies'] },
-    },
+    { headers },
   );
 
   if (!trendingRes.ok) {
