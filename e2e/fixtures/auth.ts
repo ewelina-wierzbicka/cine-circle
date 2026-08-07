@@ -16,8 +16,11 @@ type SetCookie = { name: string; value: string; options?: { maxAge?: number } };
 
 // Log in via Supabase REST (signInWithPassword), capturing the exact cookies
 // @supabase/ssr would write so the app's server client reads a valid session.
-// No UI involved.
-async function sessionCookies(): Promise<Cookie[]> {
+// No UI involved. Shared by the persistent-user and isolated-user fixtures.
+export async function sessionCookiesFor(
+  email: string,
+  password: string,
+): Promise<Cookie[]> {
   const jar: SetCookie[] = [];
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
@@ -28,10 +31,7 @@ async function sessionCookies(): Promise<Cookie[]> {
     },
   });
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: TEST_USER_EMAIL,
-    password: TEST_USER_PASSWORD,
-  });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
 
   return jar.map(({ name, value, options }) => ({
@@ -53,7 +53,9 @@ export const test = base.extend<{
   isolatedUser: IsolatedUser;
 }>({
   authedPage: async ({ context }, use) => {
-    await context.addCookies(await sessionCookies());
+    await context.addCookies(
+      await sessionCookiesFor(TEST_USER_EMAIL, TEST_USER_PASSWORD),
+    );
     const page = await context.newPage();
     // eslint-disable-next-line react-hooks/rules-of-hooks -- `use` is Playwright's fixture callback, not a React hook
     await use(page);

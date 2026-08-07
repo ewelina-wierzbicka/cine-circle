@@ -1,45 +1,10 @@
-import { createServerClient } from '@supabase/ssr';
-import { test as base, expect, type Cookie, type Page } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
 import { admin } from '../admin';
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../env';
+import { sessionCookiesFor } from './auth';
 
 // A fresh, pre-confirmed Supabase user per test, authed and torn down after.
 // Mutating collection flows use this so they never pollute the shared user or
-// each other. Mirrors the cookie-capture trick from fixtures/auth.ts but for
-// arbitrary credentials.
-
-type SetCookie = { name: string; value: string; options?: { maxAge?: number } };
-
-async function sessionCookiesFor(
-  email: string,
-  password: string,
-): Promise<Cookie[]> {
-  const jar: SetCookie[] = [];
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll: () => jar.map(({ name, value }) => ({ name, value })),
-      setAll: (cookies) => {
-        jar.push(...cookies);
-      },
-    },
-  });
-
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) throw error;
-
-  return jar.map(({ name, value, options }) => ({
-    name,
-    value,
-    domain: 'localhost',
-    path: '/',
-    httpOnly: false,
-    secure: false,
-    sameSite: 'Lax' as const,
-    expires: options?.maxAge
-      ? Math.floor(Date.now() / 1000) + options.maxAge
-      : -1,
-  }));
-}
+// each other. Cookie capture is shared with fixtures/auth.ts.
 
 type IsolatedUser = { id: string; email: string; page: Page };
 
