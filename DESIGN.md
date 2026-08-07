@@ -296,6 +296,7 @@ export const motion = {
 - `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files and by Suspense fallbacks (e.g. `MediaInfo` action buttons while user data streams under PPR).
 - `src/components/MediaDetailSkeleton.tsx` — full movie/series detail skeleton mirroring `MediaDetailWrapper`: same radial gradient backdrop, rotated poster placeholder on the left (`h-[50vh]` on mobile, `md:w-1/2`), and a `MediaInfoHeader`-shaped skeleton column on the right (back link, genre pills, type eyebrow, serif title, meta row, mint divider, overview lines).
 - `src/components/MediaCardSkeleton.tsx` — single `MediaCard`-shaped skeleton: `aspect-2/3` poster block plus two title/meta lines. Used by the `search` and `collection` `loading.tsx` grids (12 cells, matching `MediaList` breakpoints).
+- `src/components/RecentWatchedSkeleton.tsx` — fixed-height (`~237px`) skeleton mirroring the home `RecentWatched` strip: same `px-6 md:px-12 pb-8` shell, `mb-4` header row (two `h-5` bars), and one row of six `w-27.5 h-41.25` poster placeholders (`gap-3`, `overflow-hidden`). Used as the `<Suspense>` fallback on the home page so the strip streams in without layout shift; users with zero recent items collapse from this height to 0.
 - Route skeletons:
   - `src/app/(app)/movie/[id]/loading.tsx` renders `<MediaDetailSkeleton />`.
   - `src/app/(app)/series/[id]/loading.tsx` renders `<MediaDetailSkeleton />` (identical layout to the movie route).
@@ -378,7 +379,7 @@ Search
 Recently Watched
 
 - Streams in via Suspense under PPR. `page.tsx` awaits `getTrendingMovies()` (cached `use cache`) to build the hero `hintTitles`, then hands `getRecentWatched()` (Supabase, per-user) as a promise to `RecentWatched`.
-- `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
+- `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={<RecentWatchedSkeleton />}>`; it `await`s the promise and renders nothing when empty. The fixed-height `RecentWatchedSkeleton` (~237px) mirrors the populated strip so resolving the promise produces no shift; users with zero recent items get one small collapse to 0.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
 - Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-mint tracking-[0.08em]`.

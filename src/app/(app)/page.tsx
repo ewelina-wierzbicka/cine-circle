@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
+import { RecentWatchedSkeleton } from '@/components/RecentWatchedSkeleton';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
@@ -20,7 +21,7 @@ export default async function Home() {
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
         recentPostersPromise={recentPostersPromise}
       />
-      <Suspense fallback={null}>
+      <Suspense fallback={<RecentWatchedSkeleton />}>
         <RecentWatched recentPostersPromise={recentPostersPromise} />
       </Suspense>
     </div>
