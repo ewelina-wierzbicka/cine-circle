@@ -1,12 +1,16 @@
 import { test as base, expect, type Page } from '@playwright/test';
-import { admin } from '../admin';
-import { sessionCookiesFor } from './auth';
+import { admin, deleteUserByEmail } from '../admin';
+import { sessionCookiesFor } from './session';
 
-// A fresh, pre-confirmed Supabase user per test, authed and torn down after.
-// Mutating collection flows use this so they never pollute the shared user or
-// each other. Cookie capture is shared with fixtures/auth.ts.
-
-type IsolatedUser = { id: string; email: string; page: Page };
+// A fresh, pre-confirmed Supabase user per test, authed with its own page and
+// torn down after. Mutating and destructive flows use this so they never
+// pollute the shared user or each other.
+export type IsolatedUser = {
+  id: string;
+  email: string;
+  password: string;
+  page: Page;
+};
 
 export const test = base.extend<{ isolatedUser: IsolatedUser }>({
   isolatedUser: async ({ context }, use, testInfo) => {
@@ -29,9 +33,10 @@ export const test = base.extend<{ isolatedUser: IsolatedUser }>({
     const page = await context.newPage();
 
     // eslint-disable-next-line react-hooks/rules-of-hooks -- `use` is Playwright's fixture callback, not a React hook
-    await use({ id: userId, email, page });
+    await use({ id: userId, email, password, page });
 
-    await admin.auth.admin.deleteUser(userId);
+    // Idempotent: the delete-account test removes the user itself.
+    await deleteUserByEmail(email);
   },
 });
 
