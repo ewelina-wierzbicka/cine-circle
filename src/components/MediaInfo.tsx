@@ -90,8 +90,8 @@ export default function MediaInfo({
           aria-busy="true"
           aria-live="polite"
         >
-          <Skeleton className="h-12 rounded-xl flex-1" />
-          <Skeleton className="h-12 rounded-xl flex-1" />
+          <Skeleton className="h-12 w-full sm:w-44 rounded-xl" />
+          <Skeleton className="h-12 w-full sm:w-36 rounded-xl" />
         </div>
       ) : !isAuthenticated ? (
         <div className="flex flex-col gap-3 pt-3">
