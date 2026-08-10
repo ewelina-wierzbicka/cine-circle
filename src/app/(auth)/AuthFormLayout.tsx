@@ -36,13 +36,13 @@ export default async function AuthFormLayout({
         >
           <Image
             src="/logo.png"
-            alt="cineCircle logo"
+            alt="MidnightFrame logo"
             width={26}
             height={26}
             className="object-contain"
           />
           <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-            cineCircle
+            MidnightFrame
           </span>
         </Link>
 
