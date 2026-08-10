@@ -68,6 +68,12 @@ export function ResetPasswordForm() {
                 value: 8,
                 message: 'Password must be at least 8 characters',
               },
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/,
+                message:
+                  'Password must contain uppercase, lowercase, number, and special character',
+              },
             })}
             error={errors.password?.message}
           />

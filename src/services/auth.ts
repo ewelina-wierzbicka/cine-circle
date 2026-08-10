@@ -72,6 +72,14 @@ export async function updatePasswordAfterReset(
 
   if (!user) return { error: 'Reset link expired or invalid' };
 
+  // Only allow password update from a recovery session, not any authenticated session
+  const { data: aal } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const isRecovery = aal?.currentAuthenticationMethods?.some((m) =>
+    typeof m === 'string' ? m === 'recovery' : m.method === 'recovery',
+  );
+  if (!isRecovery) return { error: 'Reset link expired or invalid' };
+
   const { error } = await supabase.auth.updateUser({ password: newPassword });
 
   if (error) {
