@@ -19,4 +19,3 @@ const authedTest = base.extend<{ authedPage: Page }>({
 // One import gives specs both `authedPage` and `isolatedUser`.
 export const test = mergeTests(authedTest, isolatedTest);
 export { expect };
-export type { IsolatedUser } from './isolatedUser';
