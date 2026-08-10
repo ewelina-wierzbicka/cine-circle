@@ -5,12 +5,13 @@ import Input from '@/components/Input';
 import { Link } from '@/components/Link';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 export function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const rurl = searchParams.get('rurl') ?? undefined;
   const errorParam = searchParams.get('error');
@@ -19,8 +20,11 @@ export function LoginForm() {
   useEffect(() => {
     if (errorParam === 'reset_failed') {
       toast.error('Password reset failed. Please try again.');
+      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
     }
-  }, [errorParam]);
+    // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const {
     register,
     handleSubmit,

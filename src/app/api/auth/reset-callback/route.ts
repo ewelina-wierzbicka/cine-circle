@@ -5,7 +5,9 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
 
   if (!code) {
-    return NextResponse.redirect(new URL('/forgot-password', request.url));
+    return NextResponse.redirect(
+      new URL('/login?error=reset_failed', request.url),
+    );
   }
 
   const supabase = await createClient();

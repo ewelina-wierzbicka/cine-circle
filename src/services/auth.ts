@@ -1,7 +1,6 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export async function login(email: string, password: string, rurl?: string) {
@@ -41,13 +40,11 @@ export async function sendPasswordReset(
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
 
-  let origin = process.env.NEXT_PUBLIC_SITE_URL ?? '';
-  if (!origin) {
-    const headersList = await headers();
-    const proto = headersList.get('x-forwarded-proto') ?? 'https';
-    const host = headersList.get('host') ?? '';
-    if (host) origin = `${proto}://${host}`;
-  }
+  const origin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!origin)
+    return {
+      error: 'Server misconfiguration: NEXT_PUBLIC_SITE_URL is not set.',
+    };
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/auth/reset-callback`,
