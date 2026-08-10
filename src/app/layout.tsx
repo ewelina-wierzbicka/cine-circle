@@ -28,7 +28,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CineCircle',
+  title: 'MidnightFrame',
   description: "Let's watch some movies",
 };
 

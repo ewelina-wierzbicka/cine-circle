@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Privacy Policy — CineCircle',
+  title: 'Privacy Policy — MidnightFrame',
 };
 
 type Section = { heading: string; body: string };
@@ -11,7 +11,7 @@ const sections: Section[] = [
   },
   {
     heading: 'How We Use It',
-    body: 'Your data is used solely to provide the CineCircle service: showing your collection, powering search, and personalising your experience. We do not sell or rent your personal data to third parties.',
+    body: 'Your data is used solely to provide the MidnightFrame service: showing your collection, powering search, and personalising your experience. We do not sell or rent your personal data to third parties.',
   },
   {
     heading: 'Storage',
@@ -31,7 +31,7 @@ const sections: Section[] = [
   },
   {
     heading: 'Contact',
-    body: 'For any privacy questions, reach us at info.cineCircle@gmail.com',
+    body: 'For any privacy questions, reach us at info.midnightframe@gmail.com',
   },
 ];
 
