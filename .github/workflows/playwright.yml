@@ -12,6 +12,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
