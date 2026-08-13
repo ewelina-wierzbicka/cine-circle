@@ -14,10 +14,14 @@ export type IsolatedUser = { email: string; password: string };
 
 type SetCookie = { name: string; value: string; options?: { maxAge?: number } };
 
-// Log in via Supabase REST (signInWithPassword), capturing the exact cookies
-// @supabase/ssr would write so the app's server client reads a valid session.
+// Run a Supabase auth call through a cookie jar, returning the exact cookies
+// @supabase/ssr would write so the app's server client reads the session.
 // No UI involved.
-async function sessionCookies(): Promise<Cookie[]> {
+async function captureCookies(
+  authenticate: (
+    supabase: ReturnType<typeof createServerClient>,
+  ) => Promise<{ error: unknown }>,
+): Promise<Cookie[]> {
   const jar: SetCookie[] = [];
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
@@ -28,10 +32,7 @@ async function sessionCookies(): Promise<Cookie[]> {
     },
   });
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: TEST_USER_EMAIL,
-    password: TEST_USER_PASSWORD,
-  });
+  const { error } = await authenticate(supabase);
   if (error) throw error;
 
   return jar.map(({ name, value, options }) => ({
@@ -46,6 +47,22 @@ async function sessionCookies(): Promise<Cookie[]> {
       ? Math.floor(Date.now() / 1000) + options.maxAge
       : -1,
   }));
+}
+
+// Cookies for a password (AMR 'password') session. The reset-password gate
+// only accepts a 'recovery' AMR session, so this is deliberately non-recovery.
+export function passwordSessionCookies(
+  email: string,
+  password: string,
+): Promise<Cookie[]> {
+  return captureCookies((supabase) =>
+    supabase.auth.signInWithPassword({ email, password }),
+  );
+}
+
+// Cookies for the shared persistent user.
+function sessionCookies(): Promise<Cookie[]> {
+  return passwordSessionCookies(TEST_USER_EMAIL, TEST_USER_PASSWORD);
 }
 
 export const test = base.extend<{
