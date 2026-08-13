@@ -310,28 +310,11 @@ export const motion = {
 ## Auth Error Pages
 
 - Routes: `/login/error`, `/register/error`, `/forgot-password/error`, `/reset-password/error` — auth failure pages within the `(auth)` route group.
-- Client components (`'use client'`) — CTA calls `reset()`, secondary link uses `next/link`.
+- Rendered via `AuthErrorState` (`src/components/AuthErrorState.tsx`) — shared client component; accepts `error`, `reset`, `eyebrow`, `title`, and `ctaLabel` props.
 - Layout: full-screen `fixed inset-0`, centered content column `max-w-[380px] text-center`, `animate-fade-up`.
-- Background: `bg-dark` + 48px grid overlay (`rgba(255,255,255,0.07)`, `opacity-40`) + bottom-center radial glow in error-red (`oklch(65% 0.18 25 / 0.10)`).
-- Logo: absolute top-left (`top-7 left-6`), identical to `AuthFormLayout`.
-- Icon: `LockXIcon` (`src/icons/LockX.tsx`) 52×52, `text-error`, centered with `mb-5`.
-- Eyebrow: `font-mono text-sm uppercase tracking-[0.22em] text-error mb-6`.
-  - Login: "SIGN-IN FAILED"
-  - Register: "ACCOUNT NOT CREATED"
-  - Forgot password: "REQUEST FAILED"
-  - Reset password: "RESET FAILED"
-- Title: `font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em] mb-3.5` with `<em class="text-error">` for the key word.
-  - Login: "Couldn't _verify_ you"
-  - Register: "Couldn't _create_ your account"
-  - Forgot password: "Couldn't send your _reset link_"
-  - Reset password: "Couldn't _reset_ your password"
-- Body: `text-sm leading-relaxed text-secondary mb-7` — "Something on our end failed. Try again, or continue as a guest."
-- CTA button: `Button` component with `handleClick={reset}`.
-  - Login: "Return to sign in"
-  - Register: "Return to register"
-  - Forgot password: "Return to reset password"
-  - Reset password: "Try again"
-- Secondary: `Link` "Continue as guest" → `/`, `text-sm text-secondary hover:text-primary`.
+- Background: `bg-dark` + 48px grid overlay + bottom-center radial glow in error-red.
+- Icon: `LockXIcon`, `text-error`. Body copy: "Something on our end failed. Try again, or continue as a guest."
+- CTA calls `reset()`; secondary "Continue as guest" link goes to `/`.
 
 ---
 
