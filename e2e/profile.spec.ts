@@ -21,15 +21,10 @@ test.describe('profile', () => {
   });
 
   test('T11 delete account redirects and blocks re-login', async ({
-    page,
     isolatedUser,
   }) => {
-    // Log in as the throwaway user via the UI.
-    await page.goto('/login');
-    await page.getByLabel('Email').fill(isolatedUser.email);
-    await page.getByLabel('Password').fill(isolatedUser.password);
-    await page.getByRole('button', { name: 'SIGN IN' }).click();
-    await page.waitForURL('/');
+    // Throwaway user is already authed on its own page.
+    const { page } = isolatedUser;
 
     await page.goto('/profile');
 
