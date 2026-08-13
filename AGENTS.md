@@ -60,9 +60,11 @@ src/
       forgot-password/         # /forgot-password — request a reset link
         page.tsx
         ForgotPasswordForm.tsx
+        error.tsx              # error boundary for /forgot-password — request failure UI
       reset-password/          # /reset-password — set a new password (reached via email link → reset-callback)
         page.tsx
         ResetPasswordForm.tsx
+        error.tsx              # error boundary for /reset-password — reset failure UI
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
