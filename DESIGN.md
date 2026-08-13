@@ -309,23 +309,12 @@ export const motion = {
 
 ## Auth Error Pages
 
-- Routes: `/login/error` and `/register/error` — auth failure pages within the `(auth)` route group.
-- Server components — no client interactivity; CTA and secondary link use `next/link`.
+- Routes: `/login/error`, `/register/error`, `/forgot-password/error`, `/reset-password/error` — auth failure pages within the `(auth)` route group.
+- Rendered via `AuthErrorState` (`src/components/AuthErrorState.tsx`) — shared client component; accepts `error`, `reset`, `eyebrow`, `title`, and `ctaLabel` props.
 - Layout: full-screen `fixed inset-0`, centered content column `max-w-[380px] text-center`, `animate-fade-up`.
-- Background: `bg-dark` + 48px grid overlay (`rgba(255,255,255,0.07)`, `opacity-40`) + bottom-center radial glow in error-red (`oklch(65% 0.18 25 / 0.10)`).
-- Logo: absolute top-left (`top-7 left-6`), identical to `AuthFormLayout`.
-- Icon: `LockXIcon` (`src/icons/LockX.tsx`) 52×52, `text-error`, centered with `mb-5`.
-- Eyebrow: `font-mono text-sm uppercase tracking-[0.22em] text-error mb-6`.
-  - Login: "SIGN-IN FAILED"
-  - Register: "ACCOUNT NOT CREATED"
-- Title: `font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em] mb-3.5` with `<em class="text-error">` for the key word.
-  - Login: "Couldn't _verify_ you"
-  - Register: "Couldn't _create_ your account"
-- Body: `text-sm leading-relaxed text-secondary mb-7`.
-- CTA button: `Button` component.
-  - Login: "RETURN TO SIGN IN" → `/login`
-  - Register: "RETURN TO REGISTER" → `/register`
-- Secondary: `Link` "Continue as guest" → `/`, `text-sm text-secondary hover:text-primary`.
+- Background: `bg-dark` + 48px grid overlay + bottom-center radial glow in error-red.
+- Icon: `LockXIcon`, `text-error`. Body copy: "Something on our end failed. Try again, or continue as a guest."
+- CTA calls `reset()`; secondary "Continue as guest" link goes to `/`.
 
 ---
 
@@ -350,6 +339,16 @@ Right column (Visuals)
 - 3×2 grid of `MediaPoster` components; each tile fills its cell.
 - Two overlay gradients: a right-to-left dark fade and a top/bottom vignette applied via absolute layers.
 - Top-left logo (26×26) and `font-mono` wordmark are positioned absolutely.
+
+---
+
+## Forgot Password / Reset Password
+
+Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients.
+
+- `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
+- `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
+- Both: `font-serif text-6xl` title with mint `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` mint medium CTA, "Back to Sign in" footer link.
 
 ---
 

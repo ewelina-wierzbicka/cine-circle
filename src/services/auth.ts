@@ -34,3 +34,62 @@ export async function logout() {
   await supabase.auth.signOut();
   redirect('/login');
 }
+
+export async function sendPasswordReset(
+  email: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!origin)
+    return {
+      error: 'Server misconfiguration: NEXT_PUBLIC_SITE_URL is not set.',
+    };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/api/auth/reset-callback`,
+  });
+
+  // ponytail: treat user-not-found as success to prevent account enumeration
+  if (error && !error.message.toLowerCase().includes('user not found')) {
+    return { error: error.message };
+  }
+
+  return {};
+}
+
+export async function updatePasswordAfterReset(
+  newPassword: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: 'Reset link expired or invalid' };
+
+  // Only allow password update from a recovery session, not any authenticated session
+  const { data: aal } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  const isRecovery = aal?.currentAuthenticationMethods?.some((m) =>
+    typeof m === 'string' ? m === 'recovery' : m.method === 'recovery',
+  );
+  if (!isRecovery) return { error: 'Reset link expired or invalid' };
+
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    const msg = error.message.includes('at least one character of each')
+      ? 'Password should be at least 8 characters. It must contain uppercase, lowercase, number, and special character.'
+      : error.message;
+    return { error: msg };
+  }
+
+  return {};
+}
+
+export async function signOutOnly(): Promise<void> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+}

@@ -7,16 +7,16 @@ type Props = {
   reset: () => void;
 };
 
-export default function LoginError({ reset }: Props) {
+export default function ForgotPasswordError({ reset }: Props) {
   return (
     <AuthErrorState
-      eyebrow="Sign-in failed"
+      eyebrow="Request failed"
       title={
         <>
-          Couldn&rsquo;t <em className="text-error">verify</em> you
+          Couldn&rsquo;t send your <em className="text-error">reset link</em>
         </>
       }
-      ctaLabel="Return to sign in"
+      ctaLabel="Return to reset password"
       reset={reset}
     />
   );
