@@ -344,42 +344,11 @@ Right column (Visuals)
 
 ## Forgot Password / Reset Password
 
-Both reuse `(auth)/AuthFormLayout.tsx` so they get the same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), the top-left logo, and the shared overlay gradients. Each page is a thin wrapper rendering `AuthFormLayout` with the form as its child.
+Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients.
 
-### Forgot Password (`/forgot-password`)
-
-- Implemented by `src/app/(auth)/forgot-password/page.tsx` → `ForgotPasswordForm.tsx` (client).
-- Route is in `AUTH_ROUTES` — authenticated users are redirected to `/`.
-- Title: `font-serif text-6xl` with mint-emphasized word — "Reset your _password_".
-- Subtext: `text-base text-secondary` — "Enter your email and we'll send a reset link."
-- Single `email` field with `font-mono text-sm` label and email-pattern validation; uses `Input`.
-- Submit calls `sendPasswordReset` (services/auth.ts); on success the form flips to a "Check your _inbox_" confirmation state, on error shows `toast.error`.
-- CTA: `Button` mint medium — "SEND RESET LINK".
-- Footer: `Back to <Link href="/login">Sign in</Link>` (`text-sm text-secondary`, mint link).
-
-Confirmation state (after email submitted)
-
-- Header: mint-tinted `EnvelopeIcon` in a `rounded-xl bg-mint/10 border border-mint/20` chip, then `font-serif text-4xl` "Check your _inbox_" and `text-sm text-secondary` subtext "A reset link is on its way."
-- Body: `text-sm text-secondary leading-relaxed` explanation sentence.
-- Tip card: `bg-bg2 border border-white/[0.07] rounded-xl p-3.5` with a `font-mono text-sm uppercase tracking-[0.14em] text-secondary` label "Didn't receive it?" and `text-sm text-secondary` body "Check your spam folder. It may take a few minutes to arrive."
-- Footer: `Back to <Link href="/login">Sign in</Link>`.
-
-### Reset Password (`/reset-password`)
-
-- Implemented by `src/app/(auth)/reset-password/page.tsx` → `ResetPasswordForm.tsx` (client).
-- Not in `AUTH_ROUTES` — reached only after `reset-callback` exchanges the email-link code for a session, so the user is authenticated when landing here. On callback failure, the handler redirects to `/login?error=reset_failed`.
-- Title: `font-serif text-6xl` with mint-emphasized word — "Choose a new _password_".
-- Subtext: `text-base text-secondary` — "At least 8 characters with uppercase, lowercase, number, and special character." Mirrors the full Supabase password policy.
-- Two `Input` password fields with `font-mono text-sm` labels ("New password", "Confirm password"):
-  - `password` — `required` + `minLength 8` validation.
-  - `confirmPassword` — `required` + matches `password` via `getValues('password')` (not `watch()`) to avoid the lint warning.
-- Submit calls `updatePasswordAfterReset`; on error shows `toast.error` and re-enables the form, on success shows `toast.success('Password updated. Please sign in.')`, then calls `signOutOnly` (services/auth.ts) to end the now-live recovery session and `router.push('/login')` (so the toast lands on the login page, not the authed home).
-- CTA: `Button` mint medium — "SET NEW PASSWORD".
-- Footer: `Back to <Link href="/login">Sign in</Link>`.
-
-### Login error param
-
-- `LoginForm` reads `error` from `useSearchParams`; when it equals `reset_failed` it surfaces `toast.error('Password reset failed. Please try again.')` once on mount via `useEffect`. Other params (e.g. `rurl`) keep their existing behavior.
+- `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
+- `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
+- Both: `font-serif text-6xl` title with mint `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` mint medium CTA, "Back to Sign in" footer link.
 
 ---
 
