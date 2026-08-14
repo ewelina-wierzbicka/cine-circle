@@ -1,4 +1,4 @@
-# CineCircle
+# MidnightFrame
 
 A web app for tracking and sharing watched movies with friends.
 

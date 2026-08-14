@@ -47,13 +47,13 @@ export default function Header({ profile }: HeaderProps) {
       <Link href="/" className="flex items-center gap-2.5">
         <Image
           src="/logo.png"
-          alt="cineCircle logo"
+          alt="MidnightFrame logo"
           width={26}
           height={26}
           className="object-contain"
         />
         <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-          cineCircle
+          MidnightFrame
         </span>
       </Link>
       <nav

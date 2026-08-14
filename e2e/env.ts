@@ -41,6 +41,6 @@ export const SUPABASE_ANON_KEY = required('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 export const SUPABASE_SERVICE_KEY = required('SUPABASE_SECRET_KEY');
 
 export const TEST_USER_EMAIL =
-  process.env.TEST_USER_EMAIL ?? 'e2e-persistent@cinecircle.test';
+  process.env.TEST_USER_EMAIL ?? 'e2e-persistent@midnightframe.test';
 export const TEST_USER_PASSWORD =
   process.env.TEST_USER_PASSWORD ?? 'E2ePersistent!1';

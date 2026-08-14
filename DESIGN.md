@@ -1,6 +1,6 @@
-# cineCircle — Design System & Screen Specs
+# MidnightFrame — Design System & Screen Specs
 
-> **This document is a complete design reference** for implementing the cineCircle app UI in a React codebase.
+> **This document is a complete design reference** for implementing the MidnightFrame app UI in a React codebase.
 
 ---
 

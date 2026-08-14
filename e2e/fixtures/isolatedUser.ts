@@ -16,7 +16,7 @@ export const test = base.extend<{ isolatedUser: IsolatedUser }>({
   isolatedUser: async ({ context }, use, testInfo) => {
     const email = `e2e-iso-${Date.now()}-${testInfo.workerIndex}-${Math.random()
       .toString(36)
-      .slice(2, 8)}@cinecircle.test`;
+      .slice(2, 8)}@midnightframe.test`;
     const password = 'E2eIsolated!1';
 
     const { data, error } = await admin.auth.admin.createUser({
