@@ -1,5 +1,5 @@
 import { test, expect, passwordSessionCookies } from './fixtures/auth';
-import { deleteUserByEmail } from './admin';
+import { deleteUserByEmail, resetPasswordViaRecovery } from './admin';
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from './env';
 
 // Strong password satisfying: upper, lower, digit, special, 8+ chars.
@@ -179,5 +179,34 @@ test.describe('auth', () => {
 
     await expect(page.getByText('Reset link expired or invalid')).toBeVisible();
     await expect(page).toHaveURL('/reset-password');
+  });
+
+  test('T9 reset happy path: new password logs in, old one fails', async ({
+    page,
+    context,
+    isolatedUser,
+  }) => {
+    const newPassword = 'N3w!pass99';
+
+    // Complete the reset via a real recovery-token session (same Supabase
+    // change the form makes). The emailed PKCE code is unavailable offline, so
+    // the form's success click cannot run here; this proves the outcome.
+    await resetPasswordViaRecovery(isolatedUser.email, newPassword);
+
+    // The isolatedUser fixture seeded this user's session on the context; clear
+    // it so /login renders instead of redirecting an already-authed user.
+    await context.clearCookies();
+    await page.goto('/login');
+
+    // Old password no longer works.
+    await page.getByLabel('Email').fill(isolatedUser.email);
+    await page.getByLabel('Password').fill(isolatedUser.password);
+    await page.getByRole('button', { name: 'SIGN IN' }).click();
+    await expect(page.getByText('Invalid login credentials')).toBeVisible();
+
+    // New password logs in.
+    await page.getByLabel('Password').fill(newPassword);
+    await page.getByRole('button', { name: 'SIGN IN' }).click();
+    await page.waitForURL('/');
   });
 });
