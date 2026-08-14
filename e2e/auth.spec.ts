@@ -42,7 +42,7 @@ test.describe('auth', () => {
     ).toBeVisible();
 
     // Wrong credentials -> Supabase error toast.
-    await page.getByLabel('Email').fill('nobody@cinecircle.test');
+    await page.getByLabel('Email').fill('nobody@midnightframe.test');
     await page.getByLabel('Password').fill('WrongPass!1');
     await signIn.click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
@@ -50,7 +50,7 @@ test.describe('auth', () => {
   });
 
   test('T3 registration validation + confirm-email', async ({ page }) => {
-    const newEmail = `reg-${Date.now()}@cinecircle.test`;
+    const newEmail = `reg-${Date.now()}@midnightframe.test`;
     await page.goto('/register');
     const createAccount = page.getByRole('button', { name: 'CREATE ACCOUNT' });
 

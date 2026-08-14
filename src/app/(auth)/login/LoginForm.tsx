@@ -5,15 +5,26 @@ import Input from '@/components/Input';
 import { Link } from '@/components/Link';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 export function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const rurl = searchParams.get('rurl') ?? undefined;
+  const errorParam = searchParams.get('error');
   const [isPending, setIsPending] = useState(false);
+
+  useEffect(() => {
+    if (errorParam === 'reset_failed') {
+      toast.error('Password reset failed. Please try again.');
+      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+    }
+    // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const {
     register,
     handleSubmit,
@@ -66,12 +77,20 @@ export function LoginForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="password"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
-            Password
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="password"
+              className="font-mono text-sm uppercase tracking-[0.14em] text-secondary"
+            >
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-sm text-secondary hover:text-primary"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input id="password" type="password" {...register('password')} />
         </div>
 

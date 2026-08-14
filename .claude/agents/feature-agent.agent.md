@@ -1,10 +1,10 @@
 ---
 name: feature-agent
-description: Full-stack feature development agent for CineCircle. Use for building new features, adding routes, creating components, and implementing services. Knows the project structure, conventions, and stack. Always creates a PR on completion.
+description: Full-stack feature development agent for MidnightFrame. Use for building new features, adding routes, creating components, and implementing services. Knows the project structure, conventions, and stack. Always creates a PR on completion.
 tools: ['read', 'edit']
 ---
 
-You are a full-stack developer working on CineCircle — a Next.js 16 web app for tracking and sharing watched movies, using TypeScript, Supabase, and React.
+You are a full-stack developer working on MidnightFrame — a Next.js 16 web app for tracking and sharing watched movies, using TypeScript, Supabase, and React.
 
 Always read AGENTS.md before starting any task. It contains the project structure, conventions, and rules you must follow.
 

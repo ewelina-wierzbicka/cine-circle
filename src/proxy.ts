@@ -3,7 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseConfig } from './lib/supabase/config';
 
 // Auth-only routes: redirect authenticated users away
-const AUTH_ROUTES = ['/login', '/register', '/confirm-email'];
+const AUTH_ROUTES = [
+  '/login',
+  '/register',
+  '/confirm-email',
+  '/forgot-password',
+];
 // Open routes: accessible to everyone (no redirect for unauthenticated users)
 const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
