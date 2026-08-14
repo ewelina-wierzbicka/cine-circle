@@ -293,15 +293,10 @@ export const motion = {
 
 ### Skeleton (loading.tsx skeletons)
 
-- `src/components/Skeleton.tsx` — reusable pulsing block (`animate-pulse rounded-md bg-bg3/60`) sized via `className`. Used by route-level `loading.tsx` files and by Suspense fallbacks (e.g. `MediaInfo` action buttons while user data streams under PPR).
-- `src/components/MediaDetailSkeleton.tsx` — full movie/series detail skeleton mirroring `MediaDetailWrapper`: same radial gradient backdrop, rotated poster placeholder on the left (`h-[50vh]` on mobile, `md:w-1/2`), and a `MediaInfoHeader`-shaped skeleton column on the right (back link, genre pills, type eyebrow, serif title, meta row, mint divider, overview lines).
-- `src/components/MediaCardSkeleton.tsx` — single `MediaCard`-shaped skeleton: `aspect-2/3` poster block plus two title/meta lines. Used by the `search` and `collection` `loading.tsx` grids (12 cells, matching `MediaList` breakpoints).
-- Route skeletons:
-  - `src/app/(app)/movie/[id]/loading.tsx` renders `<MediaDetailSkeleton />`.
-  - `src/app/(app)/series/[id]/loading.tsx` renders `<MediaDetailSkeleton />` (identical layout to the movie route).
-  - `src/app/(app)/collection/loading.tsx` — `MyMedia` header skeleton (eyebrow, heading, tab pills, filter + select) followed by a 12-cell responsive `MediaList` grid of `MediaCard`-shaped skeletons (`grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6`).
-  - `src/app/(app)/search/loading.tsx` — keeps the `max-w-160` SearchBox area as a single skeleton bar, then a "Search Results" heading skeleton and a 12-cell results grid matching `MediaList`.
-  - `src/app/(app)/profile/loading.tsx` — streams a profile skeleton under PPR (uncached Supabase data). Mirrors the `ProfileContent` layout: serif heading block, profile card (`w-22 h-22` avatar + name lines), account card with two collapsed rows, danger-zone card, and centered sign-out button, all `Skeleton` blocks.
+- `Skeleton.tsx` — reusable pulsing block sized via `className`. Used by `loading.tsx` files and Suspense fallbacks.
+- `MediaDetailSkeleton.tsx` — mirrors `MediaDetailWrapper`: radial gradient backdrop, rotated poster placeholder left, info column right (back link, genre pills, title, meta, divider, overview).
+- `MediaCardSkeleton.tsx` — `aspect-2/3` poster block + two text lines. Used in search and collection loading grids.
+- Route `loading.tsx` files: movie/series → `MediaDetailSkeleton`; collection → header + card grid; search → SearchBox bar + results grid; profile → heading + profile/account/danger-zone cards.
 
 ---
 
@@ -541,17 +536,8 @@ Static legal pages, open routes (no auth required).
 
 ## Error & Not-Found Pages
 
-- Implemented by `src/app/(app)/error.tsx` (client component), `src/app/(app)/not-found.tsx` (client component), and `src/app/not-found.tsx` (client component, root 404).
-- `(app)` entries render inside the `(app)` layout, so the Header and ambient background remain visible. They center content within the `main` slot using `relative flex min-h-full items-center justify-center px-6 py-16`.
-- The root `src/app/not-found.tsx` handles routes that do not match any segment (e.g. `/dafda`). It does NOT render inside the `(app)` layout, so it carries its own full-screen `h-screen bg-dark` wrapper and replicates the (app) ambient gradients so the page stays visually consistent. The `(app)` not-found still handles `notFound()` calls thrown from within (app) routes (e.g. `/movie/dafda` when the movie isn't found).
-- Design matches the standalone reference: no card/panel. A single soft radial glow sits behind the content as an absolute layer pinned to the top center: `pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full blur-[40px] bg-[radial-gradient(...)]` (mint `oklch(82% 0.10 165/0.07)` for 404, red `oklch(65% 0.18 25/0.08)` for error).
-- Content column: `relative z-10 max-w-[420px] animate-fade-up text-center`.
-- A 56px line icon (opacitied) sits above the eyebrow:
-  - 404 uses `ClapperboardIcon` (`src/icons/Clapperboard.tsx`) with `text-mint opacity-50`.
-  - Error uses `AlertCircleIcon` (`src/icons/AlertCircle.tsx`) with `text-error opacity-55`.
-- Eyebrow: `font-mono text-sm tracking-[0.22em] uppercase` — `Error 404` in `text-mint`, `Something went wrong` in `text-error`.
-- Title: `font-serif text-[clamp(34px,5vw,52px)] leading-none tracking-[-0.03em]` with a single mint/red italicized word via `<em class="text-mint">` / `<em class="text-error">` (`This scene doesn't exist` / `We hit a glitch`).
-- Message: `mt-3.5 mb-8 text-sm leading-relaxed text-secondary`.
-- Actions are pill buttons (`rounded-full h-12 px-7/8 font-sans text-sm font-semibold tracking-[0.02em] normal-case`, `hover:scale-[1.04]`):
-  - 404: a single mint filled `next/link` (`Back to home` → `/`) styled to match the pill look (server component cannot use the client `Button`).
-  - Error: the `Button` component with pill overrides — filled `Try again` (`reset()`) and outlined `Go home` (`router.push('/')`). Errors are logged via `useEffect`. When `error.digest` is present it is shown as `font-mono text-xs tracking-[0.08em] text-secondary/50`.
+- `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
+- No card/panel. Centered content column with soft radial glow: mint for 404, red for error.
+- 56px icon above eyebrow: `ClapperboardIcon` (mint) for 404, `AlertCircleIcon` (red) for error.
+- Eyebrow: mono small uppercase. Title: serif display with one italicized accent word.
+- Actions use pill-shaped buttons — 404: single "Back to home" link; Error: "Try again" (`reset()`) + "Go home".
