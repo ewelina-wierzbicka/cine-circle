@@ -107,28 +107,15 @@ export const type = {
 };
 ```
 
-### Spacing & Layout
-
-```ts
-export const layout = {
-  topBarHeight: 56,
-  pagePadH: 48, // horizontal page padding
-  gap_sm: 8,
-  gap_md: 12,
-  gap_lg: 20,
-  gap_xl: 32,
-};
-```
-
 ### Border Radius
 
 ```ts
 export const radius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  pill: 999,
+  sm: 6,     // reference value; no 6px usage in code
+  md: 10,    // rounded-[10px] — MyMedia tabs
+  lg: 12,    // rounded-xl — primary card/input/poster radius (most common)
+  xl: 16,    // rounded-2xl — large posters, profile/auth cards
+  pill: 999, // rounded-full — pills, avatars, genre badges
 };
 ```
 
@@ -137,9 +124,13 @@ export const radius = {
 ```ts
 export const shadows = {
   poster: '0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07)',
-  stacked: '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
 };
 ```
+
+> **Shadow notes:**
+>
+> - These are reference values, not Tailwind utilities. They are single-use and applied inline where needed.
+
 
 ### Animations
 
