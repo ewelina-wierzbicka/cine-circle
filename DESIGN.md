@@ -161,7 +161,8 @@ export const motion = {
 - Relative header bar (`h-14`) with `px-6 md:px-12` padding.
 - Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
 - Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
-- Right: avatar button with accessible dropdown, keyboard support and route handlers.
+- Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
+- Right (logged out): mint pill-shaped `Login` link to `/login` (`rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
 
 ### StarRating
 
