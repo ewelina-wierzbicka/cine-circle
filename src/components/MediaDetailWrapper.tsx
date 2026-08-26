@@ -69,12 +69,12 @@ export default function MediaDetailWrapper({
                       sizes="110px"
                     />
                     {rec.genre && (
-                      <span className="absolute bottom-1.5 left-1.5 font-mono text-xs tracking-[0.06em] uppercase bg-dark/70 text-mint px-1.5 py-0.5 rounded-full">
+                      <span className="absolute bottom-1.5 left-1.5 font-mono text-sm tracking-[0.06em] uppercase bg-dark/70 text-mint px-1.5 py-0.5 rounded-full">
                         {rec.genre}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-secondary mt-1.5 w-27.5 truncate group-hover:text-primary transition-colors">
+                  <p className="text-sm text-secondary mt-1.5 w-27.5 truncate group-hover:text-primary transition-colors">
                     {rec.title}
                   </p>
                 </Link>
