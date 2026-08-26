@@ -107,39 +107,16 @@ export const type = {
 };
 ```
 
-### Spacing & Layout
-
-```ts
-export const layout = {
-  topBarHeight: 56, // h-14
-  pagePadH: 48,     // px-12 — horizontal page padding
-  // Gap scale — canonical values (Tailwind utility in comment). Keys mirror the
-  // Tailwind class actually used in code; the old gap_sm/md/lg/xl names are gone.
-  gap_2: 8,         // gap-2
-  gap_2_5: 10,      // gap-2.5 — most common gap (15 uses)
-  gap_3: 12,        // gap-3
-  gap_5: 20,        // gap-5
-  gap_6: 24,        // gap-6 — common (10 uses)
-  gap_8: 32,        // gap-8
-};
-// Accepted off-scale gap exceptions (minor one-off use, not canonical):
-// gap-0.5 (2px), gap-0.75 (3px), gap-1 (4px), gap-4 (16px), gap-7 (28px)
-```
-
 ### Border Radius
 
 ```ts
 export const radius = {
-  sm: 6,     // reference value; no 6px usage in code (rounded-sm is 2px, see below)
+  sm: 6,     // reference value; no 6px usage in code
   md: 10,    // rounded-[10px] — MyMedia tabs
   lg: 12,    // rounded-xl — primary card/input/poster radius (most common)
   xl: 16,    // rounded-2xl — large posters, profile/auth cards
   pill: 999, // rounded-full — pills, avatars, genre badges
 };
-// Accepted off-scale radius exceptions (minor one-off use, not canonical):
-// rounded-sm (Tailwind 2px) — StarRatingInput star clip
-// rounded-md (Tailwind 4px) — Skeleton block, SearchDropdownItem thumbnail
-// Retired: md:8 (rounded-lg) — never used in code
 ```
 
 ### Shadows
@@ -153,9 +130,7 @@ export const shadows = {
 > **Shadow notes:**
 >
 > - These are reference values, not Tailwind utilities. They are single-use and applied inline where needed.
-> - `poster` is applied via inline `style={{ boxShadow }}` in `src/components/MediaPoster.tsx` (plus an inset vignette `inset 0 0 40px rgba(0,0,0,0.25)` on the same component).
-> - Tailwind built-in shadows (`shadow-xl`, `shadow-lg`) are used sparingly off-scale; `SearchBox` focus ring uses an arbitrary `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
-> - Retired: `stacked` — never used in code.
+
 
 ### Animations
 
