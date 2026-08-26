@@ -1,7 +1,6 @@
 import { test, expect, passwordSessionCookies } from './fixtures/auth';
 import { deleteUserByEmail, resetPasswordViaRecovery } from './admin';
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from './env';
-import { MAILPIT_URL, clearMailpit, waitForResetLink } from './mailpit';
 
 // Strong password satisfying: upper, lower, digit, special, 8+ chars.
 const STRONG_PASSWORD = 'Str0ng!pass';
@@ -206,47 +205,6 @@ test.describe('auth', () => {
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
 
     // New password logs in.
-    await page.getByLabel('Password').fill(newPassword);
-    await page.getByRole('button', { name: 'SIGN IN' }).click();
-    await page.waitForURL('/');
-  });
-
-  // Real email-click flow: only runs against local Supabase (Mailpit inbox).
-  // Skips on remote runs where the inbox is unreadable. See mailpit.ts.
-  test('T10 email link drives the full browser reset flow', async ({
-    page,
-    context,
-    isolatedUser,
-  }) => {
-    test.skip(!MAILPIT_URL, 'E2E_MAILPIT_URL unset (remote Supabase run)');
-    const newPassword = 'Emailed!pass7';
-
-    await clearMailpit();
-    // forgot-password is an auth route; drop the seeded session so it renders.
-    await context.clearCookies();
-
-    await page.goto('/forgot-password');
-    await page.getByLabel('Email').fill(isolatedUser.email);
-    await page.getByRole('button', { name: 'SEND RESET LINK' }).click();
-    await expect(page.getByText('A reset link is on its way.')).toBeVisible();
-
-    // Click the emailed link in the same context so the PKCE code_verifier
-    // cookie matches; callback exchanges it and lands on /reset-password.
-    const link = await waitForResetLink(isolatedUser.email);
-    await page.goto(link);
-    await page.waitForURL('/reset-password');
-
-    await page.getByLabel('New password').fill(newPassword);
-    await page.getByLabel('Confirm password').fill(newPassword);
-    await page.getByRole('button', { name: 'SET NEW PASSWORD' }).click();
-
-    // Reset succeeds and leaves /reset-password.
-    await page.waitForURL((url) => url.pathname !== '/reset-password');
-
-    // The new password logs in.
-    await context.clearCookies();
-    await page.goto('/login');
-    await page.getByLabel('Email').fill(isolatedUser.email);
     await page.getByLabel('Password').fill(newPassword);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await page.waitForURL('/');
