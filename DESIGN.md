@@ -54,12 +54,9 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
-// NOTE: This object is docs-only — no code imports the named variants.
-// Specs are applied via Tailwind classes (plus one inline style for heroTitle).
-// Values track the per-screen section specs below, which are authoritative.
+
 export const type = {
   heroTitle: {
-    // MediaInfoHeader.tsx — inline style clamp(42px, 5.5vw, 72px)
     fontFamily: fonts.serif,
     fontSize: 'clamp(42px, 5.5vw, 72px)',
     fontWeight: 400,
@@ -67,7 +64,6 @@ export const type = {
     lineHeight: 0.95,
   },
   searchHero: {
-    // HomeHero.tsx — text-[46px] xl:text-[52px] leading-none
     fontFamily: fonts.serif,
     fontSize: '46px (52px at xl)',
     fontWeight: 400,
@@ -75,7 +71,6 @@ export const type = {
     lineHeight: 1.0,
   },
   sectionTitle: {
-    // MyMedia.tsx — text-[clamp(32px,5vw,48px)] leading-[0.95]
     fontFamily: fonts.serif,
     fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 400,
@@ -83,8 +78,6 @@ export const type = {
     lineHeight: 0.95,
   },
   loginTitle: {
-    // Primary auth headings (login/register/forgot/reset) use text-6xl (60px).
-    // Secondary confirmation headings ("Check your inbox") use text-4xl (36px).
     fontFamily: fonts.serif,
     fontSize: 60,
     fontWeight: 400,
@@ -93,8 +86,6 @@ export const type = {
   },
   body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
   label: {
-    // Form field labels (mono 14px 0.14em uppercase). Eyebrows, wordmark,
-    // genre pills, and section labels use their own tracking per section spec.
     fontFamily: fonts.mono,
     fontSize: 14,
     fontWeight: 400,
@@ -102,16 +93,14 @@ export const type = {
     textTransform: 'uppercase',
   },
   navItem: {
-    // Header.tsx nav links — text-sm font-medium tracking-[0.02em]
     fontFamily: fonts.sans,
     fontSize: 14,
     fontWeight: 500,
     letterSpacing: '0.02em',
   },
   btnLabel: {
-    // Button.tsx — medium: text-base md:text-sm lg:text-base; small: text-sm
     fontFamily: fonts.sans,
-    fontSize: 16,
+    fontSize: 'medium: 16px (14px at md), small: 14px',
     fontWeight: 600,
     letterSpacing: '0.08em',
   },
