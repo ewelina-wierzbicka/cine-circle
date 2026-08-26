@@ -54,6 +54,7 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
+
 export const type = {
   heroTitle: {
     fontFamily: fonts.serif,
@@ -64,21 +65,21 @@ export const type = {
   },
   searchHero: {
     fontFamily: fonts.serif,
-    fontSize: 52,
+    fontSize: '46px (52px at xl)',
     fontWeight: 400,
     letterSpacing: '-0.03em',
-    lineHeight: 0.95,
+    lineHeight: 1.0,
   },
   sectionTitle: {
     fontFamily: fonts.serif,
-    fontSize: 48,
+    fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 400,
     letterSpacing: '-0.03em',
     lineHeight: 0.95,
   },
   loginTitle: {
     fontFamily: fonts.serif,
-    fontSize: 36,
+    fontSize: 60,
     fontWeight: 400,
     letterSpacing: '-0.02em',
     lineHeight: 1.1,
@@ -99,8 +100,7 @@ export const type = {
   },
   btnLabel: {
     fontFamily: fonts.sans,
-    // Buttons use text-base (16px) for medium and text-sm (14px) for small
-    fontSize: 16,
+    fontSize: 'medium: 16px (14px at md), small: 14px',
     fontWeight: 600,
     letterSpacing: '0.08em',
   },

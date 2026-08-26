@@ -95,7 +95,7 @@ export default function Header({ profile }: HeaderProps) {
           onClick={() => setDropdownOpen((p) => !p)}
         >
           {displayName && (
-            <span className="hidden sm:inline text-[14px] font-sans text-primary tracking-[0.02em]">
+            <span className="hidden sm:inline text-sm font-sans text-primary tracking-[0.02em]">
               Hello <span className="text-mint">{displayName}</span>!
             </span>
           )}
