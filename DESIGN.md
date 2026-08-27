@@ -54,7 +54,6 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
-
 export const type = {
   heroTitle: {
     fontFamily: fonts.serif,
@@ -321,6 +320,7 @@ export const motion = {
 Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
+- Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.82 0.1 250/0.1)`) and a mint glow at the bottom (`-bottom-30`, `oklch(0.82 0.1 165/0.1)`), both `w-120 h-120` centered, over a 48px grid overlay at 40% opacity.
 - Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with mint-emphasized word (`<em class="text-mint">`).
 - Subtext: `text-base text-secondary`.
 - Labels: `font-mono text-sm uppercase tracking-[0.14em] text-secondary`.
