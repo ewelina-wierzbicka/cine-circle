@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const movieRoutes: MetadataRoute.Sitemap = trendingMovies.map((movie) => ({
     url: `${baseUrl}${toHref(movie.id, movie.title, movie.type)}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly',
+    changeFrequency: 'daily',
     priority: 0.6,
   }));
 
