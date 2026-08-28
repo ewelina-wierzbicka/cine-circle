@@ -99,9 +99,11 @@ series/[id]/             # /series/:id
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
+    sitemap.ts                # /sitemap.xml — public routes + trending movies
+    robots.ts                 # /robots.txt — crawler rules and sitemap pointer
   globals.css
   providers.tsx               # app-wide React context providers
-  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts)
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
   components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
   hooks/                      # custom React hooks
