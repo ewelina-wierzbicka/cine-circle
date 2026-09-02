@@ -19,3 +19,7 @@ const authedTest = base.extend<{ authedPage: Page }>({
 // One import gives specs both `authedPage` and `isolatedUser`.
 export const test = mergeTests(authedTest, isolatedTest);
 export { expect };
+
+// A normal password login yields an AMR 'password' session. Used by reset tests
+// that assert a non-recovery session cannot set a new password.
+export { sessionCookiesFor as passwordSessionCookies };
