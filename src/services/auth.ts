@@ -19,13 +19,22 @@ export async function login(email: string, password: string, rurl?: string) {
 export async function register(email: string, password: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signUp({ email, password });
+  const origin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!origin)
+    return {
+      error: 'Server misconfiguration: NEXT_PUBLIC_SITE_URL is not set.',
+    };
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${origin}/api/auth/confirm-callback` },
+  });
 
   if (error) {
     return { error: error.message };
   }
 
-  // Redirect to confirm email page after registration
   redirect('/confirm-email');
 }
 

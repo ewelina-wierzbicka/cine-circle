@@ -21,6 +21,9 @@ export function LoginForm() {
     if (errorParam === 'reset_failed') {
       toast.error('Password reset failed. Please try again.');
       router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+    } else if (errorParam === 'confirm_failed') {
+      toast.error('Email confirmation failed. Please try again.');
+      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
     }
     // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
     // eslint-disable-next-line react-hooks/exhaustive-deps
