@@ -19,5 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  await supabase.auth.signOut();
+
   return NextResponse.redirect(new URL('/registration-confirmed', request.url));
 }
