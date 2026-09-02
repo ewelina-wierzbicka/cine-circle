@@ -65,6 +65,8 @@ src/
         page.tsx
         ResetPasswordForm.tsx
         error.tsx              # error boundary for /reset-password — reset failure UI
+      registration-confirmed/  # /registration-confirmed — success page after confirm-callback (auth required; not in AUTH_ROUTES)
+        page.tsx
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
@@ -89,8 +91,6 @@ series/[id]/             # /series/:id
       terms/                  # /terms — static Terms and Conditions page (open route)
         page.tsx
       privacy/                # /privacy — static Privacy Policy page (open route)
-        page.tsx
-      registration-confirmed/ # /registration-confirmed — email confirmation success page (auth-required; reached via confirm-callback)
         page.tsx
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
@@ -120,7 +120,7 @@ series/[id]/             # /series/:id
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
-- `/registration-confirmed` is not in `AUTH_ROUTES` — it is reached only after the confirm-callback exchanges the confirmation code for a valid session. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
+- `/registration-confirmed` is not in `AUTH_ROUTES` — it is reached only after the confirm-callback exchanges the confirmation code for a valid session, so it expects an authenticated user. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
 - Open routes (no redirect for unauthenticated users): exact match `/`, plus prefixes `/search`, `/movie/`, `/series/`, `/terms`, `/privacy`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`

@@ -338,6 +338,16 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 ---
 
+## Registration Confirmed
+
+- Implemented by `src/app/(auth)/registration-confirmed/page.tsx` — server component, no data fetching. Reached via `api/auth/confirm-callback` after it exchanges the confirmation code for a session; the visitor is authenticated. Not in `AUTH_ROUTES`.
+- Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
+- Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-mint/10 border border-mint/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-mint`.
+- Heading: `font-serif text-4xl` two-line with mint `<em>` — "You are / _all set_". Subtext `text-sm text-secondary` confirms the account is active.
+- CTA: `Link` to `/` styled as the medium filled `Button` ("Start exploring") — `bg-mint text-dark`, `rounded-xl`, `uppercase tracking-[0.08em]`, full width, `hover:opacity-[0.82]`.
+
+---
+
 ## Search / Home
 
 - Implemented in `src/app/(app)/page.tsx`.
