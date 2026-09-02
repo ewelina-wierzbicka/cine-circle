@@ -98,7 +98,7 @@ series/[id]/             # /series/:id
     api/                      # Route Handlers
       auth/
         confirm-callback/
-          route.ts            # GET — exchanges email confirmation code (verifies email), signs out so no session survives, redirects to /registration-confirmed or /login?error=confirm_failed
+          route.ts            # GET — redirect-only: Supabase's confirmation link verifies the email, then lands here with a code; code present → /registration-confirmed (no session ever created), no code → /login?error=confirm_failed
         reset-callback/
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
     layout.tsx                # root layout
@@ -120,7 +120,7 @@ series/[id]/             # /series/:id
 - `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`)
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
-- `/registration-confirmed` is an open route in `OPEN_ROUTES_EXACT` — the confirm-callback verifies the email then signs out, so the visitor arrives without a session and authenticated users are not redirected away. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
+- `/registration-confirmed` is an open route in `OPEN_ROUTES_EXACT` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session; authenticated users are not redirected away. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
 - Open routes (no redirect for unauthenticated users): exact match `/`, `/terms`, `/privacy`, `/registration-confirmed`, plus prefixes `/search`, `/movie/`, `/series/`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts`
 - All other routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
