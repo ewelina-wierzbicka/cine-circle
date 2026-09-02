@@ -232,7 +232,7 @@ otp_expiry = 3600
 # user = "resend"
 # pass = "env(RESEND_API_KEY)"
 # admin_email = "info@midnightframe.app"
-# sender_name = "Midnight Frame"
+# sender_name = "MidnightFrame"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
