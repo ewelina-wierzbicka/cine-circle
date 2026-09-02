@@ -75,7 +75,7 @@ export default function Header({ profile }: HeaderProps) {
           href="/login"
           className="rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
         >
-          Login
+          Sign in
         </Link>
       ) : (
         <div
