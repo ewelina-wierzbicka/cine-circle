@@ -37,11 +37,6 @@ export default function Header({ profile }: HeaderProps) {
     await logout();
   };
 
-  const handleLogin = () => {
-    setDropdownOpen(false);
-    router.push('/login');
-  };
-
   return (
     <header className="relative z-50 flex items-center justify-between h-14 px-6 md:px-12 shrink-0">
       <Link href="/" className="flex items-center gap-2.5">
@@ -75,144 +70,130 @@ export default function Header({ profile }: HeaderProps) {
           </Link>
         ))}
       </nav>
-      <div
-        className="relative"
-        onMouseEnter={() => setDropdownOpen(true)}
-        onMouseLeave={() => setDropdownOpen(false)}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget)) {
-            setDropdownOpen(false);
-          }
-        }}
-      >
-        <button
-          type="button"
-          className="flex items-center gap-4 bg-transparent border-none cursor-pointer p-0"
-          aria-label="User menu"
-          aria-haspopup="menu"
-          aria-expanded={dropdownOpen}
-          aria-controls="user-dropdown-menu"
-          onClick={() => setDropdownOpen((p) => !p)}
+      {!profile ? (
+        <Link
+          href="/login"
+          className="rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
         >
-          {displayName && (
-            <span className="hidden sm:inline text-sm font-sans text-primary tracking-[0.02em]">
-              Hello <span className="text-mint">{displayName}</span>!
-            </span>
-          )}
-          {avatarUrl ? (
-            <Image
-              src={avatarUrl}
-              alt="User avatar"
-              width={32}
-              height={32}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          ) : (
-            <AvatarIcon className="w-8 h-8 text-primary" />
-          )}
-        </button>
+          Sign in
+        </Link>
+      ) : (
+        <div
+          className="relative"
+          onMouseEnter={() => setDropdownOpen(true)}
+          onMouseLeave={() => setDropdownOpen(false)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+              setDropdownOpen(false);
+            }
+          }}
+        >
+          <button
+            type="button"
+            className="flex items-center gap-4 bg-transparent border-none cursor-pointer p-0"
+            aria-label="User menu"
+            aria-haspopup="menu"
+            aria-expanded={dropdownOpen}
+            aria-controls="user-dropdown-menu"
+            onClick={() => setDropdownOpen((p) => !p)}
+          >
+            {displayName && (
+              <span className="hidden sm:inline text-[14px] font-sans text-primary tracking-[0.02em]">
+                Hello <span className="text-mint">{displayName}</span>!
+              </span>
+            )}
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt="User avatar"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <AvatarIcon className="w-8 h-8 text-primary" />
+            )}
+          </button>
 
-        {dropdownOpen && (
-          <div className="absolute right-0 top-full pt-3 w-40 z-50">
-            <ul
-              id="user-dropdown-menu"
-              className="rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"
-              role="menu"
-              aria-label="User menu"
-            >
-              {NAV_ITEMS.filter(
-                (el) => profile || el.label !== 'Collection',
-              ).map(({ label, href, match }) => (
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full pt-3 w-40 z-50">
+              <ul
+                id="user-dropdown-menu"
+                className="rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"
+                role="menu"
+                aria-label="User menu"
+              >
+                {NAV_ITEMS.map(({ label, href, match }) => (
+                  <li
+                    key={href}
+                    role="menuitem"
+                    tabIndex={0}
+                    className={twMerge(
+                      'md:hidden px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
+                      match(pathname) && 'text-primary bg-bg3',
+                    )}
+                    onClick={() => {
+                      router.push(href);
+                      setDropdownOpen(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        router.push(href);
+                        setDropdownOpen(false);
+                      } else if (e.key === 'Escape') {
+                        setDropdownOpen(false);
+                      }
+                    }}
+                  >
+                    {label}
+                  </li>
+                ))}
                 <li
-                  key={href}
                   role="menuitem"
                   tabIndex={0}
                   className={twMerge(
-                    'md:hidden px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                    match(pathname) && 'text-primary bg-bg3',
+                    'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
+                    pathname === '/profile' && 'text-primary bg-bg3',
                   )}
                   onClick={() => {
-                    router.push(href);
+                    router.push('/profile');
                     setDropdownOpen(false);
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      router.push(href);
+                      router.push('/profile');
                       setDropdownOpen(false);
                     } else if (e.key === 'Escape') {
                       setDropdownOpen(false);
                     }
                   }}
                 >
-                  {label}
+                  Profile
                 </li>
-              ))}
-              {profile ? (
-                <>
-                  <li
-                    role="menuitem"
-                    tabIndex={0}
-                    className={twMerge(
-                      'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                      pathname === '/profile' && 'text-primary bg-bg3',
-                    )}
-                    onClick={() => {
-                      router.push('/profile');
-                      setDropdownOpen(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        router.push('/profile');
-                        setDropdownOpen(false);
-                      } else if (e.key === 'Escape') {
-                        setDropdownOpen(false);
-                      }
-                    }}
-                  >
-                    Profile
-                  </li>
 
-                  <li
-                    role="menuitem"
-                    tabIndex={0}
-                    className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0"
-                    onClick={handleLogout}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        void handleLogout();
-                      } else if (e.key === 'Escape') {
-                        setDropdownOpen(false);
-                      }
-                    }}
-                  >
-                    Logout
-                  </li>
-                </>
-              ) : (
                 <li
                   role="menuitem"
                   tabIndex={0}
                   className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0"
-                  onClick={handleLogin}
+                  onClick={handleLogout}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      void handleLogin();
+                      void handleLogout();
                     } else if (e.key === 'Escape') {
                       setDropdownOpen(false);
                     }
                   }}
                 >
-                  Login
+                  Logout
                 </li>
-              )}
-            </ul>
-          </div>
-        )}
-      </div>
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }

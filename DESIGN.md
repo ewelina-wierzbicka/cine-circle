@@ -54,7 +54,6 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
-
 export const type = {
   heroTitle: {
     fontFamily: fonts.serif,
@@ -111,10 +110,10 @@ export const type = {
 
 ```ts
 export const radius = {
-  sm: 6,     // reference value; no 6px usage in code
-  md: 10,    // rounded-[10px] — MyMedia tabs
-  lg: 12,    // rounded-xl — primary card/input/poster radius (most common)
-  xl: 16,    // rounded-2xl — large posters, profile/auth cards
+  sm: 6, // reference value; no 6px usage in code
+  md: 10, // rounded-[10px] — MyMedia tabs
+  lg: 12, // rounded-xl — primary card/input/poster radius (most common)
+  xl: 16, // rounded-2xl — large posters, profile/auth cards
   pill: 999, // rounded-full — pills, avatars, genre badges
 };
 ```
@@ -130,7 +129,6 @@ export const shadows = {
 > **Shadow notes:**
 >
 > - These are reference values, not Tailwind utilities. They are single-use and applied inline where needed.
-
 
 ### Animations
 
@@ -152,7 +150,8 @@ export const motion = {
 - Relative header bar (`h-14`) with `px-6 md:px-12` padding.
 - Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
 - Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
-- Right: avatar button with accessible dropdown, keyboard support and route handlers.
+- Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
+- Right (logged out): mint pill-shaped `Sign in` link to `/login` (`rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
 
 ### StarRating
 
