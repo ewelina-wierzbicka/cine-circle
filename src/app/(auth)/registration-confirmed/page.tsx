@@ -15,22 +15,17 @@ export default function RegistrationConfirmedPage() {
           <br />
           <em className="text-mint">all set</em>
         </h1>
-        <p className="text-sm text-secondary">
-          Your account is confirmed and active.
+        <p className="text-sm text-secondary leading-relaxed">
+          Your email is confirmed. Sign in to start building your collection.
         </p>
       </div>
 
       <div className="w-full flex flex-col gap-4">
-        <p className="text-sm text-secondary leading-relaxed">
-          Welcome to MidnightFrame. Track what you watch, rate it, and share
-          your collection with friends.
-        </p>
-
         <Link
-          href="/"
+          href="/login"
           className="flex w-full items-center justify-center rounded-xl bg-mint px-8 py-3 text-base font-semibold uppercase tracking-[0.08em] text-dark transition-opacity hover:opacity-[0.82] cursor-pointer md:text-sm lg:text-base"
         >
-          Start exploring
+          Sign in
         </Link>
       </div>
     </AuthFormLayout>
