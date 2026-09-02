@@ -64,21 +64,21 @@ export const type = {
   },
   searchHero: {
     fontFamily: fonts.serif,
-    fontSize: 52,
+    fontSize: '46px (52px at xl)',
     fontWeight: 400,
     letterSpacing: '-0.03em',
-    lineHeight: 0.95,
+    lineHeight: 1.0,
   },
   sectionTitle: {
     fontFamily: fonts.serif,
-    fontSize: 48,
+    fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 400,
     letterSpacing: '-0.03em',
     lineHeight: 0.95,
   },
   loginTitle: {
     fontFamily: fonts.serif,
-    fontSize: 36,
+    fontSize: 60,
     fontWeight: 400,
     letterSpacing: '-0.02em',
     lineHeight: 1.1,
@@ -99,24 +99,10 @@ export const type = {
   },
   btnLabel: {
     fontFamily: fonts.sans,
-    // Buttons use text-base (16px) for medium and text-sm (14px) for small
-    fontSize: 16,
+    fontSize: 'medium: 16px (14px at md), small: 14px',
     fontWeight: 600,
     letterSpacing: '0.08em',
   },
-};
-```
-
-### Spacing & Layout
-
-```ts
-export const layout = {
-  topBarHeight: 56,
-  pagePadH: 48, // horizontal page padding
-  gap_sm: 8,
-  gap_md: 12,
-  gap_lg: 20,
-  gap_xl: 32,
 };
 ```
 
@@ -124,11 +110,11 @@ export const layout = {
 
 ```ts
 export const radius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  pill: 999,
+  sm: 6, // reference value; no 6px usage in code
+  md: 10, // rounded-[10px] — MyMedia tabs
+  lg: 12, // rounded-xl — primary card/input/poster radius (most common)
+  xl: 16, // rounded-2xl — large posters, profile/auth cards
+  pill: 999, // rounded-full — pills, avatars, genre badges
 };
 ```
 
@@ -137,9 +123,12 @@ export const radius = {
 ```ts
 export const shadows = {
   poster: '0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07)',
-  stacked: '0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
 };
 ```
+
+> **Shadow notes:**
+>
+> - These are reference values, not Tailwind utilities. They are single-use and applied inline where needed.
 
 ### Animations
 
