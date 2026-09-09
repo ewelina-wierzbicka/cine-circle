@@ -97,6 +97,9 @@ series/[id]/             # /series/:id
       auth/
         reset-callback/
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
+      email/
+        inbound/
+          route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — public routes + trending movies
