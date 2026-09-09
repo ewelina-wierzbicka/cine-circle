@@ -40,6 +40,23 @@ export const SUPABASE_URL = required('NEXT_PUBLIC_SUPABASE_URL');
 export const SUPABASE_ANON_KEY = required('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 export const SUPABASE_SERVICE_KEY = required('SUPABASE_SECRET_KEY');
 
+// Safety guard. The suite runs destructive service-role operations
+// (create/delete users, seed rows bypassing RLS). It must never touch a
+// remote or production project. `.env.test.local` is gitignored, so on a
+// fresh checkout or CI env.ts would otherwise fall back to `.env.local`
+// (remote) and run those operations against production. Fail loudly instead.
+{
+  const host = new URL(SUPABASE_URL).hostname;
+  const isLocal = host === '127.0.0.1' || host === 'localhost' || host === '::1';
+  if (!isLocal && !process.env.E2E_ALLOW_REMOTE_SUPABASE) {
+    throw new Error(
+      `Refusing to run e2e against non-local Supabase (${SUPABASE_URL}). ` +
+        'Start local Supabase and provide .env.test.local, or set ' +
+        'E2E_ALLOW_REMOTE_SUPABASE=1 to override.',
+    );
+  }
+}
+
 export const TEST_USER_EMAIL =
   process.env.TEST_USER_EMAIL ?? 'e2e-persistent@midnightframe.test';
 export const TEST_USER_PASSWORD =
