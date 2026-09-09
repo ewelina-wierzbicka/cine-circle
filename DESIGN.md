@@ -344,7 +344,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
 - Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-mint/10 border border-mint/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-mint`.
 - Heading: `font-serif text-4xl` two-line with mint `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
-- CTA: `Link` to `/login` styled as the medium filled `Button` ("Sign in") — `bg-mint text-dark`, `rounded-xl`, `uppercase tracking-[0.08em]`, full width, `hover:opacity-[0.82]`.
+- CTA: `SignInButton` (`SignInButton.tsx`, client) — medium filled mint `Button` ("SIGN IN") navigating to `/login` via `router.push`. Page stays a Server Component.
 
 ---
 
