@@ -3,7 +3,7 @@
 import SearchBox from '@/components/SearchBox';
 import { twMerge } from '@/lib/cn';
 import { MediaType, TrendingMovie } from '@/types';
-import { Suspense, useEffect, useState, use } from 'react';
+import { Suspense, use, useEffect, useState } from 'react';
 
 type Props = {
   hintTitles?: { id: number; title: string; type: MediaType }[];
@@ -27,7 +27,7 @@ export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
       <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
         What will you
         <br />
-        <em className="text-mint">watch next?</em>
+        <em className="text-accent">watch next?</em>
       </h2>
       <p className="text-secondary text-md text-center mb-12 animate-fade-in [animation-delay:80ms]">
         Search any title to add it to your list

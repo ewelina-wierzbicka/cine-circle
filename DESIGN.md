@@ -26,17 +26,17 @@ export const colors = {
   text: '#ece9e3', // maps to CSS var --color-primary
   muted: 'rgba(236,233,227,0.75)', // maps to CSS var --color-secondary
 
-  // Accent — pastel mint
-  mint: 'oklch(82% 0.10 165)', // maps to CSS var --color-mint
+  // Accent — pastel accent
+  accent: 'oklch(80% 0.25 285)', // maps to CSS var --color-accent
 };
 ```
 
 > **Token notes:**
 >
-> - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-mint`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-mint`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`.
+> - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`.
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
-> - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `mint` → `--color-mint`.
+> - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
 > - Note: `src/globals.css` sets `body { overflow: hidden }` and `#root { position: fixed; inset: 0 }`.
 
@@ -151,7 +151,7 @@ export const motion = {
 - Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
 - Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
 - Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
-- Right (logged out): mint pill-shaped `Sign in` link to `/login` (`rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
+- Right (logged out): accent pill-shaped `Sign in` link to `/login` (`rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
 
 ### StarRating
 
@@ -164,9 +164,9 @@ export const motion = {
 
 - `src/components/MediaCard.tsx`.
 - Card: `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
-- Hover lift (`-translate-y-1.25`) and hover border tint to mint.
+- Hover lift (`-translate-y-1.25`) and hover border tint to accent.
 - Poster image fills card; placeholder gradient when missing.
-- Hover overlay exposes actions or a `VIEW →` label (`font-mono text-sm text-mint`).
+- Hover overlay exposes actions or a `VIEW →` label (`font-mono text-sm text-accent`).
 - Title/date use `text-sm`; title `font-medium`.
 - Shows `StarRating` when `watchStatus === 'watched'` and `rating` present.
 
@@ -210,7 +210,7 @@ export const motion = {
 
 - `src/components/Input.tsx`.
 - Controlled input with `variant` prop: `search` adds an icon and padding; `rating` shows `/10` suffix.
-- Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `mint` and `bg3`.
+- Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `accent` and `bg3`.
 - Forwards ref and renders error text when provided.
 
 ### SearchBox
@@ -254,7 +254,7 @@ export const motion = {
 
 - `src/components/Button.tsx`.
 - Variants: `filled` (default) and `outlined`.
-- Colors: `mint` (default) and `error`. Only affects the `filled` variant — `error` filled uses `bg-red-800 text-primary hover:bg-red-900`, `mint` filled uses `bg-mint text-dark hover:opacity-[0.82]`. `outlined` is unaffected by `color`.
+- Colors: `accent` (default) and `error`. Only affects the `filled` variant — `error` filled uses `bg-red-800 text-primary hover:bg-red-900`, `accent` filled uses `bg-accent text-dark hover:opacity-[0.82]`. `outlined` is unaffected by `color`.
 - Sizes: `medium` (h-12 text-base) and `small` (h-10 text-sm).
 - Uses `uppercase tracking-[0.08em] font-semibold` and merges custom classes via `twMerge`.
 
@@ -311,13 +311,13 @@ export const motion = {
 Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
-- Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a mint glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
-- Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with mint-emphasized word (`<em class="text-mint">`).
+- Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
+- Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with accent-emphasized word (`<em class="text-accent">`).
 - Subtext: `text-base text-secondary`.
 - Labels: `font-mono text-sm uppercase tracking-[0.14em] text-secondary`.
-- Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-mint` and `bg-bg3`.
-- Buttons: use `Button` component (color `mint`, medium size → `h-12 text-base`). Disabled/pending states handled.
-- Footer link toggles between Login and Register using `text-mint` links.
+- Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
+- Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
+- Footer link toggles between Login and Register using `text-accent` links.
 
 Right column (Visuals)
 
@@ -334,7 +334,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
 - `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
-- Both: `font-serif text-6xl` title with mint `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` mint medium CTA, "Back to Sign in" footer link.
+- Both: `font-serif text-6xl` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
 
 ---
 
@@ -342,9 +342,9 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - Implemented by `src/app/(auth)/registration-confirmed/page.tsx` — server component, no data fetching. Reached via `api/auth/confirm-callback` after Supabase's confirmation link verifies the email; the callback creates no session, so the visitor is not authenticated. Auth route in `AUTH_ROUTES`; not in `OPEN_ROUTES_EXACT` — logged-in users are redirected to `/`.
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
-- Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-mint/10 border border-mint/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-mint`.
-- Heading: `font-serif text-4xl` two-line with mint `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
-- CTA: `Link` to `/login` styled as the medium filled `Button` ("Sign in") — `bg-mint text-dark`, `rounded-xl`, `uppercase tracking-[0.08em]`, full width, `hover:opacity-[0.82]`.
+- Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
+- Heading: `font-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
+- CTA: `Link` to `/login` styled as the medium filled `Button` ("Sign in") — `bg-accent text-dark`, `rounded-xl`, `uppercase tracking-[0.08em]`, full width, `hover:opacity-[0.82]`.
 
 ---
 
@@ -355,19 +355,19 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 Layout & Ambient
 
 - `min-h-full` flex column with three absolute radial blobs implemented as blurred rounded divs.
-- Blobs mimic movie color accents and a mint blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
+- Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 
 Hero
 
-- Heading implemented as `h2` using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with mint emphasis via `<em class="text-mint">`.
+- Heading implemented as `h2` using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
 Search
 
 - Central SearchBox (`src/components/SearchBox.tsx`) placed in a `max-w-160` wrapper.
-- SearchBox internals: `Input` with transparent background in the centered layout, container toggles focus state to `bg-bg2` and `border-mint` plus focus shadow `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
-- Filter chips are buttons with `font-mono text-sm tracking-[0.05em]`; active chip uses `bg-mint text-dark font-medium`.
+- SearchBox internals: `Input` with transparent background in the centered layout, container toggles focus state to `bg-bg2` and `border-accent` plus focus shadow `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
+- Filter chips are buttons with `font-mono text-sm tracking-[0.05em]`; active chip uses `bg-accent text-dark font-medium`.
 - SearchBox provides `hintTitles` from `getTrendingMovies()` and renders an animated dropdown with infinite-scroll via IntersectionObserver.
 
 Recently Watched
@@ -376,9 +376,9 @@ Recently Watched
 - `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
-- Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-mint tracking-[0.08em]`.
+- Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
 
-- Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" mint
+- Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
 
 ---
@@ -389,8 +389,8 @@ Recently Watched
 
 Layout & Header
 
-- Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-mint uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
-- Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-mint text-dark`.
+- Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-accent uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
+- Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
 - Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering.
 - Search filter is debounced via `useSearch` hook.
 
@@ -430,13 +430,13 @@ Info & Form
 
 - Info view (`MediaInfo` or `WatchedMediaInfo`) shows:
   - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
-  - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-mint` spans. Placed above the type label.
+  - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
   - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
-  - Mint divider `w-12 h-px bg-mint opacity-60`.
-  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the mint divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
-  - Action buttons: `Button` (mint filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
+  - Mint divider `w-12 h-px bg-accent opacity-60`.
+  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
+  - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
 - Watched view (`WatchedMediaInfo`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
 
@@ -452,7 +452,7 @@ Recommendations ("More Like This")
 - Section label: `font-mono text-sm tracking-[0.2em] text-secondary uppercase`.
 - Horizontal scroll row (`flex gap-3 overflow-x-auto pb-1`) matching the home page "Recently Watched" pattern.
 - Each card: `w-27.5 h-41.25 rounded-xl overflow-hidden border border-white/[0.07]` with `MediaPoster` inside.
-- Genre badge overlay: `font-mono text-sm` in a `bg-dark/70 text-mint` pill at bottom-left of the card.
+- Genre badge overlay: `font-mono text-sm` in a `bg-dark/70 text-accent` pill at bottom-left of the card.
 - Title below card: `text-sm text-secondary truncate`, transitions to `text-primary` on hover.
 - Cards link to `/movie/{id}-{slug}` or `/series/{id}-{slug}`.
 - Padding: `px-6 md:px-12 pb-8`.
@@ -473,16 +473,16 @@ Layout
 
 - Centered single column `max-w-xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center`.
 - Entry animation: `animate-fade-up`.
-- Heading: `font-serif text-4xl md:text-5xl` with mint emphasis (`<em class="text-mint">`): "Your _Profile_".
+- Heading: `font-serif text-4xl md:text-5xl` with accent emphasis (`<em class="text-accent">`): "Your _Profile_".
 
 Profile Card
 
 - `bg-bg2 border border-secondary/25 rounded-2xl p-6`, horizontal flex with `gap-6`.
-- Avatar: `w-22 h-22 rounded-full border-2 border-mint` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
-- Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with mint pencil SVG icon. Triggers hidden file input.
+- Avatar: `w-22 h-22 rounded-full border-2 border-accent` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
+- Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with accent pencil SVG icon. Triggers hidden file input.
 - Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
 - Display name: `font-mono text-sm uppercase tracking-[0.15em] text-secondary` label. Name shown as `text-2xl font-sans font-semibold` with pencil edit icon.
-- Inline edit mode: `Input` component with Save (`text-mint font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
+- Inline edit mode: `Input` component with Save (`text-accent font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
 
 Account Card
 
@@ -523,7 +523,7 @@ Static legal pages, open routes (no auth required).
 - Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
 - Title: `font-serif text-3xl sm:text-4xl text-primary`.
 - Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
-- Section headings: `font-mono text-sm tracking-[0.15em] text-mint uppercase`.
+- Section headings: `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
 - Body text: `font-sans text-base text-secondary leading-relaxed`.
 - Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
 
@@ -538,7 +538,7 @@ Static legal pages, open routes (no auth required).
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
-- No card/panel. Centered content column with soft radial glow: mint for 404, red for error.
-- 56px icon above eyebrow: `ClapperboardIcon` (mint) for 404, `AlertCircleIcon` (red) for error.
+- No card/panel. Centered content column with soft radial glow: accent for 404, red for error.
+- 56px icon above eyebrow: `ClapperboardIcon` (accent) for 404, `AlertCircleIcon` (red) for error.
 - Eyebrow: mono small uppercase. Title: serif display with one italicized accent word.
 - Actions use pill-shaped buttons — 404: single "Back to home" link; Error: "Try again" (`reset()`) + "Go home".

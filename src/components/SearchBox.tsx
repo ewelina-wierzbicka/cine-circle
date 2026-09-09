@@ -261,7 +261,7 @@ export function SearchBox({
         className={twMerge(
           'flex items-center rounded-2xl border transition-all duration-200 pl-5 pr-1.5 py-1.5',
           focused
-            ? 'bg-bg2 border-mint shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]'
+            ? 'bg-bg2 border-accent shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]'
             : 'border-secondary/50',
         )}
       >
@@ -301,7 +301,7 @@ export function SearchBox({
               className={twMerge(
                 'px-3 py-1.5 rounded-xl text-sm font-mono tracking-[0.05em] transition-all duration-150 cursor-pointer whitespace-nowrap',
                 mediaType === value
-                  ? 'bg-mint text-dark font-medium'
+                  ? 'bg-accent text-dark font-medium'
                   : 'text-secondary hover:text-primary',
               )}
             >
@@ -320,7 +320,7 @@ export function SearchBox({
             className={twMerge(
               'flex-1 py-2.5 rounded-xl text-sm font-mono tracking-[0.05em] transition-all duration-150 cursor-pointer',
               mediaType === value
-                ? 'bg-mint text-dark font-medium'
+                ? 'bg-accent text-dark font-medium'
                 : 'bg-bg3 text-secondary border border-secondary/20',
             )}
           >
@@ -379,7 +379,7 @@ export function SearchBox({
                     `${toHref(item.id, item.title, item.type)}?from=search`,
                   )
                 }
-                className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-mint hover:text-mint cursor-pointer"
+                className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-accent hover:text-accent cursor-pointer"
               >
                 {item.title}
               </button>

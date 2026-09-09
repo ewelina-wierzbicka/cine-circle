@@ -91,7 +91,7 @@ export default function StarRatingInput({
                     onMouseEnter={() => setHoverValue(val)}
                     onClick={() => onChange(value === val ? 0 : val)}
                     aria-label={`${val / 2} out of 5`}
-                    className="relative w-4 h-8 overflow-hidden cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-offset-1 focus-visible:ring-offset-dark"
+                    className="relative w-4 h-8 overflow-hidden cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-dark"
                   >
                     <StarIcon
                       className={twMerge(

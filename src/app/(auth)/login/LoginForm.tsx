@@ -49,7 +49,7 @@ export function LoginForm() {
         <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
           Welcome
           <br />
-          <em className="text-mint">back</em>
+          <em className="text-accent">back</em>
         </h1>
         <p className="text-base text-secondary">Sign in to your collection</p>
       </div>

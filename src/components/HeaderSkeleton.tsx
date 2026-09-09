@@ -4,18 +4,15 @@ import Link from 'next/link';
 
 export function HeaderSkeleton() {
   return (
-    <header className="relative z-50 flex items-center justify-between h-14 px-6 md:px-12 shrink-0">
+    <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
       <Link href="/" className="flex items-center gap-2.5">
         <Image
           src="/logo.png"
           alt="MidnightFrame logo"
-          width={26}
-          height={26}
+          width={200}
+          height={50}
           className="object-contain"
         />
-        <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-          MidnightFrame
-        </span>
       </Link>
       <nav
         className="hidden md:flex items-center gap-1"

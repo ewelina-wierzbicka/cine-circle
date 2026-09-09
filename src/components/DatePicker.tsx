@@ -46,9 +46,8 @@ export default function DatePicker({
 
   useEffect(() => {
     if (isOpen && openedWithKeyboard.current && pickerRef.current) {
-      const focusable = pickerRef.current.querySelector<HTMLElement>(
-        '[tabindex="0"]',
-      );
+      const focusable =
+        pickerRef.current.querySelector<HTMLElement>('[tabindex="0"]');
       if (focusable) {
         requestAnimationFrame(() => focusable.focus());
       } else {
@@ -125,8 +124,8 @@ export default function DatePicker({
             selected={selected}
             onSelect={handleDateSelect}
             classNames={{
-              nav_button: 'color-mint',
-              chevron: 'fill-mint',
+              nav_button: 'color-accent',
+              chevron: 'fill-accent',
             }}
             disabled={{ after: new Date() }}
           />
