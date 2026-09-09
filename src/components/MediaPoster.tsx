@@ -1,3 +1,4 @@
+import { tmdbImageLoader } from '@/lib/tmdbImageLoader';
 import { twMerge } from '@/lib/cn';
 import Image from 'next/image';
 
@@ -36,6 +37,7 @@ export default function MediaPoster({
           sizes={sizes}
           alt={title}
           priority={priority}
+          loader={tmdbImageLoader}
         />
       ) : (
         <div
