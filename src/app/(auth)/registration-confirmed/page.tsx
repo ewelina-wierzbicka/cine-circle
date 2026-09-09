@@ -1,6 +1,6 @@
-import { Link } from '@/components/Link';
 import { CheckCircleIcon } from '@/icons/CheckCircle';
 import AuthFormLayout from '../AuthFormLayout';
+import { SignInButton } from './SignInButton';
 
 export default function RegistrationConfirmedPage() {
   return (
@@ -21,12 +21,7 @@ export default function RegistrationConfirmedPage() {
       </div>
 
       <div className="w-full flex flex-col gap-4">
-        <Link
-          href="/login"
-          className="flex w-full items-center justify-center rounded-xl bg-accent px-8 py-3 text-base font-semibold uppercase tracking-[0.08em] text-dark transition-opacity hover:opacity-[0.82] cursor-pointer md:text-sm lg:text-base"
-        >
-          Sign in
-        </Link>
+        <SignInButton />
       </div>
     </AuthFormLayout>
   );

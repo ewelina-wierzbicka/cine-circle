@@ -49,41 +49,82 @@ test.describe('auth', () => {
     await expect(page).toHaveURL('/login');
   });
 
-  test('T3 registration validation + confirm-email', async ({ page }) => {
-    const newEmail = `reg-${Date.now()}@midnightframe.test`;
-    await page.goto('/register');
-    const createAccount = page.getByRole('button', { name: 'CREATE ACCOUNT' });
+  // Registration is one flow: register -> confirm-email -> the emailed link
+  // hits confirm-callback -> registration-confirmed -> sign in. These tests
+  // walk that flow in order.
+  test.describe('registration flow', () => {
+    test('T3 registration validation + confirm-email', async ({ page }) => {
+      const newEmail = `reg-${Date.now()}@midnightframe.test`;
+      await page.goto('/register');
+      const createAccount = page.getByRole('button', {
+        name: 'CREATE ACCOUNT',
+      });
 
-    // Weak password.
-    await page.getByLabel('Email').fill(newEmail);
-    await page.getByLabel('Password', { exact: true }).fill('weak');
-    await page.getByLabel('Confirm Password').fill('weak');
-    await createAccount.click();
-    await expect(
-      page.getByText('Password must be at least 8 characters'),
-    ).toBeVisible();
+      // Weak password.
+      await page.getByLabel('Email').fill(newEmail);
+      await page.getByLabel('Password', { exact: true }).fill('weak');
+      await page.getByLabel('Confirm Password').fill('weak');
+      await createAccount.click();
+      await expect(
+        page.getByText('Password must be at least 8 characters'),
+      ).toBeVisible();
 
-    // Mismatched confirm.
-    await page.getByLabel('Password', { exact: true }).fill(STRONG_PASSWORD);
-    await page.getByLabel('Confirm Password').fill('Different!1');
-    await createAccount.click();
-    await expect(page.getByText('Passwords do not match')).toBeVisible();
+      // Mismatched confirm.
+      await page.getByLabel('Password', { exact: true }).fill(STRONG_PASSWORD);
+      await page.getByLabel('Confirm Password').fill('Different!1');
+      await createAccount.click();
+      await expect(page.getByText('Passwords do not match')).toBeVisible();
 
-    // Valid submit. register() redirects to /confirm-email. If the Supabase
-    // project has email confirmation off, signUp returns a session and
-    // middleware bounces the now-authed user off /confirm-email to /.
-    await page.getByLabel('Confirm Password').fill(STRONG_PASSWORD);
-    await createAccount.click();
-    await page.waitForURL(
-      (url) => url.pathname === '/confirm-email' || url.pathname === '/',
-    );
-    // No validation error means the account was created.
-    await expect(page.getByText('Passwords do not match')).toBeHidden();
+      // Valid submit. register() redirects to /confirm-email. If the Supabase
+      // project has email confirmation off, signUp returns a session and
+      // middleware bounces the now-authed user off /confirm-email to /.
+      await page.getByLabel('Confirm Password').fill(STRONG_PASSWORD);
+      await createAccount.click();
+      await page.waitForURL(
+        (url) => url.pathname === '/confirm-email' || url.pathname === '/',
+      );
+      // No validation error means the account was created.
+      await expect(page.getByText('Passwords do not match')).toBeHidden();
 
-    await deleteUserByEmail(newEmail);
+      await deleteUserByEmail(newEmail);
+    });
+
+    test('T4 confirm-callback with code lands on registration-confirmed', async ({
+      page,
+    }) => {
+      // The emailed link verifies the email, then redirects here with a code.
+      // Any code present -> /registration-confirmed. No session is created.
+      await page.goto('/api/auth/confirm-callback?code=any-code');
+      await page.waitForURL('/registration-confirmed');
+      await expect(page.getByText('all set')).toBeVisible();
+
+      // SIGN IN CTA routes to /login.
+      await page.getByRole('button', { name: 'SIGN IN' }).click();
+      await page.waitForURL('/login');
+      await expect(page.getByRole('button', { name: 'SIGN IN' })).toBeVisible();
+    });
+
+    test('T5 confirm-callback with no code redirects to login with toast', async ({
+      page,
+    }) => {
+      // Callback with no code -> /login?error=confirm_failed, surfaced as a toast.
+      await page.goto('/api/auth/confirm-callback');
+      await page.waitForURL('/login');
+      await expect(
+        page.getByText('Email confirmation failed. Please try again.'),
+      ).toBeVisible();
+    });
+
+    test('T6 registration-confirmed redirects a logged-in user home', async ({
+      authedPage,
+    }) => {
+      // It is an auth route; authed users are bounced to /.
+      await authedPage.goto('/registration-confirmed');
+      await authedPage.waitForURL('/');
+    });
   });
 
-  test('T4 auth redirect + rurl', async ({ page }) => {
+  test('T7 auth redirect + rurl', async ({ page }) => {
     // Anonymous access to protected route redirects with rurl.
     await page.goto('/collection');
     await page.waitForURL(/\/login\?rurl=%2Fcollection/);
@@ -100,7 +141,7 @@ test.describe('auth', () => {
     await expect(authedPage).toHaveURL('/collection');
   });
 
-  test('T5 forgot-password validation + request sent', async ({ page }) => {
+  test('T8 forgot-password validation + request sent', async ({ page }) => {
     await page.goto('/forgot-password');
     const send = page.getByRole('button', { name: 'SEND RESET LINK' });
 
@@ -123,7 +164,7 @@ test.describe('auth', () => {
     await expect(page.getByText('A reset link is on its way.')).toBeVisible();
   });
 
-  test('T6 reset-callback failure redirects to login with toast', async ({
+  test('T9 reset-callback failure redirects to login with toast', async ({
     page,
   }) => {
     // Callback with no code -> /login?error=reset_failed, surfaced as a toast.
@@ -134,7 +175,7 @@ test.describe('auth', () => {
     ).toBeVisible();
   });
 
-  test('T7 reset-password form validates new password', async ({
+  test('T10 reset-password form validates new password', async ({
     page,
     context,
     isolatedUser,
@@ -161,7 +202,7 @@ test.describe('auth', () => {
     await expect(page.getByText('Passwords do not match')).toBeVisible();
   });
 
-  test('T8 reset-password rejects a non-recovery session', async ({
+  test('T11 reset-password rejects a non-recovery session', async ({
     page,
     context,
     isolatedUser,
@@ -181,7 +222,7 @@ test.describe('auth', () => {
     await expect(page).toHaveURL('/reset-password');
   });
 
-  test('T9 reset happy path: new password logs in, old one fails', async ({
+  test('T12 reset happy path: new password logs in, old one fails', async ({
     page,
     context,
     isolatedUser,
