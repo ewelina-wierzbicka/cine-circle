@@ -67,6 +67,7 @@ src/
         error.tsx              # error boundary for /reset-password — reset failure UI
       registration-confirmed/  # /registration-confirmed — email confirmation success page (auth route; reached via confirm-callback without a session, logged-in users redirected to /)
         page.tsx
+        SignInButton.tsx       # client — Button-styled CTA, router.push('/login')
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       search/                 # /search
