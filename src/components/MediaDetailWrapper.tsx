@@ -49,7 +49,7 @@ export default function MediaDetailWrapper({
       </div>
       {recommendations && recommendations.length > 0 && step === 1 && (
         <div className="relative z-2 px-6 md:px-12 pb-8 pt-12">
-          <span className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-4 block">
+          <span className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-4 block">
             More like this
           </span>
           <div className="flex gap-3 overflow-x-auto pb-1">
@@ -69,7 +69,7 @@ export default function MediaDetailWrapper({
                       sizes="110px"
                     />
                     {rec.genre && (
-                      <span className="absolute bottom-1.5 left-1.5 font-mono text-sm tracking-[0.06em] uppercase bg-dark/70 text-mint px-1.5 py-0.5 rounded-full">
+                      <span className="absolute bottom-1.5 left-1.5 font-mono text-sm tracking-[0.06em] uppercase bg-dark/70 text-accent px-1.5 py-0.5 rounded-full">
                         {rec.genre}
                       </span>
                     )}

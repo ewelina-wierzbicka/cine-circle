@@ -13,7 +13,7 @@
   --color-dark: #0d0d10;
   --color-bg2: #18181f;
   --color-bg3: #21212a;
-  --color-mint: oklch(82% 0.1 165);
+  --color-accent: oklch(80% 0.25 285);
   --color-error: var(--color-red-400);
   --gradient-blue: linear-gradient(
     160deg,
@@ -94,17 +94,17 @@ body {
 /* ── React Day Picker ── */
 
 .rdp-today:not(.rdp-outside) {
-  color: var(--color-mint) !important;
+  color: var(--color-accent) !important;
   font-weight: bold !important;
 }
 
 .rdp-selected .rdp-day_button {
-  border: 2px solid var(--color-mint) !important;
+  border: 2px solid var(--color-accent) !important;
 }
 
 /* ── React Toastify ── */
 
 :root {
-  --toastify-color-success: var(--color-mint);
+  --toastify-color-success: var(--color-accent);
   --toastify-color-error: var(--color-error);
 }

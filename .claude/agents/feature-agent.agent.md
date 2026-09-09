@@ -70,8 +70,8 @@ Always read AGENTS.md before starting any task. It contains the project structur
   - `text-secondary` — muted / supporting text (`rgba(236,233,227,0.75)`)
   - `bg-dark` — page background (`#0d0d10`)
   - `bg-bg2` / `bg-bg3` — card and elevated surfaces (`#18181f` / `#21212a`)
-  - `text-mint` / `bg-mint` — mint accent (`oklch(82% 0.10 165)`)
-  - `text-dark` — text on mint backgrounds
+  - `text-accent` / `bg-accent` — accent accent (`oklch(80% 0.25 285)`)
+  - `text-dark` — text on accent backgrounds
 - Before building new UI, check `components/` for existing patterns to stay consistent
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files

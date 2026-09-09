@@ -33,18 +33,15 @@ export default async function AuthFormLayout({
         <div className="absolute -bottom-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.60_0.1_165/0.1)_0%,transparent_65%)]" />
         <Link
           href="/"
-          className="absolute top-7 left-6 z-10 flex items-center gap-2.5"
+          className="absolute top-4 left-6 z-10 flex items-center gap-2.5"
         >
           <Image
             src="/logo.png"
             alt="MidnightFrame logo"
-            width={26}
-            height={26}
+            width={200}
+            height={50}
             className="object-contain"
           />
-          <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-            MidnightFrame
-          </span>
         </Link>
 
         <div className="relative flex items-center justify-center h-full px-6 md:px-12">

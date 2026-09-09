@@ -72,7 +72,7 @@ export default function Select<T extends string = string>({
         onKeyDown={handleKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-mint transition-colors"
+        className="flex items-center justify-between gap-2 rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5 w-full cursor-pointer outline-none focus:border-accent transition-colors"
       >
         <span className="text-sm text-secondary">{selectedLabel}</span>
         <ChevronIcon

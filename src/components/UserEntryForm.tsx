@@ -109,7 +109,7 @@ export default function UserEntryForm({
     <div className="w-full py-4 animate-fade-up">
       <p className="font-serif text-[40px] lg:text-5xl tracking-[-0.02em] leading-[1.1] mb-10 md:max-w-140">
         {isUpdateMode ? 'Update' : 'Add'}{' '}
-        <em className="text-mint">&ldquo;{title}&rdquo;</em>
+        <em className="text-accent">&ldquo;{title}&rdquo;</em>
       </p>
       <form
         onSubmit={handleSubmit(onSubmit)}

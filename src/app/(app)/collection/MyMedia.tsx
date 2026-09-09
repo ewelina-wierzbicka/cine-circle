@@ -25,7 +25,7 @@ export default function MyMedia({ tab, initialData }: Props) {
     <>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-10 pb-12">
         <div className="w-full sm:w-[25%]">
-          <p className="font-mono text-sm tracking-[0.2em] text-mint uppercase mb-2">
+          <p className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-2">
             My Collection
           </p>
           <h1 className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95]">
@@ -44,7 +44,7 @@ export default function MyMedia({ tab, initialData }: Props) {
               href="?tab=watched"
               className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
                 tab === 'watched'
-                  ? 'bg-mint text-dark'
+                  ? 'bg-accent text-dark'
                   : 'text-secondary hover:text-primary'
               }`}
             >
@@ -54,7 +54,7 @@ export default function MyMedia({ tab, initialData }: Props) {
               href="?tab=to_watch"
               className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
                 tab === 'to_watch'
-                  ? 'bg-mint text-dark'
+                  ? 'bg-accent text-dark'
                   : 'text-secondary hover:text-primary'
               }`}
             >

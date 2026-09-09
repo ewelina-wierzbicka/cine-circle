@@ -42,7 +42,7 @@ export default function MediaInfoHeader({ media }: Props) {
     <>
       <Link
         href={fromSearch ? '/' : '/collection'}
-        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-mint transition-colors duration-150 mb-9 self-start"
+        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
       >
         {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
       </Link>
@@ -51,7 +51,7 @@ export default function MediaInfoHeader({ media }: Props) {
           {genres.map((g) => (
             <span
               key={g.id}
-              className="font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-mint"
+              className="font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent"
             >
               {g.name}
             </span>
@@ -83,7 +83,7 @@ export default function MediaInfoHeader({ media }: Props) {
           {dateDisplay}
         </span>
       </div>
-      <div className="mb-8 shrink-0 w-12 h-px bg-mint opacity-60" />
+      <div className="mb-8 shrink-0 w-12 h-px bg-accent opacity-60" />
       {overview && (
         <p className="text-sm text-primary leading-relaxed mb-8">{overview}</p>
       )}

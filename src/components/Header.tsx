@@ -38,18 +38,15 @@ export default function Header({ profile }: HeaderProps) {
   };
 
   return (
-    <header className="relative z-50 flex items-center justify-between h-14 px-6 md:px-12 shrink-0">
+    <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
       <Link href="/" className="flex items-center gap-2.5">
         <Image
           src="/logo.png"
           alt="MidnightFrame logo"
-          width={26}
-          height={26}
+          width={200}
+          height={50}
           className="object-contain"
         />
-        <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-          MidnightFrame
-        </span>
       </Link>
       <nav
         className="hidden md:flex items-center gap-1"
@@ -73,7 +70,7 @@ export default function Header({ profile }: HeaderProps) {
       {!profile ? (
         <Link
           href="/login"
-          className="rounded-full bg-mint text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
+          className="rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
         >
           Sign in
         </Link>
@@ -99,7 +96,7 @@ export default function Header({ profile }: HeaderProps) {
           >
             {displayName && (
               <span className="hidden sm:inline text-[14px] font-sans text-primary tracking-[0.02em]">
-                Hello <span className="text-mint">{displayName}</span>!
+                Hello <span className="text-accent">{displayName}</span>!
               </span>
             )}
             {avatarUrl ? (

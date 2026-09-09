@@ -154,8 +154,8 @@ export const colors = {
   text: '#ece9e3', // maps to CSS var --color-primary
   muted: 'rgba(236,233,227,0.75)', // maps to CSS var --color-secondary
 
-  // Accent — pastel mint
-  mint: 'oklch(82% 0.10 165)', // maps to CSS var --color-mint
+  // Accent — pastel accent
+  accent: 'oklch(80% 0.25 285)', // maps to CSS var --color-accent
 };
 ```
 
