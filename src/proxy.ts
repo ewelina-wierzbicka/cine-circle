@@ -8,9 +8,10 @@ const AUTH_ROUTES = [
   '/register',
   '/confirm-email',
   '/forgot-password',
+  '/registration-confirmed',
 ];
 // Open routes: accessible to everyone (no redirect for unauthenticated users)
-const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy', '/registration-confirmed'];
+const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
 export default async function proxy(request: NextRequest) {
