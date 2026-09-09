@@ -40,6 +40,32 @@ export const SUPABASE_URL = required('NEXT_PUBLIC_SUPABASE_URL');
 export const SUPABASE_ANON_KEY = required('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 export const SUPABASE_SERVICE_KEY = required('SUPABASE_SECRET_KEY');
 
+// Safety guard. The suite creates and deletes users via the service-role key
+// and seeds rows bypassing RLS. `.env.test.local` (local Supabase) is gitignored,
+// so a fresh clone or CI silently falls back to `.env.local` (the app's real
+// project). Refuse to run destructive admin ops against a non-local Supabase
+// unless a human explicitly opts in with E2E_ALLOW_REMOTE=1.
+function assertLocalTarget(url: string): void {
+  if (process.env.E2E_ALLOW_REMOTE === '1') return;
+  let host: string;
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    throw new Error(`Invalid NEXT_PUBLIC_SUPABASE_URL: ${url}`);
+  }
+  const isLocal =
+    host === '127.0.0.1' || host === 'localhost' || host === '::1';
+  if (!isLocal) {
+    throw new Error(
+      `Refusing to run e2e against non-local Supabase host "${host}". ` +
+        `The suite deletes users and bypasses RLS. Point .env.test.local at a ` +
+        `local/disposable project, or set E2E_ALLOW_REMOTE=1 to override.`,
+    );
+  }
+}
+
+assertLocalTarget(SUPABASE_URL);
+
 export const TEST_USER_EMAIL =
   process.env.TEST_USER_EMAIL ?? 'e2e-persistent@midnightframe.test';
 export const TEST_USER_PASSWORD =
