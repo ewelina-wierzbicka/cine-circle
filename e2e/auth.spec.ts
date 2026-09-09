@@ -181,6 +181,39 @@ test.describe('auth', () => {
     await expect(page).toHaveURL('/reset-password');
   });
 
+  test('T10 confirm-callback with no code redirects to login with toast', async ({
+    page,
+  }) => {
+    // Callback with no code -> /login?error=confirm_failed, surfaced as a toast.
+    await page.goto('/api/auth/confirm-callback');
+    await page.waitForURL('/login');
+    await expect(
+      page.getByText('Email confirmation failed. Please try again.'),
+    ).toBeVisible();
+  });
+
+  test('T11 confirm-callback with code lands on registration-confirmed', async ({
+    page,
+  }) => {
+    // Any code present -> /registration-confirmed. No session is created.
+    await page.goto('/api/auth/confirm-callback?code=any-code');
+    await page.waitForURL('/registration-confirmed');
+    await expect(page.getByText('all set')).toBeVisible();
+
+    // SIGN IN CTA routes to /login.
+    await page.getByRole('button', { name: 'SIGN IN' }).click();
+    await page.waitForURL('/login');
+    await expect(page.getByRole('button', { name: 'SIGN IN' })).toBeVisible();
+  });
+
+  test('T12 registration-confirmed redirects a logged-in user home', async ({
+    authedPage,
+  }) => {
+    // It is an auth route; authed users are bounced to /.
+    await authedPage.goto('/registration-confirmed');
+    await authedPage.waitForURL('/');
+  });
+
   test('T9 reset happy path: new password logs in, old one fails', async ({
     page,
     context,
