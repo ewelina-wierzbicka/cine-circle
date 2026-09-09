@@ -344,7 +344,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
 - Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
 - Heading: `font-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
-- CTA: `Link` to `/login` styled as the medium filled `Button` ("Sign in") — `bg-accent text-dark`, `rounded-xl`, `uppercase tracking-[0.08em]`, full width, `hover:opacity-[0.82]`.
+- CTA: `SignInButton` (`SignInButton.tsx`, client) — medium filled accent `Button` ("SIGN IN") navigating to `/login` via `router.push`. Page stays a Server Component.
 
 ---
 
@@ -434,7 +434,7 @@ Info & Form
   - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
   - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
-  - Mint divider `w-12 h-px bg-accent opacity-60`.
+  - Accent divider `w-12 h-px bg-accent opacity-60`.
   - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
