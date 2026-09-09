@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import MediaPoster from '@/components/MediaPoster';
 import { toHref } from '@/lib/mediaUtils';
 import { TrendingMovie } from '@/types';
+import Link from 'next/link';
 
 type Props = {
   recentPostersPromise: Promise<TrendingMovie[]>;
@@ -19,7 +19,7 @@ export async function RecentWatched({ recentPostersPromise }: Props) {
         </span>
         <Link
           href="/collection"
-          className="font-mono text-sm text-mint tracking-[0.08em] hover:opacity-70 transition-opacity"
+          className="font-mono text-sm text-accent tracking-[0.08em] hover:opacity-70 transition-opacity"
         >
           SEE ALL →
         </Link>

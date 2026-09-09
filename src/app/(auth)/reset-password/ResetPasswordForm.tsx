@@ -40,7 +40,7 @@ export function ResetPasswordForm() {
         <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
           Choose a new
           <br />
-          <em className="text-mint">password</em>
+          <em className="text-accent">password</em>
         </h1>
         <p className="text-base text-secondary">
           At least 8 characters with uppercase, lowercase, number, and special

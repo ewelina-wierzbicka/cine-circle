@@ -49,7 +49,7 @@ export default function PrivacyPage() {
         <div className="space-y-8">
           {sections.map(({ heading, body }) => (
             <div key={heading}>
-              <h2 className="font-mono text-sm tracking-[0.15em] text-mint uppercase mb-3">
+              <h2 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-3">
                 {heading}
               </h2>
               <p className="font-sans text-base text-secondary leading-relaxed">

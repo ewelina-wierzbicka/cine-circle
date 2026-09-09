@@ -17,7 +17,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
         <textarea
           id={id}
           className={twMerge(
-            'h-30 rounded-xl p-4 bg-bg2 border border-secondary/25 pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-secondary focus:border-mint focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+            'h-30 rounded-xl p-4 bg-bg2 border border-secondary/25 pl-4 pr-4 w-full outline-none text-sm text-primary transition-colors placeholder:text-secondary focus:border-accent focus:bg-bg3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
             className,
           )}
           onChange={handleChange}

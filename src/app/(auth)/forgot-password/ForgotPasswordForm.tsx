@@ -35,14 +35,14 @@ export function ForgotPasswordForm() {
     return (
       <>
         <div className="mb-8">
-          <div className="mb-5 w-10 h-10 rounded-xl bg-mint/10 border border-mint/20 flex items-center justify-center">
-            <EnvelopeIcon className="text-mint" />
+          <div className="mb-5 w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+            <EnvelopeIcon className="text-accent" />
           </div>
 
           <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
             Check your
             <br />
-            <em className="text-mint">inbox</em>
+            <em className="text-accent">inbox</em>
           </h1>
           <p className="text-sm text-secondary">A reset link is on its way.</p>
         </div>
@@ -76,7 +76,7 @@ export function ForgotPasswordForm() {
         <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
           Reset your
           <br />
-          <em className="text-mint">password</em>
+          <em className="text-accent">password</em>
         </h1>
         <p className="text-base text-secondary">
           Enter your email and we&apos;ll send a reset link.

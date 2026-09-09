@@ -33,7 +33,7 @@ export function RegisterForm() {
         <h1 className="font-serif text-6xl tracking-[-0.02em] leading-[1.1] mb-3">
           Your movies.
           <br />
-          <em className="text-mint">Your list.</em>
+          <em className="text-accent">Your list.</em>
         </h1>
         <p className="text-base text-secondary">
           Track every movie. Build your list.

@@ -7,7 +7,7 @@ type Props = {
   handleClick?: (e: MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   type?: 'submit' | 'button';
   variant?: 'filled' | 'outlined';
-  color?: 'mint' | 'error';
+  color?: 'accent' | 'error';
   size?: 'small' | 'medium';
   className?: string;
   disabled?: boolean;
@@ -18,7 +18,7 @@ export default function Button({
   handleClick,
   type = 'button',
   variant = 'filled',
-  color = 'mint',
+  color = 'accent',
   size = 'medium',
   className,
   disabled,
@@ -27,7 +27,7 @@ export default function Button({
   const filledColors =
     color === 'error'
       ? 'bg-red-800 text-primary hover:bg-red-900'
-      : 'bg-mint text-dark hover:opacity-[0.82]';
+      : 'bg-accent text-dark hover:opacity-[0.82]';
 
   return (
     <button

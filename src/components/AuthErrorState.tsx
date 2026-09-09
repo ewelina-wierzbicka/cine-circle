@@ -23,18 +23,15 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
       />
       <div className="pointer-events-none absolute -bottom-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,oklch(65%_0.18_25/0.10)_0%,transparent_65%)]" />
 
-      <header className="absolute top-7 left-6 z-10">
+      <header className="absolute top-7 left-6 z-10 h-16">
         <Link href="/" className="flex items-center gap-2.5">
           <Image
             src="/logo.png"
             alt="MidnightFrame logo"
-            width={26}
-            height={26}
+            width={200}
+            height={50}
             className="object-contain"
           />
-          <span className="font-mono text-sm font-medium tracking-[0.05em] text-primary">
-            MidnightFrame
-          </span>
         </Link>
       </header>
       <main className="relative flex h-full items-center justify-center p-6">

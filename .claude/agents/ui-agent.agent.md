@@ -35,17 +35,17 @@ You do not handle data fetching, Supabase schema changes, or auth logic unless i
 
 The project uses Tailwind CSS v4 with custom tokens defined in `src/globals.css`. Always use these — never hardcode hex values.
 
-| Token                         | Use                                                  |
-| ----------------------------- | ---------------------------------------------------- |
-| `text-primary` / `bg-primary` | Warm near-white (`#ece9e3`) — primary text           |
-| `text-secondary`              | Muted text (`rgba(236,233,227,0.75)`)                |
-| `bg-dark` / `text-dark`       | Page background / text on mint (`#0d0d10`)           |
-| `bg-bg2`                      | Card / input background (`#18181f`)                  |
-| `bg-bg3`                      | Elevated elements, hover states (`#21212a`)          |
-| `text-mint` / `bg-mint`       | Pastel mint — primary accent (`oklch(82% 0.10 165)`) |
-| `font-sans`                   | DM Sans — primary body font                          |
-| `font-serif`                  | DM Serif Display — headings, display text            |
-| `font-mono`                   | DM Mono — labels, nav items                          |
+| Token                         | Use                                                    |
+| ----------------------------- | ------------------------------------------------------ |
+| `text-primary` / `bg-primary` | Warm near-white (`#ece9e3`) — primary text             |
+| `text-secondary`              | Muted text (`rgba(236,233,227,0.75)`)                  |
+| `bg-dark` / `text-dark`       | Page background / text on accent (`#0d0d10`)           |
+| `bg-bg2`                      | Card / input background (`#18181f`)                    |
+| `bg-bg3`                      | Elevated elements, hover states (`#21212a`)            |
+| `text-accent` / `bg-accent`   | Pastel accent — primary accent (`oklch(80% 0.25 285)`) |
+| `font-sans`                   | DM Sans — primary body font                            |
+| `font-serif`                  | DM Serif Display — headings, display text              |
+| `font-mono`                   | DM Mono — labels, nav items                            |
 
 > For borders and overlays without a named token, use Tailwind opacity utilities: `border-secondary/25`, `bg-white/4`, etc.
 > Star ratings use `text-amber-400` (Tailwind built-in — not a custom token).
