@@ -1,5 +1,5 @@
 import { test, expect, passwordSessionCookies } from './fixtures/auth';
-import { deleteUserByEmail, resetPasswordViaRecovery } from './admin';
+import { admin, deleteUserByEmail, resetPasswordViaRecovery } from './admin';
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from './env';
 
 // Strong password satisfying: upper, lower, digit, special, 8+ chars.
@@ -125,15 +125,29 @@ test.describe('auth', () => {
   });
 
   test('T7 auth redirect + rurl', async ({ page }) => {
-    // Anonymous access to protected route redirects with rurl.
-    await page.goto('/collection');
-    await page.waitForURL(/\/login\?rurl=%2Fcollection/);
+    // Use a dedicated user so T1's global signOut cannot race with this login.
+    const email = `e2e-rurl-${Date.now()}@midnightframe.test`;
+    const password = 'E2eRurl!1';
+    const { error } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+    if (error) throw error;
 
-    await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
-    await page.getByRole('button', { name: 'SIGN IN' }).click();
+    try {
+      // Anonymous access to protected route redirects with rurl.
+      await page.goto('/collection');
+      await page.waitForURL(/\/login\?rurl=%2Fcollection/);
 
-    await page.waitForURL('/collection');
+      await page.getByLabel('Email').fill(email);
+      await page.getByLabel('Password').fill(password);
+      await page.getByRole('button', { name: 'SIGN IN' }).click();
+
+      await page.waitForURL('/collection');
+    } finally {
+      await deleteUserByEmail(email);
+    }
   });
 
   test('authedPage fixture reaches protected route', async ({ authedPage }) => {
