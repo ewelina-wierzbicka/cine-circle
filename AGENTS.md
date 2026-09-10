@@ -213,6 +213,8 @@ export const colors = {
 - Keep data fetching in Server Components or Route Handlers — avoid fetching in Client Components where possible
 - Use Next.js `loading.tsx` and `error.tsx` files for async boundaries
 - Environment variables: server-only vars in `.env.local`, public vars prefixed with `NEXT_PUBLIC_`
+- Images use a global custom loader: `images.loader: 'custom'` + `images.loaderFile: './src/lib/imageLoader.ts'`. TMDB URLs are rewritten to the nearest TMDB width bucket (`w92`…`w780`, else `original`), which restores `srcset`. All other sources (Supabase avatars, local `/logo.png`) pass through untouched.
+- Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
 
 ---
 
