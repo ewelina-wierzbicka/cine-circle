@@ -32,6 +32,7 @@ export default function MediaPoster({
         <Image
           className="object-cover object-top"
           fill
+          unoptimized
           src={src}
           sizes={sizes}
           alt={title}
