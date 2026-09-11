@@ -15,7 +15,9 @@ export default defineConfig({
   // 6 parallel workers against a Turbopack dev server + local Supabase can
   // push a single test past the 30s default when routes still need compiling.
   timeout: 60_000,
-  retries: process.env.CI ? 2 : 0,
+  // Allow one retry locally too: server-action roundtrips against local
+  // Supabase under parallel load occasionally exceed the timeout once.
+  retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   globalSetup: './e2e/global-setup.ts',

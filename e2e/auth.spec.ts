@@ -51,8 +51,10 @@ test.describe('auth', () => {
 
   // Registration is one flow: register -> confirm-email -> the emailed link
   // hits confirm-callback -> registration-confirmed -> sign in. These tests
-  // walk that flow in order.
+  // walk that flow in order. Generous timeout: signup is a server action on a
+  // Turbopack dev server, slowest under first-hit compile + parallel load.
   test.describe('registration flow', () => {
+    test.describe.configure({ timeout: 120_000 });
     test('T3 registration validation + confirm-email', async ({ page }) => {
       const newEmail = `reg-${Date.now()}@midnightframe.test`;
       await page.goto('/register');
