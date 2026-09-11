@@ -175,7 +175,11 @@ test.describe('auth', () => {
     // Valid submit -> confirmation screen (no email enumeration).
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
     await send.click();
-    await expect(page.getByText('A reset link is on its way.')).toBeVisible();
+    // The success screen renders only after the Supabase reset request
+    // resolves; on a slow local instance default 5s can be too tight.
+    await expect(page.getByText('A reset link is on its way.')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('T9 reset-callback failure redirects to login with toast', async ({

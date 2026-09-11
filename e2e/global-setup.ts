@@ -11,4 +11,19 @@ export default async function globalSetup() {
     email_confirm: true,
   });
   if (error) throw error;
+
+  // Warm up the test server so Turbopack compiles all pages before tests run
+  // in parallel. Without this, the first concurrent requests to complex pages
+  // (movie detail, search) queue behind auth-page compilations and time out.
+  const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
+  const warmupPaths = [
+    '/login',
+    '/search',
+    `/movie/27205`, // Inception — used by collection tests
+  ];
+  await Promise.allSettled(
+    warmupPaths.map((p) =>
+      fetch(`${baseURL}${p}`, { signal: AbortSignal.timeout(25_000) }),
+    ),
+  );
 }
