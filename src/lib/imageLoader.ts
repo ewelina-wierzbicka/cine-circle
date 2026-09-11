@@ -21,6 +21,9 @@ function tmdbSize(width: number): string {
 // They cannot be forwarded to `/_next/image`: Next.js 404s that route whenever
 // `images.loader` is `custom` (see next-server.js, `imagesConfig.loader !==
 // 'default'` -> render404), so any optimizer URL we built would be a dead link.
+//
+// `quality` is ignored: TMDB serves pre-encoded files per width bucket and has
+// no quality parameter, and non-TMDB sources are passed through untouched.
 export default function imageLoader({ src, width }: ImageLoaderProps): string {
   if (!src.startsWith(`${TMDB_HOST}/`)) return src;
 

@@ -34,7 +34,10 @@ export async function resizeImage(
     canvas.height = height;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return file;
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
 
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
