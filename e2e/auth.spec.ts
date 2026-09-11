@@ -1,5 +1,5 @@
 import { test, expect, passwordSessionCookies } from './fixtures/auth';
-import { deleteUserByEmail, resetPasswordViaRecovery } from './admin';
+import { admin, deleteUserByEmail, resetPasswordViaRecovery } from './admin';
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from './env';
 
 // Strong password satisfying: upper, lower, digit, special, 8+ chars.
@@ -51,8 +51,10 @@ test.describe('auth', () => {
 
   // Registration is one flow: register -> confirm-email -> the emailed link
   // hits confirm-callback -> registration-confirmed -> sign in. These tests
-  // walk that flow in order.
+  // walk that flow in order. Generous timeout: signup is a server action on a
+  // Turbopack dev server, slowest under first-hit compile + parallel load.
   test.describe('registration flow', () => {
+    test.describe.configure({ timeout: 120_000 });
     test('T3 registration validation + confirm-email', async ({ page }) => {
       const newEmail = `reg-${Date.now()}@midnightframe.test`;
       await page.goto('/register');
@@ -125,15 +127,29 @@ test.describe('auth', () => {
   });
 
   test('T7 auth redirect + rurl', async ({ page }) => {
-    // Anonymous access to protected route redirects with rurl.
-    await page.goto('/collection');
-    await page.waitForURL(/\/login\?rurl=%2Fcollection/);
+    // Use a dedicated user so T1's global signOut cannot race with this login.
+    const email = `e2e-rurl-${Date.now()}@midnightframe.test`;
+    const password = 'E2eRurl!1';
+    const { error } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
+    if (error) throw error;
 
-    await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
-    await page.getByRole('button', { name: 'SIGN IN' }).click();
+    try {
+      // Anonymous access to protected route redirects with rurl.
+      await page.goto('/collection');
+      await page.waitForURL(/\/login\?rurl=%2Fcollection/);
 
-    await page.waitForURL('/collection');
+      await page.getByLabel('Email').fill(email);
+      await page.getByLabel('Password').fill(password);
+      await page.getByRole('button', { name: 'SIGN IN' }).click();
+
+      await page.waitForURL('/collection');
+    } finally {
+      await deleteUserByEmail(email);
+    }
   });
 
   test('authedPage fixture reaches protected route', async ({ authedPage }) => {
@@ -161,7 +177,11 @@ test.describe('auth', () => {
     // Valid submit -> confirmation screen (no email enumeration).
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
     await send.click();
-    await expect(page.getByText('A reset link is on its way.')).toBeVisible();
+    // The success screen renders only after the Supabase reset request
+    // resolves; on a slow local instance default 5s can be too tight.
+    await expect(page.getByText('A reset link is on its way.')).toBeVisible({
+      timeout: 15_000,
+    });
   });
 
   test('T9 reset-callback failure redirects to login with toast', async ({

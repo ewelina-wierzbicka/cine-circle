@@ -26,10 +26,11 @@ export async function resetPasswordViaRecovery(
   email: string,
   newPassword: string,
 ) {
+  const baseURL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
   const { data, error } = await admin.auth.admin.generateLink({
     type: 'recovery',
     email,
-    options: { redirectTo: 'http://localhost:3000/api/auth/reset-callback' },
+    options: { redirectTo: `${baseURL}/api/auth/reset-callback` },
   });
   if (error || !data.properties) {
     throw error ?? new Error('Failed to generate recovery link');
