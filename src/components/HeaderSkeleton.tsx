@@ -7,7 +7,7 @@ export function HeaderSkeleton() {
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
       <Link href="/" className="flex items-center gap-2.5">
         <Image
-          src="/logo.png"
+          src="/logo.webp"
           alt="MidnightFrame logo"
           width={200}
           height={50}

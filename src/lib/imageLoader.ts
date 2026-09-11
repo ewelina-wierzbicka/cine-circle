@@ -15,7 +15,9 @@ function tmdbSize(width: number): string {
 
 // `images.loaderFile` is global, so this runs for every next/image usage.
 //
-// Non-TMDB sources (Supabase avatars, local /logo.png) are returned as-is.
+// Non-TMDB sources (Supabase avatars, local /logo.webp) are returned as-is.
+// Both are pre-sized at the source instead: /logo.webp ships at 400px wide
+// (2x its 200px render) and avatars are resized to 128px before upload.
 // They cannot be forwarded to `/_next/image`: Next.js 404s that route whenever
 // `images.loader` is `custom` (see next-server.js, `imagesConfig.loader !==
 // 'default'` -> render404), so any optimizer URL we built would be a dead link.
