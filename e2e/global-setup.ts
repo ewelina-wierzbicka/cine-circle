@@ -15,9 +15,13 @@ export default async function globalSetup() {
   // Warm up the test server so Turbopack compiles all pages before tests run
   // in parallel. Without this, the first concurrent requests to complex pages
   // (movie detail, search) queue behind auth-page compilations and time out.
-  const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
+  // Must match the port in playwright.config.ts.
+  const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3001';
   const warmupPaths = [
     '/login',
+    '/register',
+    '/confirm-email',
+    '/forgot-password',
     '/search',
     `/movie/27205`, // Inception — used by collection tests
   ];

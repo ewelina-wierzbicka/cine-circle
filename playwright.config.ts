@@ -12,6 +12,9 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  // 6 parallel workers against a Turbopack dev server + local Supabase can
+  // push a single test past the 30s default when routes still need compiling.
+  timeout: 60_000,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
