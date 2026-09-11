@@ -4,6 +4,7 @@ import Button from '@/components/Button';
 import Input from '@/components/Input';
 import ChevronIcon from '@/icons/Chevron';
 import { twMerge } from '@/lib/cn';
+import { resizeImage } from '@/lib/resizeImage';
 import { createClient } from '@/lib/supabase/client';
 import { deleteAccount, updateEmail, updatePassword } from '@/services/account';
 import { logout } from '@/services/auth';
@@ -94,12 +95,19 @@ export function ProfileContent({ profile, email }: Props) {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const ext = file.name.split('.').pop() ?? 'jpg';
+    // Avatars render at 32x32, so downscale before upload. Falls back to the
+    // original file if the browser cannot re-encode it.
+    const upload = await resizeImage(file);
+
+    // `upsert` only overwrites the same path, so an earlier `avatar.jpg` is
+    // left behind when the extension changes. Accepted: one stale object per
+    // user, never served because the profile row points at the new path.
+    const ext = upload.name.split('.').pop() ?? 'jpg';
     const path = `${user.id}/avatar.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatar')
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, upload, { upsert: true, contentType: upload.type });
 
     if (uploadError) {
       setAvatarError(uploadError.message);
