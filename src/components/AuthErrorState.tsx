@@ -26,7 +26,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
       <header className="absolute top-7 left-6 z-10 h-16">
         <Link href="/" className="flex items-center gap-2.5">
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="MidnightFrame logo"
             width={200}
             height={50}

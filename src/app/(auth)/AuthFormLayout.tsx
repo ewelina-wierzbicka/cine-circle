@@ -36,7 +36,7 @@ export default async function AuthFormLayout({
           className="absolute top-4 left-6 z-10 flex items-center gap-2.5"
         >
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt="MidnightFrame logo"
             width={200}
             height={50}
