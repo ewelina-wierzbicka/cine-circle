@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+      # Server actions (register, sendPasswordReset) hard-fail without this.
+      # Must match the Supabase auth redirect allowlist (localhost:3001 e2e server).
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || vars.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001' }}
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
