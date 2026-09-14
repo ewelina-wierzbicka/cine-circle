@@ -62,9 +62,3 @@ export const TEST_USER_EMAIL =
   process.env.TEST_USER_EMAIL ?? 'e2e-persistent@midnightframe.test';
 export const TEST_USER_PASSWORD =
   process.env.TEST_USER_PASSWORD ?? 'E2ePersistent!1';
-
-// Server actions (register, sendPasswordReset) hard-fail without
-// NEXT_PUBLIC_SITE_URL. CI has no .env.test.local, so default it to the e2e
-// server origin. Must run before playwright.config builds the webServer env.
-process.env.NEXT_PUBLIC_SITE_URL ??=
-  process.env.E2E_BASE_URL ?? 'http://localhost:3001';
