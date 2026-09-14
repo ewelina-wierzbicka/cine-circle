@@ -1,9 +1,3 @@
-// Avatars render at 32x32 (`Header.tsx`) but uploads are only capped at 1 MB.
-// The custom `images.loaderFile` is global, so `/_next/image` is unavailable
-// for every source (Next.js 404s that route under a non-default loader) and
-// Supabase Image Transformations are a paid feature. So resize in the browser
-// before upload — that is where the bytes are actually saved.
-
 export const AVATAR_MAX_SIZE = 128;
 
 type ResizeOptions = {
