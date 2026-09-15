@@ -2,6 +2,7 @@ import { test, expect } from './fixtures/auth';
 import { admin } from './admin';
 import { SUPABASE_URL } from './env';
 import { makeNoisePng } from './fixtures/png';
+import { supportsWebp } from './fixtures/webp';
 
 test.describe('profile', () => {
   test('T10 update display name persists after reload', async ({
@@ -91,14 +92,7 @@ test.describe('profile', () => {
 
     await page.goto('/profile');
 
-    // WebP encode support decides whether resizeImage downscales or passes
-    // the original through (per-project capability, checked at runtime).
-    const canEncodeWebp = await page.evaluate(() =>
-      document
-        .createElement('canvas')
-        .toDataURL('image/webp')
-        .startsWith('data:image/webp'),
-    );
+    const canEncodeWebp = await supportsWebp(page);
 
     // Drive the real flow: the pencil button opens the file chooser.
     const chooserPromise = page.waitForEvent('filechooser');
@@ -208,12 +202,7 @@ test.describe('profile', () => {
 
     await page.goto('/profile');
 
-    const canEncodeWebp = await page.evaluate(() =>
-      document
-        .createElement('canvas')
-        .toDataURL('image/webp')
-        .startsWith('data:image/webp'),
-    );
+    const canEncodeWebp = await supportsWebp(page);
     test.skip(!canEncodeWebp, 'Browser cannot encode WebP; resize is bypassed');
 
     // Non-square source: proves the long edge is capped and the ratio kept.
