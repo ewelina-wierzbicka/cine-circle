@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { TrendingMovie, UserMedia } from '@/types';
 
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
 export const RECENT_WATCHED_COUNT = 8;
 
 function toRecentPoster(item: UserMedia): TrendingMovie {
@@ -11,7 +11,7 @@ function toRecentPoster(item: UserMedia): TrendingMovie {
     year: (item.media.release_date ?? '').slice(0, 4),
     type: item.media.media_type,
     posterUrl: item.media.poster_path
-      ? `${TMDB_IMAGE_BASE}${item.media.poster_path}`
+      ? tmdbImageUrl(item.media.poster_path)
       : undefined,
     id: item.media.tmdb_id,
   };

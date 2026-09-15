@@ -1,6 +1,5 @@
 import type { ImageLoaderProps } from 'next/image';
-
-const TMDB_HOST = 'https://image.tmdb.org';
+import { TMDB_HOST } from '@/lib/tmdbImage';
 
 // TMDB serves fixed width buckets. Anything wider falls back to `original`.
 const TMDB_WIDTHS = [92, 154, 185, 342, 500, 780] as const;

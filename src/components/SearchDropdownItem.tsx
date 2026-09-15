@@ -1,6 +1,7 @@
 'use client';
 
 import MediaPoster from '@/components/MediaPoster';
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import type { NormalizedMedia } from '@/types';
 import { useRouter } from 'next/navigation';
 import { forwardRef } from 'react';
@@ -36,11 +37,7 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
       >
         <MediaPoster
           title={item.title}
-          src={
-            item.poster_path
-              ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-              : undefined
-          }
+          src={item.poster_path ? tmdbImageUrl(item.poster_path) : undefined}
           className="w-8 h-12 rounded-md shadow-none!"
           sizes="32px"
         />
