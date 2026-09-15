@@ -2,6 +2,7 @@
 
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
 import { useDetailStep } from '@/hooks/useDetailStep';
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { NormalizedMedia, SavedMedia } from '@/types';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -93,9 +94,7 @@ export default function MediaDetail({
   return (
     <MediaDetailWrapper
       posterSrc={
-        media.poster_path
-          ? `https://image.tmdb.org/t/p/w780${media.poster_path}`
-          : undefined
+        media.poster_path ? tmdbImageUrl(media.poster_path) : undefined
       }
       posterTitle={media.title}
       step={step}

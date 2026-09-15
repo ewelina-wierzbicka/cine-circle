@@ -1,8 +1,8 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { TrendingMovie } from '@/types';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -52,7 +52,7 @@ export async function getTrendingMovies(): Promise<TrendingMovie[]> {
       title: item.title ?? item.name ?? 'Unknown',
       year: (item.release_date ?? item.first_air_date ?? '').slice(0, 4),
       type: item.media_type === 'movie' ? 'movie' : 'series',
-      posterUrl: `${TMDB_IMAGE_BASE}${item.poster_path}`,
+      posterUrl: tmdbImageUrl(item.poster_path),
       id: item.id,
     }));
 }

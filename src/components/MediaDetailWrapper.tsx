@@ -1,6 +1,7 @@
 import MediaPoster from '@/components/MediaPoster';
 import { twMerge } from '@/lib/cn';
 import { toHref } from '@/lib/mediaUtils';
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { RecommendedMedia } from '@/types';
 import Link from 'next/link';
 import { ReactNode } from 'react';
@@ -13,8 +14,6 @@ type Props = {
   formSlot: ReactNode;
   recommendations?: RecommendedMedia[];
 };
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
 
 export default function MediaDetailWrapper({
   posterSrc,
@@ -62,7 +61,7 @@ export default function MediaDetailWrapper({
                       title={rec.title}
                       src={
                         rec.poster_path
-                          ? `${TMDB_IMAGE_BASE}${rec.poster_path}`
+                          ? tmdbImageUrl(rec.poster_path)
                           : undefined
                       }
                       className="w-full h-full max-w-none rounded-xl"

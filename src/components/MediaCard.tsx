@@ -1,5 +1,6 @@
 'use client';
 
+import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { addUserMedia } from '@/services/addUserMedia';
 import { deleteUserMedia } from '@/services/deleteUserMedia';
 import { NormalizedMedia, SavedMedia } from '@/types';
@@ -116,11 +117,7 @@ export default function MediaCard({
         >
           <MediaPoster
             title={title}
-            src={
-              poster_path
-                ? `https://image.tmdb.org/t/p/w342${poster_path}`
-                : undefined
-            }
+            src={poster_path ? tmdbImageUrl(poster_path) : undefined}
             sizes="(max-width: 639px) 50vw, (max-width: 767px) 33vw, (max-width: 1023px) 25vw, (max-width: 1279px) 20vw, 16vw"
             priority={priority}
           />
