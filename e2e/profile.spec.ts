@@ -174,6 +174,94 @@ test.describe('profile', () => {
     ).toHaveCount(0);
   });
 
+  test('T16 avatar with disallowed type is rejected with inline error', async ({
+    isolatedUser,
+  }) => {
+    const { page } = isolatedUser;
+
+    await page.goto('/profile');
+
+    // Type is validated before decoding, so the payload need not be an image.
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Change avatar' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles({
+      name: 'notes.txt',
+      mimeType: 'text/plain',
+      buffer: Buffer.from('not an image'),
+    });
+
+    await expect(
+      page.getByText('Only JPEG, PNG, WebP, and GIF images are allowed.'),
+    ).toBeVisible();
+
+    // No upload happened: the avatar img never appears.
+    await expect(
+      page.getByRole('img', { name: 'Avatar', exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test('T17 stored avatar is WebP capped at 128px with aspect preserved', async ({
+    isolatedUser,
+  }) => {
+    const { page } = isolatedUser;
+
+    await page.goto('/profile');
+
+    const canEncodeWebp = await page.evaluate(() =>
+      document
+        .createElement('canvas')
+        .toDataURL('image/webp')
+        .startsWith('data:image/webp'),
+    );
+    test.skip(!canEncodeWebp, 'Browser cannot encode WebP; resize is bypassed');
+
+    // Non-square source: proves the long edge is capped and the ratio kept.
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Change avatar' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles({
+      name: 'avatar.png',
+      mimeType: 'image/png',
+      buffer: makeNoisePng(400, 300),
+    });
+
+    const avatar = page.getByRole('img', { name: 'Avatar', exact: true });
+    await expect(avatar).toBeVisible();
+    const src = await avatar.getAttribute('src');
+    expect(src).toBeTruthy();
+
+    // Decode in the browser: Node has no createImageBitmap, and this also
+    // proves the signed URL serves a real, decodable image.
+    const stored = await page.evaluate(async (url: string) => {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const bitmap = await createImageBitmap(blob);
+      const dims = { width: bitmap.width, height: bitmap.height };
+      bitmap.close();
+      return {
+        contentType: res.headers.get('content-type'),
+        blobType: blob.type,
+        ...dims,
+      };
+    }, src!);
+
+    expect(stored.contentType).toContain('image/webp');
+    expect(stored.blobType).toBe('image/webp');
+
+    // 400x300 scaled to a 128px box -> 128x96.
+    expect(stored.width).toBe(128);
+    expect(stored.height).toBe(96);
+
+    // Keep local storage tidy; user deletion does not cascade to objects.
+    const marker = '/object/sign/avatar/';
+    const pathname = new URL(src!, SUPABASE_URL).pathname;
+    const storedPath = decodeURIComponent(
+      pathname.slice(pathname.indexOf(marker) + marker.length),
+    );
+    await admin.storage.from('avatar').remove([storedPath]);
+  });
+
   test('T11 delete account redirects and blocks re-login', async ({
     isolatedUser,
   }) => {
