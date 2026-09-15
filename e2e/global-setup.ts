@@ -11,4 +11,15 @@ export default async function globalSetup() {
     email_confirm: true,
   });
   if (error) throw error;
+
+  // Storage buckets are not captured in migrations, so a fresh local
+  // Supabase lacks the private `avatar` bucket the app uploads to. Mirror
+  // the remote project: private bucket, RLS comes from the migrations.
+  const { data: buckets } = await admin.storage.listBuckets();
+  if (!buckets?.some((b) => b.id === 'avatar')) {
+    const { error: bucketError } = await admin.storage.createBucket('avatar', {
+      public: false,
+    });
+    if (bucketError) throw bucketError;
+  }
 }

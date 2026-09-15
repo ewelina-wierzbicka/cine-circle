@@ -1,4 +1,7 @@
 import { test, expect } from './fixtures/auth';
+import { admin } from './admin';
+import { SUPABASE_URL } from './env';
+import { makeNoisePng } from './fixtures/png';
 
 test.describe('profile', () => {
   test('T10 update display name persists after reload', async ({
@@ -75,6 +78,100 @@ test.describe('profile', () => {
     // Email only changes after the link is confirmed, so it is unchanged now.
     await expect(page.getByText(email)).toBeVisible();
     await expect(page.getByText(requestedEmail)).toBeHidden();
+  });
+
+  test('T14 avatar upload updates avatar and stores resized image', async ({
+    isolatedUser,
+  }) => {
+    const { page, id: userId } = isolatedUser;
+
+    // 500x500 noise PNG ≈ 750 KB — under the 1 MB limit but far larger
+    // than a resized 128px WebP, so the resize is provable by size.
+    const source = makeNoisePng(500);
+
+    await page.goto('/profile');
+
+    // WebP encode support decides whether resizeImage downscales or passes
+    // the original through (per-project capability, checked at runtime).
+    const canEncodeWebp = await page.evaluate(() =>
+      document
+        .createElement('canvas')
+        .toDataURL('image/webp')
+        .startsWith('data:image/webp'),
+    );
+
+    // Drive the real flow: the pencil button opens the file chooser.
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Change avatar' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles({
+      name: 'avatar.png',
+      mimeType: 'image/png',
+      buffer: source,
+    });
+
+    // Initials swap to a rendered <img> once the signed URL comes back.
+    // exact: the header renders its own "User avatar" img after upload.
+    const avatar = page.getByRole('img', { name: 'Avatar', exact: true });
+    await expect(avatar).toBeVisible();
+
+    const src = await avatar.getAttribute('src');
+    expect(src).toBeTruthy();
+
+    // Signed URL must point at the user's object in the avatar bucket.
+    const marker = '/object/sign/avatar/';
+    const pathname = new URL(src!, SUPABASE_URL).pathname;
+    expect(pathname).toContain(marker);
+    const storedPath = decodeURIComponent(
+      pathname.slice(pathname.indexOf(marker) + marker.length),
+    );
+    expect(storedPath.startsWith(`${userId}/avatar.`)).toBeTruthy();
+
+    const { data: object, error } = await admin.storage
+      .from('avatar')
+      .download(storedPath);
+    expect(error).toBeNull();
+    if (!object) throw new Error('Avatar object missing from storage');
+
+    if (canEncodeWebp) {
+      expect(storedPath.endsWith('.webp')).toBeTruthy();
+      // Materially smaller than the source proves the resize ran.
+      expect(object.size).toBeLessThan(source.length / 2);
+    } else {
+      // Fallback path: resizeImage returned the original untouched.
+      expect(storedPath.endsWith('.png')).toBeTruthy();
+      expect(object.size).toBe(source.length);
+    }
+
+    // Keep local storage tidy; user deletion does not cascade to objects.
+    await admin.storage.from('avatar').remove([storedPath]);
+  });
+
+  test('T15 avatar over 1 MB is rejected with inline error', async ({
+    isolatedUser,
+  }) => {
+    const { page } = isolatedUser;
+
+    await page.goto('/profile');
+
+    // Size is validated before decoding, so the payload need not be a
+    // real image.
+    const oversize = Buffer.alloc(1024 * 1024 + 1);
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Change avatar' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles({
+      name: 'big.png',
+      mimeType: 'image/png',
+      buffer: oversize,
+    });
+
+    await expect(page.getByText('Image must be under 1 MB.')).toBeVisible();
+
+    // No upload happened: the avatar img never appears.
+    await expect(
+      page.getByRole('img', { name: 'Avatar', exact: true }),
+    ).toHaveCount(0);
   });
 
   test('T11 delete account redirects and blocks re-login', async ({
