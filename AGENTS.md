@@ -205,8 +205,6 @@ export const colors = {
 | -------- | ------ | ---------------------- | ---------------------------------------- |
 | `avatar` | ✅     | `{user_id}/{filename}` | Users can only write to their own folder |
 
-> The bucket is `avatar` (singular) — that is what `.from('avatar')` uses in `services/updateProfile.ts`, `services/account.ts`, and `ProfileContent.tsx`. A second `avatars` bucket exists from migration `20260414221253_add_profiles.sql` but no code reads or writes it.
-
 ---
 
 ## Next.js Conventions
@@ -220,7 +218,7 @@ export const colors = {
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
-- Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site: the loader rewrites the size segment per rendered width, so a hardcoded `w92`/`w780` reads as intent but does nothing.
+- Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site
 
 ---
 
