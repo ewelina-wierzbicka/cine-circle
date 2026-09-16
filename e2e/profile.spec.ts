@@ -3,6 +3,7 @@ import { admin } from './admin';
 import { SUPABASE_URL } from './env';
 import { makeNoisePng } from './fixtures/png';
 import { supportsWebp } from './fixtures/webp';
+import { seedUserMedia } from './fixtures/seed';
 
 test.describe('profile', () => {
   test('T10 update display name persists after reload', async ({
@@ -272,5 +273,75 @@ test.describe('profile', () => {
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
     await expect(page).toHaveURL('/login');
+  });
+
+  test('T18 delete account removes avatar objects and user rows', async ({
+    isolatedUser,
+  }) => {
+    const { page, id: userId } = isolatedUser;
+
+    // A collection row makes the cascade assertion below meaningful.
+    await seedUserMedia(userId, {
+      tmdbId: 27205,
+      title: 'Inception',
+      watchStatus: 'watched',
+    });
+
+    await page.goto('/profile');
+
+    // Upload through the real flow so an object exists under {user_id}/.
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: 'Change avatar' }).click();
+    const chooser = await chooserPromise;
+    await chooser.setFiles({
+      name: 'avatar.png',
+      mimeType: 'image/png',
+      buffer: makeNoisePng(200),
+    });
+    await expect(
+      page.getByRole('img', { name: 'Avatar', exact: true }),
+    ).toBeVisible();
+
+    // Orphaned sibling object: what a partial upload leaves behind when the
+    // upload succeeds but updateAvatarPath fails, so profiles.avatar_url
+    // never points at it. Deletion must clear the folder, not just the one
+    // path stored on the profile row.
+    const orphanPath = `${userId}/avatar.png`;
+    const orphan = await admin.storage
+      .from('avatar')
+      .upload(orphanPath, makeNoisePng(32), { contentType: 'image/png' });
+    expect(orphan.error).toBeNull();
+
+    // Guard: the assertion after deletion is only meaningful if the folder
+    // held both the profile avatar and the orphan.
+    const before = await admin.storage.from('avatar').list(userId);
+    expect(before.error).toBeNull();
+    expect((before.data ?? []).length).toBeGreaterThan(1);
+
+    await page.getByRole('button', { name: /Delete account/ }).click();
+    await page.getByPlaceholder('DELETE').fill('DELETE');
+    await page.getByRole('button', { name: 'Delete my account' }).click();
+    await page.waitForURL('/login');
+
+    // Storage does not cascade from auth.users — deleteAccount must clear
+    // the whole folder itself.
+    const after = await admin.storage.from('avatar').list(userId);
+    expect(after.error).toBeNull();
+    expect(after.data ?? []).toEqual([]);
+
+    // DB rows cascade from auth.users; assert it to catch a regression.
+    const profiles = await admin
+      .from('profiles')
+      .select('id')
+      .eq('user_id', userId);
+    expect(profiles.error).toBeNull();
+    expect(profiles.data ?? []).toEqual([]);
+
+    const userMedia = await admin
+      .from('user_media')
+      .select('id')
+      .eq('user_id', userId);
+    expect(userMedia.error).toBeNull();
+    expect(userMedia.data ?? []).toEqual([]);
   });
 });
