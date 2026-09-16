@@ -69,6 +69,22 @@ export const deleteAccount = async (): Promise<void> => {
     .eq('user_id', user.id)
     .maybeSingle();
 
+  // Enumerate all objects in the user's avatar folder.
+  const pathsToRemove = new Set<string>();
+
+  const { data: folderObjects, error: listError } = await adminSupabase.storage
+    .from('avatar')
+    .list(user.id);
+
+  if (listError) {
+    console.error('avatar list error (non-fatal):', listError.message);
+  } else if (folderObjects && folderObjects.length > 0) {
+    for (const obj of folderObjects) {
+      pathsToRemove.add(`${user.id}/${obj.name}`);
+    }
+  }
+
+  // Also include the avatar_url path as a fallback for legacy rows.
   const storedAvatar = profile?.avatar_url;
   if (storedAvatar) {
     let objectPath: string | undefined;
@@ -85,14 +101,15 @@ export const deleteAccount = async (): Promise<void> => {
     } else {
       objectPath = storedAvatar;
     }
+    if (objectPath) pathsToRemove.add(objectPath);
+  }
 
-    if (objectPath) {
-      const { error: storageError } = await adminSupabase.storage
-        .from('avatar')
-        .remove([objectPath]);
-      if (storageError)
-        throw new Error('Failed to delete account. Please try again.');
-    }
+  if (pathsToRemove.size > 0) {
+    const { error: storageError } = await adminSupabase.storage
+      .from('avatar')
+      .remove([...pathsToRemove]);
+    if (storageError)
+      throw new Error('Failed to delete account. Please try again.');
   }
 
   const { error } = await adminSupabase.auth.admin.deleteUser(user.id);
