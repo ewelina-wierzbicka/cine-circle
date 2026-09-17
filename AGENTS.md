@@ -398,6 +398,8 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
 - `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
 - The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
+- Any test that logs out must use `isolatedUser`, never the shared persistent user. `supabase.auth.signOut()` defaults to global scope, so it revokes every session that user holds and breaks tests running in parallel.
+- `playwright.config.ts` sets `timeout: 60_000` and `expect.timeout: 10_000`. The suite runs against `next dev`, where routes compile on first hit; the 30s/5s defaults flake when several workers hit cold routes at once.
 
 ---
 

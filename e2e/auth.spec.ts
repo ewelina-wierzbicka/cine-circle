@@ -6,11 +6,19 @@ import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from './env';
 const STRONG_PASSWORD = 'Str0ng!pass';
 
 test.describe('auth', () => {
-  test('T1 login happy path + logout', async ({ page }) => {
+  // Logout is destructive for the shared user: supabase signOut() defaults to
+  // global scope, so it revokes every session that user has, including ones
+  // other tests are mid-flight with. Use an isolated user and start anonymous.
+  test('T1 login happy path + logout', async ({
+    page,
+    context,
+    isolatedUser,
+  }) => {
+    await context.clearCookies();
     await page.goto('/login');
 
-    await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
+    await page.getByLabel('Email').fill(isolatedUser.email);
+    await page.getByLabel('Password').fill(isolatedUser.password);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     await page.waitForURL('/');
