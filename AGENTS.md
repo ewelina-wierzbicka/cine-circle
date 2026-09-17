@@ -201,9 +201,11 @@ export const colors = {
 
 ### Storage
 
-| Bucket   | Public | Path pattern           | Notes                                    |
-| -------- | ------ | ---------------------- | ---------------------------------------- |
-| `avatar` | ✅     | `{user_id}/{filename}` | Users can only write to their own folder |
+| Bucket   | Public | Path pattern           | Notes                                                                                |
+| -------- | ------ | ---------------------- | ------------------------------------------------------------------------------------ |
+| `avatar` | ❌     | `{user_id}/{filename}` | Private. Read and write limited to own folder. Served via signed URLs, 1 hour expiry |
+
+The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar_bucket.sql`, so `supabase db reset` gives a fresh local stack a working bucket. Storage RLS policies for it live in the base `remote_schema` migration.
 
 ---
 
