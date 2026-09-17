@@ -12,14 +12,19 @@ export default async function globalSetup() {
   });
   if (error) throw error;
 
-  // Storage buckets are not captured in migrations, so a fresh local
-  // Supabase lacks the private `avatar` bucket the app uploads to. Mirror
-  // the remote project: private bucket, RLS comes from the migrations.
-  const { data: buckets } = await admin.storage.listBuckets();
-  if (!buckets?.some((b) => b.id === 'avatar')) {
-    const { error: bucketError } = await admin.storage.createBucket('avatar', {
-      public: false,
-    });
-    if (bucketError) throw bucketError;
+  const { data: buckets, error: bucketsError } =
+    await admin.storage.listBuckets();
+  if (bucketsError) throw bucketsError;
+
+  const avatarBucket = buckets?.find((b) => b.id === 'avatar');
+  if (!avatarBucket) {
+    throw new Error(
+      'Storage bucket `avatar` is missing. Run `npx supabase db reset` to apply migrations.',
+    );
+  }
+  if (avatarBucket.public) {
+    throw new Error(
+      'Storage bucket `avatar` must be private; the app serves avatars via signed URLs.',
+    );
   }
 }
