@@ -11,4 +11,20 @@ export default async function globalSetup() {
     email_confirm: true,
   });
   if (error) throw error;
+
+  const { data: buckets, error: bucketsError } =
+    await admin.storage.listBuckets();
+  if (bucketsError) throw bucketsError;
+
+  const avatarBucket = buckets?.find((b) => b.id === 'avatar');
+  if (!avatarBucket) {
+    throw new Error(
+      'Storage bucket `avatar` is missing. Run `npx supabase db reset` to apply migrations.',
+    );
+  }
+  if (avatarBucket.public) {
+    throw new Error(
+      'Storage bucket `avatar` must be private; the app serves avatars via signed URLs.',
+    );
+  }
 }

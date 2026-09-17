@@ -387,7 +387,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | `auth.spec.ts`       | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
 | `search.spec.ts`     | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
 | `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
-| `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change                                                                                                                                                                                                                                                                                                                  |
+| `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
 
 **Rules:**
 
@@ -396,6 +396,8 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
+- `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
+- The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
 
 ---
 

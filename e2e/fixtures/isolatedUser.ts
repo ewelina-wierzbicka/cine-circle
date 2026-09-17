@@ -35,6 +35,13 @@ export const test = base.extend<{ isolatedUser: IsolatedUser }>({
     // eslint-disable-next-line react-hooks/rules-of-hooks -- `use` is Playwright's fixture callback, not a React hook
     await use({ id: userId, email, password, page });
 
+    const { data: objects } = await admin.storage.from('avatar').list(userId);
+    if (objects?.length) {
+      await admin.storage
+        .from('avatar')
+        .remove(objects.map((o) => `${userId}/${o.name}`));
+    }
+
     // Idempotent: the delete-account test removes the user itself.
     await deleteUserByEmail(email);
   },
