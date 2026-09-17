@@ -396,6 +396,8 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
+- `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
+- The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
 
 ---
 

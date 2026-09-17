@@ -138,8 +138,7 @@ test.describe('profile', () => {
       expect(object.size).toBe(source.length);
     }
 
-    // Keep local storage tidy; user deletion does not cascade to objects.
-    await admin.storage.from('avatar').remove([storedPath]);
+    // The isolatedUser teardown clears the folder; no cleanup needed here.
   });
 
   test('T15 avatar over 1 MB is rejected with inline error', async ({
@@ -243,13 +242,7 @@ test.describe('profile', () => {
     expect(stored.width).toBe(128);
     expect(stored.height).toBe(96);
 
-    // Keep local storage tidy; user deletion does not cascade to objects.
-    const marker = '/object/sign/avatar/';
-    const pathname = new URL(src!, SUPABASE_URL).pathname;
-    const storedPath = decodeURIComponent(
-      pathname.slice(pathname.indexOf(marker) + marker.length),
-    );
-    await admin.storage.from('avatar').remove([storedPath]);
+    // The isolatedUser teardown clears the folder; no cleanup needed here.
   });
 
   test('T11 delete account redirects and blocks re-login', async ({

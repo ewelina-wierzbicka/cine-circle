@@ -35,6 +35,17 @@ export const test = base.extend<{ isolatedUser: IsolatedUser }>({
     // eslint-disable-next-line react-hooks/rules-of-hooks -- `use` is Playwright's fixture callback, not a React hook
     await use({ id: userId, email, password, page });
 
+    // `deleteAccount` clears the user's avatar folder, but that only runs when
+    // a test drives the real delete-account flow. `storage.objects` has no FK
+    // to `auth.users`, so the admin delete below leaves objects behind. Clear
+    // the folder here so any test that uploads an avatar stays self-contained.
+    const { data: objects } = await admin.storage.from('avatar').list(userId);
+    if (objects?.length) {
+      await admin.storage
+        .from('avatar')
+        .remove(objects.map((o) => `${userId}/${o.name}`));
+    }
+
     // Idempotent: the delete-account test removes the user itself.
     await deleteUserByEmail(email);
   },
