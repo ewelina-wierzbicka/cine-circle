@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 import './e2e/env';
 
-const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3001';
+const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 // `next dev` ignores the url we wait on, so the port has to be passed
 // explicitly or the server boots on 3000 and the wait times out.
-const port = new URL(baseURL).port || '3001';
+const port = new URL(baseURL).port || '3000';
 
 export default defineConfig({
   testDir: './e2e',
@@ -30,11 +30,6 @@ export default defineConfig({
     command: `npm run dev -- --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    env: {
-      // register/sendPasswordReset bail out without this, and the confirm and
-      // reset links must point at the server the browser is driving.
-      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || baseURL,
-    },
     // A cold Turbopack boot plus the proxy compile can pass two minutes.
     timeout: 300_000,
   },

@@ -32,7 +32,7 @@ async function warmRoutes(baseURL: string) {
 // Create a pre-confirmed persistent test user via the Supabase admin API.
 // Runs once before the whole suite.
 export default async function globalSetup() {
-  await warmRoutes(process.env.E2E_BASE_URL ?? 'http://localhost:3001');
+  await warmRoutes(process.env.E2E_BASE_URL ?? 'http://localhost:3000');
 
   await deleteUserByEmail(TEST_USER_EMAIL); // ensure clean slate
   const { error } = await admin.auth.admin.createUser({
