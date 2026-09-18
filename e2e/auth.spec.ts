@@ -34,30 +34,29 @@ test.describe('auth', () => {
     browser,
     isolatedUser,
   }) => {
-    // Second device: its own context, its own session for the same user.
-    const otherDevice = await browser.newContext();
-    try {
-      await otherDevice.addCookies(
-        await passwordSessionCookies(isolatedUser.email, isolatedUser.password),
-      );
-      const otherPage = await otherDevice.newPage();
-      await otherPage.goto('/collection');
-      await expect(otherPage).toHaveURL('/collection');
+    const { page, email, password } = isolatedUser;
 
-      // Log out on the first device.
-      await isolatedUser.page.goto('/');
-      await isolatedUser.page
-        .getByRole('button', { name: 'User menu' })
-        .hover();
-      await isolatedUser.page.getByRole('menuitem', { name: 'Logout' }).click();
-      await isolatedUser.page.waitForURL('/login');
+    // A second context is the only way to hold a second session for one user:
+    // a second page in the same context would share the first device's cookies.
+    const secondDevice = await browser.newContext({
+      storageState: {
+        cookies: await passwordSessionCookies(email, password),
+        origins: [],
+      },
+    });
+    const secondPage = await secondDevice.newPage();
+    await secondPage.goto('/collection');
+    await expect(secondPage).toHaveURL('/collection');
 
-      // Second device still has a live session.
-      await otherPage.reload();
-      await expect(otherPage).toHaveURL('/collection');
-    } finally {
-      await otherDevice.close();
-    }
+    await page.goto('/');
+    await page.getByRole('button', { name: 'User menu' }).hover();
+    await page.getByRole('menuitem', { name: 'Logout' }).click();
+    await page.waitForURL('/login');
+
+    await secondPage.reload();
+    await expect(secondPage).toHaveURL('/collection');
+
+    await secondDevice.close();
   });
 
   test('T2 login validation', async ({ page }) => {
