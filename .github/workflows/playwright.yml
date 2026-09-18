@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
-      # register/sendPasswordReset bail out early without this, so the
-      # confirm and reset email flows fail with no visible error.
-      # Repo variable; must stay the runner-local URL, no trailing slash.
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
     steps:
     - uses: actions/checkout@v6
