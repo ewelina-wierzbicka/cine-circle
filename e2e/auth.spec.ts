@@ -108,11 +108,15 @@ test.describe('auth', () => {
       page,
     }) => {
       // Callback with no code -> /login?error=confirm_failed, surfaced as a toast.
-      await page.goto('/api/auth/confirm-callback');
+      // The toast auto-closes after 5s, so watch for it while navigating.
+      // Asserting after the redirect settles loses the race under load.
+      await Promise.all([
+        page
+          .getByText('Email confirmation failed. Please try again.')
+          .waitFor({ timeout: 45_000 }),
+        page.goto('/api/auth/confirm-callback'),
+      ]);
       await page.waitForURL('/login');
-      await expect(
-        page.getByText('Email confirmation failed. Please try again.'),
-      ).toBeVisible();
     });
 
     test('T6 registration-confirmed redirects a logged-in user home', async ({
@@ -168,11 +172,14 @@ test.describe('auth', () => {
     page,
   }) => {
     // Callback with no code -> /login?error=reset_failed, surfaced as a toast.
-    await page.goto('/api/auth/reset-callback');
+    // Same 5s auto-close race as T5: watch for the toast while navigating.
+    await Promise.all([
+      page
+        .getByText('Password reset failed. Please try again.')
+        .waitFor({ timeout: 45_000 }),
+      page.goto('/api/auth/reset-callback'),
+    ]);
     await page.waitForURL('/login');
-    await expect(
-      page.getByText('Password reset failed. Please try again.'),
-    ).toBeVisible();
   });
 
   test('T10 reset-password form validates new password', async ({
