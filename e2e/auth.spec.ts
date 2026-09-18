@@ -31,6 +31,36 @@ test.describe('auth', () => {
     await expect(page.getByRole('button', { name: 'SIGN IN' })).toBeVisible();
   });
 
+  test('T1b logout signs out only the current device', async ({
+    browser,
+    isolatedUser,
+  }) => {
+    // Second device: its own context, its own session for the same user.
+    const otherDevice = await browser.newContext();
+    try {
+      await otherDevice.addCookies(
+        await passwordSessionCookies(isolatedUser.email, isolatedUser.password),
+      );
+      const otherPage = await otherDevice.newPage();
+      await otherPage.goto('/collection');
+      await expect(otherPage).toHaveURL('/collection');
+
+      // Log out on the first device.
+      await isolatedUser.page.goto('/');
+      await isolatedUser.page
+        .getByRole('button', { name: 'User menu' })
+        .hover();
+      await isolatedUser.page.getByRole('menuitem', { name: 'Logout' }).click();
+      await isolatedUser.page.waitForURL('/login');
+
+      // Second device still has a live session.
+      await otherPage.reload();
+      await expect(otherPage).toHaveURL('/collection');
+    } finally {
+      await otherDevice.close();
+    }
+  });
+
   test('T2 login validation', async ({ page }) => {
     await page.goto('/login');
     const signIn = page.getByRole('button', { name: 'SIGN IN' });

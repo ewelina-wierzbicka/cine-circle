@@ -40,7 +40,9 @@ export async function register(email: string, password: string) {
 
 export async function logout() {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // 'local' revokes only this device's session. The supabase default is
+  // 'global', which signs the user out everywhere they are logged in.
+  await supabase.auth.signOut({ scope: 'local' });
   redirect('/login');
 }
 
