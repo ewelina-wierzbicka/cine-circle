@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+      # register/sendPasswordReset bail out early without this, so the
+      # confirm and reset email flows fail with no visible error.
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
     steps:
     - uses: actions/checkout@v6
     - uses: actions/setup-node@v6
