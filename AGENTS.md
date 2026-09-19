@@ -221,6 +221,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
 - Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site
+- Build every TMDB API URL with `tmdbApiUrl(path)` from `lib/tmdbApi.ts`. Never hardcode `https://api.themoviedb.org/3` — the e2e suite overrides the host via `TMDB_BASE_URL`, and a hardcoded call escapes the fixture stub
 
 ---
 
@@ -399,6 +400,8 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - `e2e/global-setup.ts` warms the routes the suite visits before any test runs. A cold `next dev` compile of `/movie/[id]` alone takes ~30s, which used to blow the per-test timeout. Add a route there when a new spec navigates somewhere new.
 - `playwright.config.ts` derives the dev server port from `E2E_BASE_URL`; the suite runs on 3001 so it never fights the dev server on 3000.
 - CI has no `E2E_BASE_URL`, so it uses the config default (port 3000) and reads `NEXT_PUBLIC_SITE_URL` from the GitHub repo variable. Those two must agree: `register()` and `sendPasswordReset()` return early when the site URL is unset, and T3/T8 then fail with no visible error.
+- The suite never calls TMDB. `e2e/global-setup.ts` starts the fixture stub in `e2e/tmdbStub.ts` and `playwright.config.ts` points the dev server at it with `TMDB_BASE_URL` (plus a placeholder `TMDB_TOKEN`), so fork PRs without repo secrets and TMDB outages both run green. Global setup fails loudly if the app is not using the stub, which happens when Playwright reuses a dev server you started by hand.
+- A spec that opens a new `/movie/:id` or `/series/:id` needs a fixture in `e2e/fixtures/tmdb/` registered in `e2e/tmdbStub.ts`; unknown ids 404 and the page renders `notFound()`.
 - `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
 - The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
 

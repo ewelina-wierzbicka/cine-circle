@@ -1,8 +1,7 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import { tmdbApiUrl } from '@/lib/tmdbApi';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { TrendingMovie } from '@/types';
-
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -32,8 +31,10 @@ export async function getTrendingMovies(): Promise<TrendingMovie[]> {
   const headers = { Authorization: `Bearer ${getTmdbToken()}` };
 
   const trendingRes = await fetch(
-    `${TMDB_BASE_URL}/trending/all/week?language=en-US`,
-    { headers },
+    tmdbApiUrl('/trending/all/week?language=en-US'),
+    {
+      headers,
+    },
   );
 
   if (!trendingRes.ok) {

@@ -2,10 +2,11 @@ import { test, expect } from '@playwright/test';
 import searchInception from './fixtures/tmdb/search-inception.json';
 import movie27205 from './fixtures/tmdb/movie-27205.json';
 
-// TMDB traffic is mocked at the client `/api/*` layer with fixture JSON so the
-// search flow is deterministic and never hits the real TMDB API.
-// ponytail: SSR of /search seeds initialData server-side; these routes cover
-// every client-side fetch (grid refetch, filter switch, detail enrichment).
+// These routes cover client-side TMDB traffic: the grid refetch, the filter
+// switch, and the detail enrichment in `hooks/useGetMediaDetails.ts`.
+// Server-rendered TMDB data (the /search `initialData` seed, the movie page)
+// is served by the fixture stub in `e2e/tmdbStub.ts`, so neither layer reaches
+// the live API.
 test.beforeEach(async ({ page }) => {
   await page.route('**/api/search*', (route) =>
     route.fulfill({

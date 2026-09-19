@@ -1,12 +1,13 @@
 import { test, expect } from './fixtures/isolatedUser';
 import { seedUserMedia } from './fixtures/seed';
 
-// Inception on TMDB. The movie page fetches real TMDB data server-side, same
-// as search.spec's detail assertion.
+// The movie page fetches TMDB server-side. `e2e/tmdbStub.ts` answers that
+// request from `fixtures/tmdb/movie-27205.json`, so this id must have a
+// fixture there.
 const INCEPTION_ID = 27205;
 
-// Fake TMDB ids for collection-only seeds. They never hit the movie page, so
-// the app never needs real TMDB data for these rows.
+// Ids with no fixture. They are collection-only seeds and never open the movie
+// page, where the stub would 404 them.
 const ALPHA = { tmdbId: 900001, title: 'Alpha Collection Movie' };
 const BETA = { tmdbId: 900002, title: 'Beta Collection Movie' };
 const GAMMA = { tmdbId: 900003, title: 'Gamma Collection Movie' };

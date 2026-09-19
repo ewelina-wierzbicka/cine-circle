@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import './e2e/env';
+import { TMDB_STUB_BASE_URL } from './e2e/tmdbStub';
 
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 const port = new URL(baseURL).port || '3000';
@@ -30,5 +31,14 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     // A cold Turbopack boot plus the proxy compile can pass two minutes.
     timeout: 300_000,
+    // Point the server at the fixture stub `global-setup.ts` runs, so no test
+    // ever reaches api.themoviedb.org. The token is a placeholder that only
+    // satisfies the services' missing-token guard: a real `TMDB_TOKEN` in the
+    // environment is deliberately overridden, and fork PRs (which get no
+    // secret) run the suite exactly like trunk does.
+    env: {
+      TMDB_BASE_URL: TMDB_STUB_BASE_URL,
+      TMDB_TOKEN: 'e2e-stub-token',
+    },
   },
 });
