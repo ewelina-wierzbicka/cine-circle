@@ -9,7 +9,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
-      TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
+      # No TMDB_TOKEN: the suite serves TMDB from a local fixture stub
+      # (e2e/tmdbStub.ts), so fork PRs without repo secrets can run it too.
       NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
     steps:
     - uses: actions/checkout@v6

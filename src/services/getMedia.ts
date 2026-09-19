@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from 'next/cache';
+import { tmdbApiUrl } from '@/lib/tmdbApi';
 import {
   FilterMediaType,
   Movie,
@@ -7,8 +8,6 @@ import {
   Series,
   TmdbRecommendation,
 } from '@/types';
-
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -20,7 +19,7 @@ async function tmdbFetch<T>(
   path: string,
   nextConfig: { revalidate?: number; tags?: string[] } = {},
 ): Promise<T> {
-  const res = await fetch(`${TMDB_BASE_URL}${path}`, {
+  const res = await fetch(tmdbApiUrl(path), {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
     next: nextConfig,
   });
@@ -29,7 +28,7 @@ async function tmdbFetch<T>(
 }
 
 async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${TMDB_BASE_URL}${path}`, {
+  const res = await fetch(tmdbApiUrl(path), {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
   });
   if (res.status === 404) return null;
