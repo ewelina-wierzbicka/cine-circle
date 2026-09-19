@@ -6,9 +6,9 @@ const port = new URL(baseURL).port || '3000';
 
 export default defineConfig({
   testDir: './e2e',
-  // Auth-gated routes compile on their first in-test request; 30s was not
-  // enough for a cold `next dev` to serve /collection or /profile.
-  timeout: 60_000,
+  // global-setup warms every route the suite visits, auth-gated ones
+  // included, so no test pays a cold `next dev` compile.
+  timeout: 30_000,
   // One dev server serves every worker, so assertions that wait on a
   // round trip (avatar upload, signed URL) need more than the 5s default.
   expect: { timeout: 15_000 },
