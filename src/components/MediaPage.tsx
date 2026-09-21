@@ -3,6 +3,10 @@ import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
 import { notFound } from 'next/navigation';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbJsonLd, movieJsonLd, tvSeriesJsonLd } from '@/lib/jsonLd';
+import { toHref } from '@/lib/mediaUtils';
+import { absoluteUrl } from '@/lib/seo';
 import MediaDetail from './MediaDetail';
 
 type Props = {
@@ -24,20 +28,40 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const initialStep = step === '2' ? 2 : 1;
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
 
+  const canonicalUrl = absoluteUrl(
+    toHref(baseMedia.id, baseMedia.title, mediaType),
+  );
+
   return (
-    <Suspense
-      fallback={
-        <MediaDetail media={baseMedia} initialStep={initialStep} pending />
-      }
-    >
-      <UserEnrichedMedia
-        baseMedia={baseMedia}
-        tmdbId={Number(id)}
-        mediaType={mediaType}
-        slug={slug}
-        initialStep={initialStep}
+    <>
+      <JsonLd
+        data={
+          mediaType === 'series'
+            ? tvSeriesJsonLd(baseMedia, canonicalUrl)
+            : movieJsonLd(baseMedia, canonicalUrl)
+        }
       />
-    </Suspense>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'Home', url: absoluteUrl('/') },
+          { name: 'Search', url: absoluteUrl('/search') },
+          { name: baseMedia.title, url: canonicalUrl },
+        ])}
+      />
+      <Suspense
+        fallback={
+          <MediaDetail media={baseMedia} initialStep={initialStep} pending />
+        }
+      >
+        <UserEnrichedMedia
+          baseMedia={baseMedia}
+          tmdbId={Number(id)}
+          mediaType={mediaType}
+          slug={slug}
+          initialStep={initialStep}
+        />
+      </Suspense>
+    </>
   );
 }
 

@@ -117,7 +117,7 @@ series/[id]/             # /series/:id
   components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
-  lib/                        # utilities, helpers, constants
+  lib/                        # utilities, helpers, constants (seo.ts, jsonLd.ts, tmdbImage.ts, …)
   services/                   # data fetching / API service functions
 ```
 
@@ -233,6 +233,23 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
 - `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
+
+#### Structured data (JSON-LD)
+
+`src/lib/jsonLd.ts` holds the typed builders; `src/components/JsonLd.tsx` renders one graph as an `application/ld+json` script tag.
+
+| Page                   | Graphs emitted               |
+| ---------------------- | ---------------------------- |
+| `/` (`(app)/page.tsx`) | `WebSite`, `Organization`    |
+| `/movie/[id]`          | `Movie`, `BreadcrumbList`    |
+| `/series/[id]`         | `TVSeries`, `BreadcrumbList` |
+
+- Detail-page JSON-LD is rendered in `components/MediaPage.tsx` **outside** the `<Suspense>` that wraps `UserEnrichedMedia`. It is built from the `use cache` TMDB payload only, so it prerenders into the static shell and crawlers see it without waiting on Supabase. Do not move it inside the boundary.
+- Builders are pure functions over TMDB data plus `lib/seo.ts` constants. They must never read `cookies()`, `headers()` or Supabase, and no user-specific data belongs in a graph.
+- The breadcrumb's final `item` must equal the page's `alternates.canonical`. Both are built with `absoluteUrl(toHref(id, title, mediaType))` — a mismatch is a Search Console error.
+- `JsonLd` escapes `<`, `>` and `&` before injecting, because TMDB overviews and titles are third-party text inside a `<script>` tag.
+- `NormalizedMedia.director` is the TMDB director for movies and `created_by[0]` for series, so it maps to `director` on `Movie` and `creator` on `TVSeries`.
+- No JSON-LD on `/collection`, `/profile`, `/search` or auth routes — they are noindex.
 
 ---
 
