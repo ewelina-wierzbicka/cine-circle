@@ -9,6 +9,8 @@ export const metadata: Metadata = {
 
 import { Suspense } from 'react';
 import { HomeHero } from '@/components/HomeHero';
+import { JsonLd } from '@/components/JsonLd';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonLd';
 import { RecentWatched } from '@/components/RecentWatched';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
@@ -25,6 +27,10 @@ export default async function Home() {
 
   return (
     <div className="min-h-full flex flex-col relative">
+      {/* Static graphs, so they belong in the prerendered shell rather than
+          behind the RecentWatched Suspense boundary. */}
+      <JsonLd data={websiteJsonLd()} />
+      <JsonLd data={organizationJsonLd()} />
       <HomeHero
         hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
         recentPostersPromise={recentPostersPromise}
