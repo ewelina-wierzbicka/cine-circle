@@ -225,10 +225,9 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 
 ### Metadata & SEO
 
-All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TAGLINE`, `SITE_TITLE`, `SITE_DESCRIPTION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
+All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
 
-- The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Every page title is the bare page name (`'Sign in'`, `'Your Profile'`, and `SITE_TAGLINE` on the home page); the template appends the brand, so every tab reads `<page> | MidnightFrame`. Do not use `title: { absolute: ... }` — it drops the brand.
-- `SITE_TITLE` (`'MidnightFrame — Track the movies and series you watch'`) is only for places no template runs: the OG/Twitter title and the `title.default` fallback.
+- The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
 - `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
 - Every indexable page sets `alternates.canonical`. Movie and series pages canonicalise to `absoluteUrl(toHref(id, title, mediaType))`, which collapses every mis-slugged `/movie/123-anything` variant onto one URL. `/search` canonicalises to `/search` with no query string.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.

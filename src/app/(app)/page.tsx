@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
-import { SITE_DESCRIPTION, SITE_TAGLINE } from '@/lib/seo';
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  // Bare tagline — the root template appends "| MidnightFrame", like every
-  // other page, so the brand still lands in the tab and the SERP.
-  title: SITE_TAGLINE,
+  title: { absolute: SITE_TITLE },
   description: SITE_DESCRIPTION,
   alternates: { canonical: '/' },
 };
