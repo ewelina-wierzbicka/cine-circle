@@ -283,15 +283,9 @@ export const motion = {
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static Server Component rendering the "What is MidnightFrame" section below the home hero.
-- **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the Supabase session and renders `HomeAbout` or `null`; signed-in users see the hero and Recently Watched and nothing below. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Section wrapper: `relative z-10 px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto`, labelled via `aria-labelledby` pointing at its `h2`.
-- Eyebrow: `font-mono text-sm tracking-[0.2em] text-accent uppercase`.
-- `h2`: `font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95]` with accent emphasis via `<em class="text-accent">`, matching the hero pattern.
-- Body paragraphs: `font-sans text-base text-secondary leading-relaxed max-w-2xl`.
-- Three feature blocks in `grid gap-8 md:grid-cols-3`: decorative icon (`SearchIcon`, `StarIcon`, `ClapperboardIcon` at `w-6 h-6 text-accent`, wrapped in an `aria-hidden` span), `h3` in `font-mono text-sm tracking-[0.15em] text-accent uppercase`, body `text-sm text-secondary leading-relaxed`.
-- Closes with a descriptive `Link` to `/search` (`font-mono text-sm tracking-[0.08em]`), giving `/search` a real anchor text internal link.
-- `HomeAbout` itself has no interactivity and no data fetching; the session read lives in its `SignedOutAbout` wrapper, which sits inside `<Suspense fallback={null}>` so the home shell still prerenders.
+- `src/components/HomeAbout.tsx` — static "What is MidnightFrame" section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
+- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, `font-serif` `h2` with `<em class="text-accent">`, `text-secondary` body.
 
 ### Skeleton (loading.tsx skeletons)
 
