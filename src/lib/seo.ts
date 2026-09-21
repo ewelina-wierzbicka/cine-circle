@@ -9,7 +9,11 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 ).replace(/\/$/, '');
 
-export const SITE_TITLE = `${SITE_NAME} — Track the movies and series you watch`;
+export const SITE_TAGLINE = 'Track the movies and series you watch';
+
+// Used for the OG/Twitter title and as the `title.default` fallback, where no
+// template runs and the brand has to be spelled out.
+export const SITE_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 
 export const SITE_DESCRIPTION =
   'MidnightFrame is a free movie and TV tracker. Log what you watch, rate it, write reviews, and build a collection you can share with friends.';
