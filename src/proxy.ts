@@ -68,6 +68,6 @@ export const config = {
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|opengraph-image|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

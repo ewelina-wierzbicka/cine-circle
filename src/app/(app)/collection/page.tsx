@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Your Collection',
+  robots: { index: false, follow: false },
+};
+
 import ErrorToast from '@/components/ErrorToast';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { UserMediaPage } from '@/types';
