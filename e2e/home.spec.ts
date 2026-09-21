@@ -3,8 +3,6 @@ import { test, expect } from './fixtures/auth';
 const ABOUT_HEADING = 'Your film diary, properly kept';
 
 test.describe('home', () => {
-  // `authedPage` adds session cookies to the default context, so the signed-out
-  // half needs its own context rather than the default `page` fixture.
   test('T19 "What is MidnightFrame" shows signed-out, hidden signed-in', async ({
     browser,
     authedPage,

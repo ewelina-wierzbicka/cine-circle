@@ -25,18 +25,18 @@ export function HomeAbout() {
   return (
     <section
       aria-labelledby="what-is-midnightframe"
-      className="relative z-10 px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto"
+      className="relative z-10 px-6 md:px-12 py-8 md:py-32 max-w-6xl mx-auto"
     >
       <p className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-4">
         What is MidnightFrame
       </p>
       <h2
         id="what-is-midnightframe"
-        className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95] mb-6"
+        className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.2] mb-6"
       >
         Your film diary, <em className="text-accent">properly kept</em>
       </h2>
-      <p className="font-sans text-base text-secondary leading-relaxed max-w-2xl">
+      <p className="font-sans text-base text-secondary leading-relaxed">
         MidnightFrame is a tracker for the movies and series you watch. Search
         any title, log the date you saw it, rate it out of ten, and write down
         what you thought while it is still fresh. Everything lands in one
@@ -58,7 +58,7 @@ export function HomeAbout() {
         ))}
       </div>
 
-      <p className="font-sans text-base text-secondary leading-relaxed max-w-2xl mt-12">
+      <p className="font-sans text-base text-secondary leading-relaxed mt-12">
         Nothing you save is public. Your collection stays yours, whether you log
         a film the night you watch it or catch up on a month of viewing in one
         sitting.
