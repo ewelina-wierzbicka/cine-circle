@@ -281,6 +281,12 @@ export const motion = {
 - Receives a `Promise<TrendingMovie[]>` (resolved by `getRecentWatched`) and `await`s it; renders `null` when empty.
 - Hosts the section header ("RECENTLY WATCHED" + "SEE ALL →") and the horizontal `MediaPoster` scroll. Lifted out of `page.tsx` so the home shell prerenders with the hero and the strip streams in via Suspense.
 
+### HomeAbout
+
+- `src/components/HomeAbout.tsx` — static "What is MidnightFrame" section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
+- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, `font-serif` `h2` with `<em class="text-accent">`, `text-secondary` body.
+
 ### Skeleton (loading.tsx skeletons)
 
 - `Skeleton.tsx` — reusable pulsing block sized via `className`. Used by `loading.tsx` files and Suspense fallbacks.
@@ -354,12 +360,14 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 Layout & Ambient
 
-- `min-h-full` flex column with three absolute radial blobs implemented as blurred rounded divs.
+- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-data-home-about` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
+- Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 
 Hero
 
-- Heading implemented as `h2` using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`.
+- Heading is the page `h1` ("What will you watch next?") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
@@ -380,6 +388,10 @@ Recently Watched
 
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
+
+What is MidnightFrame
+
+- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
 
 ---
 
