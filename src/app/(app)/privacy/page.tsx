@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { breadcrumbJsonLd, webPageJsonLd } from '@/lib/jsonLd';
+import { absoluteUrl } from '@/lib/seo';
+
+const TITLE = 'Privacy Policy';
+const DESCRIPTION =
+  'What MidnightFrame collects, how your watch history is stored, and the rights you have over your data.';
+const CANONICAL_PATH = '/privacy';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description:
-    'What MidnightFrame collects, how your watch history is stored, and the rights you have over your data.',
-  alternates: { canonical: '/privacy' },
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: CANONICAL_PATH },
 };
 
 type Section = { heading: string; body: string };
@@ -43,6 +50,15 @@ const sections: Section[] = [
 export default function PrivacyPage() {
   return (
     <div className="min-h-full px-6 md:px-12 py-12">
+      <JsonLd
+        data={webPageJsonLd(TITLE, absoluteUrl(CANONICAL_PATH), DESCRIPTION)}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'Home', url: absoluteUrl('/') },
+          { name: TITLE, url: absoluteUrl(CANONICAL_PATH) },
+        ])}
+      />
       <div className="max-w-2xl mx-auto">
         <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
           Privacy Policy
