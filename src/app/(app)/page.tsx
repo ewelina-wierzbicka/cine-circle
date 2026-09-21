@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { HomeAbout } from '@/components/HomeAbout';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
 import { getRecentWatched } from '@/services/getRecentWatched';
@@ -15,14 +16,18 @@ export default async function Home() {
   const recentPostersPromise = getRecentWatched();
 
   return (
-    <div className="min-h-full flex flex-col relative">
-      <HomeHero
-        hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
-        recentPostersPromise={recentPostersPromise}
-      />
-      <Suspense fallback={null}>
-        <RecentWatched recentPostersPromise={recentPostersPromise} />
-      </Suspense>
+    <div className="relative">
+      {/* Header is h-16, so the hero + recently watched block fills the first screen. */}
+      <div className="min-h-[calc(100vh-4rem)] flex flex-col">
+        <HomeHero
+          hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
+          recentPostersPromise={recentPostersPromise}
+        />
+        <Suspense fallback={null}>
+          <RecentWatched recentPostersPromise={recentPostersPromise} />
+        </Suspense>
+      </div>
+      <HomeAbout />
     </div>
   );
 }

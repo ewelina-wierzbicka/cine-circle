@@ -281,6 +281,17 @@ export const motion = {
 - Receives a `Promise<TrendingMovie[]>` (resolved by `getRecentWatched`) and `await`s it; renders `null` when empty.
 - Hosts the section header ("RECENTLY WATCHED" + "SEE ALL →") and the horizontal `MediaPoster` scroll. Lifted out of `page.tsx` so the home shell prerenders with the hero and the strip streams in via Suspense.
 
+### HomeAbout
+
+- `src/components/HomeAbout.tsx` — static Server Component rendering the "What is MidnightFrame" section below the home hero.
+- Section wrapper: `relative z-10 px-6 md:px-12 py-16 md:py-24 max-w-4xl mx-auto`, labelled via `aria-labelledby` pointing at its `h2`.
+- Eyebrow: `font-mono text-sm tracking-[0.2em] text-accent uppercase`.
+- `h2`: `font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95]` with accent emphasis via `<em class="text-accent">`, matching the hero pattern.
+- Body paragraphs: `font-sans text-base text-secondary leading-relaxed max-w-2xl`.
+- Three feature blocks in `grid gap-8 md:grid-cols-3`: decorative icon (`SearchIcon`, `StarIcon`, `ClapperboardIcon` at `w-6 h-6 text-accent`, wrapped in an `aria-hidden` span), `h3` in `font-mono text-sm tracking-[0.15em] text-accent uppercase`, body `text-sm text-secondary leading-relaxed`.
+- Closes with a descriptive `Link` to `/search` (`font-mono text-sm tracking-[0.08em]`), giving `/search` a real anchor text internal link.
+- No interactivity, no data fetching — part of the prerendered static shell.
+
 ### Skeleton (loading.tsx skeletons)
 
 - `Skeleton.tsx` — reusable pulsing block sized via `className`. Used by `loading.tsx` files and Suspense fallbacks.
@@ -354,12 +365,13 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 Layout & Ambient
 
-- `min-h-full` flex column with three absolute radial blobs implemented as blurred rounded divs.
+- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `HomeAbout` flowing beneath it. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 
 Hero
 
-- Heading implemented as `h2` using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`.
+- Heading is the page `h1` ("What will you watch next?") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It is the only `h1` on `/`; `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
@@ -380,6 +392,12 @@ Recently Watched
 
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
+
+What is MidnightFrame
+
+- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
+- Copy: eyebrow "WHAT IS MIDNIGHTFRAME", heading "Your film diary, _properly kept_", a lead paragraph, three feature blocks (Track what you watch / Rate and review / Keep one collection), a privacy line, and a "Search the full movie and TV catalogue →" link to `/search`.
+- Every claim maps to a shipped feature — search, watched vs to-watch lists, rating out of ten, watch date, notes, collection filtering, per-user privacy. Do not add copy for features that do not exist.
 
 ---
 
