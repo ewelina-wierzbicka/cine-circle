@@ -243,12 +243,9 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 | `/` (`(app)/page.tsx`) | `WebSite`, `Organization`    |
 | `/movie/[id]`          | `Movie`, `BreadcrumbList`    |
 | `/series/[id]`         | `TVSeries`, `BreadcrumbList` |
-| `/terms`               | `WebPage`, `BreadcrumbList`  |
-| `/privacy`             | `WebPage`, `BreadcrumbList`  |
 
 - Detail-page JSON-LD is rendered in `components/MediaPage.tsx` **outside** the `<Suspense>` that wraps `UserEnrichedMedia`. It is built from the `use cache` TMDB payload only, so it prerenders into the static shell and crawlers see it without waiting on Supabase. Do not move it inside the boundary.
 - Builders are pure functions over TMDB data plus `lib/seo.ts` constants. They must never read `cookies()`, `headers()` or Supabase, and no user-specific data belongs in a graph.
-- `/terms` and `/privacy` keep their title, description and canonical path in one `TITLE` / `DESCRIPTION` / `CANONICAL_PATH` const each, shared by `metadata` and the graphs, so the two can never drift apart.
 - The breadcrumb's final `item` must equal the page's `alternates.canonical`. Both are built with `absoluteUrl(toHref(id, title, mediaType))` — a mismatch is a Search Console error.
 - `JsonLd` escapes `<`, `>` and `&` before injecting, because TMDB overviews and titles are third-party text inside a `<script>` tag.
 - `NormalizedMedia.director` is the TMDB director for movies and `created_by[0]` for series, so it maps to `director` on `Movie` and `creator` on `TVSeries`.

@@ -51,23 +51,6 @@ export function organizationJsonLd(): JsonLdGraph {
   };
 }
 
-// Legal pages have no rich-result type of their own. `WebPage` plus a
-// breadcrumb is all Google renders for them.
-export function webPageJsonLd(
-  name: string,
-  url: string,
-  description?: string,
-): JsonLdGraph {
-  return {
-    '@context': SCHEMA_CONTEXT,
-    '@type': 'WebPage',
-    name,
-    url,
-    ...optional('description', description),
-    isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
-  };
-}
-
 function mediaGraph(
   media: NormalizedMedia,
   canonicalUrl: string,

@@ -1,17 +1,10 @@
 import type { Metadata } from 'next';
-import { JsonLd } from '@/components/JsonLd';
-import { breadcrumbJsonLd, webPageJsonLd } from '@/lib/jsonLd';
-import { absoluteUrl } from '@/lib/seo';
-
-const TITLE = 'Terms and Conditions';
-const DESCRIPTION =
-  'The terms you agree to when you use MidnightFrame to track and rate the movies and series you watch.';
-const CANONICAL_PATH = '/terms';
 
 export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: CANONICAL_PATH },
+  title: 'Terms and Conditions',
+  description:
+    'The terms you agree to when you use MidnightFrame to track and rate the movies and series you watch.',
+  alternates: { canonical: '/terms' },
 };
 
 type Section = { heading: string; body: string };
@@ -46,15 +39,6 @@ const sections: Section[] = [
 export default function TermsPage() {
   return (
     <div className="min-h-full px-6 md:px-12 py-12">
-      <JsonLd
-        data={webPageJsonLd(TITLE, absoluteUrl(CANONICAL_PATH), DESCRIPTION)}
-      />
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: 'Home', url: absoluteUrl('/') },
-          { name: TITLE, url: absoluteUrl(CANONICAL_PATH) },
-        ])}
-      />
       <div className="max-w-2xl mx-auto">
         <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
           Terms and Conditions
