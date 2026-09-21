@@ -114,7 +114,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, JsonLd, etc.)
+  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants (seo.ts, jsonLd.ts, tmdbImage.ts, …)

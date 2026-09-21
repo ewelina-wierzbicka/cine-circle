@@ -5,7 +5,7 @@ export const alt = 'MidnightFrame — track the movies and series you watch';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// ponytail: system fonts only. Satori has no oklch() support, so the accent
+// system fonts only. Satori has no oklch() support, so the accent
 // token is written here as its sRGB equivalent.
 const ACCENT = '#a97dff';
 

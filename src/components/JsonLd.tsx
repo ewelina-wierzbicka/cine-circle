@@ -13,9 +13,6 @@ export function JsonLd({ data }: { data: JsonLdGraph }) {
   return (
     <script
       type="application/ld+json"
-      // JSON-LD has no React-safe alternative: the graph must be raw text
-      // inside the script tag. `serialize` escapes every character that
-      // could break out of it.
       dangerouslySetInnerHTML={{ __html: serialize(data) }}
     />
   );

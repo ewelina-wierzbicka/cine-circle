@@ -27,8 +27,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-full flex flex-col relative">
-      {/* Static graphs, so they belong in the prerendered shell rather than
-          behind the RecentWatched Suspense boundary. */}
       <JsonLd data={websiteJsonLd()} />
       <JsonLd data={organizationJsonLd()} />
       <HomeHero

@@ -28,16 +28,12 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
   const initialStep = step === '2' ? 2 : 1;
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
 
-  // Must match the canonical `mediaMetadata` builds, or Search Console
-  // reports the breadcrumb and the canonical as conflicting URLs.
   const canonicalUrl = absoluteUrl(
     toHref(baseMedia.id, baseMedia.title, mediaType),
   );
 
   return (
     <>
-      {/* Built from the cached TMDB payload only, so the graph prerenders
-          into the static shell instead of waiting on the Suspense below. */}
       <JsonLd
         data={
           mediaType === 'series'

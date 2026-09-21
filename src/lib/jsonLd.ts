@@ -33,7 +33,6 @@ export function websiteJsonLd(): JsonLdGraph {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        // `query` is the param `(app)/search/page.tsx` reads.
         urlTemplate: `${SITE_URL}/search?query={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
