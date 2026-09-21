@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { HomeAbout } from '@/components/HomeAbout';
+import { SignedOutAbout } from '@/app/(app)/SignedOutAbout';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
 import { getRecentWatched } from '@/services/getRecentWatched';
@@ -27,7 +27,9 @@ export default async function Home() {
           <RecentWatched recentPostersPromise={recentPostersPromise} />
         </Suspense>
       </div>
-      <HomeAbout />
+      <Suspense fallback={null}>
+        <SignedOutAbout />
+      </Suspense>
     </div>
   );
 }
