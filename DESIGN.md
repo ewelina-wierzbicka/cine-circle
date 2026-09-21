@@ -361,6 +361,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 Layout & Ambient
 
 - Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-[[data-home-about]]` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
 - Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 

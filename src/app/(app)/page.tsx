@@ -16,9 +16,12 @@ export default async function Home() {
   const recentPostersPromise = getRecentWatched();
 
   return (
-    <div className="relative">
-      {/* Header is h-16, so the hero + recently watched block fills the first screen. */}
-      <div className="min-h-[calc(100vh-4rem)] flex flex-col">
+    <div className="group relative">
+      {/* Header is h-16, so the hero + recently watched block fills the first screen.
+          ponytail: signed-out pages carry `data-home-about`, and `group-has-*` collapses
+          that full-height block so the About section starts above the fold. Pure CSS,
+          so the shell still prerenders without knowing the session. */}
+      <div className="min-h-[calc(100vh-4rem)] group-has-[[data-home-about]]:min-h-0 flex flex-col">
         <HomeHero
           hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
           recentPostersPromise={recentPostersPromise}

@@ -12,5 +12,10 @@ export async function SignedOutAbout() {
 
   if (user) return null;
 
-  return <HomeAbout />;
+  // `data-home-about` is the hook `page.tsx` keys its `group-has-*` layout off.
+  return (
+    <div data-home-about>
+      <HomeAbout />
+    </div>
+  );
 }
