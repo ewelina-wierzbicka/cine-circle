@@ -1,5 +1,10 @@
-export const metadata = {
-  title: 'Terms and Conditions — MidnightFrame',
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Terms and Conditions',
+  description:
+    'The terms you agree to when you use MidnightFrame to track and rate the movies and series you watch.',
+  alternates: { canonical: '/terms' },
 };
 
 type Section = { heading: string; body: string };

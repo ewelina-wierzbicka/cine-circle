@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
-
-const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '');
+import { SITE_URL } from '@/lib/seo';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -14,10 +13,11 @@ export default function robots(): MetadataRoute.Robots {
         '/confirm-email',
         '/forgot-password',
         '/reset-password',
+        '/registration-confirmed',
         '/profile',
         '/collection',
       ],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

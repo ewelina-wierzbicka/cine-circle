@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { toHref } from '@/lib/mediaUtils';
-
-const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '');
+import { SITE_URL as baseUrl } from '@/lib/seo';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const trendingMovies = await getTrendingMovies();

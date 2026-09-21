@@ -109,6 +109,7 @@ series/[id]/             # /series/:id
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — public routes + trending movies
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
+    opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
   globals.css
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt
@@ -220,7 +221,18 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
-- Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site
+- Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site. For social/OG images use `tmdbSocialImageUrl(path)` — crawlers fetch the raw URL with no loader in front of it, so it pins the `w780` bucket.
+
+### Metadata & SEO
+
+All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
+
+- The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
+- `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
+- Every indexable page sets `alternates.canonical`. Movie and series pages canonicalise to `absoluteUrl(toHref(id, title, mediaType))`, which collapses every mis-slugged `/movie/123-anything` variant onto one URL. `/search` canonicalises to `/search` with no query string.
+- `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
+- noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
+- `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
 
 ---
 

@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Email confirmed',
+  description:
+    'Your MidnightFrame email is confirmed. Sign in to start building your collection.',
+};
+
 import { CheckCircleIcon } from '@/icons/CheckCircle';
 import AuthFormLayout from '../AuthFormLayout';
 import { SignInButton } from './SignInButton';
