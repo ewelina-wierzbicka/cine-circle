@@ -14,7 +14,36 @@ const AUTH_ROUTES = [
 const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
+// IMPORTANT: a new page route MUST end up in KNOWN_ROUTES_EXACT or KNOWN_ROUTE_PREFIXES list, or it will 404.
+const KNOWN_ROUTES_EXACT = [
+  ...AUTH_ROUTES,
+  ...OPEN_ROUTES_EXACT,
+  '/search',
+  '/collection',
+  '/profile',
+  '/reset-password',
+];
+const KNOWN_ROUTE_PREFIXES = ['/movie/', '/series/'];
+
+function isKnownRoute(pathname: string) {
+  const normalized =
+    pathname.length > 1 && pathname.endsWith('/')
+      ? pathname.slice(0, -1)
+      : pathname;
+
+  return (
+    KNOWN_ROUTES_EXACT.includes(normalized) ||
+    KNOWN_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  );
+}
+
 export default async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (!isKnownRoute(pathname)) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -42,7 +71,6 @@ export default async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
   const isOpenRoute =
     OPEN_ROUTES_EXACT.includes(pathname) ||
