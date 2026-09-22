@@ -18,20 +18,17 @@ const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 // entirely and falls through to the root not-found page, so unknown URLs answer
 // 404 instead of a soft 404 redirect to /login.
 //
-// IMPORTANT: a new page route MUST be registered here, or it will 404.
+// IMPORTANT: a new page route MUST end up in this list, or it will 404.
+// Auth routes and exact open routes are spread in, so those register
+// themselves. Everything else goes below by hand, including open *prefix*
+// routes like /search and session-gated routes like /reset-password.
 const KNOWN_ROUTES_EXACT = [
-  '/',
-  '/terms',
-  '/privacy',
+  ...AUTH_ROUTES,
+  ...OPEN_ROUTES_EXACT,
   '/search',
   '/collection',
   '/profile',
-  '/login',
-  '/register',
-  '/confirm-email',
-  '/forgot-password',
   '/reset-password',
-  '/registration-confirmed',
 ];
 const KNOWN_ROUTE_PREFIXES = ['/movie/', '/series/'];
 
