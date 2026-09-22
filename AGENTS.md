@@ -240,6 +240,26 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
 - `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
 
+### Security headers
+
+Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml` and `robots.txt` from auth, but `headers()` still applies to them.
+
+| Header                      | Value                                                          | Why                                     |
+| --------------------------- | -------------------------------------------------------------- | --------------------------------------- |
+| `X-Content-Type-Options`    | `nosniff`                                                      | Stops MIME sniffing of responses        |
+| `Referrer-Policy`           | `strict-origin-when-cross-origin`                              | No path or query leaks to third parties |
+| `X-Frame-Options`           | `DENY`                                                         | Clickjacking cover for old browsers     |
+| `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
+| `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
+
+**CSP ships as `Content-Security-Policy-Report-Only`, not enforcing.** It logs violations without blocking, so a missing origin cannot break the app. Tighten it to the enforcing header only after the reports come back clean.
+
+- Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
+- `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason.
+- Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`.
+- Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
+- Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
+
 ---
 
 ## Next.js 16 — Important Changes
