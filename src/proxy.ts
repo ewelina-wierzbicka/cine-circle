@@ -14,14 +14,7 @@ const AUTH_ROUTES = [
 const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
-// Every page route the app serves. A path matching nothing here skips auth
-// entirely and falls through to the root not-found page, so unknown URLs answer
-// 404 instead of a soft 404 redirect to /login.
-//
-// IMPORTANT: a new page route MUST end up in this list, or it will 404.
-// Auth routes and exact open routes are spread in, so those register
-// themselves. Everything else goes below by hand, including open *prefix*
-// routes like /search and session-gated routes like /reset-password.
+// IMPORTANT: a new page route MUST end up in KNOWN_ROUTES_EXACT or KNOWN_ROUTE_PREFIXES list, or it will 404.
 const KNOWN_ROUTES_EXACT = [
   ...AUTH_ROUTES,
   ...OPEN_ROUTES_EXACT,
@@ -47,7 +40,6 @@ function isKnownRoute(pathname: string) {
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Unknown path: let Next render the root 404 rather than redirecting.
   if (!isKnownRoute(pathname)) {
     return NextResponse.next();
   }
