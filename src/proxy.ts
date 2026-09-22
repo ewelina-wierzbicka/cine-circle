@@ -11,7 +11,7 @@ const AUTH_ROUTES = [
   '/registration-confirmed',
 ];
 // Open routes: accessible to everyone (no redirect for unauthenticated users)
-const OPEN_ROUTES_EXACT = ['/', '/about', '/terms', '/privacy'];
+const OPEN_ROUTES_EXACT = ['/', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
 // Every page route the app serves. A path matching nothing here skips auth
@@ -21,7 +21,6 @@ const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 // IMPORTANT: a new page route MUST be registered here, or it will 404.
 const KNOWN_ROUTES_EXACT = [
   '/',
-  '/about',
   '/terms',
   '/privacy',
   '/search',

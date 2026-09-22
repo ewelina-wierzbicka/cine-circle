@@ -128,7 +128,7 @@ series/[id]/             # /series/:id
 - `/registration-confirmed` is an auth route in `AUTH_ROUTES` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session, so the visitor is logged out; logged-in users hitting it are redirected to `/`. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
 - `KNOWN_ROUTES_EXACT` / `KNOWN_ROUTE_PREFIXES` list every page route the app serves. A path matching neither skips auth and falls through to the root 404 — unknown URLs like `/nonexistent-xyz` or `/llms.txt` must answer 404, not redirect to `/login`, or crawlers waste budget on soft 404s
 - **Any new page route must be registered in `KNOWN_ROUTES_EXACT` or `KNOWN_ROUTE_PREFIXES`, or it will 404 for everyone.** This check runs first, before the open/auth/private logic
-- Open routes (no redirect for unauthenticated users): exact match `/`, `/about`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
 - To add a new open route, add it to `OPEN_ROUTES_EXACT` or `OPEN_ROUTE_PREFIXES` in `proxy.ts` — and to the known-route list
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
