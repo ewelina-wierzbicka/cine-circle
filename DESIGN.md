@@ -182,6 +182,7 @@ export const motion = {
 - Large poster container used in detail pages.
 - Rotated card visual (`-1.5deg`), rounded-2xl, heavy shadow and inset vignette.
 - Uses placeholder gradient when no poster path.
+- `priority` preloads the poster and drops `loading="lazy"`. `fetchPriority="high"` is a separate prop — pass it only on the single LCP poster of a page (the detail-page poster in `MediaDetailWrapper`).
 
 ### MediaInfo & WatchedMediaInfo
 
