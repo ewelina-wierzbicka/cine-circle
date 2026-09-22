@@ -16,7 +16,10 @@ export function toHref(
   mediaType: MediaType,
 ): string {
   const base = mediaType === 'series' ? 'series' : 'movie';
-  return `/${base}/${tmdbId}-${toSlug(title)}`;
+  const slug = toSlug(title);
+  // A title that slugifies to nothing must not produce a trailing dash,
+  // or the canonical redirect in MediaPage would never settle.
+  return slug ? `/${base}/${tmdbId}-${slug}` : `/${base}/${tmdbId}`;
 }
 
 export function toSearchMediaListProps(media: NormalizedMedia) {

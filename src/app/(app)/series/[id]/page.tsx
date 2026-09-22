@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import MediaPage from '@/components/MediaPage';
+import MediaPage, { type MediaPageSearchParams } from '@/components/MediaPage';
 import { getSeriesDetails } from '@/services/getMedia';
 import { mediaMetadata, NOT_FOUND_METADATA } from '@/lib/seo';
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ step?: string }>;
+  searchParams: Promise<MediaPageSearchParams>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,6 +22,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params, searchParams }: Props) {
   const { id: slug } = await params;
-  const { step } = await searchParams;
-  return <MediaPage slug={slug} mediaType="series" step={step} />;
+  const search = await searchParams;
+  return <MediaPage slug={slug} mediaType="series" searchParams={search} />;
 }
