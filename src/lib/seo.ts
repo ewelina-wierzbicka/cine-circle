@@ -14,6 +14,13 @@ export const SITE_TITLE = `${SITE_NAME} — Track the movies and series you watc
 export const SITE_DESCRIPTION =
   'MidnightFrame is a free movie and TV tracker. Log what you watch, rate it, write reviews, and build a collection you can share with friends.';
 
+// `lastmod` for pages whose copy only changes when we edit it: `/`, `/terms`,
+// `/privacy`. Also the fallback for media pages TMDB gives no date for. Bump by
+// hand whenever that copy changes — never replace it with `new Date()`, or every
+// sitemap entry claims to have changed on every build and crawlers stop
+// trusting our `lastmod` altogether.
+export const STATIC_PAGE_LAST_MODIFIED = '2026-09-22T00:00:00.000Z';
+
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
