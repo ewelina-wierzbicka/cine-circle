@@ -1,14 +1,22 @@
 import type { NextConfig } from 'next';
 
-// Report-Only for now: it logs violations without blocking, so a missing origin
-// cannot break the app. `script-src` still needs 'unsafe-inline' because Next.js
-// streams the RSC payload through inline scripts, and a nonce-based policy is
-// off the table: a per-request nonce forces every route dynamic and destroys the
-// PPR static shell (`cacheComponents: true`).
-// Origins: fonts are self-hosted by `next/font/google`, TMDB images are served
-// straight from image.tmdb.org by the custom loader, avatars come from Supabase
-// storage, and @vercel/analytics loads from the same origin in production but
-// from va.vercel-scripts.com in dev and preview.
+// The list below says which servers the browser may load things from.
+//
+// It is sent as Report-Only, so the browser only warns in the console instead of
+// blocking. If we forgot an allowed server, nothing on the site breaks. Switch to
+// the enforcing header once the warnings stay empty.
+//
+// 'unsafe-inline' has to stay in script-src. Next.js puts small inline scripts in
+// the page to hand React its data. The usual fix is a one-time token per request,
+// but that would make every page render on demand and remove the prerendered
+// shell that `cacheComponents: true` gives us.
+//
+// Where each allowed server comes from:
+// - self: our own pages, our fonts (next/font/google copies them into the build)
+// - image.tmdb.org: movie posters, loaded straight from TMDB
+// - *.supabase.co: avatar images and browser calls to the database
+// - va.vercel-scripts.com: analytics in dev and preview only. In production the
+//   same script is served from our own domain.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
