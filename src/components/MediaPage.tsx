@@ -42,7 +42,6 @@ export default async function MediaPage({
       : await getMovieDetails(id);
   if (!tmdbData) notFound();
 
-  // One canonical URL per title: every other `<id>-<anything>` variant 308s here.
   const canonicalHref = toHref(tmdbData.id, tmdbData.title, mediaType);
   const requestedHref = `/${mediaType}/${slug}`;
   if (requestedHref !== canonicalHref) {
