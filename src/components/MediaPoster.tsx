@@ -7,8 +7,6 @@ type Props = {
   className?: string;
   sizes?: string;
   priority?: boolean;
-  // Next 16's `priority` only preloads + disables lazy; it no longer sets
-  // fetchpriority. Pass "high" on the single LCP poster of a page.
   fetchPriority?: 'high' | 'low' | 'auto';
 };
 
