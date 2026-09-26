@@ -11,6 +11,9 @@ const WARM_ROUTES = [
   '/forgot-password',
   '/search',
   '/movie/27205',
+  // Soft-404 tests: these compile /_not-found, which `proxy.ts` rewrites to.
+  '/movie/999999999',
+  '/series/999999999',
   // Toast-on-redirect tests only get the 5s the toast lives, so these
   // handlers must already be compiled when the test navigates.
   '/api/auth/confirm-callback',

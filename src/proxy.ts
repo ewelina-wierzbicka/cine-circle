@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseConfig } from './lib/supabase/config';
+import { mediaExists } from './services/mediaExists';
 
 // Auth-only routes: redirect authenticated users away
 const AUTH_ROUTES = [
@@ -37,6 +38,49 @@ function isKnownRoute(pathname: string) {
   );
 }
 
+// The `/movie/[id]` and `/series/[id]` route prefixes, with the media type
+// `mediaExists` expects.
+const MEDIA_ROUTES = [
+  ['/movie/', 'movie'],
+  ['/series/', 'series'],
+] as const;
+
+type MediaRoute = {
+  mediaType: 'movie' | 'series';
+  // null when the slug does not start with a numeric TMDB id.
+  id: string | null;
+};
+
+function parseMediaRoute(pathname: string): MediaRoute | null {
+  for (const [prefix, mediaType] of MEDIA_ROUTES) {
+    if (!pathname.startsWith(prefix)) continue;
+
+    const slug = pathname.slice(prefix.length).replace(/\/$/, '');
+    // Anything deeper than one segment matches no route; Next.js 404s it.
+    if (!slug || slug.includes('/')) return null;
+
+    const id = slug.split('-')[0];
+    return { mediaType, id: /^\d+$/.test(id) ? id : null };
+  }
+  return null;
+}
+
+// `/movie/[id]` is a PPR route: the prerendered shell flushes a 200 before the
+// page body runs, so `notFound()` in `MediaPage` can only swap the body and the
+// status stays 200. Crawlers read that as a soft 404. Resolve the id here,
+// before the response starts, so an unknown id gets a real 404.
+async function isMissingMediaRoute(request: NextRequest): Promise<boolean> {
+  // RSC navigations never reach a crawler and still render the not-found UI
+  // via `notFound()`. Skip the lookup so in-app navigation stays cheap.
+  if (request.headers.get('rsc')) return false;
+
+  const route = parseMediaRoute(request.nextUrl.pathname);
+  if (!route) return false;
+  if (!route.id) return true;
+
+  return !(await mediaExists(route.mediaType, route.id));
+}
+
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -67,9 +111,28 @@ export default async function proxy(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Run both round trips at once; the media lookup must not add latency on top
+  // of the session check.
+  const [
+    {
+      data: { user },
+    },
+    isMissingMedia,
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    isMissingMediaRoute(request),
+  ]);
+
+  if (isMissingMedia) {
+    const notFoundResponse = NextResponse.rewrite(
+      new URL('/_not-found', request.url),
+    );
+    // Carry over any session cookie Supabase refreshed above.
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => notFoundResponse.cookies.set(cookie));
+    return notFoundResponse;
+  }
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
   const isOpenRoute =
