@@ -107,7 +107,7 @@ series/[id]/             # /series/:id
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
-    sitemap.ts                # /sitemap.xml — public routes + trending movies
+    sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
   globals.css
@@ -232,7 +232,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 
 ### Metadata & SEO
 
-All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
+All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `STATIC_PAGE_LAST_MODIFIED`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
 
 - The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
 - `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
@@ -240,6 +240,9 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - `MediaPage` also redirects every non-canonical slug to `toHref(id, title, mediaType)` with `permanentRedirect`, preserving the query string. `toHref` drops the trailing dash when a title slugifies to nothing, so the comparison always settles and cannot loop. Note the status: `/movie/[id]` is a PPR route, so the prerendered shell flushes 200 before the redirect resolves and Next emits a `<meta http-equiv="refresh">` instead of a 308. A true 308 would have to move into `proxy.ts` and cost a TMDB lookup per request.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
+- `sitemap.ts` lists the three open static routes plus trending and popular media, roughly 86 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
+- Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
+- `lastModified` never comes from `new Date()`. Static routes use `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media routes use the TMDB `release_date` / `first_air_date`, capped at that constant so unreleased titles cannot claim a future `lastmod`. Reading the clock in `sitemap.ts` would make `/sitemap.xml` dynamic under Cache Components — it is prerendered today, keep it that way.
 - `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
 
 ### Security headers
@@ -325,7 +328,7 @@ export async function getMovieDetails(id: string) {
 }
 ```
 
-Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`). All use `cacheLife('days')`.
+Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`. The `<page>` in those two tags is a TMDB result-page index, not an app route — there is no `/popular-movies` or `/popular-series` page and the sitemap never emits one.
 
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 

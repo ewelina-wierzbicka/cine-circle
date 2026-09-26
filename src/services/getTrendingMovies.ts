@@ -50,6 +50,7 @@ export async function getTrendingMovies(): Promise<TrendingMovie[]> {
     .slice(0, 6)
     .map((item) => ({
       title: item.title ?? item.name ?? 'Unknown',
+      release_date: item.release_date ?? item.first_air_date,
       year: (item.release_date ?? item.first_air_date ?? '').slice(0, 4),
       type: item.media_type === 'movie' ? 'movie' : 'series',
       posterUrl: tmdbImageUrl(item.poster_path),
