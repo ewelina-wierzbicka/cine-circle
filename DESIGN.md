@@ -206,6 +206,7 @@ export const motion = {
 - `src/components/MediaList.tsx`.
 - Grid list of `MediaCard` components with responsive columns.
 - Implements intersection-observer pagination and shows `Loader` while fetching.
+- Only the first `PRIORITY_CARD_COUNT` cards (6) get `priority`. That is one row at `xl` and about the mobile fold. The rest stay lazy.
 
 ### Input
 
