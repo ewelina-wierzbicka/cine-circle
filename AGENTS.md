@@ -254,13 +254,14 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
 
-**CSP ships as `Content-Security-Policy-Report-Only`, not enforcing.** It logs violations without blocking, so a missing origin cannot break the app. Tighten it to the enforcing header only after the reports come back clean.
+**CSP ships as `Content-Security-Policy` — enforcing, not Report-Only.** The browser blocks anything the policy does not list. An origin missing from the policy is a broken request in production, not a console warning.
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
-- `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason.
+- `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
 - Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`.
+- `img-src` and `connect-src` also carry the origin of `NEXT_PUBLIC_SUPABASE_URL`. Local development and the e2e suite point it at `http://127.0.0.1:54321`, which is neither `'self'` nor covered by the `*.supabase.co` wildcard, so without it every browser-side Supabase call is blocked locally.
 - Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
-- Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
+- Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests are blocked outright.
 
 ---
 
