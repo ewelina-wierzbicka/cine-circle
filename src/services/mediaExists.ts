@@ -1,8 +1,5 @@
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-// Called from `proxy.ts`, which runs before the response starts and therefore
-// cannot use `use cache`. Kept free of `next/cache` imports for that reason —
-// the cached detail fetches live in `getMedia.ts`.
 export async function mediaExists(
   mediaType: 'movie' | 'series',
   id: string,

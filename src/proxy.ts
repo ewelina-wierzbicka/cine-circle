@@ -38,8 +38,6 @@ function isKnownRoute(pathname: string) {
   );
 }
 
-// The `/movie/[id]` and `/series/[id]` route prefixes, with the media type
-// `mediaExists` expects.
 const MEDIA_ROUTES = [
   ['/movie/', 'movie'],
   ['/series/', 'series'],
@@ -56,7 +54,6 @@ function parseMediaRoute(pathname: string): MediaRoute | null {
     if (!pathname.startsWith(prefix)) continue;
 
     const slug = pathname.slice(prefix.length).replace(/\/$/, '');
-    // Anything deeper than one segment matches no route; Next.js 404s it.
     if (!slug || slug.includes('/')) return null;
 
     const id = slug.split('-')[0];
@@ -111,8 +108,6 @@ export default async function proxy(request: NextRequest) {
     },
   );
 
-  // Run both round trips at once; the media lookup must not add latency on top
-  // of the session check.
   const [
     {
       data: { user },
@@ -127,7 +122,6 @@ export default async function proxy(request: NextRequest) {
     const notFoundResponse = NextResponse.rewrite(
       new URL('/_not-found', request.url),
     );
-    // Carry over any session cookie Supabase refreshed above.
     supabaseResponse.cookies
       .getAll()
       .forEach((cookie) => notFoundResponse.cookies.set(cookie));
