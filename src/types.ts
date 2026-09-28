@@ -94,3 +94,9 @@ export type TrendingMovie = {
   posterUrl?: string;
   id: number;
 };
+
+export type PopularMedia = {
+  id: number;
+  title: string;
+  mediaType: MediaType;
+};
