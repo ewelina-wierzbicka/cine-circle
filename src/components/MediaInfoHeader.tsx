@@ -1,5 +1,8 @@
 import { NormalizedMedia } from '@/types';
-import Link from 'next/link';
+import { Suspense } from 'react';
+import MediaBackLink, {
+  MediaBackLinkFallback,
+} from '@/components/MediaBackLink';
 
 type Props = {
   media: Pick<
@@ -12,10 +15,9 @@ type Props = {
     | 'genres'
     | 'overview'
   >;
-  fromSearch?: boolean;
 };
 
-export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
+export default function MediaInfoHeader({ media }: Props) {
   const {
     title,
     release_date,
@@ -36,12 +38,9 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
 
   return (
     <>
-      <Link
-        href={fromSearch ? '/' : '/collection'}
-        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
-      >
-        {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
-      </Link>
+      <Suspense fallback={<MediaBackLinkFallback />}>
+        <MediaBackLink />
+      </Suspense>
       {genres && genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {genres.map((g) => (

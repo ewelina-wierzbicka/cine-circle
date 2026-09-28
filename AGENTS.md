@@ -75,8 +75,8 @@ src/
         loading.tsx           # streams SearchBox + results grid skeleton
         SearchResults.tsx
       movie/[id]/             # /movie/:id
-        page.tsx
-        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+        page.tsx              # generateStaticParams prerenders the trending + popular ids
+        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense (unlisted ids only)
       collection/               # /collection
         page.tsx
         loading.tsx           # streams MyMedia header + grid skeleton
@@ -87,8 +87,8 @@ src/
         loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
 series/[id]/             # /series/:id
-        page.tsx
-        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+        page.tsx              # generateStaticParams prerenders the trending + popular ids
+        loading.tsx           # streams <MediaDetailSkeleton /> via Suspense (unlisted ids only)
       terms/                  # /terms — static Terms and Conditions page (open route)
         page.tsx
       privacy/                # /privacy — static Privacy Policy page (open route)
@@ -242,7 +242,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
 - `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
 - Every indexable page sets `alternates.canonical`. Movie and series pages canonicalise to `absoluteUrl(toHref(id, title, mediaType))`, which collapses every mis-slugged `/movie/123-anything` variant onto one URL. `/search` canonicalises to `/search` with no query string.
-- `MediaPage` also redirects every non-canonical slug to `toHref(id, title, mediaType)` with `permanentRedirect`, preserving the query string. `toHref` drops the trailing dash when a title slugifies to nothing, so the comparison always settles and cannot loop. Note the status: `/movie/[id]` is a PPR route, so the prerendered shell flushes 200 before the redirect resolves and Next emits a `<meta http-equiv="refresh">` instead of a 308. A true 308 would have to move into `proxy.ts`; the `mediaExists()` lookup added there for the 404 fix does not return a title, so it would need the fuller detail fetch.
+- `MediaPage` also redirects every non-canonical slug to `toHref(id, title, mediaType)` with `permanentRedirect`. **The query string is dropped.** Preserving it meant awaiting `searchParams` at the page root, which de-opted the whole route out of prerendering (CIN-213); every in-app link is already canonical, so only crawlers and hand-typed URLs reach the redirect. `toHref` drops the trailing dash when a title slugifies to nothing, so the comparison always settles and cannot loop. Note the status: `/movie/[id]` is a PPR route, so the prerendered shell flushes 200 before the redirect resolves and Next emits a `<meta http-equiv="refresh">` instead of a 308. A true 308 would have to move into `proxy.ts`; the `mediaExists()` lookup added there for the 404 fix does not return a title, so it would need the fuller detail fetch.
 - **Unknown movie and series ids answer a real 404**, resolved in `proxy.ts` before the response starts. Same PPR constraint as the redirect above. See the `proxy.ts` bullets under Project Structure.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
@@ -358,10 +358,20 @@ return (
 - `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
 - `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
+- `components/MediaInfoHeader.tsx` — `MediaBackLink` wrapped with `MediaBackLinkFallback`. The fallback is the `/collection` branch verbatim, so the swap costs no layout shift.
+- `components/MediaDetail.tsx` — `DetailStepSync` in `<Suspense fallback={null}>`.
+
+**The media routes are prerendered per id.** `generateStaticParams` in `movie/[id]/page.tsx` and `series/[id]/page.tsx` returns `getStaticMediaParams(mediaType)` — the same trending + popular set, same `${mediaType}-${id}` dedupe and same `toHref` slugs `sitemap.ts` emits, so no prerendered path redirects. Roughly 40 ids per media type. Three things used to keep the routes dynamic and all three are gone; do not reintroduce any of them:
+
+- **No `searchParams` at the page root.** Awaiting it de-opts everything above the nearest boundary, which is `loading.tsx`, so the entire prerendered shell was `MediaDetailSkeleton`.
+- **No `useSearchParams()` outside a Suspense boundary.** `MediaBackLink` (`?from=search`) and `DetailStepSync` (`?step=2`) are the only two call sites on these routes, and each sits in its own boundary.
+- **The detail step is client state, not the URL.** `useDetailStep` is a context hook now (`DetailStepContext`, provided by `MediaDetail`), not a `useSearchParams` + `router.push` pair. `MediaActions` and `MediaEntryForm` are server-rendered subtrees passed to `MediaDetail` as props, so the callbacks travel through context, not props. `DetailStepSync` still honours the `?step=2` deep link `MediaCard`'s "I watched" action pushes; it promotes the state in an effect and is the only thing that reads the param.
+
+`dynamicParams` stays at its default, so an unlisted id still renders on demand and gets the `loading.tsx` shell. `getStaticMediaParams` returns `[]` on a TMDB failure, which costs prerendering, not the build.
 
 **Never put TMDB copy in a Suspense fallback on the media pages.** The old fallback was `<MediaDetail media={baseMedia} pending />`, which re-rendered the real `h1`, genres, director, date and overview; the streamed tree then rendered all of it again, so crawlers saw two `h1`s and duplicated text on ~80 sitemap URLs. `MediaActionsSkeleton` is text-free by design: two `Skeleton` blocks with `aria-busy="true" aria-live="polite"`. `e2e/seo.spec.ts` guards the single-`h1` invariant.
 
-**`MediaInfoHeader` takes `fromSearch` as a plain prop.** It used to read `useSearchParams()` for the `from=search` back link. It now renders outside the Suspense boundary, so the value is read from `searchParams` at the page root and passed down `MediaPage → MediaDetail → MediaInfoHeader`.
+**`MediaInfoHeader` takes no `fromSearch` prop.** The `from=search` back link lives in `MediaBackLink`, a client component behind its own Suspense boundary. Passing the value down from the page root would mean awaiting `searchParams` there, which is exactly what CIN-213 removed.
 
 **Do not add `export const dynamic` / `force-dynamic`** to routes. PPR handles dynamicity per Suspense boundary. Use `connection()` only when a subtree must opt out of prerendering entirely (not currently needed).
 
@@ -438,14 +448,15 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File                 | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts`       | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
-| `home.spec.ts`       | T19 about section renders signed-out, hidden signed-in                                                                                                                                                                                                                                                                                                                                                        |
-| `seo.spec.ts`        | T20 movie page renders one h1, T21 series page renders one h1, T22 movie overview text appears once                                                                                                                                                                                                                                                                                                           |
-| `search.spec.ts`     | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
-| `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
+| File                   | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts`         | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
+| `home.spec.ts`         | T19 about section renders signed-out, hidden signed-in                                                                                                                                                                                                                                                                                                                                                        |
+| `seo.spec.ts`          | T20 movie page renders one h1, T21 series page renders one h1, T22 movie overview text appears once                                                                                                                                                                                                                                                                                                           |
+| `media-detail.spec.ts` | T23 `?from=search` swaps the back link, T24 `?step=2` deep link opens the entry form                                                                                                                                                                                                                                                                                                                          |
+| `search.spec.ts`       | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
+| `collection.spec.ts`   | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
+| `profile.spec.ts`      | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
 
 **Rules:**
 

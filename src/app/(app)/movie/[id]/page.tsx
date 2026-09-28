@@ -1,12 +1,19 @@
 import type { Metadata } from 'next';
-import MediaPage, { type MediaPageSearchParams } from '@/components/MediaPage';
+import MediaPage from '@/components/MediaPage';
 import { getMovieDetails } from '@/services/getMedia';
+import { getStaticMediaParams } from '@/services/getStaticMediaParams';
 import { mediaMetadata, NOT_FOUND_METADATA } from '@/lib/seo';
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<MediaPageSearchParams>;
 };
+
+// The trending and popular ids, the same set `sitemap.ts` emits. Without this
+// the segment has no build-time id and the prerendered shell is `loading.tsx`
+// alone. `dynamicParams` stays default: an unlisted id still renders on demand.
+export async function generateStaticParams() {
+  return getStaticMediaParams('movie');
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: slug } = await params;
@@ -20,8 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return mediaMetadata(data, 'movie');
 }
 
-export default async function Page({ params, searchParams }: Props) {
+export default async function Page({ params }: Props) {
   const { id: slug } = await params;
-  const search = await searchParams;
-  return <MediaPage slug={slug} mediaType="movie" searchParams={search} />;
+  return <MediaPage slug={slug} mediaType="movie" />;
 }
