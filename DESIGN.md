@@ -184,12 +184,11 @@ export const motion = {
 - Uses placeholder gradient when no poster path.
 - `priority` preloads the poster and drops `loading="lazy"`. `fetchPriority="high"` is a separate prop — pass it only on the single LCP poster of a page (the detail-page poster in `MediaDetailWrapper`).
 
-### MediaInfo & WatchedMediaInfo
+### MediaInfoHeader & MediaActions
 
-- `src/components/MediaInfo.tsx` and `src/components/WatchedMediaInfo.tsx`.
-- MediaInfo: actions for adding/removing media, shows director, date, and call-to-action buttons.
-- WatchedMediaInfo: shows rating, watched date, and review; includes Update button.
-- Both use `font-mono` for labels and `font-serif` for large title with `clamp(42px, 5.5vw, 72px)`.
+- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: back link, genre pills, type label, `h1` (`font-serif`, `clamp(42px, 5.5vw, 72px)`), director/date meta row, accent divider, overview. `font-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop.
+- `src/components/MediaActions.tsx` renders everything below the divider that depends on the signed-in user: the signed-out sign-in prompt, the `to_watch` buttons, the default add buttons, and the `watched` body (rating via `StarRating`, watched date, review) with its UPDATE / DELETE buttons.
+- `src/components/MediaActionsSkeleton.tsx` is its Suspense fallback. Two `Skeleton` blocks, no text.
 
 ### MediaDetail & MediaDetailWrapper
 
@@ -199,7 +198,7 @@ export const motion = {
 ### MediaPage
 
 - `src/components/MediaPage.tsx` is an async wrapper used by route handlers.
-- Fetches data via `getMediaPageData`, shows `ErrorToast` on error and `MediaDetail` on success.
+- Awaits the cached TMDB fetch, then renders `MediaDetail` with the streamed `actions` and `form` subtrees.
 
 ### MediaList
 
@@ -429,9 +428,10 @@ Notes
 
 Overall structure
 
-- `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data. It then wraps the user-enriched subtree in `<Suspense>` while `getEnrichedMedia` reads cookies + Supabase.
-- The Suspense fallback renders `<MediaDetail media={baseMedia} pending />` — the full detail UI with the action buttons replaced by `Skeleton` blocks (`MediaInfo` `pending` prop, `aria-busy="true"`). Once `UserEnrichedMedia` resolves, the real `MediaDetail` (with `watchStatus` if saved) replaces it.
-- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = info, 2 = form). It detects saved state by checking `watchStatus` in the media object.
+- `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data.
+- **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` two server-rendered `<Suspense>` subtrees as the `actions` and `form` props, and `getEnrichedMedia` reads cookies + Supabase inside them.
+- The `actions` fallback is `MediaActionsSkeleton` — two `Skeleton` blocks (`h-12 w-full sm:w-44 rounded-xl` and `h-12 w-full sm:w-36 rounded-xl`), `aria-busy="true" aria-live="polite"`, and no text. The `form` fallback is `UserEntryFormSkeleton`. A fallback that repeated the TMDB copy used to ship the `h1` and overview twice in the SSR HTML.
+- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = header + `actions`, 2 = `form`). `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
 - `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
 - On home (and other non-cinematic routes) the `(app)` layout's ambient blobs show only in the 56px `Header` strip because `main` is opaque `bg-dark`; that subtle soft transition reads as one continuous background.
@@ -443,17 +443,17 @@ Poster & Visuals
 
 Info & Form
 
-- Info view (`MediaInfo` or `WatchedMediaInfo`) shows:
+- Info view (`MediaInfoHeader` + `MediaActions`) shows:
   - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
   - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
   - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
   - Accent divider `w-12 h-px bg-accent opacity-60`.
-  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
+  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
-- Watched view (`WatchedMediaInfo`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
+- Watched view (the `watched` branch of `MediaActions`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
 
 - Form view (`UserEntryForm`) uses `react-hook-form` and includes:
   - DatePicker (`DatePicker`) for `watched_date` (disables future dates).
