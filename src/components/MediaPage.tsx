@@ -56,9 +56,6 @@ export default async function MediaPage({
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
   const tmdbId = Number(id);
 
-  // The TMDB block renders once, outside Suspense. Only the two user-dependent
-  // subtrees below stream, so the SSR HTML carries a single <h1> and a single
-  // copy of the overview.
   return (
     <MediaDetail
       key={slug}
@@ -93,8 +90,6 @@ type EnrichedProps = {
   mediaType: 'movie' | 'series';
 };
 
-// `getEnrichedMedia` is wrapped in React `cache`, so both boundaries share one
-// Supabase round trip per request.
 async function UserEnrichedActions({
   baseMedia,
   tmdbId,

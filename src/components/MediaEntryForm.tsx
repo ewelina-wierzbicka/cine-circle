@@ -15,8 +15,6 @@ type Props = {
   media: NormalizedMedia | SavedMedia;
 };
 
-// Step 2 of the detail page. Lives behind the same Suspense boundary as
-// `MediaActions` because the form is prefilled from the user's saved entry.
 export default function MediaEntryForm({ media }: Props) {
   const { goToInfo } = useDetailStep();
   const router = useRouter();
