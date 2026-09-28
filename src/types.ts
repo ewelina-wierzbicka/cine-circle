@@ -89,7 +89,6 @@ export type UserProfile = {
 export type TrendingMovie = {
   title: string;
   year: string;
-  // Full TMDB release / first-air date. `year` is the display value; this is
   // what the sitemap turns into a per-URL `lastmod`.
   release_date?: string;
   type: MediaType;
@@ -98,7 +97,6 @@ export type TrendingMovie = {
   id: number;
 };
 
-// Minimal shape the sitemap needs to build one media URL with a real `lastmod`.
 export type PopularMedia = {
   id: number;
   title: string;
