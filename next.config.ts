@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
 // The list below says which servers the browser may load things from.
@@ -71,4 +72,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: 'ewierzbicka',
+  project: 'midnightframe',
+  silent: !process.env.CI,
+
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});
