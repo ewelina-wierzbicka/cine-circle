@@ -1,9 +1,10 @@
 import { test, expect } from './fixtures/auth';
 
-const ABOUT_HEADING = 'Your film diary, properly kept';
+const ABOUT_HEADING = "Every movie you've watched. Every one you haven't.";
+const ABOUT_EYEBROW = 'For people who care what they watch';
 
 test.describe('home', () => {
-  test('T19 "What is MidnightFrame" shows signed-out, hidden signed-in', async ({
+  test('T19 about section shows signed-out, hidden signed-in', async ({
     browser,
     authedPage,
   }) => {
@@ -15,7 +16,7 @@ test.describe('home', () => {
     await expect(
       anonPage.getByRole('heading', { name: ABOUT_HEADING, level: 2 }),
     ).toBeVisible();
-    await expect(anonPage.getByText('What is MidnightFrame')).toBeVisible();
+    await expect(anonPage.getByText(ABOUT_EYEBROW)).toBeVisible();
     await anonContext.close();
 
     // Signed in: the hero h1 stays, the section is gone.
@@ -24,6 +25,6 @@ test.describe('home', () => {
     await expect(
       authedPage.getByRole('heading', { name: ABOUT_HEADING, level: 2 }),
     ).toHaveCount(0);
-    await expect(authedPage.getByText('What is MidnightFrame')).toHaveCount(0);
+    await expect(authedPage.getByText(ABOUT_EYEBROW)).toHaveCount(0);
   });
 });
