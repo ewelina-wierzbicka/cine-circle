@@ -4,7 +4,11 @@ import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toHref } from '@/lib/mediaUtils';
+import MediaActions from './MediaActions';
+import MediaActionsSkeleton from './MediaActionsSkeleton';
 import MediaDetail from './MediaDetail';
+import MediaEntryForm from './MediaEntryForm';
+import UserEntryFormSkeleton from './UserEntryFormSkeleton';
 
 export type MediaPageSearchParams = Record<
   string,
@@ -48,54 +52,64 @@ export default async function MediaPage({
     permanentRedirect(`${canonicalHref}${toQueryString(searchParams)}`);
   }
 
-  const step = searchParams.step;
-  const initialStep = step === '2' ? 2 : 1;
+  const initialStep = searchParams.step === '2' ? 2 : 1;
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
+  const tmdbId = Number(id);
 
   return (
-    <Suspense
-      fallback={
-        <MediaDetail media={baseMedia} initialStep={initialStep} pending />
+    <MediaDetail
+      key={slug}
+      media={baseMedia}
+      initialStep={initialStep}
+      fromSearch={searchParams.from === 'search'}
+      actions={
+        <Suspense fallback={<MediaActionsSkeleton />}>
+          <UserEnrichedActions
+            baseMedia={baseMedia}
+            tmdbId={tmdbId}
+            mediaType={mediaType}
+          />
+        </Suspense>
       }
-    >
-      <UserEnrichedMedia
-        baseMedia={baseMedia}
-        tmdbId={Number(id)}
-        mediaType={mediaType}
-        slug={slug}
-        initialStep={initialStep}
-      />
-    </Suspense>
+      form={
+        <Suspense fallback={<UserEntryFormSkeleton />}>
+          <UserEnrichedForm
+            baseMedia={baseMedia}
+            tmdbId={tmdbId}
+            mediaType={mediaType}
+          />
+        </Suspense>
+      }
+    />
   );
 }
 
-type UserEnrichedMediaProps = {
+type EnrichedProps = {
   baseMedia: NormalizedMedia;
   tmdbId: number;
   mediaType: 'movie' | 'series';
-  slug: string;
-  initialStep: 1 | 2;
 };
 
-async function UserEnrichedMedia({
+async function UserEnrichedActions({
   baseMedia,
   tmdbId,
   mediaType,
-  slug,
-  initialStep,
-}: UserEnrichedMediaProps) {
+}: EnrichedProps) {
   const { media, isAuthenticated } = await getEnrichedMedia(
     baseMedia,
     tmdbId,
     mediaType,
   );
 
-  return (
-    <MediaDetail
-      key={slug}
-      media={media}
-      initialStep={initialStep}
-      isAuthenticated={isAuthenticated}
-    />
-  );
+  return <MediaActions media={media} isAuthenticated={isAuthenticated} />;
+}
+
+async function UserEnrichedForm({
+  baseMedia,
+  tmdbId,
+  mediaType,
+}: EnrichedProps) {
+  const { media } = await getEnrichedMedia(baseMedia, tmdbId, mediaType);
+
+  return <MediaEntryForm media={media} />;
 }

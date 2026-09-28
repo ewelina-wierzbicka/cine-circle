@@ -342,9 +342,14 @@ Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails`
 // MediaPage pattern: cached TMDB awaited directly, user data streams
 const tmdbData = await getMovieDetails(id);          // cached, fast
 return (
-  <Suspense fallback={<MediaDetail media={tmdbData} pending />}>
-    <UserEnrichedMedia baseMedia={tmdbData} ... />   // reads cookies, Supabase
-  </Suspense>
+  <MediaDetail
+    media={tmdbData}                                 // TMDB block, rendered once
+    actions={
+      <Suspense fallback={<MediaActionsSkeleton />}>
+        <UserEnrichedActions ... />                  // reads cookies, Supabase
+      </Suspense>
+    }
+  />
 );
 ```
 
@@ -352,9 +357,9 @@ return (
 
 - `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
-- `components/MediaPage.tsx` — TMDB cached fetch awaited directly; `UserEnrichedMedia` (Supabase enrichment via `getEnrichedMedia`) streams via Suspense with a `pending` skeleton.
+- `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
 
-**`pending` prop** — `MediaDetail` and `MediaInfo` accept `pending` to render a `Skeleton` block for action buttons while user data streams. Pass it from the Suspense fallback.
+**Never put TMDB copy in a Suspense fallback on the media pages.** The old fallback was `<MediaDetail media={baseMedia} pending />`, which re-rendered the real `h1`, genres, director, date and overview; the streamed tree then rendered all of it again, so crawlers saw two `h1`s and duplicated text on ~80 sitemap URLs. `MediaActionsSkeleton` is text-free by design: two `Skeleton` blocks with `aria-busy="true" aria-live="polite"`.
 
 **Do not add `export const dynamic` / `force-dynamic`** to routes. PPR handles dynamicity per Suspense boundary. Use `connection()` only when a subtree must opt out of prerendering entirely (not currently needed).
 
