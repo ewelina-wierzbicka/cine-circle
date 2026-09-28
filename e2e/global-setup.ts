@@ -10,6 +10,7 @@ const WARM_ROUTES = [
   '/register',
   '/forgot-password',
   '/search',
+  '/search?query=matrix',
   '/movie/27205',
   // Toast-on-redirect tests only get the 5s the toast lives, so these
   // handlers must already be compiled when the test navigates.
