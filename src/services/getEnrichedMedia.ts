@@ -3,8 +3,6 @@ import { getUserMedia } from '@/services/getUserMedia';
 import { MediaType, NormalizedMedia, SavedMedia } from '@/types';
 import { cache } from 'react';
 
-// `cache` keeps the media page's two Suspense boundaries (actions and entry
-// form) on a single Supabase round trip per request.
 export const getEnrichedMedia = cache(
   async (
     baseMedia: NormalizedMedia,

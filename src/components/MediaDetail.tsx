@@ -15,9 +15,6 @@ type Props = {
   form: ReactNode;
 };
 
-// Renders the TMDB block exactly once, on every request. `actions` and `form`
-// are server-rendered Suspense subtrees handed down from `MediaPage`; only
-// they depend on the signed-in user.
 export default function MediaDetail({
   media,
   initialStep = 1,

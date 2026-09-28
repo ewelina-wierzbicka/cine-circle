@@ -1,8 +1,5 @@
 import Skeleton from '@/components/Skeleton';
 
-// Suspense fallback for `MediaActions`. Text-free on purpose: the TMDB copy
-// now renders once outside the boundary, so the fallback must add no markup a
-// crawler could read as a duplicate of it.
 export function MediaActionsSkeleton() {
   return (
     <div
