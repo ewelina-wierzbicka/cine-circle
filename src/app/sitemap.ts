@@ -55,10 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // No `lastModified` here. We have no record of when a media page's content
-  // last changed, and the TMDB release date is not one — a 1985 film would
-  // claim a 1985 `lastmod` for a page built this deploy. Crawlers ignore a
-  // `lastmod` they cannot corroborate, and the field is optional, so omitting
-  // it beats publishing a date we cannot stand behind.
+  // last changed
   const mediaRoutes: MetadataRoute.Sitemap = [...byKey.values()].map(
     (item) => ({
       url: `${baseUrl}${toHref(item.id, item.title, item.mediaType)}`,
