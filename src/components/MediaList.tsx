@@ -5,12 +5,6 @@ import { NormalizedMedia, SavedMedia } from '@/types';
 import { useCallback, useEffect, useRef } from 'react';
 import MediaCard from './MediaCard';
 
-// The grid runs 2 columns on mobile up to 6 at xl, and `priority` preloads
-// regardless of viewport. Six is one full row at xl and about the mobile fold,
-// so no breakpoint preloads much more than it paints. The rest stay lazy, which
-// is the only viewport-aware option the browser gives us.
-const PRIORITY_CARD_COUNT = 6;
-
 type Props = {
   media: ((SavedMedia | NormalizedMedia) & { href: string })[];
   heading?: React.ReactNode;
@@ -82,7 +76,7 @@ export default function MediaList({
             <MediaCard
               key={`${item.media_type}-${tmdbId}`}
               media={item}
-              priority={index < PRIORITY_CARD_COUNT}
+              priority={index < 6}
               userMediaId={userMediaId}
               isAuthenticated={isAuthenticated}
             />
