@@ -19,7 +19,12 @@ type Props = {
 // Everything below the accent divider that depends on the signed-in user.
 // The TMDB header renders once outside the Suspense boundary; only this
 // subtree streams, so crawlers never see the media copy twice.
-export default function MediaActions({ media, isAuthenticated = true }: Props) {
+// ponytail: default false, fail closed. A missing prop must not expose the
+// collection actions to a signed-out visitor.
+export default function MediaActions({
+  media,
+  isAuthenticated = false,
+}: Props) {
   const { goToForm } = useDetailStep();
   const router = useRouter();
   const pathname = usePathname();
