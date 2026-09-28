@@ -1,3 +1,4 @@
+import MediaActionsSkeleton from '@/components/MediaActionsSkeleton';
 import Skeleton from '@/components/Skeleton';
 
 export function MediaDetailSkeleton() {
@@ -30,10 +31,7 @@ export function MediaDetailSkeleton() {
             <Skeleton className="h-4 w-full mb-2" />
             <Skeleton className="h-4 w-full mb-2" />
             <Skeleton className="h-4 w-5/6 mb-8" />
-            <div className="flex gap-2.5 flex-col md:flex-row">
-              <Skeleton className="h-12 rounded-xl flex-1" />
-              <Skeleton className="h-12 rounded-xl flex-1" />
-            </div>
+            <MediaActionsSkeleton />
           </div>
         </div>
       </div>

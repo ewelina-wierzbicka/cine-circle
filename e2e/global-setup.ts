@@ -11,7 +11,6 @@ const WARM_ROUTES = [
   '/forgot-password',
   '/search',
   '/movie/27205',
-  '/series/1399',
   // Toast-on-redirect tests only get the 5s the toast lives, so these
   // handlers must already be compiled when the test navigates.
   '/api/auth/confirm-callback',
