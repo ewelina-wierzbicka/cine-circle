@@ -285,9 +285,10 @@ export const motion = {
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static "What is MidnightFrame" section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, `font-serif` `h2` with `<em class="text-accent">`, `text-secondary` body.
+- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, plain `font-serif` `h2` with no accent `<em>`, `text-secondary` body.
+- Copy is short declarative sentences ("Log it", "Rate it honestly", "One collection"). Keep it that way; it is the approved marketing voice from CIN-194.
 
 ### Skeleton (loading.tsx skeletons)
 
@@ -391,7 +392,7 @@ Recently Watched
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
 
-What is MidnightFrame
+About section
 
 - `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
 
