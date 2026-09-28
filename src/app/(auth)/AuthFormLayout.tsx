@@ -41,6 +41,8 @@ export default async function AuthFormLayout({
             width={200}
             height={50}
             className="object-contain"
+            priority
+            fetchPriority="high"
           />
         </Link>
 
@@ -58,6 +60,7 @@ export default async function AuthFormLayout({
                 src={poster.posterUrl}
                 className="h-full shadow-none!"
                 sizes="16vw"
+                priority
               />
             ))}
           </div>

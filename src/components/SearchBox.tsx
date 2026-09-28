@@ -176,11 +176,9 @@ export function SearchBox({
           e.preventDefault();
           if (activeIndex >= 0 && displayResults[activeIndex]) {
             const item = displayResults[activeIndex];
-            const href =
-              item.media_type === 'series'
-                ? `/series/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`
-                : `/movie/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`;
-            router.push(href);
+            router.push(
+              `${toHref(item.id, item.title, item.media_type)}?from=search`,
+            );
           } else {
             navigate(query);
           }

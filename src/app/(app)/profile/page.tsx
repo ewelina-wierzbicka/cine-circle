@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Your Profile',
+  robots: { index: false, follow: false },
+};
+
 import { createClient } from '@/lib/supabase/server';
 import { getProfile } from '@/services/getProfile';
 import { ProfileContent } from './ProfileContent';

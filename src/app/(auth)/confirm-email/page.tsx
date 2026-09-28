@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Confirm your email',
+  description: 'Check your inbox for the MidnightFrame confirmation link.',
+};
+
 import { Link } from '@/components/Link';
 import { EnvelopeIcon } from '@/icons/Envelope';
 import AuthFormLayout from '../AuthFormLayout';

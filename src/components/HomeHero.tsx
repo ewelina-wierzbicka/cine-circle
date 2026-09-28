@@ -24,11 +24,11 @@ export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
           '-translate-y-[calc(50dvh-42%)] md:-translate-y-[calc(50dvh-30%)]',
       )}
     >
-      <h2 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
+      <h1 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
         What will you
         <br />
         <em className="text-accent">watch next?</em>
-      </h2>
+      </h1>
       <p className="text-secondary text-md text-center mb-12 animate-fade-in [animation-delay:80ms]">
         Search any title to add it to your list
       </p>

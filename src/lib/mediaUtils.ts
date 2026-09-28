@@ -16,7 +16,8 @@ export function toHref(
   mediaType: MediaType,
 ): string {
   const base = mediaType === 'series' ? 'series' : 'movie';
-  return `/${base}/${tmdbId}-${toSlug(title)}`;
+  const slug = toSlug(title);
+  return slug ? `/${base}/${tmdbId}-${slug}` : `/${base}/${tmdbId}`;
 }
 
 export function toSearchMediaListProps(media: NormalizedMedia) {

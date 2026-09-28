@@ -2,16 +2,41 @@ import { Suspense } from 'react';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
+import { toHref } from '@/lib/mediaUtils';
+import MediaActions from './MediaActions';
+import MediaActionsSkeleton from './MediaActionsSkeleton';
 import MediaDetail from './MediaDetail';
+import MediaEntryForm from './MediaEntryForm';
+import UserEntryFormSkeleton from './UserEntryFormSkeleton';
+
+export type MediaPageSearchParams = Record<
+  string,
+  string | string[] | undefined
+>;
 
 type Props = {
   slug: string;
   mediaType: 'movie' | 'series';
-  step?: string;
+  searchParams?: MediaPageSearchParams;
 };
 
-export default async function MediaPage({ slug, mediaType, step }: Props) {
+function toQueryString(searchParams: MediaPageSearchParams): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (Array.isArray(value))
+      value.forEach((entry) => params.append(key, entry));
+    else if (value !== undefined) params.append(key, value);
+  }
+  const query = params.toString();
+  return query ? `?${query}` : '';
+}
+
+export default async function MediaPage({
+  slug,
+  mediaType,
+  searchParams = {},
+}: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
@@ -21,53 +46,70 @@ export default async function MediaPage({ slug, mediaType, step }: Props) {
       : await getMovieDetails(id);
   if (!tmdbData) notFound();
 
-  const initialStep = step === '2' ? 2 : 1;
+  const canonicalHref = toHref(tmdbData.id, tmdbData.title, mediaType);
+  const requestedHref = `/${mediaType}/${slug}`;
+  if (requestedHref !== canonicalHref) {
+    permanentRedirect(`${canonicalHref}${toQueryString(searchParams)}`);
+  }
+
+  const initialStep = searchParams.step === '2' ? 2 : 1;
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
+  const tmdbId = Number(id);
 
   return (
-    <Suspense
-      fallback={
-        <MediaDetail media={baseMedia} initialStep={initialStep} pending />
+    <MediaDetail
+      key={slug}
+      media={baseMedia}
+      initialStep={initialStep}
+      fromSearch={searchParams.from === 'search'}
+      actions={
+        <Suspense fallback={<MediaActionsSkeleton />}>
+          <UserEnrichedActions
+            baseMedia={baseMedia}
+            tmdbId={tmdbId}
+            mediaType={mediaType}
+          />
+        </Suspense>
       }
-    >
-      <UserEnrichedMedia
-        baseMedia={baseMedia}
-        tmdbId={Number(id)}
-        mediaType={mediaType}
-        slug={slug}
-        initialStep={initialStep}
-      />
-    </Suspense>
+      form={
+        <Suspense fallback={<UserEntryFormSkeleton />}>
+          <UserEnrichedForm
+            baseMedia={baseMedia}
+            tmdbId={tmdbId}
+            mediaType={mediaType}
+          />
+        </Suspense>
+      }
+    />
   );
 }
 
-type UserEnrichedMediaProps = {
+type EnrichedProps = {
   baseMedia: NormalizedMedia;
   tmdbId: number;
   mediaType: 'movie' | 'series';
-  slug: string;
-  initialStep: 1 | 2;
 };
 
-async function UserEnrichedMedia({
+async function UserEnrichedActions({
   baseMedia,
   tmdbId,
   mediaType,
-  slug,
-  initialStep,
-}: UserEnrichedMediaProps) {
+}: EnrichedProps) {
   const { media, isAuthenticated } = await getEnrichedMedia(
     baseMedia,
     tmdbId,
     mediaType,
   );
 
-  return (
-    <MediaDetail
-      key={slug}
-      media={media}
-      initialStep={initialStep}
-      isAuthenticated={isAuthenticated}
-    />
-  );
+  return <MediaActions media={media} isAuthenticated={isAuthenticated} />;
+}
+
+async function UserEnrichedForm({
+  baseMedia,
+  tmdbId,
+  mediaType,
+}: EnrichedProps) {
+  const { media } = await getEnrichedMedia(baseMedia, tmdbId, mediaType);
+
+  return <MediaEntryForm media={media} />;
 }

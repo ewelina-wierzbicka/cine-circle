@@ -1,5 +1,10 @@
-export const metadata = {
-  title: 'Privacy Policy — MidnightFrame',
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'What MidnightFrame collects, how your watch history is stored, and the rights you have over your data.',
+  alternates: { canonical: '/privacy' },
 };
 
 type Section = { heading: string; body: string };

@@ -1,6 +1,7 @@
 'use client';
 
 import MediaPoster from '@/components/MediaPoster';
+import { toHref } from '@/lib/mediaUtils';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import type { NormalizedMedia } from '@/types';
 import { useRouter } from 'next/navigation';
@@ -17,10 +18,7 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
   ({ item, isActive, onMouseEnter }, ref) => {
     const router = useRouter();
 
-    const href =
-      item.media_type === 'series'
-        ? `/series/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`
-        : `/movie/${item.id}-${item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?from=search`;
+    const href = `${toHref(item.id, item.title, item.media_type)}?from=search`;
 
     return (
       <button

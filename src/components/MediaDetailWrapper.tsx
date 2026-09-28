@@ -40,6 +40,8 @@ export default function MediaDetailWrapper({
             src={posterSrc}
             title={posterTitle}
             className="rounded-2xl -rotate-[1.5deg] origin-center w-auto md:w-full h-full md:h-auto"
+            priority
+            fetchPriority="high"
           />
         </div>
         <div className="flex-1 flex flex-col justify-center py-12 px-6 md:pl-6 lg:pl-12 overflow-y-auto">

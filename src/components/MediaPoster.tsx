@@ -7,6 +7,7 @@ type Props = {
   className?: string;
   sizes?: string;
   priority?: boolean;
+  fetchPriority?: 'high' | 'low' | 'auto';
 };
 
 export default function MediaPoster({
@@ -15,6 +16,7 @@ export default function MediaPoster({
   className = '',
   sizes = '(max-width: 767px) 340px, 500px',
   priority = false,
+  fetchPriority,
 }: Props) {
   return (
     <div
@@ -36,6 +38,7 @@ export default function MediaPoster({
           sizes={sizes}
           alt={title}
           priority={priority}
+          fetchPriority={fetchPriority}
         />
       ) : (
         <div
