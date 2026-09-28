@@ -284,10 +284,13 @@ export const motion = {
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, definition paragraph, three icon feature blocks, a "Common questions" FAQ, and a `/search` link.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, plain `font-serif` `h2` with no accent `<em>`, `text-secondary` body.
+- Typography follows the hero: `font-mono` accent eyebrow and feature `h3`s, plain `font-serif` `h2`s with no accent `<em>`, `text-secondary` body.
 - Copy is short declarative sentences ("Log it", "Rate it honestly", "One collection"). Keep it that way; it is the approved marketing voice from CIN-194.
+- The lead paragraph is the product definition and opens literally with "MidnightFrame is a free, private movie and TV tracker". It is the only place on the site that names the brand, says free and private, and credits TMDB as the data source. `SITE_DESCRIPTION` in `src/lib/seo.ts` is the compressed form of the same sentence — change both together.
+- FAQ block: `h2` "Common questions" (`id="midnightframe-faq"`, `font-serif text-[clamp(24px,3.5vw,32px)]`) over a `grid gap-8 md:grid-cols-2` of four question and answer pairs. Questions are `h3 font-sans text-base font-medium text-primary`, answers `p text-sm text-secondary`. Four fixed topics: free, private, data source, Letterboxd comparison. The Letterboxd answer stays factual and non-disparaging.
+- **Plain `div`/`h3`/`p`, not a `<dl>`.** The HTML spec forbids heading content inside `<dt>`, and the questions must be real `h3`s. FAQPage JSON-LD is tracked separately in CIN-207.
 
 ### Skeleton (loading.tsx skeletons)
 
@@ -393,7 +396,7 @@ Recently Watched
 
 About section
 
-- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
+- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition, the three feature blocks and the "Common questions" FAQ. See "Shared Components → HomeAbout" for the full spec.
 
 ---
 

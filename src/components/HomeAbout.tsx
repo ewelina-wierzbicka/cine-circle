@@ -3,6 +3,29 @@ import { ClapperboardIcon } from '@/icons/Clapperboard';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import StarIcon from '@/icons/Star';
 
+const faq = [
+  {
+    question: 'Is MidnightFrame free?',
+    answer:
+      'Yes. Every feature is free, with no ads and no paid tier. You only need an account so your collection follows you between devices.',
+  },
+  {
+    question: 'Is my collection private?',
+    answer:
+      'Yes. Nothing you log is published or shown to anyone else. There are no followers, no public profiles and no activity feed.',
+  },
+  {
+    question: 'Where does the movie and series data come from?',
+    answer:
+      'Titles, posters, cast and release dates come from TMDB. Your ratings, dates and notes are yours and stay in your account. This product uses the TMDB API but is not endorsed or certified by TMDB.',
+  },
+  {
+    question: 'How does it compare with Letterboxd?',
+    answer:
+      'Letterboxd is a social network built around public reviews, lists and followers. MidnightFrame is a private log: one collection, visible only to you. Choose it when you want to remember what you watched rather than publish it.',
+  },
+];
+
 const features = [
   {
     Icon: SearchIcon,
@@ -37,8 +60,13 @@ export function HomeAbout() {
         Every movie you&apos;ve watched. Every one you haven&apos;t.
       </h2>
       <p className="font-sans text-base text-secondary leading-relaxed">
-        Log what you watch. Rate it out of ten. Write down what you thought
-        before you forget. One collection, no algorithm, no ads.
+        MidnightFrame is a free, private movie and TV tracker. Search millions
+        of titles, mark them watched or queue them for later, rate them out of
+        ten, and write a note you can read back years from now. Every title,
+        poster and credit comes from TMDB. Your collection stays yours alone.
+      </p>
+      <p className="font-sans text-base text-secondary leading-relaxed mt-4">
+        No algorithm, no ads, no feed to keep up with.
       </p>
 
       <div className="grid gap-8 md:grid-cols-3 mt-12">
@@ -56,9 +84,28 @@ export function HomeAbout() {
       </div>
 
       <p className="font-sans text-base text-secondary leading-relaxed mt-12">
-        Your collection is private. Log one movie tonight or catch up on a whole
-        month. Either way, it&apos;s just for you.
+        Log one movie tonight or catch up on a whole month. Either way,
+        it&apos;s just for you.
       </p>
+
+      <h2
+        id="midnightframe-faq"
+        className="font-serif text-[clamp(24px,3.5vw,32px)] tracking-[-0.03em] leading-[1.2] mt-16"
+      >
+        Common questions
+      </h2>
+      {/* Plain headings and paragraphs, not a <dl>: the HTML spec forbids
+          heading content inside <dt>, and FAQPage JSON-LD lands with CIN-207. */}
+      <div className="mt-8 grid gap-8 md:grid-cols-2">
+        {faq.map(({ question, answer }) => (
+          <div key={question}>
+            <h3 className="font-sans text-base font-medium text-primary mb-2">
+              {question}
+            </h3>
+            <p className="text-sm text-secondary leading-relaxed">{answer}</p>
+          </div>
+        ))}
+      </div>
 
       <Link
         href="/search"
