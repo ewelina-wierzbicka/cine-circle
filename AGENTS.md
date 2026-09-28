@@ -306,7 +306,7 @@ export async function getMovieDetails(id: string) {
 }
 ```
 
-Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`. The `<page>` in those two tags is a TMDB result-page index, not an app route — there is no `/popular-movies` or `/popular-series` page and the sitemap never emits one.
+Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
 
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 
@@ -430,3 +430,4 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 - Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components
 - Update `DESIGN.md` if the task added or changed any page, layout, or visual design
+- Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically
