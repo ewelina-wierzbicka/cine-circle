@@ -59,18 +59,14 @@ export default async function MediaPage({
 
   return (
     <>
-      {/* Built from the cached TMDB data, outside every Suspense boundary, so
-          both blocks land in the prerendered HTML. */}
       <script
         type="application/ld+json"
-        // Payload is typed app data; jsonLdScript escapes `<` in TMDB copy.
         dangerouslySetInnerHTML={{
           __html: jsonLdScript(mediaJsonLd(baseMedia, mediaType)),
         }}
       />
       <script
         type="application/ld+json"
-        // Payload is typed app data; jsonLdScript escapes `<` in TMDB copy.
         dangerouslySetInnerHTML={{
           __html: jsonLdScript(breadcrumbJsonLd(baseMedia, mediaType)),
         }}

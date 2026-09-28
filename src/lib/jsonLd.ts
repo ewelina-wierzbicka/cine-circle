@@ -110,8 +110,6 @@ export function siteJsonLd(): SiteJsonLd {
   };
 }
 
-// No aggregateRating. TMDB vote data is not our review data, and Google
-// treats borrowed ratings as a rich-result violation.
 export function mediaJsonLd(
   media: NormalizedMedia,
   mediaType: MediaType,
