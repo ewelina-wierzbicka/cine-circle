@@ -13,8 +13,6 @@ type TmdbPopularItem = {
   id: number;
   title?: string;
   name?: string;
-  release_date?: string;
-  first_air_date?: string;
 };
 
 type TmdbPopularResponse = {
@@ -44,7 +42,6 @@ function toPopularMedia(
         id: item.id,
         title,
         mediaType,
-        releaseDate: item.release_date ?? item.first_air_date,
       },
     ];
   });

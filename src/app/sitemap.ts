@@ -7,17 +7,6 @@ import { PopularMedia } from '@/types';
 
 const POPULAR_PAGES = [1, 2];
 
-const STATIC_LAST_MODIFIED_MS = new Date(STATIC_PAGE_LAST_MODIFIED).getTime();
-
-function toLastModified(date: string | undefined): string {
-  if (!date) return STATIC_PAGE_LAST_MODIFIED;
-  const parsed = new Date(date).getTime();
-  if (Number.isNaN(parsed) || parsed > STATIC_LAST_MODIFIED_MS) {
-    return STATIC_PAGE_LAST_MODIFIED;
-  }
-  return new Date(parsed).toISOString();
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [trending, popularPages] = await Promise.all([
     getTrendingMovies(),
@@ -53,7 +42,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       id: item.id,
       title: item.title,
       mediaType: item.type,
-      releaseDate: item.release_date,
     })),
     ...popularPages.flat(),
   ];
@@ -66,10 +54,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (!byKey.has(key)) byKey.set(key, item);
   }
 
+  // No `lastModified` here. We have no record of when a media page's content
+  // last changed, and the TMDB release date is not one — a 1985 film would
+  // claim a 1985 `lastmod` for a page built this deploy. Crawlers ignore a
+  // `lastmod` they cannot corroborate, and the field is optional, so omitting
+  // it beats publishing a date we cannot stand behind.
   const mediaRoutes: MetadataRoute.Sitemap = [...byKey.values()].map(
     (item) => ({
       url: `${baseUrl}${toHref(item.id, item.title, item.mediaType)}`,
-      lastModified: toLastModified(item.releaseDate),
       changeFrequency: 'weekly',
       priority: 0.6,
     }),

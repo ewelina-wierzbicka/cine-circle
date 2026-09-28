@@ -89,8 +89,6 @@ export type UserProfile = {
 export type TrendingMovie = {
   title: string;
   year: string;
-  // what the sitemap turns into a per-URL `lastmod`.
-  release_date?: string;
   type: MediaType;
   genres?: { id: number; name: string }[];
   posterUrl?: string;
@@ -101,5 +99,4 @@ export type PopularMedia = {
   id: number;
   title: string;
   mediaType: MediaType;
-  releaseDate?: string;
 };
