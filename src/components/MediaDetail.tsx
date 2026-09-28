@@ -1,95 +1,31 @@
 'use client';
 
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
+import MediaInfoHeader from '@/components/MediaInfoHeader';
 import { useDetailStep } from '@/hooks/useDetailStep';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
-import { NormalizedMedia, SavedMedia } from '@/types';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import MediaInfo from './MediaInfo';
-import WatchedMediaInfo from './WatchedMediaInfo';
-import UserEntryFormSkeleton from './UserEntryFormSkeleton';
-
-const UserEntryForm = dynamic(() => import('@/components/UserEntryForm'), {
-  ssr: false,
-  loading: () => <UserEntryFormSkeleton />,
-});
+import { NormalizedMedia } from '@/types';
+import { ReactNode } from 'react';
 
 type Props = {
-  media: NormalizedMedia | SavedMedia;
+  media: NormalizedMedia;
   initialStep?: number;
-  isAuthenticated?: boolean;
-  pending?: boolean;
+  fromSearch?: boolean;
+  actions: ReactNode;
+  form: ReactNode;
 };
 
+// Renders the TMDB block exactly once, on every request. `actions` and `form`
+// are server-rendered Suspense subtrees handed down from `MediaPage`; only
+// they depend on the signed-in user.
 export default function MediaDetail({
   media,
   initialStep = 1,
-  isAuthenticated = false,
-  pending = false,
+  fromSearch = false,
+  actions,
+  form,
 }: Props) {
-  const { step, goToForm, goToInfo } = useDetailStep(initialStep);
-  const router = useRouter();
-  const isSaved = 'watchStatus' in media;
-  const saved = isSaved ? (media as SavedMedia) : null;
-  const watchStatus = saved?.watchStatus;
-  const userMediaId = saved?.id;
-
-  const handleUpdateSuccess = () => {
-    router.refresh();
-    goToInfo();
-  };
-
-  const handleMoveToWatchedSuccess = () => {
-    router.push(`/collection?tab=watched`);
-  };
-
-  const onUpdateSuccess = !isSaved
-    ? undefined
-    : watchStatus === 'watched'
-      ? handleUpdateSuccess
-      : handleMoveToWatchedSuccess;
-
-  const infoSlot =
-    watchStatus === 'watched' ? (
-      <WatchedMediaInfo
-        media={media}
-        userMediaId={userMediaId!}
-        userEntry={{
-          watched_date: saved!.watched_date,
-          rating: saved!.rating,
-          review: saved!.review,
-        }}
-        onEdit={goToForm}
-      />
-    ) : (
-      <MediaInfo
-        media={media}
-        userMediaId={userMediaId}
-        isToWatch={watchStatus === 'to_watch'}
-        addToWatched={goToForm}
-        isAuthenticated={isAuthenticated}
-        pending={pending}
-      />
-    );
-
-  const formSlot = (
-    <UserEntryForm
-      media={media}
-      userMediaId={userMediaId}
-      initialData={
-        watchStatus === 'watched'
-          ? {
-              watched_date: saved!.watched_date,
-              rating: saved!.rating,
-              review: saved!.review,
-              watchStatus: 'watched',
-            }
-          : undefined
-      }
-      onUpdateSuccess={onUpdateSuccess}
-    />
-  );
+  const { step } = useDetailStep(initialStep);
 
   return (
     <MediaDetailWrapper
@@ -98,8 +34,13 @@ export default function MediaDetail({
       }
       posterTitle={media.title}
       step={step}
-      infoSlot={infoSlot}
-      formSlot={formSlot}
+      infoSlot={
+        <div className="flex flex-col w-full animate-fade-up md:max-w-120">
+          <MediaInfoHeader media={media} fromSearch={fromSearch} />
+          {actions}
+        </div>
+      }
+      formSlot={form}
       recommendations={media.recommendations}
     />
   );

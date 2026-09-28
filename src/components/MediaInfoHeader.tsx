@@ -1,8 +1,5 @@
-'use client';
-
 import { NormalizedMedia } from '@/types';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 type Props = {
   media: Pick<
@@ -15,9 +12,10 @@ type Props = {
     | 'genres'
     | 'overview'
   >;
+  fromSearch?: boolean;
 };
 
-export default function MediaInfoHeader({ media }: Props) {
+export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
   const {
     title,
     release_date,
@@ -27,8 +25,6 @@ export default function MediaInfoHeader({ media }: Props) {
     genres,
     overview,
   } = media;
-  const searchParams = useSearchParams();
-  const fromSearch = searchParams.get('from') === 'search';
 
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
