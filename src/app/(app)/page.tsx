@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 import { Suspense } from 'react';
 import { SignedOutAbout } from '@/app/(app)/SignedOutAbout';
+import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
 import { getRecentWatched } from '@/services/getRecentWatched';
@@ -26,6 +27,12 @@ export default async function Home() {
 
   return (
     <div className="group relative">
+      {/* Outside every Suspense boundary, so it ships in the prerendered HTML. */}
+      <script
+        type="application/ld+json"
+        // Built from typed app constants, never from user input.
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
+      />
       <div className="min-h-[calc(100vh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-18 flex flex-col">
         <HomeHero
           hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
