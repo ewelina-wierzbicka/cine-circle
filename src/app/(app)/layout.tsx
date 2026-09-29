@@ -26,10 +26,23 @@ export default function PrivateLayout({
       </Suspense>
       <main className="flex-1 overflow-y-auto bg-dark">
         {children}
-        <Footer />
+        <Suspense fallback={null}>
+          <SignedOutFooter />
+        </Suspense>
       </main>
     </div>
   );
+}
+
+async function SignedOutFooter() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) return null;
+
+  return <Footer />;
 }
 
 async function AuthenticatedHeader() {
