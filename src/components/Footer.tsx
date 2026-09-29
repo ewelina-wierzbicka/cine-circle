@@ -36,13 +36,13 @@ export function Footer() {
           <Image
             src="/tmdb.svg"
             alt="TMDB"
-            width={85}
-            height={11}
-            className="shrink-0 mt-0.5 opacity-70 group-hover:opacity-100 transition-opacity"
+            width={75}
+            height={10}
+            className="shrink-0 mt-1.5"
           />
           <span className="text-sm text-secondary group-hover:text-primary transition-colors">
-            This product uses the TMDB API but is not endorsed or certified by
-            TMDB.
+            This product uses TMDB and the TMDB APIs but is not endorsed,
+            certified, or otherwise approved by TMDB.
           </span>
         </a>
       </div>
