@@ -46,12 +46,36 @@ export type RecommendedMedia = {
   genre?: string;
 };
 
+export type CastMember = {
+  id: number;
+  name: string;
+  character?: string;
+};
+
+export type WatchProvider = {
+  provider_id: number;
+  provider_name: string;
+};
+
+export type WatchProviders = {
+  link: string;
+  flatrate?: WatchProvider[];
+  rent?: WatchProvider[];
+  buy?: WatchProvider[];
+};
+
 export type NormalizedMedia = Movie & {
   media_type: MediaType;
   last_air_date?: string;
   overview?: string;
   genres?: { id: number; name: string }[];
   recommendations?: RecommendedMedia[];
+  /** Minutes. Movies use `runtime`, series the episode runtime. */
+  runtime?: number;
+  vote_average?: number;
+  vote_count?: number;
+  cast?: CastMember[];
+  watchProviders?: WatchProviders;
 };
 
 export type UserEntry = {
