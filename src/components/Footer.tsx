@@ -23,7 +23,10 @@ export function Footer({ pinned = false }: Props) {
   return (
     <footer
       className={twMerge(
-        'border-t border-secondary/50 px-6 py-8 md:px-12',
+        // relative z-10: the movie/series backdrop is a `fixed inset-0` layer
+        // that paints over any static sibling. Everything on those pages is
+        // explicitly lifted above it.
+        'relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12',
         pinned && 'sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4',
       )}
     >
