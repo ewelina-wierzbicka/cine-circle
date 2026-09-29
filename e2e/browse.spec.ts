@@ -35,4 +35,25 @@ test.describe('browse', () => {
     await expect(page).toHaveURL(new RegExp(`${href}$`));
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
+
+  test('T21 signed-out header and footer link to /browse', async ({ page }) => {
+    await page.goto('/');
+
+    // The footer renders for signed-out visitors on every (app) route.
+    const footerLink = page
+      .getByRole('navigation', { name: 'Footer' })
+      .getByRole('link', { name: 'Browse' });
+    await expect(footerLink).toBeVisible();
+
+    const headerLink = page
+      .getByRole('navigation', { name: 'Main navigation' })
+      .getByRole('link', { name: 'Browse' });
+    await expect(headerLink).toBeVisible();
+
+    await headerLink.click();
+    await expect(page).toHaveURL(/\/browse$/);
+    await expect(
+      page.getByRole('heading', { name: 'Browse movies and series', level: 1 }),
+    ).toBeVisible();
+  });
 });

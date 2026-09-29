@@ -3,6 +3,7 @@ import Image from 'next/image';
 import NextLink from 'next/link';
 
 const NAV_LINKS = [
+  { href: '/browse', label: 'Browse' },
   { href: '/about', label: 'About' },
   { href: '/terms', label: 'Terms' },
   { href: '/privacy', label: 'Privacy' },

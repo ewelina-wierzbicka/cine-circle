@@ -150,6 +150,7 @@ export const motion = {
 - Relative header bar (`h-14`) with `px-6 md:px-12` padding.
 - Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
 - Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
+- Nav items come from one `NAV_ITEMS` array: Search (`/`), Browse (`/browse`), Collection (`/collection`). The desktop `nav` and the mobile dropdown both map over it, so one edit covers both. The desktop `nav` is outside the profile check, so Browse is visible signed out; the mobile dropdown only exists for signed-in users, and the footer carries the signed-out mobile link.
 - Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
 - Right (logged out): accent pill-shaped `Sign in` link to `/login` (`rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
 
@@ -584,7 +585,7 @@ It is the last child of the scrolling `<main>`, so it flows after page content.
 
 **Pinned variant** (`pinned`): adds `sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4` to the `<footer>` and `gap-3 md:items-center` to the inner row. Sticky, not fixed — it keeps its place in flow, so nothing overlaps the last row of results at rest.
 
-**Nav links (left):** About, Terms, Privacy (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
+**Nav links (left):** Browse, About, Terms, Privacy (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
 
 **TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`, `max-w-sm`).
 
