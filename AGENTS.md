@@ -19,6 +19,7 @@ npm run format       # run Prettier across all files
 npm run type-check   # tsc --noEmit
 npm run test         # run the Vitest unit suite once
 npm run test:watch   # Vitest in watch mode
+npm run indexnow     # submit every /sitemap.xml URL to IndexNow (Bing, Copilot)
 ```
 
 Fix all ESLint errors before committing — warnings are acceptable, errors are not. Do not use `// eslint-disable` without a comment explaining why.
@@ -319,7 +320,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 
 ### Metadata & SEO
 
-All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `STATIC_PAGE_LAST_MODIFIED`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
+All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `STATIC_PAGE_LAST_MODIFIED`, `BING_SITE_VERIFICATION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
 
 - The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
 - `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
@@ -366,6 +367,22 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - Icons live in `public/icons/` (`icon-192.png`, `icon-512.png` at `purpose: 'any'`, `icon-maskable-512.png` at `purpose: 'maskable'`). These are exempt from the 2x pre-sizing rule above: launchers need them at their stated pixel size. `icon-512.png` is also the Organization logo in `lib/jsonLd.ts`, so renaming it breaks the structured data too.
   - iOS ignores the manifest `display` field, which is why the root layout also sets `metadata.appleWebApp`. Removing that block breaks standalone launch on iOS only, and nothing in the Chrome install report catches it.
   - **No service worker.** There is no `public/sw.js`, no `serwist`, no `next-pwa`. A service worker needs a new dependency and interacts badly with PPR — it is a separate decision, not something to add alongside a manifest change.
+
+#### Bing and IndexNow
+
+Two env vars, both optional. Everything degrades cleanly when they are unset.
+
+| Var                      | Where             | Effect when unset                            |
+| ------------------------ | ----------------- | -------------------------------------------- |
+| `BING_SITE_VERIFICATION` | Vercel production | The `msvalidate.01` meta tag is omitted      |
+| `INDEXNOW_KEY`           | Vercel production | `npm run indexnow` exits 0 and sends nothing |
+
+- `BING_SITE_VERIFICATION` is the Bing Webmaster Tools token. It is read in `lib/seo.ts` and spread into the root layout's `verification.other`. Server-only on purpose: the root layout is a Server Component, so do **not** add a `NEXT_PUBLIC_` copy. When the var is unset the whole `verification` key is dropped — never emit `content=""`.
+- `scripts/indexnow.mjs` backs `npm run indexnow`. It reads `NEXT_PUBLIC_SITE_URL` and `INDEXNOW_KEY`, fetches `${SITE_URL}/sitemap.xml`, scrapes the `<loc>` values with a regex, and POSTs one batch to `https://api.indexnow.org/indexnow`. No npm dependency: Node's global `fetch` covers it, and the sitemap is under 100 URLs against an IndexNow cap of 10000. Missing env exits 0 so CI never fails on an unconfigured environment; a 4xx from IndexNow exits 1.
+- The script runs under plain `node`, which does not read `.env.local` on its own, so the `indexnow` script passes `--env-file-if-exists=.env.local`. Without that flag the two vars in `.env.local` are invisible and every local run prints `skipped`. The flag is non-fatal when the file is absent, which is the CI case.
+- The script is `.mjs`, and `tsconfig.json` includes only `**/*.ts`, `**/*.tsx` and `**/*.mts`, so it stays out of `type-check`. `eslint.config.mjs` turns `no-console` off for `scripts/**` — a CLI script's output is stdout.
+- **IndexNow needs a key file**: `https://<host>/<INDEXNOW_KEY>.txt`, whose body is the key and nothing else. Commit it as `public/<key>.txt`. The key is public by design, so committing it is correct. No route registration is needed — an unknown path is not in `KNOWN_ROUTES_EXACT`, `proxy.ts` returns `NextResponse.next()`, and Next serves the `public/` file.
+- Submission is manual today. Do not wire it into a Vercel cron or a build hook without a separate decision.
 
 ### Security headers
 

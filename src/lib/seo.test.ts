@@ -153,6 +153,26 @@ describe('mediaMetadata', () => {
   });
 });
 
+describe('BING_SITE_VERIFICATION', () => {
+  it('is the trimmed token when the env var is set', async () => {
+    vi.stubEnv('BING_SITE_VERIFICATION', '  bing-token-123  ');
+    const { BING_SITE_VERIFICATION } = await loadSeo();
+    expect(BING_SITE_VERIFICATION).toBe('bing-token-123');
+  });
+
+  it('is undefined when the env var is unset', async () => {
+    vi.stubEnv('BING_SITE_VERIFICATION', undefined);
+    const { BING_SITE_VERIFICATION } = await loadSeo();
+    expect(BING_SITE_VERIFICATION).toBeUndefined();
+  });
+
+  it('is undefined when the env var is blank', async () => {
+    vi.stubEnv('BING_SITE_VERIFICATION', '   ');
+    const { BING_SITE_VERIFICATION } = await loadSeo();
+    expect(BING_SITE_VERIFICATION).toBeUndefined();
+  });
+});
+
 describe('NOT_FOUND_METADATA', () => {
   it('is noindex, nofollow', async () => {
     const { NOT_FOUND_METADATA } = await loadSeo();
