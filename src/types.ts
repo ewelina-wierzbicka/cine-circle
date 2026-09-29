@@ -56,7 +56,6 @@ export type NormalizedMedia = Movie & {
   overview?: string;
   genres?: { id: number; name: string }[];
   recommendations?: RecommendedMedia[];
-  /** Minutes. Movies use `runtime`, series the episode runtime. */
   runtime?: number;
   vote_average?: number;
   vote_count?: number;

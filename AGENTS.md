@@ -342,7 +342,7 @@ export async function getMovieDetails(id: string) {
 
 Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
 
-`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations,watch/providers` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
 
 - They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`.
 

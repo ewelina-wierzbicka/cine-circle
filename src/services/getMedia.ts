@@ -1,4 +1,3 @@
-import { cacheLife, cacheTag } from 'next/cache';
 import {
   FilterMediaType,
   Movie,
@@ -7,20 +6,12 @@ import {
   Series,
   TmdbRecommendation,
 } from '@/types';
+import { cacheLife, cacheTag } from 'next/cache';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /** One request per detail page — never split these into extra fetches. */
 const DETAIL_APPEND = 'credits,recommendations';
-
-type TmdbCredits = {
-  crew?: { job: string; name: string }[];
-};
-
-type TmdbDetailAppend = {
-  credits?: TmdbCredits;
-  recommendations?: { results?: TmdbRecommendation[] };
-};
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -50,7 +41,9 @@ async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
 }
 
 function normalizeSeriesResult(
-  raw: Series & TmdbDetailAppend,
+  raw: Series & {
+    recommendations?: { results?: TmdbRecommendation[] };
+  },
 ): NormalizedMedia {
   const {
     id,
@@ -66,7 +59,6 @@ function normalizeSeriesResult(
     last_episode_to_air,
     vote_average,
     vote_count,
-    credits,
   } = raw;
 
   const recommendations: RecommendedMedia[] | undefined =
@@ -161,9 +153,12 @@ export const getMovieDetails = async (
   cacheLife('days');
   cacheTag(`movie-${id}`);
 
-  const data = await tmdbFetchOrNull<NormalizedMedia & TmdbDetailAppend>(
-    `/movie/${id}?append_to_response=${DETAIL_APPEND}`,
-  );
+  const data = await tmdbFetchOrNull<
+    NormalizedMedia & {
+      credits?: { crew?: { job: string; name: string }[] };
+      recommendations?: { results?: TmdbRecommendation[] };
+    }
+  >(`/movie/${id}?append_to_response=${DETAIL_APPEND}`);
   if (data === null) return null;
 
   const { credits, recommendations: rawRecommendations, ...movie } = data;
@@ -198,8 +193,8 @@ export const getSeriesDetails = async (
   cacheLife('days');
   cacheTag(`series-${id}`);
 
-  const data = await tmdbFetchOrNull<Series & TmdbDetailAppend>(
-    `/tv/${id}?append_to_response=${DETAIL_APPEND}`,
-  );
+  const data = await tmdbFetchOrNull<
+    Series & { recommendations?: { results?: TmdbRecommendation[] } }
+  >(`/tv/${id}?append_to_response=${DETAIL_APPEND}`);
   return data === null ? null : normalizeSeriesResult(data);
 };
