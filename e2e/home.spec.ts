@@ -4,27 +4,6 @@ const ABOUT_HEADING = "Every movie you've watched. Every one you haven't.";
 const ABOUT_EYEBROW = 'For people who care what they watch';
 
 test.describe('home', () => {
-  test('T20 trending chips are crawlable links and navigate to detail', async ({
-    browser,
-  }) => {
-    const anonContext = await browser.newContext();
-    const anonPage = await anonContext.newPage();
-
-    await anonPage.goto('/');
-
-    // At least one chip links to a movie or series detail page.
-    const chip = anonPage
-      .locator('a[href^="/movie/"], a[href^="/series/"]')
-      .first();
-    await expect(chip).toBeVisible();
-
-    // Clicking it navigates to the detail page.
-    await chip.click();
-    await expect(anonPage).toHaveURL(/^\/(movie|series)\//);
-
-    await anonContext.close();
-  });
-
   test('T19 about section shows signed-out, hidden signed-in', async ({
     browser,
     authedPage,

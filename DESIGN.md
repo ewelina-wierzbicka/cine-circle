@@ -379,7 +379,6 @@ Search
 - SearchBox internals: `Input` with transparent background in the centered layout, container toggles focus state to `bg-bg2` and `border-accent` plus focus shadow `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
 - Filter chips are buttons with `font-mono text-sm tracking-[0.05em]`; active chip uses `bg-accent text-dark font-medium`.
 - SearchBox provides `hintTitles` from `getTrendingMovies()` and renders an animated dropdown with infinite-scroll via IntersectionObserver.
-- Hint chips (trending titles) are `<Link>` anchors pointing to `${toHref(id, title, type)}?from=search` — not buttons — so crawlers see real outbound links on `/`.
 
 Recently Watched
 

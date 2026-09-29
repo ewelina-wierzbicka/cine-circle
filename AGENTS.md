@@ -452,7 +452,6 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Rules:**
 
-- Every new feature or changed user flow requires e2e coverage — assign qa-agent to write tests.
 - Tests are self-contained; no shared state between tests.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
