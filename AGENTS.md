@@ -111,10 +111,12 @@ series/[id]/             # /series/:id
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
+    llms.txt/
+      route.ts                # GET /llms.txt — plain-text site map for language models; open routes only
     opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
   globals.css
   providers.tsx               # app-wide React context providers
-  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt; also resolves movie/series ids so unknown ones answer a real 404
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt and llms.txt; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
   components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
@@ -124,11 +126,11 @@ series/[id]/             # /series/:id
 ```
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
-- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt` and `opengraph-image` — metadata routes must never be redirected to `/login` or crawlers cannot fetch them
+- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt` and `opengraph-image` — metadata routes must never be redirected to `/login` or crawlers cannot fetch them
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`, `/registration-confirmed`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
 - `/registration-confirmed` is an auth route in `AUTH_ROUTES` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session, so the visitor is logged out; logged-in users hitting it are redirected to `/`. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
-- `KNOWN_ROUTES_EXACT` / `KNOWN_ROUTE_PREFIXES` list every page route the app serves. A path matching neither skips auth and falls through to the root 404 — unknown URLs like `/nonexistent-xyz` or `/llms.txt` must answer 404, not redirect to `/login`
+- `KNOWN_ROUTES_EXACT` / `KNOWN_ROUTE_PREFIXES` list every page route the app serves. A path matching neither skips auth and falls through to the root 404 — unknown URLs like `/nonexistent-xyz` must answer 404, not redirect to `/login`
 - **A new page route must end up in the known-route list, or it will 404 for everyone.** This check runs first, before the open/auth/private logic. `KNOWN_ROUTES_EXACT` spreads in `AUTH_ROUTES` and `OPEN_ROUTES_EXACT`, so where you add the route decides whether registration is automatic:
   - auth route → `AUTH_ROUTES`. Registered automatically
   - open exact route → `OPEN_ROUTES_EXACT`. Registered automatically
@@ -251,6 +253,10 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
 - `sitemap.ts` lists the four open static routes plus trending and popular media, roughly 87 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
 - Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
+- **`app/llms.txt/route.ts` serves `/llms.txt`**, a plain-text description of the site for language models (`text/plain; charset=utf-8`). The body is a module-level template string built from `SITE_NAME`, `SITE_URL`, `SITE_DESCRIPTION` and `absoluteUrl()` — never hardcode the domain.
+  - Same rule as `sitemap.ts`: only open routes may be listed. Never name a path that is in the `robots.ts` `disallow` list. The `## Pages` list is `/`, `/about`, `/search`, `/terms`, `/privacy` — add a new open route here and in `sitemap.ts` together.
+  - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
+  - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
 - **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
@@ -262,7 +268,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 
 ### Security headers
 
-Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml` and `robots.txt` from auth, but `headers()` still applies to them.
+Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml`, `robots.txt` and `llms.txt` from auth, but `headers()` still applies to them.
 
 | Header                      | Value                                                          | Why                                     |
 | --------------------------- | -------------------------------------------------------------- | --------------------------------------- |
@@ -449,13 +455,14 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File                 | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts`       | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
-| `home.spec.ts`       | T19 about section renders signed-out, hidden signed-in                                                                                                                                                                                                                                                                                                                                                        |
-| `search.spec.ts`     | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
-| `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
+| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
+
+| `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
+| `search.spec.ts` | T5 search, filter movies, open detail |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
+| `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
 
