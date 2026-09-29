@@ -89,10 +89,12 @@ src/
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+      about/                  # /about — static About page (open route, indexable)
+        page.tsx              # copy only; renders <StaticContentPage />
       terms/                  # /terms — static Terms and Conditions page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       privacy/                # /privacy — static Privacy Policy page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
@@ -116,7 +118,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt and llms.txt; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
+  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -135,7 +137,7 @@ series/[id]/             # /series/:id
   - open prefix route → `OPEN_ROUTE_PREFIXES` **and** `KNOWN_ROUTE_PREFIXES`. Open prefixes are not spread in, which is why `/search` is also listed explicitly in `KNOWN_ROUTES_EXACT`
   - private route → `KNOWN_ROUTES_EXACT`. Private is the default for known routes
   - session-gated but neither auth nor open, like `/reset-password` → `KNOWN_ROUTES_EXACT` explicitly
-- Open routes (no redirect for unauthenticated users): exact match `/`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, `/about`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
 - **`proxy.ts` resolves the movie/series id before the response starts.** `/movie/[id]` is a PPR route, so the prerendered shell flushes a 200 and `notFound()` in `MediaPage` can only swap the body. A non-numeric slug is rejected with no network call; a numeric one costs one `mediaExists()` lookup (`services/mediaExists.ts`, plain fetch, no `next/cache`). Unknown ids are rewritten to `/_not-found`, which answers a real 404 with the root not-found UI.
   - The lookup runs in `Promise.all` with `supabase.auth.getUser()`, so it adds no latency on top of the session check.
   - It is skipped when the request carries an `rsc` header. In-app navigation never reaches a crawler and still renders the not-found UI via `notFound()`.
@@ -248,7 +250,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - **Unknown movie and series ids answer a real 404**, resolved in `proxy.ts` before the response starts. Same PPR constraint as the redirect above. See the `proxy.ts` bullets under Project Structure.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
-- `sitemap.ts` lists the three open static routes plus trending and popular media, roughly 86 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
+- `sitemap.ts` lists the four open static routes plus trending and popular media, roughly 87 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
 - Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
 - **`app/llms.txt/route.ts` serves `/llms.txt`**, a plain-text description of the site for language models (`text/plain; charset=utf-8`). The body is a module-level template string built from `SITE_NAME`, `SITE_URL`, `SITE_DESCRIPTION` and `absoluteUrl()` — never hardcode the domain.
   - Same rule as `sitemap.ts`: only open routes may be listed. Never name a path that is in the `robots.ts` `disallow` list.
@@ -459,7 +461,6 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Rules:**
 
-- Every new feature or changed user flow requires e2e coverage — assign qa-agent to write tests.
 - Tests are self-contained; no shared state between tests.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
@@ -476,4 +477,4 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 - Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components
 - Update `DESIGN.md` if the task added or changed any page, layout, or visual design
-- Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically
+- Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/about`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically
