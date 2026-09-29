@@ -12,7 +12,7 @@ const AUTH_ROUTES = [
   '/registration-confirmed',
 ];
 // Open routes: accessible to everyone (no redirect for unauthenticated users)
-const OPEN_ROUTES_EXACT = ['/', '/about', '/terms', '/privacy'];
+const OPEN_ROUTES_EXACT = ['/', '/browse', '/about', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
 // IMPORTANT: a new page route MUST end up in KNOWN_ROUTES_EXACT or KNOWN_ROUTE_PREFIXES list, or it will 404.

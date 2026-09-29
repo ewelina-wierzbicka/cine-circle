@@ -526,6 +526,20 @@ Services
 
 ---
 
+## Browse (`/browse`)
+
+Open, indexable hub between the home page and the media pages. Text links only, no posters.
+
+- `src/app/(app)/browse/page.tsx` — server component, fully cached, no Suspense.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-4xl mx-auto`.
+- Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`, followed by an intro paragraph in `font-sans text-base text-secondary leading-relaxed`, capped at `max-w-2xl`.
+- Three sections stacked with `space-y-10`: Trending this week, Popular movies, Popular series.
+- Section headings (`h2`): `font-mono text-sm tracking-[0.15em] text-accent uppercase`, matching StaticContentPage.
+- Each section is a `ul` grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`, `gap-x-8 gap-y-3`.
+- Links: `font-sans text-base text-secondary hover:text-primary underline decoration-white/20 underline-offset-4 transition-colors`.
+
+---
+
 ## About, Terms and Privacy
 
 Static content pages, open routes (no auth required). All three render through one shared shell.

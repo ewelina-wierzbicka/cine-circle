@@ -12,6 +12,8 @@ need no account.
 ## Pages
 
 - [Home](${absoluteUrl('/')}): trending movies and an introduction to ${SITE_NAME}.
+- [Browse](${absoluteUrl('/browse')}): trending movies, popular movies and popular
+  series, each linking to its media page.
 - [About](${absoluteUrl('/about')}): what ${SITE_NAME} is, who builds it, and how it handles data.
 - [Search](${absoluteUrl('/search')}): search movies and series by title. Only the
   bare URL is listed; \`/search?query=…\` is noindex and not worth crawling.

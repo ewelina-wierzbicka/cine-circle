@@ -14,7 +14,7 @@ export const SITE_TITLE = `${SITE_NAME} — Track the movies and series you watc
 export const SITE_DESCRIPTION =
   'MidnightFrame is a free, private movie and TV tracker. Log what you watch, rate it out of ten, and keep everything in one collection.';
 
-export const STATIC_PAGE_LAST_MODIFIED = '2026-09-28T00:00:00.000Z';
+export const STATIC_PAGE_LAST_MODIFIED = '2026-09-29T00:00:00.000Z';
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
