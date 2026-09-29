@@ -24,6 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
+      url: `${baseUrl}/about`,
+      lastModified: STATIC_PAGE_LAST_MODIFIED,
+      changeFrequency: 'yearly',
+      priority: 0.4,
+    },
+    {
       url: `${baseUrl}/terms`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,
       changeFrequency: 'yearly',

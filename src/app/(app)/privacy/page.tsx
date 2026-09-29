@@ -1,4 +1,8 @@
 import type { Metadata } from 'next';
+import {
+  StaticContentPage,
+  type StaticSection,
+} from '@/components/StaticContentPage';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -7,9 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
 };
 
-type Section = { heading: string; body: string };
-
-const sections: Section[] = [
+const sections: StaticSection[] = [
   {
     heading: 'What We Collect',
     body: 'When you register, we collect your email address. If you upload a profile picture, we store that avatar. We store your display name if you add it. As you use the app, we store your movie and series watch history, ratings, and any notes you add.',
@@ -42,28 +44,10 @@ const sections: Section[] = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-full px-6 md:px-12 py-12">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
-          Privacy Policy
-        </h1>
-        <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          Last updated: July 2026
-        </p>
-
-        <div className="space-y-8">
-          {sections.map(({ heading, body }) => (
-            <div key={heading}>
-              <h2 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-3">
-                {heading}
-              </h2>
-              <p className="font-sans text-base text-secondary leading-relaxed">
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <StaticContentPage
+      title="Privacy Policy"
+      subtitle="Last updated: July 2026"
+      sections={sections}
+    />
   );
 }
