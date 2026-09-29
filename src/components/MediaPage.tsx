@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { createClient } from '@/lib/supabase/server';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
@@ -81,11 +82,7 @@ export default async function MediaPage({
         navLink={
           !fromSearch ? (
             <Suspense fallback={null}>
-              <UserCollectionBackLink
-                baseMedia={baseMedia}
-                tmdbId={tmdbId}
-                mediaType={mediaType}
-              />
+              <UserCollectionBackLink />
             </Suspense>
           ) : undefined
         }
@@ -118,17 +115,12 @@ type EnrichedProps = {
   mediaType: 'movie' | 'series';
 };
 
-async function UserCollectionBackLink({
-  baseMedia,
-  tmdbId,
-  mediaType,
-}: EnrichedProps) {
-  const { isAuthenticated } = await getEnrichedMedia(
-    baseMedia,
-    tmdbId,
-    mediaType,
-  );
-  if (!isAuthenticated) return null;
+async function UserCollectionBackLink() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
   return <CollectionBackLink />;
 }
 

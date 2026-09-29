@@ -119,6 +119,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
                   ({vote_count.toLocaleString()})
                 </span>
               )}
+              <span className="text-secondary ml-1.5">avg on TMDB</span>
             </span>
           </>
         )}
