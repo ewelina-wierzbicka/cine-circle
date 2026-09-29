@@ -554,6 +554,18 @@ Static content pages, open routes (no auth required). All three render through o
 
 ---
 
+## Footer
+
+`src/components/Footer.tsx` — Server Component, no data fetching.
+
+Rendered inside `<main>` in `(app)/layout.tsx`, so it scrolls with page content.
+
+**Layout:** `border-t border-white/[0.07]`, `px-6 py-8 md:px-12`. Inner `max-w-6xl mx-auto` flex column on mobile, `md:flex-row md:items-start md:justify-between` on desktop.
+
+**Nav links (left):** About, Terms, Privacy, Search (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
+
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`). TMDB logo SVG (`public/tmdb.svg`, 85×11) + "This product uses the TMDB API but is not endorsed or certified by TMDB." (`text-sm text-secondary`). Logo has `opacity-70 group-hover:opacity-100 transition-opacity`; text has `group-hover:text-primary transition-colors`.
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
