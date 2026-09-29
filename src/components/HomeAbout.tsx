@@ -19,11 +19,6 @@ const faq = [
     answer:
       'Titles, posters, cast and release dates come from TMDB. Your ratings, dates and notes are yours and stay in your account. This product uses the TMDB API but is not endorsed or certified by TMDB.',
   },
-  {
-    question: 'How does it compare with Letterboxd?',
-    answer:
-      'Letterboxd is a social network built around public reviews, lists and followers. MidnightFrame is a private log: one collection, visible only to you. Choose it when you want to remember what you watched rather than publish it.',
-  },
 ];
 
 const features = [
@@ -94,8 +89,6 @@ export function HomeAbout() {
       >
         Common questions
       </h2>
-      {/* Plain headings and paragraphs, not a <dl>: the HTML spec forbids
-          heading content inside <dt>, and FAQPage JSON-LD lands with CIN-207. */}
       <div className="mt-8 grid gap-8 md:grid-cols-2">
         {faq.map(({ question, answer }) => (
           <div key={question}>
