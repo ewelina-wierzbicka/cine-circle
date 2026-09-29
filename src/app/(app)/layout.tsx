@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Footer } from '@/components/Footer';
+import { FooterSlot } from '@/components/FooterSlot';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import ScrollReset from '@/components/ScrollReset';
@@ -27,22 +27,20 @@ export default function PrivateLayout({
       <main className="flex-1 overflow-y-auto bg-dark">
         {children}
         <Suspense fallback={null}>
-          <SignedOutFooter />
+          <SessionAwareFooter />
         </Suspense>
       </main>
     </div>
   );
 }
 
-async function SignedOutFooter() {
+async function SessionAwareFooter() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) return null;
-
-  return <Footer />;
+  return <FooterSlot signedIn={Boolean(user)} />;
 }
 
 async function AuthenticatedHeader() {

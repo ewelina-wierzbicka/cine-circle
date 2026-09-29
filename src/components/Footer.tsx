@@ -1,3 +1,4 @@
+import { twMerge } from '@/lib/cn';
 import Image from 'next/image';
 import NextLink from 'next/link';
 
@@ -12,10 +13,26 @@ const CONTACT_EMAIL = 'info.midnightframe@gmail.com';
 const linkClass =
   'text-sm font-sans text-secondary hover:text-primary transition-colors';
 
-export function Footer() {
+type Props = {
+  /** Pins the footer to the bottom of the scroll container. Used on /search,
+   * where infinite scroll pushes a static footer out of reach. */
+  pinned?: boolean;
+};
+
+export function Footer({ pinned = false }: Props) {
   return (
-    <footer className="border-t border-secondary/50 px-6 py-8 md:px-12">
-      <div className="mx-auto flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+    <footer
+      className={twMerge(
+        'border-t border-secondary/50 px-6 py-8 md:px-12',
+        pinned && 'sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4',
+      )}
+    >
+      <div
+        className={twMerge(
+          'mx-auto flex flex-col gap-6 md:flex-row md:items-start md:justify-between',
+          pinned && 'gap-3 md:items-center',
+        )}
+      >
         <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3">
           {NAV_LINKS.map(({ href, label }) => (
             <NextLink key={href} href={href} className={linkClass}>
