@@ -11,6 +11,7 @@ type Props = {
   media: NormalizedMedia;
   initialStep?: number;
   fromSearch?: boolean;
+  navLink?: ReactNode;
   actions: ReactNode;
   form: ReactNode;
 };
@@ -19,6 +20,7 @@ export default function MediaDetail({
   media,
   initialStep = 1,
   fromSearch = false,
+  navLink,
   actions,
   form,
 }: Props) {
@@ -33,6 +35,7 @@ export default function MediaDetail({
       step={step}
       infoSlot={
         <div className="flex flex-col w-full animate-fade-up md:max-w-120">
+          {navLink}
           <MediaInfoHeader media={media} fromSearch={fromSearch} />
           {actions}
         </div>

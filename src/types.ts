@@ -27,6 +27,10 @@ export type Series = {
   created_by?: { name: string }[];
   overview?: string;
   genres?: { id: number; name: string }[];
+  episode_run_time?: number[];
+  last_episode_to_air?: { runtime?: number | null };
+  vote_average?: number;
+  vote_count?: number;
 };
 
 export type TmdbRecommendation = {
@@ -52,6 +56,9 @@ export type NormalizedMedia = Movie & {
   overview?: string;
   genres?: { id: number; name: string }[];
   recommendations?: RecommendedMedia[];
+  runtime?: number;
+  vote_average?: number;
+  vote_count?: number;
 };
 
 export type UserEntry = {

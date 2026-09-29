@@ -21,12 +21,11 @@ export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
       className={twMerge(
         'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-10 transition-transform duration-300 ease-out pb-44 pt-7.5 sm:pb-23',
         shouldShift &&
-          '-translate-y-[calc(50dvh-42%)] md:-translate-y-[calc(50dvh-30%)]',
+          '-translate-y-[calc(50dvh-42%)] md:-translate-y-[calc(50dvh-30%)] group-has-data-home-about:translate-y-0',
       )}
     >
       <h1 className="font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] text-center leading-none mb-3 animate-fade-up">
-        What will you
-        <br />
+        What will you <br />
         <em className="text-accent">watch next?</em>
       </h1>
       <p className="text-secondary text-md text-center mb-12 animate-fade-in [animation-delay:80ms]">

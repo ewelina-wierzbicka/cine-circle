@@ -186,7 +186,7 @@ export const motion = {
 
 ### MediaInfoHeader & MediaActions
 
-- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: back link, genre pills, type label, `h1` (`font-serif`, `clamp(42px, 5.5vw, 72px)`), director/date meta row, accent divider, overview. `font-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop.
+- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: search back link, genre pills, type label, `h1` (`font-serif`, `clamp(42px, 5.5vw, 72px)`), director/date/runtime/score meta row, accent divider, overview. `font-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop. The collection back link is not part of it — see `CollectionBackLink` under Info & Form.
 - `src/components/MediaActions.tsx` renders everything below the divider that depends on the signed-in user: the signed-out sign-in prompt, the `to_watch` buttons, the default add buttons, and the `watched` body (rating via `StarRating`, watched date, review) with its UPDATE / DELETE buttons.
 - `src/components/MediaActionsSkeleton.tsx` is its Suspense fallback. Two `Skeleton` blocks, no text.
 
@@ -284,10 +284,8 @@ export const motion = {
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, definition paragraph, three icon feature blocks, a "Common questions" FAQ, and a `/search` link.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, plain `font-serif` `h2` with no accent `<em>`, `text-secondary` body.
-- Copy is short declarative sentences ("Log it", "Rate it honestly", "One collection"). Keep it that way; it is the approved marketing voice from CIN-194.
 
 ### Skeleton (loading.tsx skeletons)
 
@@ -393,7 +391,7 @@ Recently Watched
 
 About section
 
-- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
+- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition, the three feature blocks and the "Common questions" FAQ.
 
 ---
 
@@ -429,7 +427,7 @@ Notes
 Overall structure
 
 - `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data.
-- **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` two server-rendered `<Suspense>` subtrees as the `actions` and `form` props, and `getEnrichedMedia` reads cookies + Supabase inside them.
+- **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` three server-rendered `<Suspense>` subtrees as the `navLink`, `actions` and `form` props. `actions` and `form` call `getEnrichedMedia` (cookies + Supabase) inside; `navLink` is the auth-gated `CollectionBackLink`.
 - The `actions` fallback is `MediaActionsSkeleton` — two `Skeleton` blocks (`h-12 w-full sm:w-44 rounded-xl` and `h-12 w-full sm:w-36 rounded-xl`), `aria-busy="true" aria-live="polite"`, and no text. The `form` fallback is `UserEntryFormSkeleton`. A fallback that repeated the TMDB copy used to ship the `h1` and overview twice in the SSR HTML.
 - `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = header + `actions`, 2 = `form`). `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
 - `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
@@ -444,11 +442,11 @@ Poster & Visuals
 Info & Form
 
 - Info view (`MediaInfoHeader` + `MediaActions`) shows:
-  - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
+  - Back link (font-mono, text-sm, tracking-[0.12em]). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
-  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
+  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` format, `text-secondary`) and TMDB score (`text-amber-400` value, muted vote count in parentheses, muted `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
   - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
@@ -528,24 +526,30 @@ Services
 
 ---
 
-## Terms and Privacy
+## About, Terms and Privacy
 
-Static legal pages, open routes (no auth required).
+Static content pages, open routes (no auth required). All three render through one shared shell.
+
+### StaticContentPage
+
+- `src/components/StaticContentPage.tsx` — server component, props `title`, `subtitle`, `sections`. Each page supplies only its metadata and its `StaticSection[]` copy.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
+- Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
+- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
+- Section headings (`h2`): `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
+- Body text: `font-sans text-base text-secondary leading-relaxed`. Sections stack with `space-y-8`.
+
+### About (`/about`)
+
+- Sections: What MidnightFrame Is, Who Runs It, What It Is Not, Where the Data Comes From, Contact.
+- Indexable, unlike the noindex app routes. Listed in `sitemap.ts` with `STATIC_PAGE_LAST_MODIFIED`.
 
 ### Terms (`/terms`)
 
-- `src/app/(app)/terms/page.tsx` — server component, no data fetching.
-- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
-- Title: `font-serif text-3xl sm:text-4xl text-primary`.
-- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
-- Section headings: `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
-- Body text: `font-sans text-base text-secondary leading-relaxed`.
 - Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
 
 ### Privacy (`/privacy`)
 
-- `src/app/(app)/privacy/page.tsx` — server component, no data fetching.
-- Same layout and typography as `/terms`.
 - Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
 
 ---
