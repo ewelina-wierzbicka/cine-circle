@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { Footer } from '@/components/Footer';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import ScrollReset from '@/components/ScrollReset';
@@ -23,7 +24,10 @@ export default function PrivateLayout({
       <Suspense fallback={null}>
         <ScrollReset />
       </Suspense>
-      <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-dark">
+        {children}
+        <Footer />
+      </main>
     </div>
   );
 }
