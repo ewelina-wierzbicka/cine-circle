@@ -3,7 +3,7 @@ import { FooterSlot } from '@/components/FooterSlot';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import ScrollReset from '@/components/ScrollReset';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getProfile } from '@/services/getProfile';
 
 export default function PrivateLayout({
@@ -35,19 +35,12 @@ export default function PrivateLayout({
 }
 
 async function SessionAwareFooter() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getCurrentUser();
   return <FooterSlot signedIn={Boolean(user)} />;
 }
 
 async function AuthenticatedHeader() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const profile = user ? await getProfile() : null;
   return <Header profile={profile} />;
 }
