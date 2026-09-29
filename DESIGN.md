@@ -284,10 +284,8 @@ export const motion = {
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
+- `src/components/HomeAbout.tsx` — static about section below the home hero: eyebrow, `h2`, definition paragraph, three icon feature blocks, a "Common questions" FAQ, and a `/search` link.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, plain `font-serif` `h2` with no accent `<em>`, `text-secondary` body.
-- Copy is short declarative sentences ("Log it", "Rate it honestly", "One collection"). Keep it that way; it is the approved marketing voice from CIN-194.
 
 ### Skeleton (loading.tsx skeletons)
 
@@ -393,7 +391,7 @@ Recently Watched
 
 About section
 
-- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
+- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition, the three feature blocks and the "Common questions" FAQ.
 
 ---
 
