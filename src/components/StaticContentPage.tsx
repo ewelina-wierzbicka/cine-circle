@@ -6,7 +6,6 @@ type StaticContentPageProps = {
   sections: StaticSection[];
 };
 
-// Shared shell for the static open routes: /about, /terms, /privacy.
 export function StaticContentPage({
   title,
   subtitle,

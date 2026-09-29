@@ -543,18 +543,15 @@ Static content pages, open routes (no auth required). All three render through o
 
 ### About (`/about`)
 
-- Subtitle carries the positioning line, not a date.
 - Sections: What MidnightFrame Is, Who Runs It, What It Is Not, Where the Data Comes From, Contact.
 - Indexable, unlike the noindex app routes. Listed in `sitemap.ts` with `STATIC_PAGE_LAST_MODIFIED`.
 
 ### Terms (`/terms`)
 
-- Subtitle: "Last updated: July 2026".
 - Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
 
 ### Privacy (`/privacy`)
 
-- Subtitle: "Last updated: July 2026".
 - Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
 
 ---
