@@ -363,7 +363,7 @@ return (
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SignedOutFooter` in `<Suspense fallback={null}>` (reads the Supabase user, renders `Footer` only for signed-out visitors so signed-in pages keep an app feel). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
 - `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
 

@@ -558,13 +558,13 @@ Static content pages, open routes (no auth required). All three render through o
 
 `src/components/Footer.tsx` — Server Component, no data fetching.
 
-Rendered inside `<main>` in `(app)/layout.tsx`, so it scrolls with page content.
+Signed-out visitors only. `(app)/layout.tsx` renders it through a `SignedOutFooter` async component (Supabase `getUser()`, returns null when signed in) inside `<Suspense fallback={null}>`, so signed-in app pages stay chrome-free. It sits inside the scrolling `<main>`, which is `flex flex-col`; the footer's `mt-auto` pins it to the viewport bottom on short pages and lets it flow after content on tall ones.
 
-**Layout:** `border-t border-white/[0.07]`, `px-6 py-8 md:px-12`. Inner `max-w-6xl mx-auto` flex column on mobile, `md:flex-row md:items-start md:justify-between` on desktop.
+**Layout:** `border-t border-secondary/50`, `px-6 py-8 md:px-12`. Inner `max-w-6xl mx-auto` flex column with `gap-6` on mobile, `md:flex-row md:items-start md:justify-between` on desktop.
 
-**Nav links (left):** About, Terms, Privacy, Search (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
+**Nav links (left):** About, Terms, Privacy (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
 
-**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`). TMDB logo SVG (`public/tmdb.svg`, 85×11) + "This product uses the TMDB API but is not endorsed or certified by TMDB." (`text-sm text-secondary`). Logo has `opacity-70 group-hover:opacity-100 transition-opacity`; text has `group-hover:text-primary transition-colors`.
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`, `max-w-sm`).
 
 ## Error & Not-Found Pages
 
