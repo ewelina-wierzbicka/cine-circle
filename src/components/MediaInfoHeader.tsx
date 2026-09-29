@@ -109,21 +109,19 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
           </span>
         </div>
       )}
-      <div className="-mt-5 mb-7">
-        {tmdbScore != null && (
-          <>
-            <span className="font-mono text-sm tracking-[0.04em]">
-              <span className="text-amber-400">{tmdbScore}</span>
-              {vote_count != null && vote_count > 0 && (
-                <span className="text-secondary ml-1">
-                  ({vote_count.toLocaleString()})
-                </span>
-              )}
-              <span className="text-secondary ml-1.5">avg on TMDB</span>
-            </span>
-          </>
-        )}
-      </div>
+      {tmdbScore != null && (
+        <div className="-mt-5 mb-7">
+          <span className="font-mono text-sm tracking-[0.04em]">
+            <span className="text-amber-400">{tmdbScore}</span>
+            {vote_count != null && vote_count > 0 && (
+              <span className="text-secondary ml-1">
+                ({vote_count.toLocaleString()})
+              </span>
+            )}
+            <span className="text-secondary ml-1.5">avg on TMDB</span>
+          </span>
+        </div>
+      )}
       <div className="mb-8 shrink-0 w-12 h-px bg-accent opacity-60" />
       {overview && (
         <p className="text-sm text-primary leading-relaxed mb-8">{overview}</p>
