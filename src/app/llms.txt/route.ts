@@ -12,7 +12,9 @@ need no account.
 ## Pages
 
 - [Home](${absoluteUrl('/')}): trending movies and an introduction to ${SITE_NAME}.
-- [Search](${absoluteUrl('/search')}): search movies and series by title.
+- [About](${absoluteUrl('/about')}): what ${SITE_NAME} is, who builds it, and how it handles data.
+- [Search](${absoluteUrl('/search')}): search movies and series by title. Only the
+  bare URL is listed; \`/search?query=…\` is noindex and not worth crawling.
 - [Terms and Conditions](${absoluteUrl('/terms')}): terms of use.
 - [Privacy Policy](${absoluteUrl('/privacy')}): what data is stored and why.
 
