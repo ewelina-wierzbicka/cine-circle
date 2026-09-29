@@ -52,3 +52,6 @@ node_modules/
 .claude/worktrees
 
 .next-e2e/
+
+# Sentry Config File
+.env.sentry-build-plugin

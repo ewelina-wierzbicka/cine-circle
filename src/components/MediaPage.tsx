@@ -4,6 +4,7 @@ import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toHref } from '@/lib/mediaUtils';
+import { breadcrumbJsonLd, jsonLdScript, mediaJsonLd } from '@/lib/jsonLd';
 import MediaActions from './MediaActions';
 import MediaActionsSkeleton from './MediaActionsSkeleton';
 import MediaDetail from './MediaDetail';
@@ -57,30 +58,44 @@ export default async function MediaPage({
   const tmdbId = Number(id);
 
   return (
-    <MediaDetail
-      key={slug}
-      media={baseMedia}
-      initialStep={initialStep}
-      fromSearch={searchParams.from === 'search'}
-      actions={
-        <Suspense fallback={<MediaActionsSkeleton />}>
-          <UserEnrichedActions
-            baseMedia={baseMedia}
-            tmdbId={tmdbId}
-            mediaType={mediaType}
-          />
-        </Suspense>
-      }
-      form={
-        <Suspense fallback={<UserEntryFormSkeleton />}>
-          <UserEnrichedForm
-            baseMedia={baseMedia}
-            tmdbId={tmdbId}
-            mediaType={mediaType}
-          />
-        </Suspense>
-      }
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(mediaJsonLd(baseMedia, mediaType)),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(breadcrumbJsonLd(baseMedia, mediaType)),
+        }}
+      />
+      <MediaDetail
+        key={slug}
+        media={baseMedia}
+        initialStep={initialStep}
+        fromSearch={searchParams.from === 'search'}
+        actions={
+          <Suspense fallback={<MediaActionsSkeleton />}>
+            <UserEnrichedActions
+              baseMedia={baseMedia}
+              tmdbId={tmdbId}
+              mediaType={mediaType}
+            />
+          </Suspense>
+        }
+        form={
+          <Suspense fallback={<UserEntryFormSkeleton />}>
+            <UserEnrichedForm
+              baseMedia={baseMedia}
+              tmdbId={tmdbId}
+              mediaType={mediaType}
+            />
+          </Suspense>
+        }
+      />
+    </>
   );
 }
 
