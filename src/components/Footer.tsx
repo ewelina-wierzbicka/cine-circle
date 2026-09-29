@@ -14,7 +14,7 @@ const linkClass =
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.07] px-6 py-8 md:px-12">
+    <footer className="border-t border-secondary/50 px-6 py-8 md:px-12">
       <div className="max-w-6xl mx-auto flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
         <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3">
           {NAV_LINKS.map(({ href, label }) => (
