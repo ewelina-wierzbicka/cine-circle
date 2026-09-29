@@ -90,11 +90,11 @@ series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       about/                  # /about — static About page (open route, indexable)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       terms/                  # /terms — static Terms and Conditions page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       privacy/                # /privacy — static Privacy Policy page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
@@ -116,7 +116,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
+  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants

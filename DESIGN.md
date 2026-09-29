@@ -530,29 +530,31 @@ Services
 
 ## About, Terms and Privacy
 
-Static content pages, open routes (no auth required).
+Static content pages, open routes (no auth required). All three render through one shared shell.
+
+### StaticContentPage
+
+- `src/components/StaticContentPage.tsx` — server component, props `title`, `subtitle`, `sections`. Each page supplies only its metadata and its `StaticSection[]` copy.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
+- Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
+- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
+- Section headings (`h2`): `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
+- Body text: `font-sans text-base text-secondary leading-relaxed`. Sections stack with `space-y-8`.
 
 ### About (`/about`)
 
-- `src/app/(app)/about/page.tsx` — server component, no data fetching, no Suspense.
-- Same layout and typography as `/terms`. Subtitle label carries the positioning line, not a date.
+- Subtitle carries the positioning line, not a date.
 - Sections: What MidnightFrame Is, Who Runs It, What It Is Not, Where the Data Comes From, Contact.
 - Indexable, unlike the noindex app routes. Listed in `sitemap.ts` with `STATIC_PAGE_LAST_MODIFIED`.
 
 ### Terms (`/terms`)
 
-- `src/app/(app)/terms/page.tsx` — server component, no data fetching.
-- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
-- Title: `font-serif text-3xl sm:text-4xl text-primary`.
-- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
-- Section headings: `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
-- Body text: `font-sans text-base text-secondary leading-relaxed`.
+- Subtitle: "Last updated: July 2026".
 - Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
 
 ### Privacy (`/privacy`)
 
-- `src/app/(app)/privacy/page.tsx` — server component, no data fetching.
-- Same layout and typography as `/terms`.
+- Subtitle: "Last updated: July 2026".
 - Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
 
 ---
