@@ -568,6 +568,26 @@ Static content pages, open routes (no auth required). All three render through o
 
 ---
 
+## Footer
+
+`src/components/Footer.tsx` — presentational, no data fetching. Takes one prop, `pinned`.
+
+**Where it renders.** `(app)/layout.tsx` renders `SessionAwareFooter` inside `<Suspense fallback={null}>`. That async component reads the Supabase user and hands the boolean to `FooterSlot` (`src/components/FooterSlot.tsx`, client, reads `usePathname()`), which decides:
+
+- `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
+- Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+- `/search` — rendered with `pinned`, because infinite scroll pushes a static footer permanently out of reach.
+
+It is the last child of the scrolling `<main>`, so it flows after page content.
+
+**Layout:** `border-t border-secondary/50`, `px-6 py-8 md:px-12`. Inner `mx-auto` flex column with `gap-6` on mobile, `md:flex-row md:items-start md:justify-between` on desktop.
+
+**Pinned variant** (`pinned`): adds `sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4` to the `<footer>` and `gap-3 md:items-center` to the inner row. Sticky, not fixed — it keeps its place in flow, so nothing overlaps the last row of results at rest.
+
+**Nav links (left):** About, Terms, Privacy (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `text-sm font-sans text-secondary hover:text-primary transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`.
+
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`, `max-w-sm`).
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.

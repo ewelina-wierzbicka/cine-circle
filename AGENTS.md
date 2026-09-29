@@ -120,7 +120,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt and llms.txt; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
+  components/                 # shared components (SearchBox, Header, Footer, FooterSlot, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -377,7 +377,7 @@ return (
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SessionAwareFooter` in `<Suspense fallback={null}>` (reads the Supabase user, hands the boolean to `FooterSlot`, which picks the footer by route: always on `/about`, `/terms`, `/privacy`, signed-out only everywhere else, and `pinned` on `/search`). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
 - `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
 
