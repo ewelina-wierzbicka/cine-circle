@@ -16,6 +16,13 @@ export const SITE_DESCRIPTION =
 
 export const STATIC_PAGE_LAST_MODIFIED = '2026-09-28T00:00:00.000Z';
 
+// Bing Webmaster Tools site verification token. Server-only on purpose — the
+// root layout is a Server Component, so no `NEXT_PUBLIC_` prefix is needed.
+// Unset in local and preview environments: the tag is omitted entirely there
+// rather than emitted with an empty `content`.
+export const BING_SITE_VERIFICATION =
+  process.env.BING_SITE_VERIFICATION?.trim() || undefined;
+
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
