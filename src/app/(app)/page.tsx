@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/lib/seo';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: { absolute: SITE_TITLE },
@@ -7,14 +7,14 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-import { Suspense } from 'react';
 import { SignedOutAbout } from '@/app/(app)/SignedOutAbout';
-import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { HomeHero } from '@/components/HomeHero';
 import { RecentWatched } from '@/components/RecentWatched';
+import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
+import { Suspense } from 'react';
 
 export default async function Home() {
   const trending = await getTrendingMovies().catch(() => [] as TrendingMovie[]);
@@ -31,7 +31,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
       />
-      <div className="min-h-[calc(100vh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-18 flex flex-col">
+      <div className="min-h-[calc(100vh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-8 group-has-data-home-about:sm:pt-18 flex flex-col">
         <HomeHero
           hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
           recentPostersPromise={recentPostersPromise}
