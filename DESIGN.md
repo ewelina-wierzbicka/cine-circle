@@ -528,9 +528,16 @@ Services
 
 ---
 
-## Terms and Privacy
+## About, Terms and Privacy
 
-Static legal pages, open routes (no auth required).
+Static content pages, open routes (no auth required).
+
+### About (`/about`)
+
+- `src/app/(app)/about/page.tsx` — server component, no data fetching, no Suspense.
+- Same layout and typography as `/terms`. Subtitle label carries the positioning line, not a date.
+- Sections: What MidnightFrame Is, Who Runs It, What It Is Not, Where the Data Comes From, Contact.
+- Indexable, unlike the noindex app routes. Listed in `sitemap.ts` with `STATIC_PAGE_LAST_MODIFIED`.
 
 ### Terms (`/terms`)
 
