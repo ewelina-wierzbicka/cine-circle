@@ -1,55 +1,25 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import {
-  CastMember,
   FilterMediaType,
   Movie,
   NormalizedMedia,
   RecommendedMedia,
   Series,
   TmdbRecommendation,
-  WatchProvider,
-  WatchProviders,
 } from '@/types';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /** One request per detail page — never split these into extra fetches. */
-const DETAIL_APPEND = 'credits,recommendations,watch/providers';
-/** Fixed region: reading headers would break `use cache`. */
-const WATCH_PROVIDER_REGION = 'US';
-const CAST_LIMIT = 6;
-
-type TmdbCastMember = {
-  id: number;
-  name: string;
-  character?: string;
-};
+const DETAIL_APPEND = 'credits,recommendations';
 
 type TmdbCredits = {
-  cast?: TmdbCastMember[];
   crew?: { job: string; name: string }[];
-};
-
-type TmdbWatchProviderEntry = {
-  provider_id: number;
-  provider_name: string;
-};
-
-type TmdbWatchProviderRegion = {
-  link?: string;
-  flatrate?: TmdbWatchProviderEntry[];
-  rent?: TmdbWatchProviderEntry[];
-  buy?: TmdbWatchProviderEntry[];
-};
-
-type TmdbWatchProviders = {
-  results?: Record<string, TmdbWatchProviderRegion | undefined>;
 };
 
 type TmdbDetailAppend = {
   credits?: TmdbCredits;
   recommendations?: { results?: TmdbRecommendation[] };
-  'watch/providers'?: TmdbWatchProviders;
 };
 
 function getTmdbToken(): string {
@@ -77,41 +47,6 @@ async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load data. Please try again.');
   return res.json() as Promise<T>;
-}
-
-function normalizeCast(credits?: TmdbCredits): CastMember[] | undefined {
-  const cast = credits?.cast
-    ?.slice(0, CAST_LIMIT)
-    .map(({ id, name, character }) => ({
-      id,
-      name,
-      character: character || undefined,
-    }));
-  return cast?.length ? cast : undefined;
-}
-
-function normalizeProviderList(
-  list?: TmdbWatchProviderEntry[],
-): WatchProvider[] | undefined {
-  const providers = list?.map(({ provider_id, provider_name }) => ({
-    provider_id,
-    provider_name,
-  }));
-  return providers?.length ? providers : undefined;
-}
-
-function normalizeWatchProviders(
-  raw?: TmdbWatchProviders,
-): WatchProviders | undefined {
-  const region = raw?.results?.[WATCH_PROVIDER_REGION];
-  if (!region?.link) return undefined;
-
-  const flatrate = normalizeProviderList(region.flatrate);
-  const rent = normalizeProviderList(region.rent);
-  const buy = normalizeProviderList(region.buy);
-  if (!flatrate && !rent && !buy) return undefined;
-
-  return { link: region.link, flatrate, rent, buy };
 }
 
 function normalizeSeriesResult(
@@ -161,8 +96,6 @@ function normalizeSeriesResult(
     runtime: episode_run_time?.[0] ?? last_episode_to_air?.runtime ?? undefined,
     vote_average,
     vote_count,
-    cast: normalizeCast(credits),
-    watchProviders: normalizeWatchProviders(raw['watch/providers']),
   };
 }
 
@@ -233,12 +166,7 @@ export const getMovieDetails = async (
   );
   if (data === null) return null;
 
-  const {
-    credits,
-    recommendations: rawRecommendations,
-    'watch/providers': rawWatchProviders,
-    ...movie
-  } = data;
+  const { credits, recommendations: rawRecommendations, ...movie } = data;
 
   const director = credits?.crew?.find(
     (person) => person.job === 'Director',
@@ -260,8 +188,6 @@ export const getMovieDetails = async (
     ...movie,
     director,
     recommendations,
-    cast: normalizeCast(credits),
-    watchProviders: normalizeWatchProviders(rawWatchProviders),
   };
 };
 

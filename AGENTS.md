@@ -344,8 +344,7 @@ Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails`
 
 `getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations,watch/providers` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
 
-- They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average`, `vote_count`, `cast` (top 6 `{ id, name, character }`) and `watchProviders` onto `NormalizedMedia`.
-- `watchProviders` is pinned to TMDB's `results.US` and returns `undefined` when the region or every provider list is missing. Do not geolocate the region: reading headers is forbidden inside `use cache`.
+- They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`.
 
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 

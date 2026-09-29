@@ -15,8 +15,6 @@ type Props = {
     | 'runtime'
     | 'vote_average'
     | 'vote_count'
-    | 'cast'
-    | 'watchProviders'
   >;
   fromSearch?: boolean;
 };
@@ -41,8 +39,6 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
     runtime,
     vote_average,
     vote_count,
-    cast,
-    watchProviders,
   } = media;
 
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
@@ -130,57 +126,6 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       <div className="mb-8 shrink-0 w-12 h-px bg-accent opacity-60" />
       {overview && (
         <p className="text-sm text-primary leading-relaxed mb-8">{overview}</p>
-      )}
-      {cast && cast.length > 0 && (
-        <div className="mb-8">
-          <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-3">
-            Cast
-          </p>
-          <div className="flex flex-wrap gap-x-5 gap-y-1">
-            {cast.map((member) => (
-              <span key={member.id} className="text-sm text-primary">
-                {member.name}
-                {member.character && (
-                  <span className="text-secondary ml-1">
-                    as {member.character}
-                  </span>
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      {watchProviders && (
-        <div className="mb-8">
-          <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-3">
-            Where to Watch
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {(watchProviders.flatrate ?? [])
-              .concat(watchProviders.rent ?? [])
-              .concat(watchProviders.buy ?? [])
-              .filter(
-                (p, i, arr) =>
-                  arr.findIndex((x) => x.provider_id === p.provider_id) === i,
-              )
-              .map((provider) => (
-                <span
-                  key={provider.provider_id}
-                  className="font-mono text-sm tracking-[0.06em] px-2.5 py-1 rounded-full bg-bg3 text-primary"
-                >
-                  {provider.provider_name}
-                </span>
-              ))}
-          </div>
-          <a
-            href={watchProviders.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-2 font-mono text-sm tracking-[0.08em] text-accent hover:opacity-80 transition-opacity duration-150"
-          >
-            View on TMDB →
-          </a>
-        </div>
       )}
     </>
   );
