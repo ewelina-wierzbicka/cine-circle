@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { createClient } from '@/lib/supabase/server';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
@@ -10,6 +11,7 @@ import MediaActionsSkeleton from './MediaActionsSkeleton';
 import MediaDetail from './MediaDetail';
 import MediaEntryForm from './MediaEntryForm';
 import UserEntryFormSkeleton from './UserEntryFormSkeleton';
+import CollectionBackLink from './CollectionBackLink';
 
 export type MediaPageSearchParams = Record<
   string,
@@ -54,6 +56,7 @@ export default async function MediaPage({
   }
 
   const initialStep = searchParams.step === '2' ? 2 : 1;
+  const fromSearch = searchParams.from === 'search';
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
   const tmdbId = Number(id);
 
@@ -75,7 +78,14 @@ export default async function MediaPage({
         key={slug}
         media={baseMedia}
         initialStep={initialStep}
-        fromSearch={searchParams.from === 'search'}
+        fromSearch={fromSearch}
+        navLink={
+          !fromSearch ? (
+            <Suspense fallback={null}>
+              <UserCollectionBackLink />
+            </Suspense>
+          ) : undefined
+        }
         actions={
           <Suspense fallback={<MediaActionsSkeleton />}>
             <UserEnrichedActions
@@ -104,6 +114,15 @@ type EnrichedProps = {
   tmdbId: number;
   mediaType: 'movie' | 'series';
 };
+
+async function UserCollectionBackLink() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  return <CollectionBackLink />;
+}
 
 async function UserEnrichedActions({
   baseMedia,

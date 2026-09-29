@@ -1,4 +1,3 @@
-import { cacheLife, cacheTag } from 'next/cache';
 import {
   FilterMediaType,
   Movie,
@@ -7,8 +6,12 @@ import {
   Series,
   TmdbRecommendation,
 } from '@/types';
+import { cacheLife, cacheTag } from 'next/cache';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+
+/** One request per detail page — never split these into extra fetches. */
+const DETAIL_APPEND = 'credits,recommendations';
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -52,6 +55,10 @@ function normalizeSeriesResult(
     created_by,
     overview,
     genres,
+    episode_run_time,
+    last_episode_to_air,
+    vote_average,
+    vote_count,
   } = raw;
 
   const recommendations: RecommendedMedia[] | undefined =
@@ -78,6 +85,9 @@ function normalizeSeriesResult(
     overview,
     genres,
     recommendations,
+    runtime: episode_run_time?.[0] ?? last_episode_to_air?.runtime ?? undefined,
+    vote_average,
+    vote_count,
   };
 }
 
@@ -148,30 +158,30 @@ export const getMovieDetails = async (
       credits?: { crew?: { job: string; name: string }[] };
       recommendations?: { results?: TmdbRecommendation[] };
     }
-  >(`/movie/${id}?append_to_response=credits,recommendations`);
+  >(`/movie/${id}?append_to_response=${DETAIL_APPEND}`);
   if (data === null) return null;
 
-  const director = data.credits?.crew?.find(
+  const { credits, recommendations: rawRecommendations, ...movie } = data;
+
+  const director = credits?.crew?.find(
     (person) => person.job === 'Director',
   )?.name;
 
   const recommendations: RecommendedMedia[] | undefined =
-    data.recommendations?.results?.slice(0, 10).map((r) => ({
+    rawRecommendations?.results?.slice(0, 10).map((r) => ({
       id: r.id,
       title: r.title ?? r.name ?? '',
       poster_path: r.poster_path ?? undefined,
       media_type:
         r.media_type === 'tv' ? ('series' as const) : ('movie' as const),
       genre: r.genre_ids?.[0]
-        ? data.genres?.find((g) => g.id === r.genre_ids![0])?.name
+        ? movie.genres?.find((g) => g.id === r.genre_ids![0])?.name
         : undefined,
     }));
 
   return {
-    ...data,
+    ...movie,
     director,
-    overview: data.overview,
-    genres: data.genres,
     recommendations,
   };
 };
@@ -185,6 +195,6 @@ export const getSeriesDetails = async (
 
   const data = await tmdbFetchOrNull<
     Series & { recommendations?: { results?: TmdbRecommendation[] } }
-  >(`/tv/${id}?append_to_response=credits,recommendations`);
+  >(`/tv/${id}?append_to_response=${DETAIL_APPEND}`);
   return data === null ? null : normalizeSeriesResult(data);
 };
