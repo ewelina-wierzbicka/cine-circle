@@ -89,6 +89,8 @@ src/
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+      browse/                 # /browse — open hub linking trending and popular media (fully cached, prerendered)
+        page.tsx
       terms/                  # /terms — static Terms and Conditions page (open route)
         page.tsx
       privacy/                # /privacy — static Privacy Policy page (open route)
@@ -107,7 +109,7 @@ series/[id]/             # /series/:id
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
-    sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
+    sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~87 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
   globals.css
@@ -133,7 +135,8 @@ series/[id]/             # /series/:id
   - open prefix route → `OPEN_ROUTE_PREFIXES` **and** `KNOWN_ROUTE_PREFIXES`. Open prefixes are not spread in, which is why `/search` is also listed explicitly in `KNOWN_ROUTES_EXACT`
   - private route → `KNOWN_ROUTES_EXACT`. Private is the default for known routes
   - session-gated but neither auth nor open, like `/reset-password` → `KNOWN_ROUTES_EXACT` explicitly
-- Open routes (no redirect for unauthenticated users): exact match `/`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, `/browse`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- `/browse` is the crawlable hub between the home page and the media pages. Everything on it comes from `getTrendingMovies`, `getPopularMovies(1)` and `getPopularSeries(1)`, all `use cache`, so the page prerenders whole. Do not add per-user data, `cookies()`, Supabase or a Suspense boundary to it. Hrefs are built with `toHref`, so no link redirects.
 - **`proxy.ts` resolves the movie/series id before the response starts.** `/movie/[id]` is a PPR route, so the prerendered shell flushes a 200 and `notFound()` in `MediaPage` can only swap the body. A non-numeric slug is rejected with no network call; a numeric one costs one `mediaExists()` lookup (`services/mediaExists.ts`, plain fetch, no `next/cache`). Unknown ids are rewritten to `/_not-found`, which answers a real 404 with the root not-found UI.
   - The lookup runs in `Promise.all` with `supabase.auth.getUser()`, so it adds no latency on top of the session check.
   - It is skipped when the request carries an `rsc` header. In-app navigation never reaches a crawler and still renders the not-found UI via `notFound()`.
@@ -246,9 +249,9 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - **Unknown movie and series ids answer a real 404**, resolved in `proxy.ts` before the response starts. Same PPR constraint as the redirect above. See the `proxy.ts` bullets under Project Structure.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
-- `sitemap.ts` lists the three open static routes plus trending and popular media, roughly 86 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
+- `sitemap.ts` lists the four open static routes (`/`, `/browse`, `/terms`, `/privacy`) plus trending and popular media, roughly 87 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
 - Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
-- `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
+- `lastModified` never comes from `new Date()`. Only the four static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
 - **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
@@ -446,6 +449,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `auth.spec.ts`       | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
 | `home.spec.ts`       | T19 about section renders signed-out, hidden signed-in                                                                                                                                                                                                                                                                                                                                                        |
+| `browse.spec.ts`     | T20 /browse loads signed out, lists media links, link opens detail                                                                                                                                                                                                                                                                                                                                             |
 | `search.spec.ts`     | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
 | `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
 | `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
