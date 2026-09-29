@@ -14,8 +14,6 @@ const linkClass =
   'text-sm font-sans text-secondary hover:text-primary transition-colors';
 
 type Props = {
-  /** Pins the footer to the bottom of the scroll container. Used on /search,
-   * where infinite scroll pushes a static footer out of reach. */
   pinned?: boolean;
 };
 
@@ -23,20 +21,20 @@ export function Footer({ pinned = false }: Props) {
   return (
     <footer
       className={twMerge(
-        // relative z-10: the movie/series backdrop is a `fixed inset-0` layer
-        // that paints over any static sibling. Everything on those pages is
-        // explicitly lifted above it.
         'relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12',
         pinned && 'sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4',
       )}
     >
       <div
         className={twMerge(
-          'mx-auto flex flex-col gap-6 md:flex-row md:items-start md:justify-between',
+          'mx-auto flex flex-col gap-6 md:flex-row items-center md:items-start md:justify-between',
           pinned && 'gap-3 md:items-center',
         )}
       >
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-3">
+        <nav
+          aria-label="Footer"
+          className="flex flex-wrap gap-x-6 gap-y-3 justify-center md:justify-start"
+        >
           {NAV_LINKS.map(({ href, label }) => (
             <NextLink key={href} href={href} className={linkClass}>
               {label}
