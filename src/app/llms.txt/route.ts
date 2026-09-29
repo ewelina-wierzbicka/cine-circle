@@ -1,19 +1,13 @@
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/seo';
 
-// llms.txt (https://llmstxt.org) — a plain-text map of the site for language
-// models. Only open routes belong here: every path listed must stay out of the
-// `robots.ts` disallow list, same rule as `sitemap.ts`.
-//
-// No `cookies()`, `headers()` or Supabase: any dynamic read would make this
-// route dynamic under `cacheComponents`, and it is prerendered today.
 const body = `# ${SITE_NAME}
 
 > ${SITE_DESCRIPTION}
 
 ${SITE_NAME} is a free web app for tracking movies and TV series. Signed-in
 users log what they have watched, rate it, keep a "to watch" list, and build a
-collection they can share with friends. Media data comes from TMDB. Browsing,
-searching and reading media pages need no account.
+collection. Media data comes from TMDB. Browsing, searching and reading media pages
+need no account.
 
 ## Pages
 
