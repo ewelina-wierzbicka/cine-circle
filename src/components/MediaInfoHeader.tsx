@@ -88,30 +88,30 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-7">
         {director && (
           <>
-            <span className="text-sm text-secondary">
+            <span className="text-sm text-secondary w-full sm:w-auto">
               <span className="font-mono tracking-[0.08em] text-secondary mr-2">
                 {dirLabel}
               </span>
               <span className="text-primary">{director}</span>
             </span>
-            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
+            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0 hidden sm:block " />
           </>
         )}
         <span className="font-mono text-sm tracking-[0.04em] text-primary">
           {dateDisplay}
         </span>
-        {runtime != null && runtime > 0 && (
-          <>
-            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
-            <span className="flex items-center gap-1.5 font-mono text-sm tracking-[0.04em] text-secondary">
-              <ClockIcon className="w-3.5 h-3.5 shrink-0" />
-              {formatRuntime(runtime)}
-            </span>
-          </>
-        )}
+      </div>
+      {runtime != null && runtime > 0 && (
+        <div className="-mt-5 mb-7">
+          <span className="flex items-center gap-1.5 font-mono text-sm tracking-[0.04em] text-primary">
+            <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
+            {formatRuntime(runtime)}
+          </span>
+        </div>
+      )}
+      <div className="-mt-5 mb-7">
         {tmdbScore != null && (
           <>
-            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
             <span className="font-mono text-sm tracking-[0.04em]">
               <span className="text-amber-400">{tmdbScore}</span>
               {vote_count != null && vote_count > 0 && (
