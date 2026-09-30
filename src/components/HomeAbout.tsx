@@ -1,6 +1,7 @@
 import { Link } from '@/components/Link';
 import { ClapperboardIcon } from '@/icons/Clapperboard';
 import SearchIcon from '@/icons/MagnifyingGlass';
+import PlusIcon from '@/icons/Plus';
 import StarIcon from '@/icons/Star';
 
 const faq = [
@@ -39,63 +40,95 @@ const features = [
   },
 ];
 
+const index = (position: number) => String(position + 1).padStart(2, '0');
+
 export function HomeAbout() {
   return (
     <section
       aria-labelledby="what-is-midnightframe"
       className="relative z-10 px-6 md:px-12 py-8 md:py-32 max-w-6xl mx-auto"
     >
-      <p className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-4">
-        For people who care what they watch
-      </p>
-      <h2
-        id="what-is-midnightframe"
-        className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.2] mb-6"
-      >
-        Every movie you&apos;ve watched. Every one you haven&apos;t.
-      </h2>
-      <p className="font-sans text-base text-secondary leading-relaxed">
-        MidnightFrame is a free, private movie and TV tracker. Search millions
-        of titles, mark them watched or queue them for later, rate them out of
-        ten, and write a note you can read back years from now. Every title,
-        poster and credit comes from TMDB. Your collection stays yours alone.
-      </p>
-      <p className="font-sans text-base text-secondary leading-relaxed mt-4">
-        No algorithm, no ads, no feed to keep up with.
-      </p>
+      <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
+        <div>
+          <p className="font-mono text-sm tracking-[0.2em] text-secondary/60 uppercase mb-5">
+            About MidnightFrame
+          </p>
+          <h2
+            id="what-is-midnightframe"
+            className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.15] mb-6"
+          >
+            A quiet place for the films that{' '}
+            <em className="text-accent">stay with you.</em>
+          </h2>
+          <p className="font-sans text-base text-secondary leading-relaxed">
+            MidnightFrame is a personal film log for late-night watchers. Keep
+            track of what you&apos;ve seen, line up what&apos;s next, and build
+            a collection that reflects your taste — not an algorithm&apos;s.
+          </p>
+          <p className="font-sans text-base text-secondary leading-relaxed mt-4">
+            It is a free, private movie and TV tracker. Search millions of
+            titles, rate them out of ten, and write a note you can read back
+            years from now. Every title, poster and credit comes from TMDB.
+          </p>
+        </div>
 
-      <div className="grid gap-8 md:grid-cols-3 mt-12">
-        {features.map(({ Icon, title, body }) => (
-          <div key={title}>
-            <span aria-hidden="true" className="block mb-3">
-              <Icon className="w-6 h-6 text-accent" />
-            </span>
-            <h3 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-2">
-              {title}
-            </h3>
-            <p className="text-sm text-secondary leading-relaxed">{body}</p>
-          </div>
-        ))}
+        <div className="lg:pt-2">
+          <h2 id="midnightframe-faq" className="sr-only">
+            Common questions
+          </h2>
+          {faq.map(({ question, answer }, position) => (
+            <details
+              key={question}
+              className="group border-t border-white/[0.08] last:border-b"
+            >
+              <summary className="flex cursor-pointer list-none items-center gap-5 py-6 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
+                <span
+                  aria-hidden="true"
+                  className="w-6 shrink-0 font-mono text-sm text-secondary/40"
+                >
+                  {index(position)}
+                </span>
+                <h3 className="flex-1 font-sans text-base md:text-lg text-primary">
+                  {question}
+                </h3>
+                <span aria-hidden="true" className="shrink-0">
+                  <PlusIcon className="w-4 h-4 text-secondary/60 transition-transform duration-300 group-open:rotate-45" />
+                </span>
+              </summary>
+              <p className="pb-6 pl-11 pr-8 text-sm text-secondary leading-relaxed">
+                {answer}
+              </p>
+            </details>
+          ))}
+        </div>
       </div>
 
-      <p className="font-sans text-base text-secondary leading-relaxed mt-12">
-        Log one movie tonight or catch up on a whole month. Either way,
-        it&apos;s just for you.
-      </p>
-
-      <h2
-        id="midnightframe-faq"
-        className="font-serif text-[clamp(24px,3.5vw,32px)] tracking-[-0.03em] leading-[1.2] mt-16"
-      >
-        Common questions
-      </h2>
-      <div className="mt-8 grid gap-8 md:grid-cols-2">
-        {faq.map(({ question, answer }) => (
-          <div key={question}>
-            <h3 className="font-sans text-base font-medium text-primary mb-2">
-              {question}
+      <div className="grid gap-4 md:grid-cols-3 md:gap-6 mt-16 md:mt-24">
+        {features.map(({ Icon, title, body }, position) => (
+          <div
+            key={title}
+            className="rounded-2xl border border-white/[0.07] bg-bg2/60 p-6 transition-colors hover:border-white/[0.14] hover:bg-bg2"
+          >
+            <div className="flex items-start justify-between">
+              <span
+                aria-hidden="true"
+                className="flex w-11 h-11 items-center justify-center rounded-xl bg-accent/12 text-accent"
+              >
+                <Icon className="w-5 h-5" />
+              </span>
+              <span
+                aria-hidden="true"
+                className="font-mono text-sm text-secondary/40"
+              >
+                {index(position)}
+              </span>
+            </div>
+            <h3 className="font-mono text-sm tracking-[0.2em] text-accent uppercase mt-6">
+              {title}
             </h3>
-            <p className="text-sm text-secondary leading-relaxed">{answer}</p>
+            <p className="text-sm text-secondary leading-relaxed mt-3">
+              {body}
+            </p>
           </div>
         ))}
       </div>
