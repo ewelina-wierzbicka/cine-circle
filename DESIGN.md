@@ -577,6 +577,12 @@ Static content pages, open routes (no auth required). All three render through o
 
 **TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
 
+## Social Share Image (Open Graph)
+
+`src/app/opengraph-image.png` — one static card for the whole site. It is what Slack, iMessage, WhatsApp, X, Facebook and LinkedIn render for any shared MidnightFrame URL except movie and series pages, which use the TMDB poster instead.
+
+---
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.

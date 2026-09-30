@@ -113,7 +113,8 @@ series/[id]/             # /series/:id
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     llms.txt/
       route.ts                # GET /llms.txt — plain-text site map for language models; open routes only
-    opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
+    opengraph-image.png       # site-wide default OG image, static 1200x630 PNG
+    opengraph-image.alt.txt   # alt text for it — becomes og:image:alt / twitter:image:alt
   globals.css
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt and llms.txt; also resolves movie/series ids so unknown ones answer a real 404
@@ -232,7 +233,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - Use Next.js `loading.tsx` and `error.tsx` files for async boundaries
 - Environment variables: server-only vars in `.env.local`, public vars prefixed with `NEXT_PUBLIC_`
 - Images use a global custom loader: `images.loader: 'custom'` + `images.loaderFile: './src/lib/imageLoader.ts'`. TMDB URLs are rewritten to the nearest TMDB width bucket (`w92`…`w780`, else `original`) and served straight from TMDB's CDN, which restores `srcset`. All other sources (Supabase avatars, local `/logo.webp`) are returned unchanged.
-- Because `/_next/image` is unavailable, non-TMDB images must be pre-sized at the source: `public/logo.webp` ships at 400px wide (2x its 200px render) and avatars are downscaled to 128px WebP by `lib/resizeImage.ts` before upload. Any new local asset must be committed at roughly 2x its render size — do not add a full-resolution PNG to `public/`.
+- Because `/_next/image` is unavailable, non-TMDB images must be pre-sized at the source: `public/logo.webp` ships at 400px wide (2x its 200px render) and avatars are downscaled to 128px WebP by `lib/resizeImage.ts` before upload. Any new local asset must be committed at roughly 2x its render size — do not add a full-resolution PNG to `public/`. The exception is `app/opengraph-image.png`: social crawlers want it at exactly 1200x630, and it never renders in the app.
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
@@ -264,7 +265,9 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
-- `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
+- **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
+  - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
+  - Next serves it at `/opengraph-image.png?<content-hash>` and emits `og:image:width`, `og:image:height` and `og:image:type` from the file itself. Nothing in `lib/seo.ts` or the root layout references it — never hardcode the URL in `openGraph.images`, that overrides the file convention and loses the hash.
 
 ### Security headers
 
