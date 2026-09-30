@@ -150,11 +150,12 @@ export const config = {
   // Run only on page routes. Excluded:
   // - _next/* static assets and image optimisation
   // - favicon and common image extensions
-  // - sitemap.xml, robots.txt, llms.txt, opengraph-image — metadata routes.
-  //   They carry no session and must never redirect, or crawlers cannot fetch them
+  // - sitemap.xml, robots.txt, llms.txt, manifest.webmanifest, opengraph-image —
+  //   metadata routes. They carry no session and must never redirect, or
+  //   crawlers cannot fetch them and the install prompt never appears
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|opengraph-image|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|manifest.webmanifest|opengraph-image|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

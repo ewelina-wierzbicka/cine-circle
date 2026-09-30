@@ -24,6 +24,8 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://image.tmdb.org https://*.supabase.co",
   "font-src 'self'",
+  // Covered by default-src already, but Safari has historically needed it named.
+  "manifest-src 'self'",
   "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",

@@ -1,6 +1,6 @@
 import '@/globals.css';
 import { Providers } from '@/providers';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/seo';
@@ -64,6 +64,20 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
+  // iOS ignores the manifest `display` field, so the standalone install needs
+  // these meta tags instead.
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+// Theme color belongs in the `viewport` export in Next.js 16, not in
+// `metadata`. The value is the `bg` token, matching the manifest.
+export const viewport: Viewport = {
+  themeColor: '#0d0d10',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({
