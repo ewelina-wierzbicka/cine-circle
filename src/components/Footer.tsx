@@ -19,7 +19,7 @@ export function Footer() {
         <div className="flex flex-col gap-4 items-center md:items-start">
           <nav
             aria-label="Footer"
-            className="flex flex-wrap gap-x-6 gap-y-3 justify-center md:justify-start"
+            className="flex flex-wrap gap-x-10 gap-y-3 justify-center md:justify-start"
           >
             {NAV_LINKS.map(({ href, label }) => (
               <NextLink key={href} href={href} className={linkClass}>
@@ -31,7 +31,7 @@ export function Footer() {
             </a>
           </nav>
           <p className="font-mono text-sm tracking-[0.14em] text-secondary">
-            © 2026 MidnightFrame
+            © 2026 MIDNIGHTFRAME
           </p>
         </div>
         <a

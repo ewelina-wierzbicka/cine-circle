@@ -569,9 +569,9 @@ It is the last child of the scrolling `<main>`, so it flows after page content. 
 
 **Layout:** `border-t border-secondary/50`, `px-6 py-8 md:px-12`. Inner `mx-auto` flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Left column stacks nav then copyright with `gap-4`.
 
-**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-6 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
+**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
 
-**Copyright:** `© 2026 MidnightFrame`, below the nav. `font-mono text-sm tracking-[0.14em] text-secondary`, not uppercased so the brand keeps its casing.
+**Copyright:** `© 2026 MIDNIGHTFRAME`, below the nav. `font-mono text-sm tracking-[0.14em] text-secondary`.
 
 **TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`, `max-w-sm`).
 
