@@ -24,7 +24,7 @@ export default function PrivateLayout({
       <Suspense fallback={null}>
         <ScrollReset />
       </Suspense>
-      <main className="flex-1 overflow-y-auto bg-dark">
+      <main className="flex-1 overflow-y-auto scroll-smooth bg-dark">
         {children}
         <Suspense fallback={null}>
           <SessionAwareFooter />

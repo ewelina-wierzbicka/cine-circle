@@ -131,10 +131,10 @@ export function HomeAbout() {
       </div>
 
       <Link
-        href="/search"
+        href="#home-search"
         className="inline-block font-mono text-sm tracking-[0.08em] mt-12"
       >
-        Browse the full catalogue →
+        Browse the full catalogue ↑
       </Link>
     </section>
   );
