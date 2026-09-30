@@ -24,7 +24,9 @@ export default function PrivateLayout({
       <Suspense fallback={null}>
         <ScrollReset />
       </Suspense>
-      <main className="flex-1 overflow-y-auto bg-dark">
+      {/* Flex column so a page marked flex-1 fills the viewport and pushes the
+       * footer to the bottom on short pages such as an empty /search. */}
+      <main className="flex-1 flex flex-col overflow-y-auto bg-dark">
         {children}
         <Suspense fallback={null}>
           <SessionAwareFooter />
