@@ -266,11 +266,8 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
-  - It replaced a `next/og` `ImageResponse` route. Do not add an `opengraph-image.tsx` back alongside the PNG — both resolve to the same metadata route and the build fails on the conflict.
-  - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`. Next reads the file **raw**, so it must have no trailing newline or the newline lands in the `content` attribute. Prettier does not format `.txt`, so nothing re-adds it.
+  - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
   - Next serves it at `/opengraph-image.png?<content-hash>` and emits `og:image:width`, `og:image:height` and `og:image:type` from the file itself. Nothing in `lib/seo.ts` or the root layout references it — never hardcode the URL in `openGraph.images`, that overrides the file convention and loses the hash.
-  - **Optimize it before committing.** 1200x630, opaque (flatten onto `#0d0d10`, no alpha channel), palette-quantized PNG, and under ~300 KB — WhatsApp silently drops previews above that, and it is the tightest limit of the platforms that matter. The current file is ~11 KB. The custom image loader does not apply here: crawlers fetch the raw file, so whatever is committed is what ships.
-  - Replacing it is a drop-in: overwrite `src/app/opengraph-image.png` at the same dimensions and update `opengraph-image.alt.txt` if the copy changes.
 
 ### Security headers
 

@@ -578,22 +578,6 @@ Static content pages, open routes (no auth required). All three render through o
 
 `src/app/opengraph-image.png` — one static card for the whole site. It is what Slack, iMessage, WhatsApp, X, Facebook and LinkedIn render for any shared MidnightFrame URL except movie and series pages, which use the TMDB poster instead.
 
-**Canvas:** exactly 1200x630, opaque. No transparency — platforms composite alpha onto white or black unpredictably.
-
-**Current artwork** (matches the design it replaced, dark and type-led):
-
-- Background: flat `bg` `#0d0d10`. Padding 96px on all sides, content vertically centered.
-- Eyebrow: `MIDNIGHTFRAME`, 28px, uppercase, `letter-spacing: 8px`, accent `#a97dff`.
-- Headline: "Track the movies and series you watch", 88px, `line-height: 1.1`, `text` `#ece9e3`, 24px below the eyebrow.
-- Rule: 96x4 accent bar, 40px below the headline.
-- Tagline: "Log it. Rate it. Share it.", 32px, `text` at 75% opacity, 40px below the rule.
-
-**Safe area:** keep type inside a 96px inset. Slack and X crop the card's edges on some layouts, and the right ~20% is where link-preview chrome overlays.
-
-**Accent in exported artwork:** the accent token is `oklch(80% 0.25 285)`. Export tools and social platforms are sRGB only, so the card uses the hex equivalent `#a97dff`.
-
-**File budget:** under ~300 KB. See the AGENTS.md OG bullet for the export recipe.
-
 ---
 
 ## Error & Not-Found Pages
