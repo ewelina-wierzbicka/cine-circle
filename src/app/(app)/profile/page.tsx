@@ -5,16 +5,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getProfile } from '@/services/getProfile';
 import { ProfileContent } from './ProfileContent';
 
 export default async function ProfilePage() {
   const profile = await getProfile();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   return <ProfileContent profile={profile} email={user?.email ?? ''} />;
 }

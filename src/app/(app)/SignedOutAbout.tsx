@@ -1,11 +1,8 @@
 import { HomeAbout } from '@/components/HomeAbout';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 
 export async function SignedOutAbout() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) return null;
 

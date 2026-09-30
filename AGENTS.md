@@ -374,7 +374,10 @@ return (
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SessionAwareFooter` in `<Suspense fallback={null}>` (reads the Supabase user, hands the boolean to `FooterSlot`, which picks the footer by route: always on `/about`, `/terms`, `/privacy`, signed-out only everywhere else, and `pinned` on `/search`). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders. Both boundaries read the session through `services/getCurrentUser.ts`, which is wrapped in React `cache`, so they share one `getUser()` round trip.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SessionAwareFooter` in `<Suspense fallback={null}>` (reads the Supabase user, hands the boolean to `FooterSlot`, which picks the footer by route: always on `/about`, `/terms`, `/privacy`, signed-out only everywhere else, and `pinned` on `/search`). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders. Both boundaries read the session through `services/getCurrentUser.ts`, so they share one `getUser()` round trip.
+
+**`services/getCurrentUser.ts` is the only server-side `auth.getUser()` call site.** It is wrapped in React `cache`, so every server component, service and server action in one request shares a single round trip. Use it for every server-side authentication check — never call `supabase.auth.getUser()` directly. Two exceptions: `proxy.ts` runs its own client outside React, and client components (`ProfileContent`, `hooks/useUserMedia`) use the browser client, where `cache` does not apply.
+
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
 - `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
 

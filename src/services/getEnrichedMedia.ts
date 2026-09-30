@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getUserMedia } from '@/services/getUserMedia';
 import { MediaType, NormalizedMedia, SavedMedia } from '@/types';
 import { cache } from 'react';
@@ -12,10 +12,7 @@ export const getEnrichedMedia = cache(
     media: NormalizedMedia | SavedMedia;
     isAuthenticated: boolean;
   }> => {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     const isAuthenticated = !!user;
 
     if (!user) return { media: baseMedia, isAuthenticated };
