@@ -1,49 +1,39 @@
-import { twMerge } from '@/lib/cn';
 import Image from 'next/image';
 import NextLink from 'next/link';
 
 const NAV_LINKS = [
   { href: '/about', label: 'About' },
-  { href: '/terms', label: 'Terms' },
-  { href: '/privacy', label: 'Privacy' },
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms & Conditions' },
 ] as const;
 
 const CONTACT_EMAIL = 'info.midnightframe@gmail.com';
 
 const linkClass =
-  'text-sm font-sans text-secondary hover:text-primary transition-colors';
+  'font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors';
 
-type Props = {
-  pinned?: boolean;
-};
-
-export function Footer({ pinned = false }: Props) {
+export function Footer() {
   return (
-    <footer
-      className={twMerge(
-        'relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12',
-        pinned && 'sticky bottom-0 z-10 bg-dark/95 backdrop-blur-sm py-4',
-      )}
-    >
-      <div
-        className={twMerge(
-          'mx-auto flex flex-col gap-6 md:flex-row items-center md:items-start md:justify-between',
-          pinned && 'gap-3 md:items-center',
-        )}
-      >
-        <nav
-          aria-label="Footer"
-          className="flex flex-wrap gap-x-6 gap-y-3 justify-center md:justify-start"
-        >
-          {NAV_LINKS.map(({ href, label }) => (
-            <NextLink key={href} href={href} className={linkClass}>
-              {label}
-            </NextLink>
-          ))}
-          <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
-            Contact
-          </a>
-        </nav>
+    <footer className="relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12">
+      <div className="mx-auto flex flex-col gap-6 items-center md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-col gap-4 items-center md:items-start">
+          <nav
+            aria-label="Footer"
+            className="flex flex-wrap gap-x-6 gap-y-3 justify-center md:justify-start"
+          >
+            {NAV_LINKS.map(({ href, label }) => (
+              <NextLink key={href} href={href} className={linkClass}>
+                {label}
+              </NextLink>
+            ))}
+            <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
+              Contact
+            </a>
+          </nav>
+          <p className="font-mono text-sm tracking-[0.14em] text-secondary">
+            © 2026 MidnightFrame
+          </p>
+        </div>
         <a
           href="https://www.themoviedb.org"
           target="_blank"
