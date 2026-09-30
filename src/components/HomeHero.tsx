@@ -18,7 +18,6 @@ export function HomeHero({ hintTitles, recentPostersPromise }: Props) {
 
   return (
     <div
-      id="home-search"
       className={twMerge(
         'flex-1 flex flex-col justify-center items-center px-6 md:px-12 relative z-20 transition-transform duration-300 ease-out pb-44 pt-7.5 sm:pb-23',
         shouldShift &&

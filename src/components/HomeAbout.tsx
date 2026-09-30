@@ -1,4 +1,4 @@
-import { Link } from '@/components/Link';
+import { BackToTopLink } from '@/components/BackToTopLink';
 import { ClapperboardIcon } from '@/icons/Clapperboard';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import PlusIcon from '@/icons/Plus';
@@ -130,12 +130,9 @@ export function HomeAbout() {
         ))}
       </div>
 
-      <Link
-        href="#home-search"
-        className="inline-block font-mono text-sm tracking-[0.08em] mt-12"
-      >
+      <BackToTopLink className="inline-block font-mono text-sm tracking-[0.08em] mt-12">
         Browse the full catalogue ↑
-      </Link>
+      </BackToTopLink>
     </section>
   );
 }
