@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { NormalizedMedia } from '@/types';
@@ -116,10 +116,7 @@ type EnrichedProps = {
 };
 
 async function UserCollectionBackLink() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
   return <CollectionBackLink />;
 }

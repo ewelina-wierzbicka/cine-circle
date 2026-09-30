@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { getUserMediaList } from '@/services/getUserMedia';
 import { TrendingMovie, UserMedia } from '@/types';
@@ -18,10 +18,7 @@ function toRecentPoster(item: UserMedia): TrendingMovie {
 }
 
 export async function getRecentWatched(): Promise<TrendingMovie[]> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return [];
 
   try {
