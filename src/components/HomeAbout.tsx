@@ -58,7 +58,9 @@ export function HomeAbout() {
             className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.15] mb-6"
           >
             A quiet place for the movies that{' '}
-            <em className="text-accent">stay with you.</em>
+            <em className="text-accent">
+              stay <span className=" whitespace-nowrap">with you.</span>
+            </em>
           </h2>
           <p className="font-sans text-base text-secondary leading-relaxed">
             MidnightFrame is a personal film log for late-night watchers. Keep
