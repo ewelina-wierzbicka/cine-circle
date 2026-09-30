@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-import { SignedOutAbout } from '@/app/(app)/SignedOutAbout';
-import { HomeHero } from '@/components/HomeHero';
-import { RecentWatched } from '@/components/RecentWatched';
+import { SignedOutAbout } from './SignedOutAbout';
+import { HomeHero } from './HomeHero';
+import { RecentWatched } from './RecentWatched';
 import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';

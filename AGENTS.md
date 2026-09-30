@@ -70,6 +70,10 @@ src/
         SignInButton.tsx       # client — Button-styled CTA, router.push('/login')
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
+      HomeHero.tsx            # home hero — h1, SearchBox, dropdown-shift flag
+      HomeAbout.tsx           # signed-out about section — FAQ accordion + feature cards
+      SignedOutAbout.tsx      # gate that renders HomeAbout for signed-out visitors only
+      RecentWatched.tsx       # "Recently Watched" strip, streams via Suspense
       search/                 # /search
         page.tsx
         loading.tsx           # streams SearchBox + results grid skeleton
@@ -86,6 +90,7 @@ src/
         page.tsx
         loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
+        ProfileSkeleton.tsx
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense

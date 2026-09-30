@@ -289,13 +289,13 @@ export const motion = {
 
 ### RecentWatched
 
-- `src/components/RecentWatched.tsx` — async Server Component rendering the "Recently Watched" strip on the home page.
+- `src/app/(app)/RecentWatched.tsx` — async Server Component rendering the "Recently Watched" strip on the home page.
 - Receives a `Promise<TrendingMovie[]>` (resolved by `getRecentWatched`) and `await`s it; renders `null` when empty.
 - Hosts the section header ("RECENTLY WATCHED" + "SEE ALL →") and the horizontal `MediaPoster` scroll. Lifted out of `page.tsx` so the home shell prerenders with the hero and the strip streams in via Suspense.
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static about section below the home hero. Two-column editorial block on `lg:` (`grid lg:grid-cols-2 gap-12 lg:gap-16`): left is eyebrow + `h2` + two paragraphs, right is the FAQ accordion. Below it a three-up feature card grid, then a `BackToTopLink`.
+- `src/app/(app)/HomeAbout.tsx` — static about section below the home hero. Two-column editorial block on `lg:` (`grid lg:grid-cols-2 gap-12 lg:gap-16`): left is eyebrow + `h2` + two paragraphs, right is the FAQ accordion. Below it a three-up feature card grid, then a `BackToTopLink`.
 - `src/components/BackToTopLink.tsx` — client `button` styled like `Link`, scrolls `main` back to 0 with `behavior: 'smooth'`.
 - FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-white/[0.08]` (`last:border-b`), `01`/`02`/`03` in `font-mono text-sm text-secondary/40`, question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
 - Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `font-mono tracking-[0.2em] text-accent uppercase` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
@@ -395,7 +395,7 @@ Search
 Recently Watched
 
 - Streams in via Suspense under PPR. `page.tsx` awaits `getTrendingMovies()` (cached `use cache`) to build the hero `hintTitles`, then hands `getRecentWatched()` (Supabase, per-user) as a promise to `RecentWatched`.
-- `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
+- `RecentWatched` (`src/app/(app)/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
 - Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
@@ -405,7 +405,7 @@ Recently Watched
 
 About section
 
-- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition and the FAQ accordion side by side, then the three feature cards.
+- `HomeAbout` (`src/app/(app)/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition and the FAQ accordion side by side, then the three feature cards.
 
 ---
 
