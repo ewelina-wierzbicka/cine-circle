@@ -1,6 +1,6 @@
 import '@/globals.css';
 import { Providers } from '@/providers';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { DM_Mono, DM_Sans, DM_Serif_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/seo';
@@ -64,6 +64,16 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0d0d10',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({

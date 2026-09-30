@@ -146,11 +146,10 @@ export const motion = {
 
 `public/icons/` holds the PWA icon set: `icon-192.png`, `icon-512.png` and `icon-maskable-512.png`. All three take their geometry from `src/app/favicon.svg`, the MidnightFrame mark, on an opaque `#0d0d10` background. Opacity matters — a transparent PWA icon renders as a black or white blob depending on the launcher.
 
-- The mark is `#b39dff`, the accent token `oklch(80% 0.25 285)` in sRGB, the same purple as the mark in `public/logo.webp`. `favicon.svg` uses a darker `#5c27e0` because it is displayed on a white browser chrome; app icons sit on the dark brand background and must match the logo instead.
+- The mark is `#b39dff`, the accent token `oklch(80% 0.25 285)` in sRGB, the same purple as the mark in `public/logo.webp`.
 
 - `icon-192.png` and `icon-512.png` are full bleed, same framing as the favicon.
 - `icon-maskable-512.png` keeps the mark inside the 80% safe zone, 320px centred on a 512 canvas, because Android crops maskable icons to a circle or squircle.
-- `favicon.ico`, `favicon.svg` and `apple-touch-icon.png` are separate and unaffected.
 
 ---
 
@@ -592,6 +591,18 @@ Static content pages, open routes (no auth required). All three render through o
 ## Social Share Image (Open Graph)
 
 `src/app/opengraph-image.png` — one static card for the whole site. It is what Slack, iMessage, WhatsApp, X, Facebook and LinkedIn render for any shared MidnightFrame URL except movie and series pages, which use the TMDB poster instead.
+
+---
+
+## Installed App (PWA chrome)
+
+`src/app/manifest.ts` — the site is installable. There is no service worker, so nothing works offline.
+
+- **Chrome.** `display: 'standalone'`, so the installed app has no browser address bar. `orientation: 'portrait'`.
+- **Splash and title bar.** `background_color` and `theme_color` are both `#0d0d10`, the `bg` token, so the launch splash and the OS title bar match the page background with no light flash. The root layout's `viewport` export sets the same value as `themeColor` plus `colorScheme: 'dark'`, which also tints mobile browser chrome on the normal site. Change one and change the other.
+- **iOS.** `metadata.appleWebApp` in the root layout sets `statusBarStyle: 'black-translucent'`, so the dark page bleeds under the status bar. iOS ignores the manifest `display` field, so this block is what makes standalone launch work there.
+- **Launcher icon.** The manifest points at the three files described under [App Icons (PWA)](#app-icons-pwa): the 192 and 512 at `purpose: 'any'`, the maskable 512 at `purpose: 'maskable'`.
+- **Launch target.** `start_url` is `/`, the home page. A signed-out install opens on real content, not the login screen.
 
 ---
 
