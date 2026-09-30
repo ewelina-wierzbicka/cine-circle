@@ -574,6 +574,28 @@ Static content pages, open routes (no auth required). All three render through o
 
 **TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
 
+## Social Share Image (Open Graph)
+
+`src/app/opengraph-image.png` — one static card for the whole site. It is what Slack, iMessage, WhatsApp, X, Facebook and LinkedIn render for any shared MidnightFrame URL except movie and series pages, which use the TMDB poster instead.
+
+**Canvas:** exactly 1200x630, opaque. No transparency — platforms composite alpha onto white or black unpredictably.
+
+**Current artwork** (matches the design it replaced, dark and type-led):
+
+- Background: flat `bg` `#0d0d10`. Padding 96px on all sides, content vertically centered.
+- Eyebrow: `MIDNIGHTFRAME`, 28px, uppercase, `letter-spacing: 8px`, accent `#a97dff`.
+- Headline: "Track the movies and series you watch", 88px, `line-height: 1.1`, `text` `#ece9e3`, 24px below the eyebrow.
+- Rule: 96x4 accent bar, 40px below the headline.
+- Tagline: "Log it. Rate it. Share it.", 32px, `text` at 75% opacity, 40px below the rule.
+
+**Safe area:** keep type inside a 96px inset. Slack and X crop the card's edges on some layouts, and the right ~20% is where link-preview chrome overlays.
+
+**Accent in exported artwork:** the accent token is `oklch(80% 0.25 285)`. Export tools and social platforms are sRGB only, so the card uses the hex equivalent `#a97dff`.
+
+**File budget:** under ~300 KB. See the AGENTS.md OG bullet for the export recipe.
+
+---
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
