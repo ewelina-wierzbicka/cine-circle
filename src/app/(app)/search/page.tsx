@@ -1,5 +1,5 @@
 import SearchBox from '@/components/SearchBox';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getMedia } from '@/services/getMedia';
 import { FilterMediaType } from '@/types';
 import type { Metadata } from 'next';
@@ -39,10 +39,7 @@ export default async function Page({ searchParams }: Props) {
     ? (rawType as FilterMediaType)
     : 'all';
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   let initialData = null;
   if (query) {

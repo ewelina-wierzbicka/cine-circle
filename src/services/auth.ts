@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { redirect } from 'next/navigation';
 
 export async function login(email: string, password: string, rurl?: string) {
@@ -71,10 +72,7 @@ export async function updatePasswordAfterReset(
   newPassword: string,
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return { error: 'Reset link expired or invalid' };
 

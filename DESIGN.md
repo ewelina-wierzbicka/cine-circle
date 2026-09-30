@@ -556,6 +556,26 @@ Static content pages, open routes (no auth required). All three render through o
 
 ---
 
+## Footer
+
+`src/components/Footer.tsx` — presentational, no data fetching, no props.
+
+**Where it renders.** `(app)/layout.tsx` renders `SessionAwareFooter` inside `<Suspense fallback={null}>`. That async component reads the Supabase user and hands the boolean to `FooterSlot` (`src/components/FooterSlot.tsx`, client, reads `usePathname()`), which decides:
+
+- `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
+- Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+
+**Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
+
+- Left — the nav only, `items-center md:items-start`.
+- Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
+
+**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
+
+**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `font-mono text-sm tracking-[0.14em] text-secondary mt-4 md:mt-0`.
+
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.

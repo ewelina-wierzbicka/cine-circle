@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
+import { FooterSlot } from '@/components/FooterSlot';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import ScrollReset from '@/components/ScrollReset';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getProfile } from '@/services/getProfile';
 
 export default function PrivateLayout({
@@ -23,16 +24,23 @@ export default function PrivateLayout({
       <Suspense fallback={null}>
         <ScrollReset />
       </Suspense>
-      <main className="flex-1 overflow-y-auto bg-dark">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-dark">
+        {children}
+        <Suspense fallback={null}>
+          <SessionAwareFooter />
+        </Suspense>
+      </main>
     </div>
   );
 }
 
+async function SessionAwareFooter() {
+  const user = await getCurrentUser();
+  return <FooterSlot signedIn={Boolean(user)} />;
+}
+
 async function AuthenticatedHeader() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const profile = user ? await getProfile() : null;
   return <Header profile={profile} />;
 }
