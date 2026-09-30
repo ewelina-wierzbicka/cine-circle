@@ -374,7 +374,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 Layout & Ambient
 
-- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100dvh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
 - Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-data-home-about` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
 - Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
@@ -576,6 +576,8 @@ Static content pages, open routes (no auth required). All three render through o
 
 - `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
 - Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+
+**Viewport height.** The footer is the last thing inside `main`, so it is the first casualty when the app shell is taller than the visible viewport. The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of `main` sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. The home first-screen wrapper uses `calc(100dvh-4rem)` for the same reason. Do not reintroduce `vh` units in the app shell.
 
 **Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
 
