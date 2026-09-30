@@ -563,17 +563,18 @@ Static content pages, open routes (no auth required). All three render through o
 - `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
 - Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
 
-It is the last child of the scrolling `<main>`, so it flows after page content. It is never sticky or fixed — `/search` included. A pinned variant existed and was dropped: it read as app chrome on a page that is meant to feel like one.
+It is the last child of the scrolling `<main>`, so it flows after page content.
 
-`relative z-10` is required, not decorative. `MediaDetailWrapper` paints a `fixed inset-0 z-0` backdrop on `/movie/:id` and `/series/:id`; a static footer with no z-index renders underneath it.
+**Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
 
-**Layout:** `border-t border-secondary/50`, `px-6 py-8 md:px-12`. Inner `mx-auto` flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Left column stacks nav then copyright with `gap-4`.
+- Left — the nav only, `items-center md:items-start`.
+- Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
 
 **Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
 
-**Copyright:** `© 2026 MIDNIGHTFRAME`, below the nav. `font-mono text-sm tracking-[0.14em] text-secondary`.
+**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `font-mono text-sm tracking-[0.14em] text-secondary mt-4 md:mt-0`.
 
-**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`, `max-w-sm`).
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
 
 ## Error & Not-Found Pages
 
