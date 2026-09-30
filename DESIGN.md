@@ -563,8 +563,6 @@ Static content pages, open routes (no auth required). All three render through o
 - `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
 - Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
 
-It is the last child of the scrolling `<main>`, so it flows after page content.
-
 **Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
 
 - Left — the nav only, `items-center md:items-start`.
