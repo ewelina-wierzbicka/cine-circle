@@ -113,11 +113,12 @@ series/[id]/             # /series/:id
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     llms.txt/
       route.ts                # GET /llms.txt — plain-text site map for language models; open routes only
+    manifest.ts               # /manifest.webmanifest — web app manifest; makes the site installable, no service worker
     opengraph-image.png       # site-wide default OG image, static 1200x630 PNG
     opengraph-image.alt.txt   # alt text for it — becomes og:image:alt / twitter:image:alt
   globals.css
   providers.tsx               # app-wide React context providers
-  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt and llms.txt; also resolves movie/series ids so unknown ones answer a real 404
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
   components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
@@ -127,7 +128,7 @@ series/[id]/             # /series/:id
 ```
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
-- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt` and `opengraph-image` — metadata routes must never be redirected to `/login` or crawlers cannot fetch them
+- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt`, `manifest.webmanifest` and `opengraph-image` — metadata routes must never be redirected to `/login`, or crawlers cannot fetch them and the install prompt never appears
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`, `/registration-confirmed`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
 - `/registration-confirmed` is an auth route in `AUTH_ROUTES` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session, so the visitor is logged out; logged-in users hitting it are redirected to `/`. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
@@ -268,10 +269,18 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
   - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
   - Next serves it at `/opengraph-image.png?<content-hash>` and emits `og:image:width`, `og:image:height` and `og:image:type` from the file itself. Nothing in `lib/seo.ts` or the root layout references it — never hardcode the URL in `openGraph.images`, that overrides the file convention and loses the hash.
+- **`app/manifest.ts` serves `/manifest.webmanifest`**, the web app manifest that makes the site installable. `name` and `description` come from `SITE_NAME` and `SITE_DESCRIPTION` — never hardcode the brand string or the domain there.
+  - `background_color` and `theme_color` are the literal `#0d0d10` (the `bg` token). Manifest JSON cannot read CSS vars, so that is the one place the hex is written out. The matching `themeColor` lives in the root layout's `viewport` export, and the two must stay in sync.
+  - Same rule as `app/llms.txt/route.ts`: the handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
+  - It reaches signed-out visitors because `manifest.webmanifest` is excluded from the `proxy.ts` matcher. Do **not** add it to `KNOWN_ROUTES_EXACT` — that would make it private and redirect signed-out visitors to `/login`, so the install prompt would never appear.
+  - `start_url` and `scope` are `/`, an open route, so a signed-out install lands on a real page instead of a login redirect. Never point `start_url` at a private route.
+  - Icons live in `public/icons/` (`icon-192.png`, `icon-512.png` at `purpose: 'any'`, `icon-maskable-512.png` at `purpose: 'maskable'`). These are exempt from the 2x pre-sizing rule above: launchers need them at their stated pixel size.
+  - iOS ignores the manifest `display` field, which is why the root layout also sets `metadata.appleWebApp`. Removing that block breaks standalone launch on iOS only, and nothing in the Chrome install report catches it.
+  - **No service worker.** There is no `public/sw.js`, no `serwist`, no `next-pwa`. A service worker needs a new dependency and interacts badly with PPR — it is a separate decision, not something to add alongside a manifest change.
 
 ### Security headers
 
-Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml`, `robots.txt` and `llms.txt` from auth, but `headers()` still applies to them.
+Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml`, `robots.txt`, `llms.txt` and `manifest.webmanifest` from auth, but `headers()` still applies to them.
 
 | Header                      | Value                                                          | Why                                     |
 | --------------------------- | -------------------------------------------------------------- | --------------------------------------- |
@@ -287,6 +296,7 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 - `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason.
 - Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`.
 - Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
+- `manifest-src 'self'` is redundant next to `default-src 'self'`, but Safari has historically needed it named, so it stays. There is no `worker-src` because there is no service worker.
 - Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
 
 ---

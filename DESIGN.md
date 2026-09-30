@@ -595,6 +595,18 @@ Static content pages, open routes (no auth required). All three render through o
 
 ---
 
+## Installed App (PWA chrome)
+
+`src/app/manifest.ts` — the site is installable. There is no service worker, so nothing works offline.
+
+- **Chrome.** `display: 'standalone'`, so the installed app has no browser address bar. `orientation: 'portrait'`.
+- **Splash and title bar.** `background_color` and `theme_color` are both `#0d0d10`, the `bg` token, so the launch splash and the OS title bar match the page background with no light flash. The root layout's `viewport` export sets the same value as `themeColor` plus `colorScheme: 'dark'`, which also tints mobile browser chrome on the normal site. Change one and change the other.
+- **iOS.** `metadata.appleWebApp` in the root layout sets `statusBarStyle: 'black-translucent'`, so the dark page bleeds under the status bar. iOS ignores the manifest `display` field, so this block is what makes standalone launch work there.
+- **Launcher icon.** The manifest points at the three files described under [App Icons (PWA)](#app-icons-pwa): the 192 and 512 at `purpose: 'any'`, the maskable 512 at `purpose: 'maskable'`.
+- **Launch target.** `start_url` is `/`, the home page. A signed-out install opens on real content, not the login screen.
+
+---
+
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
