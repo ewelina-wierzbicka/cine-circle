@@ -146,11 +146,10 @@ export const motion = {
 
 `public/icons/` holds the PWA icon set: `icon-192.png`, `icon-512.png` and `icon-maskable-512.png`. All three take their geometry from `src/app/favicon.svg`, the MidnightFrame mark, on an opaque `#0d0d10` background. Opacity matters — a transparent PWA icon renders as a black or white blob depending on the launcher.
 
-- The mark is `#b39dff`, the accent token `oklch(80% 0.25 285)` in sRGB, the same purple as the mark in `public/logo.webp`. `favicon.svg` uses a darker `#5c27e0` because it is displayed on a white browser chrome; app icons sit on the dark brand background and must match the logo instead.
+- The mark is `#b39dff`, the accent token `oklch(80% 0.25 285)` in sRGB, the same purple as the mark in `public/logo.webp`.
 
 - `icon-192.png` and `icon-512.png` are full bleed, same framing as the favicon.
 - `icon-maskable-512.png` keeps the mark inside the 80% safe zone, 320px centred on a 512 canvas, because Android crops maskable icons to a circle or squircle.
-- `favicon.ico`, `favicon.svg` and `apple-touch-icon.png` are separate and unaffected.
 
 ---
 

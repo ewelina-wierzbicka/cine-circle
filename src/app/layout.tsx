@@ -64,8 +64,6 @@ export const metadata: Metadata = {
       'max-video-preview': -1,
     },
   },
-  // iOS ignores the manifest `display` field, so the standalone install needs
-  // these meta tags instead.
   appleWebApp: {
     capable: true,
     title: SITE_NAME,
@@ -73,8 +71,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Theme color belongs in the `viewport` export in Next.js 16, not in
-// `metadata`. The value is the `bg` token, matching the manifest.
 export const viewport: Viewport = {
   themeColor: '#0d0d10',
   colorScheme: 'dark',
