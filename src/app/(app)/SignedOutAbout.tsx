@@ -1,4 +1,4 @@
-import { HomeAbout } from '@/components/HomeAbout';
+import { HomeAbout } from './HomeAbout';
 import { getCurrentUser } from '@/services/getCurrentUser';
 
 export async function SignedOutAbout() {
