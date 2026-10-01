@@ -1,4 +1,5 @@
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/seo';
+import { HOME_FAQ } from '@/lib/homeFaq';
 import { toHref } from '@/lib/mediaUtils';
 import { tmdbSocialImageUrl } from '@/lib/tmdbImage';
 import { MediaType, NormalizedMedia } from '@/types';
@@ -6,6 +7,7 @@ import { MediaType, NormalizedMedia } from '@/types';
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 const WEBAPP_ID = `${SITE_URL}/#webapp`;
+const FAQ_ID = `${SITE_URL}/#faq`;
 
 const TMDB_PAGE_BASE = 'https://www.themoviedb.org';
 
@@ -72,7 +74,18 @@ export type BreadcrumbJsonLd = {
   }[];
 };
 
-export type JsonLd = SiteJsonLd | MediaJsonLd | BreadcrumbJsonLd;
+export type FaqJsonLd = {
+  '@context': 'https://schema.org';
+  '@type': 'FAQPage';
+  '@id': string;
+  mainEntity: {
+    '@type': 'Question';
+    name: string;
+    acceptedAnswer: { '@type': 'Answer'; text: string };
+  }[];
+};
+
+export type JsonLd = SiteJsonLd | MediaJsonLd | BreadcrumbJsonLd | FaqJsonLd;
 
 // No SearchAction: /search?query= is noindex and disallowed in robots.txt.
 // No sameAs: the product has no social profiles to point at.
@@ -107,6 +120,21 @@ export function siteJsonLd(): SiteJsonLd {
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       },
     ],
+  };
+}
+
+// Built from HOME_FAQ, the same array `HomeAbout` renders on `/`, so the
+// answers in the markup and the answers here are one source.
+export function faqJsonLd(): FaqJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': FAQ_ID,
+    mainEntity: HOME_FAQ.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
   };
 }
 

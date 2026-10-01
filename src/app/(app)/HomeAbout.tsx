@@ -3,24 +3,7 @@ import { ClapperboardIcon } from '@/icons/Clapperboard';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import PlusIcon from '@/icons/Plus';
 import StarIcon from '@/icons/Star';
-
-const faq = [
-  {
-    question: 'Is MidnightFrame free?',
-    answer:
-      'Yes. Every feature is free, with no ads and no paid tier. You only need an account so your collection follows you between devices.',
-  },
-  {
-    question: "Who can see what I've watched?",
-    answer:
-      'Only you. Nothing you log is published or shown to anyone else. There are no followers, no public profiles and no activity feed.',
-  },
-  {
-    question: 'Where does the movie and series data come from?',
-    answer:
-      'Titles, posters, cast and release dates come from TMDB. Your ratings, dates and notes are yours and stay in your account. This product uses the TMDB API but is not endorsed or certified by TMDB.',
-  },
-];
+import { HOME_FAQ } from '@/lib/homeFaq';
 
 const features = [
   {
@@ -73,7 +56,7 @@ export function HomeAbout() {
           <h2 id="midnightframe-faq" className="sr-only">
             Common questions
           </h2>
-          {faq.map(({ question, answer }, position) => (
+          {HOME_FAQ.map(({ question, answer }, position) => (
             <details
               key={question}
               className="group border-t border-secondary/15 last:border-b"

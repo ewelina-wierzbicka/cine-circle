@@ -297,6 +297,7 @@ export const motion = {
 
 - `src/app/(app)/HomeAbout.tsx` — static about section below the home hero. Two-column editorial block on `lg:` (`grid lg:grid-cols-2 gap-12 lg:gap-16`): left is eyebrow + `h2` + two paragraphs, right is the FAQ accordion. Below it a three-up feature card grid, then a `BackToTopLink`.
 - `src/components/BackToTopLink.tsx` — client `button` styled like `Link`, scrolls `main` back to 0 with `behavior: 'smooth'`.
+- FAQ copy lives in `src/lib/homeFaq.ts` as `HOME_FAQ`, not in the component. `faqJsonLd()` serialises the same array, so edit the questions and answers there and the accordion and the `FAQPage` structured data stay identical.
 - FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-white/[0.08]` (`last:border-b`), `01`/`02`/`03` in `font-mono text-sm text-secondary/40`, question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
 - Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `font-mono tracking-[0.2em] text-accent uppercase` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders.
@@ -306,7 +307,7 @@ export const motion = {
 - `Skeleton.tsx` — reusable pulsing block sized via `className`. Used by `loading.tsx` files and Suspense fallbacks.
 - `MediaDetailSkeleton.tsx` — mirrors `MediaDetailWrapper`: radial gradient backdrop, rotated poster placeholder left, info column right (back link, genre pills, title, meta, divider, overview).
 - `MediaCardSkeleton.tsx` — `aspect-2/3` poster block + two text lines. Used in search and collection loading grids.
-- Route `loading.tsx` files: movie/series → `MediaDetailSkeleton`; collection → header + card grid; search → SearchBox bar + results grid; profile → heading + profile/account/danger-zone cards.
+- Route `loading.tsx` files: movie/series → `MediaDetailSkeleton`; collection → header + card grid; search → `h1` bar + SearchBox bar + results grid; profile → heading + profile/account/danger-zone cards.
 
 ---
 
@@ -406,6 +407,15 @@ Recently Watched
 About section
 
 - `HomeAbout` (`src/app/(app)/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition and the FAQ accordion side by side, then the three feature cards.
+
+Search results page (`/search`)
+
+- Implemented in `src/app/(app)/search/page.tsx`. Column is `flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12`.
+- Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox, so it is in the HTML for crawlers and is the only `h1` on the route.
+- Copy stays the same with or without a query. The query itself is already shown by the results heading below, so repeating it here would double the text.
+- SearchBox sits under it in `mb-8 w-full max-w-160`.
+- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-[0.2em] text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label. Both stay `p`, never `h1`.
+- `search/loading.tsx` mirrors the order: an `h-10 w-72` heading skeleton, then the SearchBox bar, then the results grid.
 
 ---
 
