@@ -42,7 +42,6 @@ export default async function AuthFormLayout({
             height={50}
             className="object-contain"
             priority
-            fetchPriority="high"
           />
         </Link>
 

@@ -47,7 +47,6 @@ export default function Header({ profile }: HeaderProps) {
           height={50}
           className="object-contain"
           priority
-          fetchPriority="high"
         />
       </Link>
       <nav
