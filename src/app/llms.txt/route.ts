@@ -22,8 +22,9 @@ need no account.
 
 Individual titles live at \`/movie/<id>-<slug>\` and \`/series/<id>-<slug>\`,
 where \`<id>\` is the TMDB id. The slug is cosmetic; any other slug for the same
-id redirects to the canonical URL. Each page carries the synopsis, genres, cast,
-runtime, TMDB score and streaming availability.
+id redirects to the canonical URL. Each page carries the poster, synopsis, genres,
+director or creator, release date, runtime, TMDB score and related titles. There
+is no cast list and no streaming availability.
 
 ## Optional
 
