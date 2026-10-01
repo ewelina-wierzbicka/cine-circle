@@ -3,11 +3,17 @@ import {
   StaticContentPage,
   type StaticSection,
 } from '@/components/StaticContentPage';
+import { aboutPageJsonLd, jsonLdScript } from '@/lib/jsonLd';
+
+const TITLE = 'About MidnightFrame';
+
+// Shared by the meta description and the AboutPage JSON-LD so the two cannot drift.
+const DESCRIPTION =
+  'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.';
 
 export const metadata: Metadata = {
   title: 'About',
-  description:
-    'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.',
+  description: DESCRIPTION,
   alternates: { canonical: '/about' },
 };
 
@@ -36,10 +42,18 @@ const sections: StaticSection[] = [
 
 export default function AboutPage() {
   return (
-    <StaticContentPage
-      title="About MidnightFrame"
-      subtitle="A free, private movie and TV tracker"
-      sections={sections}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(aboutPageJsonLd(TITLE, DESCRIPTION)),
+        }}
+      />
+      <StaticContentPage
+        title={TITLE}
+        subtitle="A free, private movie and TV tracker"
+        sections={sections}
+      />
+    </>
   );
 }
