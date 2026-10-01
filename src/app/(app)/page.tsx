@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 import { SignedOutAbout } from './SignedOutAbout';
 import { HomeHero } from './HomeHero';
 import { RecentWatched } from './RecentWatched';
-import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
+import { faqJsonLd, jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
@@ -30,6 +30,13 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
+      />
+      {/* Outside the SignedOutAbout boundary so it lands in the prerendered
+          shell. Crawlers are always signed out, so they see the matching
+          accordion markup below. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(faqJsonLd()) }}
       />
       <div className="min-h-[calc(100vh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-8 group-has-data-home-about:sm:pt-18 flex flex-col">
         <HomeHero

@@ -4,6 +4,7 @@ import Skeleton from '@/components/Skeleton';
 export default function Loading() {
   return (
     <div className="flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12">
+      <Skeleton className="h-10 w-72 max-w-full mb-6" />
       <div className="mb-8 w-full max-w-160">
         <Skeleton className="h-14 w-full rounded-2xl" />
       </div>
