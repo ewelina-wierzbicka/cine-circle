@@ -9,6 +9,11 @@ const WEBAPP_ID = `${SITE_URL}/#webapp`;
 
 const TMDB_PAGE_BASE = 'https://www.themoviedb.org';
 
+// Google rejects an Organization logo under 112x112, so the wordmark
+// (`/logo.webp`, 400x54) cannot be used here. The square PWA icon qualifies.
+const ORGANIZATION_LOGO_PATH = '/icons/icon-512.png';
+const ORGANIZATION_LOGO_SIZE = 512;
+
 type NodeReference = { '@id': string };
 
 type Person = { '@type': 'Person'; name: string };
@@ -18,7 +23,12 @@ type Organization = {
   '@id': string;
   name: string;
   url: string;
-  logo: { '@type': 'ImageObject'; url: string };
+  logo: {
+    '@type': 'ImageObject';
+    url: string;
+    width: number;
+    height: number;
+  };
 };
 
 type WebSite = {
@@ -85,7 +95,12 @@ export function siteJsonLd(): SiteJsonLd {
         '@id': ORGANIZATION_ID,
         name: SITE_NAME,
         url: SITE_URL,
-        logo: { '@type': 'ImageObject', url: absoluteUrl('/logo.webp') },
+        logo: {
+          '@type': 'ImageObject',
+          url: absoluteUrl(ORGANIZATION_LOGO_PATH),
+          width: ORGANIZATION_LOGO_SIZE,
+          height: ORGANIZATION_LOGO_SIZE,
+        },
       },
       {
         '@type': 'WebSite',
