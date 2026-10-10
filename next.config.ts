@@ -18,8 +18,7 @@ import type { NextConfig } from 'next';
 // - *.supabase.co: avatar images and browser calls to the database
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
-// - *.sentry.io: error reports from the browser Sentry SDK. See AGENTS.md for
-//   why we allow the origin instead of tunnelling it.
+// - *.sentry.io: error reports from the browser Sentry SDK.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
