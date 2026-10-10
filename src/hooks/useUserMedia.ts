@@ -68,18 +68,13 @@ export const useUserMedia = (
   const resolvedMediaType =
     mediaType === 'all' || !mediaType ? undefined : mediaType;
 
-  const filteredInitialData =
-    initialData && resolvedMediaType
-      ? {
-          ...initialData,
-          media: initialData.media.filter(
-            (m) => m.media.media_type === resolvedMediaType,
-          ),
-        }
-      : initialData;
+  // initialData is page 0 of the unfiltered collection. Seeding it into a
+  // filtered query marks that query fresh, so the filtered fetch never runs
+  // and only the matches inside page 0 are ever shown.
+  const canSeedInitialData = !isSearch && !resolvedMediaType;
 
   return useInfiniteQuery({
-    queryKey: ['user-movies', watchStatus, search, mediaType],
+    queryKey: ['user-movies', watchStatus, search, resolvedMediaType],
     queryFn: ({ pageParam }) =>
       fetchUserMediaPage({
         watchStatus,
@@ -90,8 +85,8 @@ export const useUserMedia = (
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialData:
-      !isSearch && filteredInitialData
-        ? { pages: [filteredInitialData], pageParams: [0] }
+      canSeedInitialData && initialData
+        ? { pages: [initialData], pageParams: [0] }
         : undefined,
     staleTime: isSearch ? SEARCH_STALE_TIME : BASE_STALE_TIME,
   });

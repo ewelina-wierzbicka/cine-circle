@@ -152,6 +152,7 @@ series/[id]/             # /series/:id
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- `hooks/useUserMedia` seeds React Query `initialData` only when no title or media type filter is active. The collection page fetches unfiltered page 0, so seeding a filtered query marks it fresh and hides every match past that page
 
 ---
 
@@ -489,7 +490,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T20 media type filter finds a series past the first page |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
