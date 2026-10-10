@@ -7,7 +7,6 @@ import { aboutPageJsonLd, jsonLdScript } from '@/lib/jsonLd';
 
 const TITLE = 'About MidnightFrame';
 
-// Shared by the meta description and the AboutPage JSON-LD so the two cannot drift.
 const DESCRIPTION =
   'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.';
 

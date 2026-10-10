@@ -136,8 +136,6 @@ export function siteJsonLd(): SiteJsonLd {
   };
 }
 
-// The Organization node ships alongside the page node: a bare cross-page `@id`
-// reference does not resolve for a validator that only reads /about.
 export function aboutPageJsonLd(
   name: string,
   description: string,
@@ -158,7 +156,6 @@ export function aboutPageJsonLd(
   };
 }
 
-// `PT2H28M`, `PT45M`, `PT2H`. Undefined when there is no runtime to state.
 function isoDuration(minutes: number | undefined): string | undefined {
   if (!minutes || minutes <= 0) return undefined;
   const hours = Math.floor(minutes / 60);
