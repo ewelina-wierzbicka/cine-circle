@@ -11,8 +11,11 @@ export default function PrivateLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // h-dvh, not h-screen: 100vh on mobile ignores the browser toolbars, so the
+  // bottom of `main` — and with it the footer — sits below the visible viewport
+  // with no way to scroll to it.
   return (
-    <div className="relative h-screen flex flex-col bg-dark">
+    <div className="relative h-dvh flex flex-col bg-dark">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute rounded-full blur-[55px] opacity-35 top-[-30%] left-[-5%] w-[60%] h-[130%] bg-[radial-gradient(#224c78_0%,transparent_65%)]" />
         <div className="absolute rounded-full blur-[55px] opacity-25 top-[10%] right-[-10%] w-[50%] h-[80%] bg-[radial-gradient(#755214_0%,transparent_65%)]" />

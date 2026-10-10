@@ -12,6 +12,6 @@ export const HOME_FAQ = [
   {
     question: 'Where does the movie and series data come from?',
     answer:
-      'Titles, posters, cast and release dates come from TMDB. Your ratings, dates and notes are yours and stay in your account. This product uses the TMDB API but is not endorsed or certified by TMDB.',
+      'Titles, posters, genres, directors and release dates come from TMDB. Your ratings, dates and notes are yours and stay in your account. This product uses the TMDB API but is not endorsed or certified by TMDB.',
   },
 ] as const;

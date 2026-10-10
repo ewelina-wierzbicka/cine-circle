@@ -3,11 +3,16 @@ import {
   StaticContentPage,
   type StaticSection,
 } from '@/components/StaticContentPage';
+import { aboutPageJsonLd, jsonLdScript } from '@/lib/jsonLd';
+
+const TITLE = 'About MidnightFrame';
+
+const DESCRIPTION =
+  'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.';
 
 export const metadata: Metadata = {
   title: 'About',
-  description:
-    'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.',
+  description: DESCRIPTION,
   alternates: { canonical: '/about' },
 };
 
@@ -26,7 +31,7 @@ const sections: StaticSection[] = [
   },
   {
     heading: 'Where the Data Comes From',
-    body: 'Titles, posters, cast, and release dates come from The Movie Database. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
+    body: 'Titles, posters, genres, directors, and release dates come from The Movie Database. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
   },
   {
     heading: 'Contact',
@@ -36,10 +41,18 @@ const sections: StaticSection[] = [
 
 export default function AboutPage() {
   return (
-    <StaticContentPage
-      title="About MidnightFrame"
-      subtitle="A free, private movie and TV tracker"
-      sections={sections}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(aboutPageJsonLd(TITLE, DESCRIPTION)),
+        }}
+      />
+      <StaticContentPage
+        title={TITLE}
+        subtitle="A free, private movie and TV tracker"
+        sections={sections}
+      />
+    </>
   );
 }

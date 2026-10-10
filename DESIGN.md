@@ -375,7 +375,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 Layout & Ambient
 
-- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100dvh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
 - Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-data-home-about` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
 - Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
@@ -454,7 +454,8 @@ Overall structure
 - **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` three server-rendered `<Suspense>` subtrees as the `navLink`, `actions` and `form` props. `actions` and `form` call `getEnrichedMedia` (cookies + Supabase) inside; `navLink` is the auth-gated `CollectionBackLink`.
 - The `actions` fallback is `MediaActionsSkeleton` — two `Skeleton` blocks (`h-12 w-full sm:w-44 rounded-xl` and `h-12 w-full sm:w-36 rounded-xl`), `aria-busy="true" aria-live="polite"`, and no text. The `form` fallback is `UserEntryFormSkeleton`. A fallback that repeated the TMDB copy used to ship the `h1` and overview twice in the SSR HTML.
 - `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = header + `actions`, 2 = `form`). `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
-- `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
+- `MediaDetailWrapper` provides the backdrop layers and two-column layout. The left poster column contains `MediaPoster`; it is `h-[50vh]` on small screens, `md:w-1/2` above that, and hidden on step 2 (form).
+- **The page scrolls in `main`, never inside the detail layout.** The wrapper carries `shrink-0` alongside its `overflow-hidden`: `overflow-hidden` zeroes the element's automatic minimum size, so as a flex child of the `(app)` layout's `main` it would otherwise shrink to the viewport and silently clip everything past the fold. That was the mobile "cannot scroll" bug — `main` reported 907px of scroll while the wrapper held 1326px of content, so the overview, actions and "More like this" were unreachable. The info column must stay free of `overflow-y-auto` for the same reason: a nested scroll area there swallows the gesture on touch. `MediaDetailSkeleton` mirrors both rules so the streamed skeleton and the real tree measure the same.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
 - On home (and other non-cinematic routes) the `(app)` layout's ambient blobs show only in the 56px `Header` strip because `main` is opaque `bg-dark`; that subtle soft transition reads as one continuous background.
 
@@ -586,6 +587,8 @@ Static content pages, open routes (no auth required). All three render through o
 
 - `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
 - Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+
+**Viewport height.** The footer is the last thing inside `main`, so it is the first casualty when the app shell is taller than the visible viewport. The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of `main` sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. The home first-screen wrapper uses `calc(100dvh-4rem)` for the same reason. Do not reintroduce `vh` units in the app shell.
 
 **Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
 
