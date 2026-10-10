@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 // The list below says which servers the browser may load things from.
 //
-// It is enforcing: the browser blocks anything not listed here. Adding a new
+// The browser blocks anything not listed here. Adding a new
 // third-party origin to the app without adding it below breaks that request in
 // production.
 //
@@ -15,9 +15,7 @@ import type { NextConfig } from 'next';
 // - self: our own pages, our fonts (next/font/google copies them into the build)
 // - image.tmdb.org: movie posters, loaded straight from TMDB
 // - *.supabase.co: avatar images and browser calls to the database
-// - the Supabase origin from the environment: local development and the e2e
-//   suite point at http://127.0.0.1:54321, which is a different origin from the
-//   app and so is not covered by 'self' or by the *.supabase.co wildcard
+// - the Supabase origin from the environment: for the local development and the e2e
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
