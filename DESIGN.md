@@ -225,6 +225,12 @@ export const motion = {
 - Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `accent` and `bg3`.
 - Forwards ref and renders error text when provided.
 
+### PasswordInput
+
+- `src/components/PasswordInput.tsx` — `Input` with a show/hide toggle. Used by `LoginForm` and `RegisterForm`.
+- Toggle is a `w-11 h-11.5` button pinned to the right edge of the field, `EyeIcon` / `EyeOffIcon` in `text-secondary`, `hover:text-primary`.
+- Accessible name flips between "Show password" and "Hide password", with `aria-pressed`. Query the field with `getByLabel('Password', { exact: true })` in tests, or the toggle matches too.
+
 ### SearchBox
 
 - `src/components/SearchBox.tsx`.
@@ -337,6 +343,7 @@ Left column (Form)
 - Subtext: `text-base text-secondary`.
 - Labels: `font-mono text-sm uppercase tracking-[0.14em] text-secondary`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
+- Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
 - Footer link toggles between Login and Register using `text-accent` links.
 
