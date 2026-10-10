@@ -13,7 +13,6 @@ export function HeaderSkeleton() {
           height={50}
           className="object-contain"
           priority
-          fetchPriority="high"
         />
       </Link>
       <nav
