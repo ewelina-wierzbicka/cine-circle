@@ -566,7 +566,6 @@ Static content pages, open routes (no auth required). All three render through o
 ### Privacy (`/privacy`)
 
 - Sections: Who We Are, What We Collect, How We Use It, Storage, Analytics and Error Reporting, Data Retention, Your Rights, Contact.
-- "Who We Are" names the data controller. GDPR expects one, and the page is the only place the app states it.
 
 ---
 
