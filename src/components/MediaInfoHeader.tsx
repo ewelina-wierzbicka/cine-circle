@@ -46,8 +46,9 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
   const dateDisplay = lastAirYear
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
-  const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
-  const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
+  const isSeries = media_type === 'series';
+  const dirLabel = isSeries ? 'CREATED BY' : 'DIR.';
+  const typeLabel = isSeries ? 'SERIES' : 'MOVIE';
 
   const tmdbScore =
     vote_average != null && vote_average > 0
@@ -105,7 +106,9 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
         <div className="-mt-5 mb-7">
           <span className="flex items-center gap-1.5 font-mono text-sm tracking-[0.04em] text-primary">
             <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
-            {formatRuntime(runtime)}
+            {isSeries
+              ? `avg ${formatRuntime(runtime)} / episode`
+              : formatRuntime(runtime)}
           </span>
         </div>
       )}
@@ -118,7 +121,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
                 ({vote_count.toLocaleString()})
               </span>
             )}
-            <span className="text-secondary ml-1.5">avg on TMDB</span>
+            <span className="text-primary ml-1.5">avg on TMDB</span>
           </span>
         </div>
       )}
