@@ -381,7 +381,7 @@ Layout & Ambient
 
 Hero
 
-- Heading is the page `h1` ("Track the movies you watch next") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
+- Heading is the page `h1` ("Track the movies you watch") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
