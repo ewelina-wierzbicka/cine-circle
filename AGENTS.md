@@ -506,4 +506,5 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 - Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components
 - Update `DESIGN.md` if the task added or changed any page, layout, or visual design
+- Revisit the JSON-LD in `src/lib/jsonLd.ts` **only when the task changed something the structured data already claims, or added a page type Schema.org covers.** Needed when: an indexable page is added or removed, the copy a node quotes changes (`SITE_NAME`, `SITE_DESCRIPTION`, the `/about` consts), a media field a node emits starts or stops being fetched, or a URL a node points at moves. Not needed for styling, private routes, noindex pages, refactors that keep the same values, or any new field nothing in `jsonLd.ts` reads. Do not invent new nodes or properties to fill a gap the task did not touch — a wrong or stale claim is worse than an absent one
 - Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/about`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically
