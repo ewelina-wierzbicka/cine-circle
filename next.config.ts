@@ -18,10 +18,8 @@ import type { NextConfig } from 'next';
 // - *.supabase.co: avatar images and browser calls to the database
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
-// - *.sentry.io: the browser Sentry SDK posts error envelopes to the ingest host
-//   in its DSN (`src/instrumentation-client.ts`). Sentry's `tunnelRoute` option
-//   would route those same-origin instead, but it mounts a path on our own domain
-//   that `proxy.ts` would 404, and it exists to dodge ad-blockers, not CSP.
+// - *.sentry.io: error reports from the browser Sentry SDK. See AGENTS.md for
+//   why we allow the origin instead of tunnelling it.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
