@@ -3,9 +3,9 @@ import type { NextConfig } from 'next';
 
 // The list below says which servers the browser may load things from.
 //
-// It is sent as Report-Only, so the browser only warns in the console instead of
-// blocking. If we forgot an allowed server, nothing on the site breaks. Switch to
-// the enforcing header once the warnings stay empty.
+// The browser blocks anything not listed here. Adding a new
+// third-party origin to the app without adding it below breaks that request in
+// production.
 //
 // 'unsafe-inline' has to stay in script-src. Next.js puts small inline scripts in
 // the page to hand React its data. The usual fix is a one-time token per request,
@@ -16,18 +16,26 @@ import type { NextConfig } from 'next';
 // - self: our own pages, our fonts (next/font/google copies them into the build)
 // - image.tmdb.org: movie posters, loaded straight from TMDB
 // - *.supabase.co: avatar images and browser calls to the database
+// - the Supabase origin from the environment: for the local development and the e2e
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
 // - *.sentry.io: error reports from the browser Sentry SDK.
+
+const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+  : '';
+
+const sources = (...values: string[]) => values.filter(Boolean).join(' ');
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://image.tmdb.org https://*.supabase.co",
+  `img-src ${sources("'self'", 'data:', 'blob:', 'https://image.tmdb.org', 'https://*.supabase.co', supabaseOrigin)}`,
   "font-src 'self'",
+  `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com')}`,
   // Covered by default-src already, but Safari has historically needed it named.
   "manifest-src 'self'",
-  "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com https://*.sentry.io",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -46,7 +54,7 @@ const securityHeaders = [
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
   },
-  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy },
+  { key: 'Content-Security-Policy', value: contentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {
