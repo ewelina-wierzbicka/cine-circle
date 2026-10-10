@@ -18,6 +18,7 @@ import type { NextConfig } from 'next';
 // - *.supabase.co: avatar images and browser calls to the database
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
+// - *.sentry.io: error reports from the browser Sentry SDK.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
@@ -26,7 +27,7 @@ const contentSecurityPolicy = [
   "font-src 'self'",
   // Covered by default-src already, but Safari has historically needed it named.
   "manifest-src 'self'",
-  "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com",
+  "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com https://*.sentry.io",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
