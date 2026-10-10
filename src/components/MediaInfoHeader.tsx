@@ -15,6 +15,8 @@ type Props = {
     | 'runtime'
     | 'vote_average'
     | 'vote_count'
+    | 'number_of_seasons'
+    | 'number_of_episodes'
   >;
   fromSearch?: boolean;
 };
@@ -39,7 +41,18 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
     runtime,
     vote_average,
     vote_count,
+    number_of_seasons,
+    number_of_episodes,
   } = media;
+
+  const hasRuntime = runtime != null && runtime > 0;
+
+  const counts = [
+    number_of_seasons &&
+      `${number_of_seasons} season${number_of_seasons === 1 ? '' : 's'}`,
+    number_of_episodes &&
+      `${number_of_episodes} episode${number_of_episodes === 1 ? '' : 's'}`,
+  ].filter((c): c is string => Boolean(c));
 
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
@@ -102,14 +115,24 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
           {dateDisplay}
         </span>
       </div>
-      {runtime != null && runtime > 0 && (
-        <div className="-mt-5 mb-7">
-          <span className="flex items-center gap-1.5 font-mono text-sm tracking-[0.04em] text-primary">
-            <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
-            {isSeries
-              ? `avg ${formatRuntime(runtime)} / episode`
-              : formatRuntime(runtime)}
-          </span>
+      {(hasRuntime || counts.length > 0) && (
+        <div className="-mt-5 mb-7 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm tracking-[0.04em] text-primary">
+          {hasRuntime && (
+            <span className="flex items-center gap-1.5">
+              <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
+              {isSeries
+                ? `avg ${formatRuntime(runtime)} / episode`
+                : formatRuntime(runtime)}
+            </span>
+          )}
+          {counts.map((count, i) => (
+            <span key={count} className="flex items-center gap-3">
+              {(hasRuntime || i > 0) && (
+                <span className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
+              )}
+              {count}
+            </span>
+          ))}
         </div>
       )}
       {tmdbScore != null && (
