@@ -1,5 +1,6 @@
 import { PAGE_SIZE } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { MediaType, UserMedia, UserMediaPage } from '@/types';
 
 export const getUserMediaList = async (
@@ -8,10 +9,7 @@ export const getUserMediaList = async (
   mediaType?: MediaType,
 ): Promise<UserMediaPage> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 
@@ -52,11 +50,8 @@ export const getUserMedia = async (
   const supabase = await createClient();
 
   if (!knownUserId) {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-    if (userError || !user) throw new Error('Not authenticated');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not authenticated');
     knownUserId = user.id;
   }
 

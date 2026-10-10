@@ -76,7 +76,7 @@ export default function MediaList({
             <MediaCard
               key={`${item.media_type}-${tmdbId}`}
               media={item}
-              priority={index < 12}
+              priority={index < 6}
               userMediaId={userMediaId}
               isAuthenticated={isAuthenticated}
             />

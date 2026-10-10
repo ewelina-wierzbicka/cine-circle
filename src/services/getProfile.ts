@@ -1,15 +1,13 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getSignedAvatarUrl } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 
 export const getProfile = async (): Promise<UserProfile | null> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 

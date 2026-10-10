@@ -142,6 +142,17 @@ export const motion = {
 
 ---
 
+## App Icons (PWA)
+
+`public/icons/` holds the PWA icon set: `icon-192.png`, `icon-512.png` and `icon-maskable-512.png`. All three take their geometry from `src/app/favicon.svg`, the MidnightFrame mark, on an opaque `#0d0d10` background. Opacity matters — a transparent PWA icon renders as a black or white blob depending on the launcher.
+
+- The mark is `#b39dff`, the accent token `oklch(80% 0.25 285)` in sRGB, the same purple as the mark in `public/logo.webp`.
+
+- `icon-192.png` and `icon-512.png` are full bleed, same framing as the favicon.
+- `icon-maskable-512.png` keeps the mark inside the 80% safe zone, 320px centred on a 512 canvas, because Android crops maskable icons to a circle or squircle.
+
+---
+
 ## Shared Components
 
 ### TopBar (Header)
@@ -184,12 +195,11 @@ export const motion = {
 - Uses placeholder gradient when no poster path.
 - `priority` preloads the poster and drops `loading="lazy"`. `fetchPriority="high"` is a separate prop — pass it only on the single LCP poster of a page (the detail-page poster in `MediaDetailWrapper`).
 
-### MediaInfo & WatchedMediaInfo
+### MediaInfoHeader & MediaActions
 
-- `src/components/MediaInfo.tsx` and `src/components/WatchedMediaInfo.tsx`.
-- MediaInfo: actions for adding/removing media, shows director, date, and call-to-action buttons.
-- WatchedMediaInfo: shows rating, watched date, and review; includes Update button.
-- Both use `font-mono` for labels and `font-serif` for large title with `clamp(42px, 5.5vw, 72px)`.
+- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: search back link, genre pills, type label, `h1` (`font-serif`, `clamp(42px, 5.5vw, 72px)`), director/date/runtime/score meta row, accent divider, overview. `font-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop. The collection back link is not part of it — see `CollectionBackLink` under Info & Form.
+- `src/components/MediaActions.tsx` renders everything below the divider that depends on the signed-in user: the signed-out sign-in prompt, the `to_watch` buttons, the default add buttons, and the `watched` body (rating via `StarRating`, watched date, review) with its UPDATE / DELETE buttons.
+- `src/components/MediaActionsSkeleton.tsx` is its Suspense fallback. Two `Skeleton` blocks, no text.
 
 ### MediaDetail & MediaDetailWrapper
 
@@ -199,13 +209,14 @@ export const motion = {
 ### MediaPage
 
 - `src/components/MediaPage.tsx` is an async wrapper used by route handlers.
-- Fetches data via `getMediaPageData`, shows `ErrorToast` on error and `MediaDetail` on success.
+- Awaits the cached TMDB fetch, then renders `MediaDetail` with the streamed `actions` and `form` subtrees.
 
 ### MediaList
 
 - `src/components/MediaList.tsx`.
 - Grid list of `MediaCard` components with responsive columns.
 - Implements intersection-observer pagination and shows `Loader` while fetching.
+- Only the first cards (6) get `priority`. That is one row at `xl` and about the mobile fold. The rest stay lazy.
 
 ### Input
 
@@ -278,22 +289,25 @@ export const motion = {
 
 ### RecentWatched
 
-- `src/components/RecentWatched.tsx` — async Server Component rendering the "Recently Watched" strip on the home page.
+- `src/app/(app)/RecentWatched.tsx` — async Server Component rendering the "Recently Watched" strip on the home page.
 - Receives a `Promise<TrendingMovie[]>` (resolved by `getRecentWatched`) and `await`s it; renders `null` when empty.
 - Hosts the section header ("RECENTLY WATCHED" + "SEE ALL →") and the horizontal `MediaPoster` scroll. Lifted out of `page.tsx` so the home shell prerenders with the hero and the strip streams in via Suspense.
 
 ### HomeAbout
 
-- `src/components/HomeAbout.tsx` — static "What is MidnightFrame" section below the home hero: eyebrow, `h2`, lead paragraph, three icon feature blocks, and a `/search` link.
-- **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders. Googlebot is always signed out, so the SEO copy stays crawlable.
-- Typography follows the hero: `font-mono` accent eyebrow and `h3`s, `font-serif` `h2` with `<em class="text-accent">`, `text-secondary` body.
+- `src/app/(app)/HomeAbout.tsx` — static about section below the home hero. Two-column editorial block on `lg:` (`grid lg:grid-cols-2 gap-12 lg:gap-16`): left is eyebrow + `h2` + two paragraphs, right is the FAQ accordion. Below it a three-up feature card grid, then a `BackToTopLink`.
+- `src/components/BackToTopLink.tsx` — client `button` styled like `Link`, scrolls `main` back to 0 with `behavior: 'smooth'`.
+- FAQ copy lives in `src/lib/homeFaq.ts` as `HOME_FAQ`, not in the component. `faqJsonLd()` serialises the same array, so edit the questions and answers there and the accordion and the `FAQPage` structured data stay identical.
+- FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-white/[0.08]` (`last:border-b`), `01`/`02`/`03` in `font-mono text-sm text-secondary/40`, question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
+- Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `font-mono tracking-[0.2em] text-accent uppercase` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
+- **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders.
 
 ### Skeleton (loading.tsx skeletons)
 
 - `Skeleton.tsx` — reusable pulsing block sized via `className`. Used by `loading.tsx` files and Suspense fallbacks.
 - `MediaDetailSkeleton.tsx` — mirrors `MediaDetailWrapper`: radial gradient backdrop, rotated poster placeholder left, info column right (back link, genre pills, title, meta, divider, overview).
 - `MediaCardSkeleton.tsx` — `aspect-2/3` poster block + two text lines. Used in search and collection loading grids.
-- Route `loading.tsx` files: movie/series → `MediaDetailSkeleton`; collection → header + card grid; search → SearchBox bar + results grid; profile → heading + profile/account/danger-zone cards.
+- Route `loading.tsx` files: movie/series → `MediaDetailSkeleton`; collection → header + card grid; search → `h1` bar + SearchBox bar + results grid; profile → heading + profile/account/danger-zone cards.
 
 ---
 
@@ -361,14 +375,14 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 Layout & Ambient
 
-- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100vh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
+- Two stacked blocks inside a `relative` page container: a first-screen wrapper (`min-h-[calc(100dvh-4rem)] flex flex-col`, the viewport minus the `h-16` header) holding the hero and the Recently Watched strip, then `SignedOutAbout` flowing beneath it. Signed-in users get only the first-screen wrapper. The page scrolls inside `main` (`flex-1 overflow-y-auto`).
 - Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-data-home-about` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
 - Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
 
 Hero
 
-- Heading is the page `h1` ("What will you watch next?") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
+- Heading is the page `h1` ("Track the movies you watch") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
@@ -382,7 +396,7 @@ Search
 Recently Watched
 
 - Streams in via Suspense under PPR. `page.tsx` awaits `getTrendingMovies()` (cached `use cache`) to build the hero `hintTitles`, then hands `getRecentWatched()` (Supabase, per-user) as a promise to `RecentWatched`.
-- `RecentWatched` (`src/components/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
+- `RecentWatched` (`src/app/(app)/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
 - Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
@@ -390,9 +404,18 @@ Recently Watched
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
 
-What is MidnightFrame
+About section
 
-- `HomeAbout` (`src/components/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. See "Shared Components → HomeAbout" for the full spec.
+- `HomeAbout` (`src/app/(app)/HomeAbout.tsx`) sits below the first screen and defines the product for search engines and first-time visitors. It carries the product definition and the FAQ accordion side by side, then the three feature cards.
+
+Search results page (`/search`)
+
+- Implemented in `src/app/(app)/search/page.tsx`. Column is `flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12`.
+- Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
+- Copy stays the same with or without a query. The query itself is already shown by the results heading below.
+- SearchBox sits under it in `mb-8 w-full max-w-160`.
+- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-[0.2em] text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label.
+- `search/loading.tsx` mirrors the order: an `h-10 w-72` heading skeleton, then the SearchBox bar, then the results grid.
 
 ---
 
@@ -427,10 +450,12 @@ Notes
 
 Overall structure
 
-- `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data. It then wraps the user-enriched subtree in `<Suspense>` while `getEnrichedMedia` reads cookies + Supabase.
-- The Suspense fallback renders `<MediaDetail media={baseMedia} pending />` — the full detail UI with the action buttons replaced by `Skeleton` blocks (`MediaInfo` `pending` prop, `aria-busy="true"`). Once `UserEnrichedMedia` resolves, the real `MediaDetail` (with `watchStatus` if saved) replaces it.
-- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = info, 2 = form). It detects saved state by checking `watchStatus` in the media object.
-- `MediaDetailWrapper` provides the backdrop layers and two-column layout. Left poster column is `hidden` on small screens (`hidden md:flex w-1/2`) and contains `MediaPoster`.
+- `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data.
+- **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` three server-rendered `<Suspense>` subtrees as the `navLink`, `actions` and `form` props. `actions` and `form` call `getEnrichedMedia` (cookies + Supabase) inside; `navLink` is the auth-gated `CollectionBackLink`.
+- The `actions` fallback is `MediaActionsSkeleton` — two `Skeleton` blocks (`h-12 w-full sm:w-44 rounded-xl` and `h-12 w-full sm:w-36 rounded-xl`), `aria-busy="true" aria-live="polite"`, and no text. The `form` fallback is `UserEntryFormSkeleton`. A fallback that repeated the TMDB copy used to ship the `h1` and overview twice in the SSR HTML.
+- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = header + `actions`, 2 = `form`). `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
+- `MediaDetailWrapper` provides the backdrop layers and two-column layout. The left poster column contains `MediaPoster`; it is `h-[50vh]` on small screens, `md:w-1/2` above that, and hidden on step 2 (form).
+- **The page scrolls in `main`, never inside the detail layout.** The wrapper carries `shrink-0` alongside its `overflow-hidden`: `overflow-hidden` zeroes the element's automatic minimum size, so as a flex child of the `(app)` layout's `main` it would otherwise shrink to the viewport and silently clip everything past the fold. That was the mobile "cannot scroll" bug — `main` reported 907px of scroll while the wrapper held 1326px of content, so the overview, actions and "More like this" were unreachable. The info column must stay free of `overflow-y-auto` for the same reason: a nested scroll area there swallows the gesture on touch. `MediaDetailSkeleton` mirrors both rules so the streamed skeleton and the real tree measure the same.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
 - On home (and other non-cinematic routes) the `(app)` layout's ambient blobs show only in the 56px `Header` strip because `main` is opaque `bg-dark`; that subtle soft transition reads as one continuous background.
 
@@ -441,17 +466,17 @@ Poster & Visuals
 
 Info & Form
 
-- Info view (`MediaInfo` or `WatchedMediaInfo`) shows:
-  - Back link `← BACK TO COLLECTION` (font-mono, text-sm, tracking-[0.12em]).
+- Info view (`MediaInfoHeader` + `MediaActions`) shows:
+  - Back link (font-mono, text-sm, tracking-[0.12em]). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
-  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`.
+  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
-  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section in `WatchedMediaInfo`).
+  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
-- Watched view (`WatchedMediaInfo`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
+- Watched view (the `watched` branch of `MediaActions`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
 
 - Form view (`UserEntryForm`) uses `react-hook-form` and includes:
   - DatePicker (`DatePicker`) for `watched_date` (disables future dates).
@@ -526,25 +551,71 @@ Services
 
 ---
 
-## Terms and Privacy
+## About, Terms and Privacy
 
-Static legal pages, open routes (no auth required).
+Static content pages, open routes (no auth required). All three render through one shared shell.
+
+### StaticContentPage
+
+- `src/components/StaticContentPage.tsx` — server component, props `title`, `subtitle`, `sections`. Each page supplies only its metadata and its `StaticSection[]` copy.
+- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
+- Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
+- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
+- Section headings (`h2`): `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
+- Body text: `font-sans text-base text-secondary leading-relaxed`. Sections stack with `space-y-8`.
+
+### About (`/about`)
+
+- Sections: What MidnightFrame Is, Who Runs It, What It Is Not, Where the Data Comes From, Contact.
+- Indexable, unlike the noindex app routes. Listed in `sitemap.ts` with `STATIC_PAGE_LAST_MODIFIED`.
 
 ### Terms (`/terms`)
 
-- `src/app/(app)/terms/page.tsx` — server component, no data fetching.
-- Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
-- Title: `font-serif text-3xl sm:text-4xl text-primary`.
-- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
-- Section headings: `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
-- Body text: `font-sans text-base text-secondary leading-relaxed`.
 - Sections: Acceptance, Use of Service, User-Generated Content, Account Termination, Disclaimer, Changes.
 
 ### Privacy (`/privacy`)
 
-- `src/app/(app)/privacy/page.tsx` — server component, no data fetching.
-- Same layout and typography as `/terms`.
-- Sections: What We Collect, How We Use It, Storage, Analytics, Data Retention, Your Rights, Contact.
+- Sections: Who We Are, What We Collect, How We Use It, Storage, Analytics and Error Reporting, Data Retention, Your Rights, Contact.
+
+---
+
+## Footer
+
+`src/components/Footer.tsx` — presentational, no data fetching, no props.
+
+**Where it renders.** `(app)/layout.tsx` renders `SessionAwareFooter` inside `<Suspense fallback={null}>`. That async component reads the Supabase user and hands the boolean to `FooterSlot` (`src/components/FooterSlot.tsx`, client, reads `usePathname()`), which decides:
+
+- `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
+- Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+
+**Viewport height.** The footer is the last thing inside `main`, so it is the first casualty when the app shell is taller than the visible viewport. The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of `main` sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. The home first-screen wrapper uses `calc(100dvh-4rem)` for the same reason. Do not reintroduce `vh` units in the app shell.
+
+**Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
+
+- Left — the nav only, `items-center md:items-start`.
+- Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
+
+**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
+
+**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `font-mono text-sm tracking-[0.14em] text-secondary mt-4 md:mt-0`.
+
+**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
+
+## Social Share Image (Open Graph)
+
+`src/app/opengraph-image.png` — one static card for the whole site. It is what Slack, iMessage, WhatsApp, X, Facebook and LinkedIn render for any shared MidnightFrame URL except movie and series pages, which use the TMDB poster instead.
+
+---
+
+## Installed App (PWA chrome)
+
+`src/app/manifest.ts` — the site is installable. There is no service worker, so nothing works offline.
+
+- **Chrome.** `display: 'standalone'`, so the installed app has no browser address bar. `orientation: 'portrait'`.
+- **Splash and title bar.** `background_color` and `theme_color` are both `#0d0d10`, the `bg` token, so the launch splash and the OS title bar match the page background with no light flash. The root layout's `viewport` export sets the same value as `themeColor` plus `colorScheme: 'dark'`, which also tints mobile browser chrome on the normal site. Change one and change the other.
+- **iOS.** `metadata.appleWebApp` in the root layout sets `statusBarStyle: 'black-translucent'`, so the dark page bleeds under the status bar. iOS ignores the manifest `display` field, so this block is what makes standalone launch work there.
+- **Launcher icon.** The manifest points at the three files described under [App Icons (PWA)](#app-icons-pwa): the 192 and 512 at `purpose: 'any'`, the maskable 512 at `purpose: 'maskable'`.
+- **Launch target.** `start_url` is `/`, the home page. A signed-out install opens on real content, not the login screen.
 
 ---
 

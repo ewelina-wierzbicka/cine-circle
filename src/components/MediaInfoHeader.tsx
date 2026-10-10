@@ -1,8 +1,6 @@
-'use client';
-
+import ClockIcon from '@/icons/Clock';
 import { NormalizedMedia } from '@/types';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 type Props = {
   media: Pick<
@@ -14,10 +12,24 @@ type Props = {
     | 'media_type'
     | 'genres'
     | 'overview'
+    | 'runtime'
+    | 'vote_average'
+    | 'vote_count'
+    | 'number_of_seasons'
+    | 'number_of_episodes'
   >;
+  fromSearch?: boolean;
 };
 
-export default function MediaInfoHeader({ media }: Props) {
+function formatRuntime(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
   const {
     title,
     release_date,
@@ -26,26 +38,46 @@ export default function MediaInfoHeader({ media }: Props) {
     media_type,
     genres,
     overview,
+    runtime,
+    vote_average,
+    vote_count,
+    number_of_seasons,
+    number_of_episodes,
   } = media;
-  const searchParams = useSearchParams();
-  const fromSearch = searchParams.get('from') === 'search';
+
+  const hasRuntime = runtime != null && runtime > 0;
+
+  const counts = [
+    number_of_seasons &&
+      `${number_of_seasons} season${number_of_seasons === 1 ? '' : 's'}`,
+    number_of_episodes &&
+      `${number_of_episodes} episode${number_of_episodes === 1 ? '' : 's'}`,
+  ].filter((c): c is string => Boolean(c));
 
   const releaseYear = release_date ? release_date.slice(0, 4) : 'N/A';
   const lastAirYear = last_air_date ? last_air_date.slice(0, 4) : null;
   const dateDisplay = lastAirYear
     ? `${releaseYear} – ${lastAirYear}`
     : releaseYear;
-  const dirLabel = media_type === 'series' ? 'CREATED BY' : 'DIR.';
-  const typeLabel = media_type === 'series' ? 'SERIES' : 'MOVIE';
+  const isSeries = media_type === 'series';
+  const dirLabel = isSeries ? 'CREATED BY' : 'DIR.';
+  const typeLabel = isSeries ? 'SERIES' : 'MOVIE';
+
+  const tmdbScore =
+    vote_average != null && vote_average > 0
+      ? Math.round(vote_average * 10) / 10
+      : null;
 
   return (
     <>
-      <Link
-        href={fromSearch ? '/' : '/collection'}
-        className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
-      >
-        {fromSearch ? '← BACK TO SEARCH' : '← BACK TO COLLECTION'}
-      </Link>
+      {fromSearch && (
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
+        >
+          ← BACK TO SEARCH
+        </Link>
+      )}
       {genres && genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {genres.map((g) => (
@@ -67,22 +99,55 @@ export default function MediaInfoHeader({ media }: Props) {
       >
         {title}
       </h1>
-      <div className="flex items-center gap-5 mb-7">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-7">
         {director && (
           <>
-            <span className="text-sm text-secondary">
+            <span className="text-sm text-secondary w-full sm:w-auto">
               <span className="font-mono tracking-[0.08em] text-secondary mr-2">
                 {dirLabel}
               </span>
               <span className="text-primary">{director}</span>
             </span>
-            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
+            <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0 hidden sm:block " />
           </>
         )}
         <span className="font-mono text-sm tracking-[0.04em] text-primary">
           {dateDisplay}
         </span>
       </div>
+      {(hasRuntime || counts.length > 0) && (
+        <div className="-mt-5 mb-7 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm tracking-[0.04em] text-primary">
+          {hasRuntime && (
+            <span className="flex items-center gap-1.5">
+              <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
+              {isSeries
+                ? `avg ${formatRuntime(runtime)} / episode`
+                : formatRuntime(runtime)}
+            </span>
+          )}
+          {counts.map((count, i) => (
+            <span key={count} className="flex items-center gap-3">
+              {(hasRuntime || i > 0) && (
+                <span className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0" />
+              )}
+              {count}
+            </span>
+          ))}
+        </div>
+      )}
+      {tmdbScore != null && (
+        <div className="-mt-5 mb-7">
+          <span className="font-mono text-sm tracking-[0.04em]">
+            <span className="text-amber-400">{tmdbScore}</span>
+            {vote_count != null && vote_count > 0 && (
+              <span className="text-secondary ml-1">
+                ({vote_count.toLocaleString()})
+              </span>
+            )}
+            <span className="text-primary ml-1.5">avg on TMDB</span>
+          </span>
+        </div>
+      )}
       <div className="mb-8 shrink-0 w-12 h-px bg-accent opacity-60" />
       {overview && (
         <p className="text-sm text-primary leading-relaxed mb-8">{overview}</p>

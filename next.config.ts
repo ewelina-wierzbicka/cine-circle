@@ -1,3 +1,4 @@
+import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
 // The list below says which servers the browser may load things from.
@@ -18,6 +19,8 @@ import type { NextConfig } from 'next';
 // - the Supabase origin from the environment: for the local development and the e2e
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
+// - *.sentry.io: error reports from the browser Sentry SDK.
+
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
   : '';
@@ -31,6 +34,8 @@ const contentSecurityPolicy = [
   `img-src ${sources("'self'", 'data:', 'blob:', 'https://image.tmdb.org', 'https://*.supabase.co', supabaseOrigin)}`,
   "font-src 'self'",
   `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com')}`,
+  // Covered by default-src already, but Safari has historically needed it named.
+  "manifest-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -78,4 +83,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: 'ewierzbicka',
+  project: 'midnightframe',
+  silent: !process.env.CI,
+
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+  },
+});

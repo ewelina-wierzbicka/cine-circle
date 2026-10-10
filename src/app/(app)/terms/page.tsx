@@ -1,4 +1,8 @@
 import type { Metadata } from 'next';
+import {
+  StaticContentPage,
+  type StaticSection,
+} from '@/components/StaticContentPage';
 
 export const metadata: Metadata = {
   title: 'Terms and Conditions',
@@ -7,9 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/terms' },
 };
 
-type Section = { heading: string; body: string };
-
-const sections: Section[] = [
+const sections: StaticSection[] = [
   {
     heading: 'Acceptance of Terms',
     body: 'By creating an account or using MidnightFrame, you agree to these terms. If you do not agree, do not use the service.',
@@ -38,28 +40,10 @@ const sections: Section[] = [
 
 export default function TermsPage() {
   return (
-    <div className="min-h-full px-6 md:px-12 py-12">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
-          Terms and Conditions
-        </h1>
-        <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          Last updated: July 2026
-        </p>
-
-        <div className="space-y-8">
-          {sections.map(({ heading, body }) => (
-            <div key={heading}>
-              <h2 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-3">
-                {heading}
-              </h2>
-              <p className="font-sans text-base text-secondary leading-relaxed">
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <StaticContentPage
+      title="Terms and Conditions"
+      subtitle="Last updated: July 2026"
+      sections={sections}
+    />
   );
 }

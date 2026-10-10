@@ -49,5 +49,9 @@ node_modules/
 /playwright/.auth/
 
 .claude/settings.local.json
+.claude/worktrees
 
 .next-e2e/
+
+# Sentry Config File
+.env.sentry-build-plugin

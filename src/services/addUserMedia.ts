@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { NormalizedMedia, UserEntry } from '@/types';
 
 export const addUserMedia = async (
@@ -22,12 +23,9 @@ export const addUserMedia = async (
       : { watched_date: undefined, rating: undefined, review: undefined };
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (userError || !user) throw new Error('Not authenticated');
+  if (!user) throw new Error('Not authenticated');
 
   const { data: media, error: mediaError } = await supabase
     .from('media')
@@ -79,12 +77,9 @@ export const updateUserMedia = async (
 ): Promise<void> => {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (userError || !user) throw new Error('Not authenticated');
+  if (!user) throw new Error('Not authenticated');
 
   const { error } = await supabase
     .from('user_media')

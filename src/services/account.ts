@@ -2,16 +2,14 @@
 
 import { adminSupabase } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { redirect } from 'next/navigation';
 
 export const updateEmail = async (
   newEmail: string,
 ): Promise<{ error?: string }> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 
@@ -27,10 +25,7 @@ export const updatePassword = async (
   newPassword: string,
 ): Promise<{ error?: string }> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 
@@ -56,10 +51,7 @@ export const updatePassword = async (
 
 export const deleteAccount = async (): Promise<void> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 

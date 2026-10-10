@@ -8,6 +8,7 @@ import SearchIcon from '@/icons/MagnifyingGlass';
 import { twMerge } from '@/lib/cn';
 import { toHref } from '@/lib/mediaUtils';
 import { FilterMediaType, MediaType } from '@/types';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
@@ -369,18 +370,13 @@ export function SearchBox({
         <div className="absolute flex justify-center w-full">
           <div className="flex justify-center gap-2 mt-7 flex-wrap animate-fade-in">
             {hintTitles.map((item) => (
-              <button
+              <Link
                 key={item.id}
-                type="button"
-                onClick={() =>
-                  router.push(
-                    `${toHref(item.id, item.title, item.type)}?from=search`,
-                  )
-                }
-                className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-accent hover:text-accent cursor-pointer"
+                href={`${toHref(item.id, item.title, item.type)}?from=search`}
+                className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-accent hover:text-accent"
               >
                 {item.title}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

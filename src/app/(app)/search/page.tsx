@@ -1,5 +1,5 @@
 import SearchBox from '@/components/SearchBox';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { getMedia } from '@/services/getMedia';
 import { FilterMediaType } from '@/types';
 import type { Metadata } from 'next';
@@ -39,10 +39,7 @@ export default async function Page({ searchParams }: Props) {
     ? (rawType as FilterMediaType)
     : 'all';
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   let initialData = null;
   if (query) {
@@ -55,6 +52,9 @@ export default async function Page({ searchParams }: Props) {
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12">
+      <h1 className="font-serif text-[clamp(28px,4vw,36px)] tracking-[-0.03em] leading-none text-center mb-4 sm:mb-8">
+        Search <em className="text-accent">movies and series</em>
+      </h1>
       <div className="mb-8 w-full max-w-160">
         <SearchBox initialQuery={query} initialType={type} />
       </div>

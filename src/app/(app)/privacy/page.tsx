@@ -1,4 +1,8 @@
 import type { Metadata } from 'next';
+import {
+  StaticContentPage,
+  type StaticSection,
+} from '@/components/StaticContentPage';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -7,9 +11,11 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacy' },
 };
 
-type Section = { heading: string; body: string };
-
-const sections: Section[] = [
+const sections: StaticSection[] = [
+  {
+    heading: 'Who We Are',
+    body: 'MidnightFrame is built and run by an independent developer. There is no company behind it, no investors, and no team. That developer is the data controller for everything described below, and can be reached at info.midnightframe@gmail.com.',
+  },
   {
     heading: 'What We Collect',
     body: 'When you register, we collect your email address. If you upload a profile picture, we store that avatar. We store your display name if you add it. As you use the app, we store your movie and series watch history, ratings, and any notes you add.',
@@ -23,8 +29,8 @@ const sections: Section[] = [
     body: 'All data is stored in Supabase (PostgreSQL) and Supabase Storage, hosted on infrastructure in the EU. Row-level security policies ensure you can only access your own data.',
   },
   {
-    heading: 'Analytics',
-    body: 'We do not use third-party analytics or advertising trackers. No cookies beyond those required for authentication are set.',
+    heading: 'Analytics and Error Reporting',
+    body: 'We use Vercel Analytics to measure traffic in aggregate: which pages are visited, how often, and how quickly they load. It is cookieless, it stores no identifier on your device, and it does not build a profile of you. We also use Sentry to report application errors so they can be fixed; it is configured to send no user information and no request bodies, and it stores its data in the EU. We use no advertising trackers, and no cookies beyond those required to keep you signed in are set.',
   },
   {
     heading: 'Data Retention',
@@ -32,7 +38,7 @@ const sections: Section[] = [
   },
   {
     heading: 'Your Rights',
-    body: 'You may request a copy of your data or ask us to delete it by contacting us. If you are in the EU or UK, you have rights under GDPR including access, rectification, and erasure.',
+    body: 'To get a copy of your data, email info.midnightframe@gmail.com from the address on your account. We reply with your profile, watch history, ratings, and notes within 30 days, the same window as account deletion. There is no self-serve export in the app, so email is the only route. You can delete your account and everything in it yourself, from your profile page. If you are in the EU or UK, you have rights under GDPR including access, rectification, and erasure.',
   },
   {
     heading: 'Contact',
@@ -42,28 +48,10 @@ const sections: Section[] = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-full px-6 md:px-12 py-12">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
-          Privacy Policy
-        </h1>
-        <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          Last updated: July 2026
-        </p>
-
-        <div className="space-y-8">
-          {sections.map(({ heading, body }) => (
-            <div key={heading}>
-              <h2 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-3">
-                {heading}
-              </h2>
-              <p className="font-sans text-base text-secondary leading-relaxed">
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    <StaticContentPage
+      title="Privacy Policy"
+      subtitle="Last updated: October 2026"
+      sections={sections}
+    />
   );
 }

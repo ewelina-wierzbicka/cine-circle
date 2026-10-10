@@ -70,6 +70,10 @@ src/
         SignInButton.tsx       # client — Button-styled CTA, router.push('/login')
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
+      HomeHero.tsx            # home hero — h1, SearchBox, dropdown-shift flag
+      HomeAbout.tsx           # signed-out about section — FAQ accordion (from lib/homeFaq.ts) + feature cards
+      SignedOutAbout.tsx      # gate that renders HomeAbout for signed-out visitors only
+      RecentWatched.tsx       # "Recently Watched" strip, streams via Suspense
       search/                 # /search
         page.tsx
         loading.tsx           # streams SearchBox + results grid skeleton
@@ -86,13 +90,16 @@ src/
         page.tsx
         loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
+        ProfileSkeleton.tsx
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
+      about/                  # /about — static About page (open route, indexable)
+        page.tsx              # copy only; renders <StaticContentPage />
       terms/                  # /terms — static Terms and Conditions page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       privacy/                # /privacy — static Privacy Policy page (open route)
-        page.tsx
+        page.tsx              # copy only; renders <StaticContentPage />
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
       not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
       layout.tsx
@@ -107,14 +114,18 @@ series/[id]/             # /series/:id
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
     not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
-    sitemap.ts                # /sitemap.xml — public routes + trending movies
+    sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
-    opengraph-image.tsx       # site-wide default OG image, generated with next/og ImageResponse
+    llms.txt/
+      route.ts                # GET /llms.txt — plain-text site map for language models; open routes only
+    manifest.ts               # /manifest.webmanifest — web app manifest; makes the site installable, no service worker
+    opengraph-image.png       # site-wide default OG image, static 1200x630 PNG
+    opengraph-image.alt.txt   # alt text for it — becomes og:image:alt / twitter:image:alt
   globals.css
   providers.tsx               # app-wide React context providers
-  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml and robots.txt
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, MediaInfoHeader, AuthErrorState, etc.)
+  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -122,18 +133,23 @@ series/[id]/             # /series/:id
 ```
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
-- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt` and `opengraph-image` — metadata routes must never be redirected to `/login` or crawlers cannot fetch them
+- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt`, `manifest.webmanifest` and `opengraph-image` — metadata routes must never be redirected to `/login`, or crawlers cannot fetch them and the install prompt never appears
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`, `/registration-confirmed`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
 - `/registration-confirmed` is an auth route in `AUTH_ROUTES` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session, so the visitor is logged out; logged-in users hitting it are redirected to `/`. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
-- `KNOWN_ROUTES_EXACT` / `KNOWN_ROUTE_PREFIXES` list every page route the app serves. A path matching neither skips auth and falls through to the root 404 — unknown URLs like `/nonexistent-xyz` or `/llms.txt` must answer 404, not redirect to `/login`
+- `KNOWN_ROUTES_EXACT` / `KNOWN_ROUTE_PREFIXES` list every page route the app serves. A path matching neither skips auth and falls through to the root 404 — unknown URLs like `/nonexistent-xyz` must answer 404, not redirect to `/login`
 - **A new page route must end up in the known-route list, or it will 404 for everyone.** This check runs first, before the open/auth/private logic. `KNOWN_ROUTES_EXACT` spreads in `AUTH_ROUTES` and `OPEN_ROUTES_EXACT`, so where you add the route decides whether registration is automatic:
   - auth route → `AUTH_ROUTES`. Registered automatically
   - open exact route → `OPEN_ROUTES_EXACT`. Registered automatically
   - open prefix route → `OPEN_ROUTE_PREFIXES` **and** `KNOWN_ROUTE_PREFIXES`. Open prefixes are not spread in, which is why `/search` is also listed explicitly in `KNOWN_ROUTES_EXACT`
   - private route → `KNOWN_ROUTES_EXACT`. Private is the default for known routes
   - session-gated but neither auth nor open, like `/reset-password` → `KNOWN_ROUTES_EXACT` explicitly
-- Open routes (no redirect for unauthenticated users): exact match `/`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- Open routes (no redirect for unauthenticated users): exact match `/`, `/about`, `/terms`, `/privacy`, plus prefixes `/search`, `/movie/`, `/series/`
+- **`proxy.ts` resolves the movie/series id before the response starts.** `/movie/[id]` is a PPR route, so the prerendered shell flushes a 200 and `notFound()` in `MediaPage` can only swap the body. A non-numeric slug is rejected with no network call; a numeric one costs one `mediaExists()` lookup (`services/mediaExists.ts`, plain fetch, no `next/cache`). Unknown ids are rewritten to `/_not-found`, which answers a real 404 with the root not-found UI.
+  - The lookup runs in `Promise.all` with `supabase.auth.getUser()`, so it adds no latency on top of the session check.
+  - It is skipped when the request carries an `rsc` header. In-app navigation never reaches a crawler and still renders the not-found UI via `notFound()`.
+  - `mediaExists` fails open on a missing `TMDB_TOKEN` or a TMDB outage. A soft 404 beats 404ing a real page.
+  - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
 
@@ -223,28 +239,60 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - Use Next.js `loading.tsx` and `error.tsx` files for async boundaries
 - Environment variables: server-only vars in `.env.local`, public vars prefixed with `NEXT_PUBLIC_`
 - Images use a global custom loader: `images.loader: 'custom'` + `images.loaderFile: './src/lib/imageLoader.ts'`. TMDB URLs are rewritten to the nearest TMDB width bucket (`w92`…`w780`, else `original`) and served straight from TMDB's CDN, which restores `srcset`. All other sources (Supabase avatars, local `/logo.webp`) are returned unchanged.
-- Because `/_next/image` is unavailable, non-TMDB images must be pre-sized at the source: `public/logo.webp` ships at 400px wide (2x its 200px render) and avatars are downscaled to 128px WebP by `lib/resizeImage.ts` before upload. Any new local asset must be committed at roughly 2x its render size — do not add a full-resolution PNG to `public/`.
+- Because `/_next/image` is unavailable, non-TMDB images must be pre-sized at the source: `public/logo.webp` ships at 400px wide (2x its 200px render) and avatars are downscaled to 128px WebP by `lib/resizeImage.ts` before upload. Any new local asset must be committed at roughly 2x its render size — do not add a full-resolution PNG to `public/`. The exception is `app/opengraph-image.png`: social crawlers want it at exactly 1200x630, and it never renders in the app.
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
-- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single LCP element per page (the three logos and the detail poster). Do not add either to the "More like this" recommendation posters or widen the `index < 12` rule in `MediaCard` / `MediaList`.
+- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single largest image per page, and the only call site is the detail poster in `MediaDetailWrapper`.
 - Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site. For social/OG images use `tmdbSocialImageUrl(path)` — crawlers fetch the raw URL with no loader in front of it, so it pins the `w780` bucket.
 
 ### Metadata & SEO
 
-All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
+All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE`, `SITE_DESCRIPTION`, `STATIC_PAGE_LAST_MODIFIED`, `absoluteUrl()`, `truncateDescription()`, `mediaMetadata()`, `NOT_FOUND_METADATA`. `sitemap.ts` and `robots.ts` import `SITE_URL` from there — do not re-derive it from `process.env`.
 
 - The root layout sets `metadataBase: new URL(SITE_URL)` and `title: { default: SITE_TITLE, template: '%s | MidnightFrame' }`. Per-page titles are the bare page name (`'Sign in'`, `'Your Profile'`); the template appends the brand. Use `title: { absolute: ... }` only on the home page.
 - `NEXT_PUBLIC_SITE_URL` must be set in every deployed environment or `metadataBase` falls back to `http://localhost:3000`.
 - Every indexable page sets `alternates.canonical`. Movie and series pages canonicalise to `absoluteUrl(toHref(id, title, mediaType))`, which collapses every mis-slugged `/movie/123-anything` variant onto one URL. `/search` canonicalises to `/search` with no query string.
-- `MediaPage` also redirects every non-canonical slug to `toHref(id, title, mediaType)` with `permanentRedirect`, preserving the query string. `toHref` drops the trailing dash when a title slugifies to nothing, so the comparison always settles and cannot loop. Note the status: `/movie/[id]` is a PPR route, so the prerendered shell flushes 200 before the redirect resolves and Next emits a `<meta http-equiv="refresh">` instead of a 308. A true 308 would have to move into `proxy.ts` and cost a TMDB lookup per request.
+- `MediaPage` also redirects every non-canonical slug to `toHref(id, title, mediaType)` with `permanentRedirect`, preserving the query string. `toHref` drops the trailing dash when a title slugifies to nothing, so the comparison always settles and cannot loop. Note the status: `/movie/[id]` is a PPR route, so the prerendered shell flushes 200 before the redirect resolves and Next emits a `<meta http-equiv="refresh">` instead of a 308. A true 308 would have to move into `proxy.ts`; the `mediaExists()` lookup added there for the 404 fix does not return a title, so it would need the fuller detail fetch.
+- **Unknown movie and series ids answer a real 404**, resolved in `proxy.ts` before the response starts. Same PPR constraint as the redirect above. See the `proxy.ts` bullets under Project Structure.
 - `generateMetadata` may await `params`, `searchParams` and `use cache` services. It must never read `cookies()`, `headers()` or Supabase — no per-user data in metadata.
+- **Do not set `htmlLimitedBots` in `next.config.ts`. It makes crawler metadata worse, not better.** Next streams metadata into the body for any UA outside its bot list, so GPTBot, ClaudeBot and Googlebot get a head with no `<title>`, description, canonical or OG tags. Widening the list looks like the fix and is not. `serveStreamingMetadata` is computed as `isHtmlBot && isRoutePPREnabled ? false : shouldServeStreamingMetadata(ua, htmlLimitedBots)` (`next/dist/build/templates/app-page.js`). Only the second branch reads the config; `isHtmlBot` comes from `getBotType`, which is hardcoded to `HTML_LIMITED_BOT_UA_RE` and ignores it. A config-only bot therefore never takes the blocking-render path, still gets the prerendered shell whose head was built with streaming on, and has the body copy suppressed by the resume render. The tags disappear from both places. Measured on next 16.1.6, `/movie/550`: without the config GPTBot and Googlebot get the tags in the body; with a widened list they get them nowhere, while Bingbot keeps working because it is on the hardcoded list. `/.*/` breaks every UA the same way. `getBotType` is still hardcoded on next 16.3.6, so upgrading does not help. Revisit only if `getBotType` starts taking the configured regex.
 - noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
-- `app/opengraph-image.tsx` is the site-wide OG image. It covers Twitter too, so there is no `twitter-image` file. Satori has no `oklch()` support — the accent is written there as its sRGB hex equivalent.
+- `sitemap.ts` lists the four open static routes plus trending and popular media, roughly 87 URLs, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
+- Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
+- **`app/llms.txt/route.ts` serves `/llms.txt`**, a plain-text description of the site for language models (`text/plain; charset=utf-8`). The body is a module-level template string built from `SITE_NAME`, `SITE_URL`, `SITE_DESCRIPTION` and `absoluteUrl()` — never hardcode the domain.
+  - Same rule as `sitemap.ts`: only open routes may be listed. Never name a path that is in the `robots.ts` `disallow` list. The `## Pages` list is `/`, `/about`, `/search`, `/terms`, `/privacy` — add a new open route here and in `sitemap.ts` together.
+  - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
+  - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
+- `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
+  <<<<<<< HEAD
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  - # `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
+  - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
+  - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
+  - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false. `numberOfSeasons` and `numberOfEpisodes` are series only, from the TMDB scalars, omitted when absent or 0.
+  - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
+  - Any key whose source is absent is omitted. Never emit `null` or `""`.
+  - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
+  - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
+  - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
+- **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
+  - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
+  - Next serves it at `/opengraph-image.png?<content-hash>` and emits `og:image:width`, `og:image:height` and `og:image:type` from the file itself. Nothing in `lib/seo.ts` or the root layout references it — never hardcode the URL in `openGraph.images`, that overrides the file convention and loses the hash.
+- **`app/manifest.ts` serves `/manifest.webmanifest`**, the web app manifest that makes the site installable. `name` and `description` come from `SITE_NAME` and `SITE_DESCRIPTION` — never hardcode the brand string or the domain there.
+  - `background_color` and `theme_color` are the literal `#0d0d10` (the `bg` token). Manifest JSON cannot read CSS vars, so that is the one place the hex is written out. The matching `themeColor` lives in the root layout's `viewport` export, and the two must stay in sync.
+  - Same rule as `app/llms.txt/route.ts`: the handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
+  - It reaches signed-out visitors because `manifest.webmanifest` is excluded from the `proxy.ts` matcher. Do **not** add it to `KNOWN_ROUTES_EXACT` — that would make it private and redirect signed-out visitors to `/login`, so the install prompt would never appear.
+  - `start_url` and `scope` are `/`, an open route, so a signed-out install lands on a real page instead of a login redirect. Never point `start_url` at a private route.
+  - Icons live in `public/icons/` (`icon-192.png`, `icon-512.png` at `purpose: 'any'`, `icon-maskable-512.png` at `purpose: 'maskable'`). These are exempt from the 2x pre-sizing rule above: launchers need them at their stated pixel size. `icon-512.png` is also the Organization logo in `lib/jsonLd.ts`, so renaming it breaks the structured data too.
+  - iOS ignores the manifest `display` field, which is why the root layout also sets `metadata.appleWebApp`. Removing that block breaks standalone launch on iOS only, and nothing in the Chrome install report catches it.
+  - **No service worker.** There is no `public/sw.js`, no `serwist`, no `next-pwa`. A service worker needs a new dependency and interacts badly with PPR — it is a separate decision, not something to add alongside a manifest change.
 
 ### Security headers
 
-Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml` and `robots.txt` from auth, but `headers()` still applies to them.
+Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml`, `robots.txt`, `llms.txt` and `manifest.webmanifest` from auth, but `headers()` still applies to them.
 
 | Header                      | Value                                                          | Why                                     |
 | --------------------------- | -------------------------------------------------------------- | --------------------------------------- |
@@ -258,10 +306,11 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
 - `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
-- Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`.
+- Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`. `*.sentry.io` in `connect-src` for browser error reports, sent to the ingest host in the DSN in `src/instrumentation-client.ts`. The host wildcard matches any depth, so it covers `o4512091748106240.ingest.de.sentry.io`.
 - `img-src` and `connect-src` also carry the origin of `NEXT_PUBLIC_SUPABASE_URL`. Local development and the e2e suite point at it, which is neither `'self'` nor covered by the `*.supabase.co` wildcard, so without it every browser-side Supabase call is blocked locally.
 - Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
-- Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests are blocked outright.
+- `manifest-src 'self'` is redundant next to `default-src 'self'`, but Safari has historically needed it named, so it stays. There is no `worker-src` because there is no service worker.
+- Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
 
 ---
 
@@ -326,7 +375,11 @@ export async function getMovieDetails(id: string) {
 }
 ```
 
-Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`). All use `cacheLife('days')`.
+Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
+
+`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+
+- They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`. `getSeriesDetails` also passes through the TMDB scalars `number_of_seasons` and `number_of_episodes` — never `seasons.length`, which counts the Specials entry. Search results never carry them.
 
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 
@@ -334,19 +387,27 @@ Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails`
 // MediaPage pattern: cached TMDB awaited directly, user data streams
 const tmdbData = await getMovieDetails(id);          // cached, fast
 return (
-  <Suspense fallback={<MediaDetail media={tmdbData} pending />}>
-    <UserEnrichedMedia baseMedia={tmdbData} ... />   // reads cookies, Supabase
-  </Suspense>
+  <MediaDetail
+    media={tmdbData}                                 // TMDB block, rendered once
+    actions={
+      <Suspense fallback={<MediaActionsSkeleton />}>
+        <UserEnrichedActions ... />                  // reads cookies, Supabase
+      </Suspense>
+    }
+  />
 );
 ```
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
-- `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
-- `components/MediaPage.tsx` — TMDB cached fetch awaited directly; `UserEnrichedMedia` (Supabase enrichment via `getEnrichedMedia`) streams via Suspense with a `pending` skeleton.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SessionAwareFooter` in `<Suspense fallback={null}>` (reads the Supabase user, hands the boolean to `FooterSlot`, which picks the footer by route: always on `/about`, `/terms`, `/privacy`, signed-out only everywhere else). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders. Both boundaries read the session through `services/getCurrentUser.ts`, so they share one `getUser()` round trip.
 
-**`pending` prop** — `MediaDetail` and `MediaInfo` accept `pending` to render a `Skeleton` block for action buttons while user data streams. Pass it from the Suspense fallback.
+**`services/getCurrentUser.ts` is the only server-side `auth.getUser()` call site.** It is wrapped in React `cache`, so every server component, service and server action in one request shares a single round trip. Use it for every server-side authentication check — never call `supabase.auth.getUser()` directly. Two exceptions: `proxy.ts` runs its own client outside React, and client components (`ProfileContent`, `hooks/useUserMedia`) use the browser client, where `cache` does not apply.
+
+- `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
+- `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
+
+**Never put TMDB copy in a Suspense fallback on the media pages.** The old fallback was `<MediaDetail media={baseMedia} pending />`, which re-rendered the real `h1`, genres, director, date and overview; the streamed tree then rendered all of it again, so crawlers saw two `h1`s and duplicated text on ~80 sitemap URLs. `MediaActionsSkeleton` is text-free by design: two `Skeleton` blocks with `aria-busy="true" aria-live="polite"`.
 
 **Do not add `export const dynamic` / `force-dynamic`** to routes. PPR handles dynamicity per Suspense boundary. Use `connection()` only when a subtree must opt out of prerendering entirely (not currently needed).
 
@@ -423,17 +484,17 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File                 | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts`       | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
-| `home.spec.ts`       | T19 "What is MidnightFrame" renders signed-out, hidden signed-in                                                                                                                                                                                                                                                                                                                                              |
-| `search.spec.ts`     | T5 search, filter movies, open detail                                                                                                                                                                                                                                                                                                                                                                         |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter                                                                                                                                                                                                                                                                                        |
-| `profile.spec.ts`    | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                   |
+| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
+
+| `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
+| `search.spec.ts` | T5 search, filter movies, open detail |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
+| `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
 
-- Every new feature or changed user flow requires e2e coverage — assign qa-agent to write tests.
 - Tests are self-contained; no shared state between tests.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
@@ -448,5 +509,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 ## After Completing a Task
 
-- Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components
-- Update `DESIGN.md` if the task added or changed any page, layout, or visual design
+- Update `AGENTS.md` if the task changed project structure, schema, conventions, or added new components. The added AGENTS.md added description should be as short as possible.
+- Update `DESIGN.md` if the task added or changed any page, layout, or visual design. The added DESIGN.md description should be as short as possible.
+- Revisit the JSON-LD in `src/lib/jsonLd.ts` **only when the task changed something the structured data already claims, or added a page type Schema.org covers.** Needed when: an indexable page is added or removed, the copy a node quotes changes (`SITE_NAME`, `SITE_DESCRIPTION`, the `/about` consts), a media field a node emits starts or stops being fetched, or a URL a node points at moves. Not needed for styling, private routes, noindex pages, refactors that keep the same values, or any new field nothing in `jsonLd.ts` reads. Do not invent new nodes or properties to fill a gap the task did not touch — a wrong or stale claim is worse than an absent one
+- Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/about`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically

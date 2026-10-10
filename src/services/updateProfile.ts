@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/services/getCurrentUser';
 import { revalidatePath } from 'next/cache';
 
 export const updateDisplayName = async (displayName: string): Promise<void> => {
@@ -9,10 +10,7 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
   }
 
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 
@@ -34,10 +32,7 @@ export const updateAvatarPath = async (
   filePath: string,
 ): Promise<{ avatarUrl: string }> => {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
 

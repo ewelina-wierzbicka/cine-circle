@@ -27,6 +27,12 @@ export type Series = {
   created_by?: { name: string }[];
   overview?: string;
   genres?: { id: number; name: string }[];
+  episode_run_time?: number[];
+  last_episode_to_air?: { runtime?: number | null };
+  vote_average?: number;
+  vote_count?: number;
+  number_of_seasons?: number;
+  number_of_episodes?: number;
 };
 
 export type TmdbRecommendation = {
@@ -52,6 +58,11 @@ export type NormalizedMedia = Movie & {
   overview?: string;
   genres?: { id: number; name: string }[];
   recommendations?: RecommendedMedia[];
+  runtime?: number;
+  vote_average?: number;
+  vote_count?: number;
+  number_of_seasons?: number;
+  number_of_episodes?: number;
 };
 
 export type UserEntry = {
@@ -93,4 +104,10 @@ export type TrendingMovie = {
   genres?: { id: number; name: string }[];
   posterUrl?: string;
   id: number;
+};
+
+export type PopularMedia = {
+  id: number;
+  title: string;
+  mediaType: MediaType;
 };
