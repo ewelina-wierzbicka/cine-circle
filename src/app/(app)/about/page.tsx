@@ -26,7 +26,7 @@ const sections: StaticSection[] = [
   },
   {
     heading: 'Where the Data Comes From',
-    body: 'Titles, posters, cast, and release dates come from The Movie Database. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
+    body: 'Titles, posters, genres, directors, and release dates come from The Movie Database. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
   },
   {
     heading: 'Contact',
