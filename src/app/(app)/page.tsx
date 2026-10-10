@@ -7,14 +7,14 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-import { SignedOutAbout } from './SignedOutAbout';
-import { HomeHero } from './HomeHero';
-import { RecentWatched } from './RecentWatched';
-import { jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
+import { faqJsonLd, jsonLdScript, siteJsonLd } from '@/lib/jsonLd';
 import { getRecentWatched } from '@/services/getRecentWatched';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
 import { Suspense } from 'react';
+import { HomeHero } from './HomeHero';
+import { RecentWatched } from './RecentWatched';
+import { SignedOutAbout } from './SignedOutAbout';
 
 export default async function Home() {
   const trending = await getTrendingMovies().catch(() => [] as TrendingMovie[]);
@@ -30,6 +30,10 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(faqJsonLd()) }}
       />
       <div className="min-h-[calc(100dvh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-8 group-has-data-home-about:sm:pt-18 flex flex-col">
         <HomeHero

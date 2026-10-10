@@ -71,7 +71,7 @@ src/
     (app)/                # private and public routes (single layout, no sub-groups)
       page.tsx                # / (home page)
       HomeHero.tsx            # home hero — h1, SearchBox, dropdown-shift flag
-      HomeAbout.tsx           # signed-out about section — FAQ accordion + feature cards
+      HomeAbout.tsx           # signed-out about section — FAQ accordion (from lib/homeFaq.ts) + feature cards
       SignedOutAbout.tsx      # gate that renders HomeAbout for signed-out visitors only
       RecentWatched.tsx       # "Recently Watched" strip, streams via Suspense
       search/                 # /search
@@ -265,7 +265,11 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
+  <<<<<<< HEAD
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  - # `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
 - **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
   - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false.

@@ -1,17 +1,17 @@
-import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/seo';
+import { HOME_FAQ } from '@/lib/homeFaq';
 import { toHref } from '@/lib/mediaUtils';
+import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/seo';
 import { tmdbSocialImageUrl } from '@/lib/tmdbImage';
 import { MediaType, NormalizedMedia } from '@/types';
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 const WEBAPP_ID = `${SITE_URL}/#webapp`;
+const FAQ_ID = `${SITE_URL}/#faq`;
 const ABOUT_PAGE_ID = `${SITE_URL}/about#webpage`;
 
 const TMDB_PAGE_BASE = 'https://www.themoviedb.org';
 
-// Google rejects an Organization logo under 112x112, so the wordmark
-// (`/logo.webp`, 400x54) cannot be used here. The square PWA icon qualifies.
 const ORGANIZATION_LOGO_PATH = '/icons/icon-512.png';
 const ORGANIZATION_LOGO_SIZE = 512;
 
@@ -100,11 +100,23 @@ export type BreadcrumbJsonLd = {
   }[];
 };
 
+export type FaqJsonLd = {
+  '@context': 'https://schema.org';
+  '@type': 'FAQPage';
+  '@id': string;
+  mainEntity: {
+    '@type': 'Question';
+    name: string;
+    acceptedAnswer: { '@type': 'Answer'; text: string };
+  }[];
+};
+
 export type JsonLd =
   | SiteJsonLd
   | AboutPageJsonLd
   | MediaJsonLd
-  | BreadcrumbJsonLd;
+  | BreadcrumbJsonLd
+  | FaqJsonLd;
 
 // No sameAs: the product has no social profiles to point at.
 function organizationNode(): Organization {
@@ -148,6 +160,19 @@ export function siteJsonLd(): SiteJsonLd {
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       },
     ],
+  };
+}
+
+export function faqJsonLd(): FaqJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': FAQ_ID,
+    mainEntity: HOME_FAQ.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
   };
 }
 
