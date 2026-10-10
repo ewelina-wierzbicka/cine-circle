@@ -59,6 +59,8 @@ function normalizeSeriesResult(
     last_episode_to_air,
     vote_average,
     vote_count,
+    number_of_seasons,
+    number_of_episodes,
   } = raw;
 
   const recommendations: RecommendedMedia[] | undefined =
@@ -88,6 +90,8 @@ function normalizeSeriesResult(
     runtime: episode_run_time?.[0] ?? last_episode_to_air?.runtime ?? undefined,
     vote_average,
     vote_count,
+    number_of_seasons,
+    number_of_episodes,
   };
 }
 
