@@ -6,6 +6,7 @@ import { MediaType, NormalizedMedia } from '@/types';
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
 const WEBAPP_ID = `${SITE_URL}/#webapp`;
+const ABOUT_PAGE_ID = `${SITE_URL}/about#webpage`;
 
 const TMDB_PAGE_BASE = 'https://www.themoviedb.org';
 
@@ -40,6 +41,15 @@ type WebSite = {
   publisher: NodeReference;
 };
 
+type AboutPage = {
+  '@type': 'AboutPage';
+  '@id': string;
+  url: string;
+  name: string;
+  description: string;
+  about: NodeReference;
+};
+
 type WebApplication = {
   '@type': 'WebApplication';
   '@id': string;
@@ -57,9 +67,15 @@ export type SiteJsonLd = {
   '@graph': [Organization, WebSite, WebApplication];
 };
 
+export type AboutPageJsonLd = {
+  '@context': 'https://schema.org';
+  '@graph': [AboutPage, Organization];
+};
+
 export type MediaJsonLd = {
   '@context': 'https://schema.org';
   '@type': 'Movie' | 'TVSeries';
+  '@id': string;
   name: string;
   url: string;
   sameAs: string;
@@ -67,6 +83,8 @@ export type MediaJsonLd = {
   image?: string;
   genre?: string[];
   datePublished?: string;
+  startDate?: string;
+  duration?: string;
   director?: Person;
   creator?: Person;
 };
@@ -82,26 +100,34 @@ export type BreadcrumbJsonLd = {
   }[];
 };
 
-export type JsonLd = SiteJsonLd | MediaJsonLd | BreadcrumbJsonLd;
+export type JsonLd =
+  | SiteJsonLd
+  | AboutPageJsonLd
+  | MediaJsonLd
+  | BreadcrumbJsonLd;
+
+// No sameAs: the product has no social profiles to point at.
+function organizationNode(): Organization {
+  return {
+    '@type': 'Organization',
+    '@id': ORGANIZATION_ID,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      '@type': 'ImageObject',
+      url: absoluteUrl(ORGANIZATION_LOGO_PATH),
+      width: ORGANIZATION_LOGO_SIZE,
+      height: ORGANIZATION_LOGO_SIZE,
+    },
+  };
+}
 
 // No SearchAction: /search?query= is noindex and disallowed in robots.txt.
-// No sameAs: the product has no social profiles to point at.
 export function siteJsonLd(): SiteJsonLd {
   return {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'Organization',
-        '@id': ORGANIZATION_ID,
-        name: SITE_NAME,
-        url: SITE_URL,
-        logo: {
-          '@type': 'ImageObject',
-          url: absoluteUrl(ORGANIZATION_LOGO_PATH),
-          width: ORGANIZATION_LOGO_SIZE,
-          height: ORGANIZATION_LOGO_SIZE,
-        },
-      },
+      organizationNode(),
       {
         '@type': 'WebSite',
         '@id': WEBSITE_ID,
@@ -125,20 +151,60 @@ export function siteJsonLd(): SiteJsonLd {
   };
 }
 
+export function aboutPageJsonLd(
+  name: string,
+  description: string,
+): AboutPageJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'AboutPage',
+        '@id': ABOUT_PAGE_ID,
+        url: absoluteUrl('/about'),
+        name,
+        description,
+        about: { '@id': ORGANIZATION_ID },
+      },
+      organizationNode(),
+    ],
+  };
+}
+
+function isoDuration(minutes: number | undefined): string | undefined {
+  if (!minutes || minutes <= 0) return undefined;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return `PT${hours ? `${hours}H` : ''}${rest ? `${rest}M` : ''}`;
+}
+
 export function mediaJsonLd(
   media: NormalizedMedia,
   mediaType: MediaType,
 ): MediaJsonLd {
-  const { id, title, overview, poster_path, genres, release_date, director } =
-    media;
+  const {
+    id,
+    title,
+    overview,
+    poster_path,
+    genres,
+    release_date,
+    runtime,
+    director,
+  } = media;
   const isSeries = mediaType === 'series';
   const genre = genres?.map((g) => g.name).filter(Boolean);
+  const url = absoluteUrl(toHref(id, title, mediaType));
+  // Movies only: for a series `runtime` is `episode_run_time[0]`, a per-episode
+  // value, so publishing it as the series duration would state something false.
+  const duration = isSeries ? undefined : isoDuration(runtime);
 
   return {
     '@context': 'https://schema.org',
     '@type': isSeries ? 'TVSeries' : 'Movie',
+    '@id': `${url}#media`,
     name: title,
-    url: absoluteUrl(toHref(id, title, mediaType)),
+    url,
     sameAs: `${TMDB_PAGE_BASE}/${isSeries ? 'tv' : 'movie'}/${id}`,
     ...(overview ? { description: overview } : {}),
     ...(poster_path ? { image: tmdbSocialImageUrl(poster_path) } : {}),
@@ -150,6 +216,9 @@ export function mediaJsonLd(
         : { director: { '@type': 'Person' as const, name: director } }
       : {}),
     ...(!isSeries && release_date ? { datePublished: release_date } : {}),
+    // `release_date` holds TMDB's `first_air_date` for a series.
+    ...(isSeries && release_date ? { startDate: release_date } : {}),
+    ...(duration ? { duration } : {}),
   };
 }
 
