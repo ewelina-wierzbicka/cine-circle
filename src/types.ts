@@ -8,6 +8,8 @@ export type MediaType = 'movie' | 'series';
 
 export type FilterMediaType = 'movie' | 'series' | 'all';
 
+export type RatingFilter = 'all' | 'unrated' | '1' | '2' | '3' | '4' | '5';
+
 export type Movie = {
   id: number;
   title: string;
