@@ -269,6 +269,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
+  - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
   - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
@@ -279,7 +280,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - Same rule as `app/llms.txt/route.ts`: the handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches signed-out visitors because `manifest.webmanifest` is excluded from the `proxy.ts` matcher. Do **not** add it to `KNOWN_ROUTES_EXACT` — that would make it private and redirect signed-out visitors to `/login`, so the install prompt would never appear.
   - `start_url` and `scope` are `/`, an open route, so a signed-out install lands on a real page instead of a login redirect. Never point `start_url` at a private route.
-  - Icons live in `public/icons/` (`icon-192.png`, `icon-512.png` at `purpose: 'any'`, `icon-maskable-512.png` at `purpose: 'maskable'`). These are exempt from the 2x pre-sizing rule above: launchers need them at their stated pixel size.
+  - Icons live in `public/icons/` (`icon-192.png`, `icon-512.png` at `purpose: 'any'`, `icon-maskable-512.png` at `purpose: 'maskable'`). These are exempt from the 2x pre-sizing rule above: launchers need them at their stated pixel size. `icon-512.png` is also the Organization logo in `lib/jsonLd.ts`, so renaming it breaks the structured data too.
   - iOS ignores the manifest `display` field, which is why the root layout also sets `metadata.appleWebApp`. Removing that block breaks standalone launch on iOS only, and nothing in the Chrome install report catches it.
   - **No service worker.** There is no `public/sw.js`, no `serwist`, no `next-pwa`. A service worker needs a new dependency and interacts badly with PPR — it is a separate decision, not something to add alongside a manifest change.
 
