@@ -31,7 +31,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
       />
-      <div className="min-h-[calc(100vh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-8 group-has-data-home-about:sm:pt-18 flex flex-col">
+      <div className="min-h-[calc(100dvh-4rem)] group-has-data-home-about:min-h-0 group-has-data-home-about:pt-8 group-has-data-home-about:sm:pt-18 flex flex-col">
         <HomeHero
           hintTitles={hintTitles.length > 0 ? hintTitles : undefined}
           recentPostersPromise={recentPostersPromise}
