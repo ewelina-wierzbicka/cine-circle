@@ -18,6 +18,10 @@ import type { NextConfig } from 'next';
 // - *.supabase.co: avatar images and browser calls to the database
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
+// - *.sentry.io: the browser Sentry SDK posts error envelopes to the ingest host
+//   in its DSN (`src/instrumentation-client.ts`). Sentry's `tunnelRoute` option
+//   would route those same-origin instead, but it mounts a path on our own domain
+//   that `proxy.ts` would 404, and it exists to dodge ad-blockers, not CSP.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
@@ -26,7 +30,7 @@ const contentSecurityPolicy = [
   "font-src 'self'",
   // Covered by default-src already, but Safari has historically needed it named.
   "manifest-src 'self'",
-  "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com",
+  "connect-src 'self' https://*.supabase.co https://api.themoviedb.org https://va.vercel-scripts.com https://*.sentry.io",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
