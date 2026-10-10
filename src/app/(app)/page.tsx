@@ -31,9 +31,6 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
       />
-      {/* Outside the SignedOutAbout boundary so it lands in the prerendered
-          shell. Crawlers are always signed out, so they see the matching
-          accordion markup below. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(faqJsonLd()) }}

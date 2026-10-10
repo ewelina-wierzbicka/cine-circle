@@ -411,10 +411,10 @@ About section
 Search results page (`/search`)
 
 - Implemented in `src/app/(app)/search/page.tsx`. Column is `flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12`.
-- Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox, so it is in the HTML for crawlers and is the only `h1` on the route.
-- Copy stays the same with or without a query. The query itself is already shown by the results heading below, so repeating it here would double the text.
+- Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
+- Copy stays the same with or without a query. The query itself is already shown by the results heading below.
 - SearchBox sits under it in `mb-8 w-full max-w-160`.
-- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-[0.2em] text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label. Both stay `p`, never `h1`.
+- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-[0.2em] text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label.
 - `search/loading.tsx` mirrors the order: an `h-10 w-72` heading skeleton, then the SearchBox bar, then the results grid.
 
 ---

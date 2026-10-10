@@ -123,8 +123,6 @@ export function siteJsonLd(): SiteJsonLd {
   };
 }
 
-// Built from HOME_FAQ, the same array `HomeAbout` renders on `/`, so the
-// answers in the markup and the answers here are one source.
 export function faqJsonLd(): FaqJsonLd {
   return {
     '@context': 'https://schema.org',

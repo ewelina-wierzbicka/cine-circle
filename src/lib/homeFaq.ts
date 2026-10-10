@@ -1,6 +1,3 @@
-// Single source for the home FAQ. `HomeAbout` renders it as the accordion and
-// `faqJsonLd()` serialises the same entries, so the markup and the structured
-// data can never drift apart.
 export const HOME_FAQ = [
   {
     question: 'Is MidnightFrame free?',
