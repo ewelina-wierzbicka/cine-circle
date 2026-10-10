@@ -272,7 +272,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
-  - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false.
+  - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false. `numberOfSeasons` and `numberOfEpisodes` are series only, from the TMDB scalars, omitted when absent or 0.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
@@ -378,7 +378,7 @@ Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails`
 
 `getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
 
-- They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`.
+- They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`. `getSeriesDetails` also passes through the TMDB scalars `number_of_seasons` and `number_of_episodes` — never `seasons.length`, which counts the Specials entry. Search results never carry them.
 
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 

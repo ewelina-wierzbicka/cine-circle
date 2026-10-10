@@ -85,6 +85,8 @@ export type MediaJsonLd = {
   datePublished?: string;
   startDate?: string;
   duration?: string;
+  numberOfSeasons?: number;
+  numberOfEpisodes?: number;
   director?: Person;
   creator?: Person;
 };
@@ -216,6 +218,8 @@ export function mediaJsonLd(
     release_date,
     runtime,
     director,
+    number_of_seasons,
+    number_of_episodes,
   } = media;
   const isSeries = mediaType === 'series';
   const genre = genres?.map((g) => g.name).filter(Boolean);
@@ -244,6 +248,12 @@ export function mediaJsonLd(
     // `release_date` holds TMDB's `first_air_date` for a series.
     ...(isSeries && release_date ? { startDate: release_date } : {}),
     ...(duration ? { duration } : {}),
+    ...(isSeries && number_of_seasons
+      ? { numberOfSeasons: number_of_seasons }
+      : {}),
+    ...(isSeries && number_of_episodes
+      ? { numberOfEpisodes: number_of_episodes }
+      : {}),
   };
 }
 
