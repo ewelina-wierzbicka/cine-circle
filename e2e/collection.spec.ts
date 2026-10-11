@@ -131,4 +131,45 @@ test.describe('collection', () => {
     ).toBeVisible();
     await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
   });
+
+  test('T21 rating multi-select keeps only the picked ratings', async ({
+    isolatedUser,
+  }) => {
+    const { id, page } = isolatedUser;
+    await seedUserMedia(id, { ...ALPHA, watchStatus: 'watched', rating: 8 });
+    await seedUserMedia(id, { ...BETA, watchStatus: 'watched', rating: 6 });
+    await seedUserMedia(id, { ...GAMMA, watchStatus: 'watched', rating: 5 });
+
+    await page.goto('/collection?tab=watched');
+
+    const trigger = page.getByRole('combobox', { name: /Filter by rating/ });
+    await expect(trigger).toContainText('Any rating');
+    await trigger.click();
+
+    // Rows are icon-only, so they are named by their aria-label.
+    await page.getByRole('option', { name: '4 stars' }).click();
+    await page.getByRole('option', { name: '3 stars' }).click();
+
+    // The listbox stays open across both clicks.
+    await expect(page.getByRole('option', { name: '4 stars' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await trigger.click();
+    await expect(trigger).toContainText('2 ratings');
+
+    await expect(
+      page.getByRole('link', { name: ALPHA.title }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: BETA.title }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: GAMMA.title })).toHaveCount(0);
+
+    // to_watch entries carry no rating, so the control is absent there.
+    await page.goto('/collection?tab=to_watch');
+    await expect(
+      page.getByRole('combobox', { name: /Filter by rating/ }),
+    ).toHaveCount(0);
+  });
 });
