@@ -131,4 +131,32 @@ test.describe('collection', () => {
     ).toBeVisible();
     await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
   });
+
+  test('T21 rating filter narrows the watched tab only', async ({
+    isolatedUser,
+  }) => {
+    const { id, page } = isolatedUser;
+    // rating is stored 1..10 in half-star steps: 8 is 4 stars, 6 is 3 stars.
+    await seedUserMedia(id, { ...ALPHA, watchStatus: 'watched', rating: 8 });
+    await seedUserMedia(id, { ...BETA, watchStatus: 'watched', rating: 6 });
+
+    await page.goto('/collection?tab=watched');
+    await expect(
+      page.getByRole('link', { name: BETA.title }).first(),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Any rating' }).click();
+    await page.getByRole('option', { name: '4+ stars' }).click();
+
+    await expect(
+      page.getByRole('link', { name: ALPHA.title }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
+
+    // The To Watch tab has no ratings, so it has no rating Select.
+    await page.goto('/collection?tab=to_watch');
+    await expect(page.getByRole('button', { name: 'Any rating' })).toHaveCount(
+      0,
+    );
+  });
 });
