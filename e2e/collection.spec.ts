@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/isolatedUser';
+import { expect, test } from './fixtures/isolatedUser';
 import { seedUserMedia } from './fixtures/seed';
 
 // Inception on TMDB. The movie page fetches real TMDB data server-side, same

@@ -3,6 +3,7 @@
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
+import { PasswordInput } from '@/components/PasswordInput';
 import { register as registerAction } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useState } from 'react';
@@ -72,9 +73,8 @@ export function RegisterForm() {
           >
             Password
           </label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             {...register('password', {
               required: 'Please enter a password',
               minLength: {
@@ -99,9 +99,8 @@ export function RegisterForm() {
           >
             Confirm Password
           </label>
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
             {...register('confirmPassword', {
               validate: (value) => {
                 if (!value) return 'Please confirm your password';

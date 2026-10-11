@@ -10,7 +10,7 @@ test.describe('auth', () => {
     await page.goto('/login');
 
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER_PASSWORD);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     await page.waitForURL('/');
@@ -35,7 +35,7 @@ test.describe('auth', () => {
 
     // Bad email format (passes native email check, fails app pattern).
     await page.getByLabel('Email').fill('foo@bar');
-    await page.getByLabel('Password').fill('whatever');
+    await page.getByLabel('Password', { exact: true }).fill('whatever');
     await signIn.click();
     await expect(
       page.getByText('Please enter a valid email address'),
@@ -43,7 +43,7 @@ test.describe('auth', () => {
 
     // Wrong credentials -> Supabase error toast.
     await page.getByLabel('Email').fill('nobody@midnightframe.test');
-    await page.getByLabel('Password').fill('WrongPass!1');
+    await page.getByLabel('Password', { exact: true }).fill('WrongPass!1');
     await signIn.click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
     await expect(page).toHaveURL('/login');
@@ -134,7 +134,7 @@ test.describe('auth', () => {
     await page.waitForURL(/\/login\?rurl=%2Fcollection/);
 
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER_PASSWORD);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     await page.waitForURL('/collection');
@@ -248,12 +248,14 @@ test.describe('auth', () => {
 
     // Old password no longer works.
     await page.getByLabel('Email').fill(isolatedUser.email);
-    await page.getByLabel('Password').fill(isolatedUser.password);
+    await page
+      .getByLabel('Password', { exact: true })
+      .fill(isolatedUser.password);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
 
     // New password logs in.
-    await page.getByLabel('Password').fill(newPassword);
+    await page.getByLabel('Password', { exact: true }).fill(newPassword);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await page.waitForURL('/');
   });

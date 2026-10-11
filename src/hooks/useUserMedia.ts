@@ -1,36 +1,18 @@
 import { PAGE_SIZE } from '@/lib/constants';
 import { createClient } from '@/lib/supabase/client';
-import {
-  FilterMediaType,
-  MediaType,
-  RatingFilter,
-  UserMedia,
-  UserMediaPage,
-} from '@/types';
+import { FilterMediaType, MediaType, UserMedia, UserMediaPage } from '@/types';
 import { useInfiniteQuery } from '@tanstack/react-query';
-
-type ResolvedRating = Exclude<RatingFilter, 'all'>;
-
-const matchesRating = (entry: UserMedia, rating: ResolvedRating) => {
-  const value = entry.rating;
-
-  if (rating === 'unrated') return value === null || value === undefined;
-
-  return value !== null && value !== undefined && value >= Number(rating);
-};
 
 const fetchUserMediaPage = async ({
   watchStatus,
   page,
   search,
   mediaType,
-  rating,
 }: {
   watchStatus: 'watched' | 'to_watch';
   page: number;
   search?: string;
   mediaType?: MediaType;
-  rating?: ResolvedRating;
 }): Promise<UserMediaPage> => {
   const supabase = createClient();
   const {
@@ -63,13 +45,6 @@ const fetchUserMediaPage = async ({
     query = query.eq('media.media_type', mediaType);
   }
 
-  // rating lives on user_media, so this needs no join change
-  if (rating === 'unrated') {
-    query = query.is('rating', null);
-  } else if (rating) {
-    query = query.gte('rating', Number(rating));
-  }
-
   const { data, error } = await query;
 
   if (error) throw new Error('Failed to load your media.');
@@ -88,41 +63,27 @@ export const useUserMedia = (
   initialData?: UserMediaPage,
   search?: string,
   mediaType?: FilterMediaType,
-  rating?: RatingFilter,
 ) => {
   const isSearch = !!search;
   const resolvedMediaType =
     mediaType === 'all' || !mediaType ? undefined : mediaType;
-  const resolvedRating = rating === 'all' || !rating ? undefined : rating;
 
-  const filteredInitialData =
-    initialData && (resolvedMediaType || resolvedRating)
-      ? {
-          ...initialData,
-          media: initialData.media.filter(
-            (m) =>
-              (!resolvedMediaType ||
-                m.media.media_type === resolvedMediaType) &&
-              (!resolvedRating || matchesRating(m, resolvedRating)),
-          ),
-        }
-      : initialData;
+  const canSeedInitialData = !isSearch && !resolvedMediaType;
 
   return useInfiniteQuery({
-    queryKey: ['user-movies', watchStatus, search, mediaType, rating],
+    queryKey: ['user-movies', watchStatus, search, resolvedMediaType],
     queryFn: ({ pageParam }) =>
       fetchUserMediaPage({
         watchStatus,
         page: pageParam,
         search,
         mediaType: resolvedMediaType,
-        rating: resolvedRating,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialData:
-      !isSearch && filteredInitialData
-        ? { pages: [filteredInitialData], pageParams: [0] }
+      canSeedInitialData && initialData
+        ? { pages: [initialData], pageParams: [0] }
         : undefined,
     staleTime: isSearch ? SEARCH_STALE_TIME : BASE_STALE_TIME,
   });
