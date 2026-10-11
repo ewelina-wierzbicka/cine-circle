@@ -260,7 +260,9 @@ test.describe('profile', () => {
 
     // Same credentials no longer authenticate.
     await page.getByLabel('Email').fill(isolatedUser.email);
-    await page.getByLabel('Password').fill(isolatedUser.password);
+    await page
+      .getByLabel('Password', { exact: true })
+      .fill(isolatedUser.password);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
     await expect(page).toHaveURL('/login');

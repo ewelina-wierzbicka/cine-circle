@@ -497,6 +497,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 - Tests are self-contained; no shared state between tests.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
+- Password fields need `getByLabel('Password', { exact: true })` — the `PasswordInput` toggle is labelled "Show password".
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
 - `e2e/global-setup.ts` warms the routes the suite visits before any test runs. A cold `next dev` compile of `/movie/[id]` alone takes ~30s, which used to blow the per-test timeout. Add a route there when a new spec navigates somewhere new.
