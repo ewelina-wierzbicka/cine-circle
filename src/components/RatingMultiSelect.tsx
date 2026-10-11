@@ -42,6 +42,14 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // The list scrolls past ten rows, so keyboard navigation has to follow it.
+  useEffect(() => {
+    if (!open) return;
+    document
+      .getElementById(optionId(RATING_FILTER_OPTIONS[highlighted].value))
+      ?.scrollIntoView({ block: 'nearest' });
+  }, [open, highlighted]);
+
   const toggle = (rating: RatingValue) => {
     onChange(
       value.includes(rating)
@@ -80,7 +88,13 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
   };
 
   return (
-    <div ref={containerRef} className={twMerge('relative shrink-0', className)}>
+    <div
+      ref={containerRef}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+      }}
+      className={twMerge('relative shrink-0', className)}
+    >
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -133,6 +147,8 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
                   role="option"
                   aria-selected={selected}
                   aria-label={option.label}
+                  // Keep focus on the trigger so the listbox survives the click.
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     setHighlighted(index);
                     toggle(option.value);
@@ -161,6 +177,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
           {value.length > 0 && (
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => onChange([])}
               className="w-full px-3.5 py-3 text-sm font-mono tracking-[0.05em] uppercase text-secondary hover:text-primary border-t border-secondary/25 cursor-pointer transition-colors"
             >

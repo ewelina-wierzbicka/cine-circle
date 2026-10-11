@@ -171,6 +171,14 @@ export const motion = {
 - Filled: `text-amber-400`; empty: `text-white/15`.
 - Display-only component; used where ratings exist.
 
+### RatingMultiSelect
+
+- `src/components/RatingMultiSelect.tsx`.
+- Select-only combobox trigger matching `Select` (`rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5`) with a rotating `ChevronIcon`.
+- Ten icon-only rows (stored values 10 down to 1) rendered with `StarRating`; selected row adds `text-primary bg-bg3` plus an accent `CheckCircleIcon`.
+- Trigger reads "Any rating", one `StarRating`, or "N ratings"; a "Clear ratings" footer appears once anything is selected.
+- Listbox is `aria-multiselectable`, stays open on click, and each row carries an `aria-label` like "3.5 stars".
+
 ### MovieCard (MediaCard)
 
 - `src/components/MediaCard.tsx`.
@@ -434,7 +442,7 @@ Layout & Header
 
 - Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-accent uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
 - Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
-- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering. The rating filter control is pending; `useUserMedia` already takes an exact-match `RatingFilter` array.
+- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` (`w-full sm:w-44`) on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
 
 List & Cards
