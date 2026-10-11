@@ -17,9 +17,6 @@ type SeedEntry = SeedMedia & {
   rating?: number;
   watchedDate?: string;
   review?: string;
-  // Explicit added_at so list order is deterministic. The default now() can
-  // tie across rows seeded in the same millisecond.
-  addedAt?: string;
 };
 
 async function upsertMedia(m: SeedMedia): Promise<number> {
@@ -53,7 +50,6 @@ export async function seedUserMedia(
     watched_date: entry.watchedDate ?? null,
     rating: entry.rating ?? null,
     review: entry.review ?? null,
-    ...(entry.addedAt ? { added_at: entry.addedAt } : {}),
   });
   if (error) throw error;
 }

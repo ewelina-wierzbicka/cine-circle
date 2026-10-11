@@ -68,9 +68,6 @@ export const useUserMedia = (
   const resolvedMediaType =
     mediaType === 'all' || !mediaType ? undefined : mediaType;
 
-  // initialData is page 0 of the unfiltered collection. Seeding it into a
-  // filtered query marks that query fresh, so the filtered fetch never runs
-  // and only the matches inside page 0 are ever shown.
   const canSeedInitialData = !isSearch && !resolvedMediaType;
 
   return useInfiniteQuery({

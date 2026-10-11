@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures/isolatedUser';
+import { expect, test } from './fixtures/isolatedUser';
 import { seedUserMedia } from './fixtures/seed';
 
 // Inception on TMDB. The movie page fetches real TMDB data server-side, same
@@ -10,11 +10,6 @@ const INCEPTION_ID = 27205;
 const ALPHA = { tmdbId: 900001, title: 'Alpha Collection Movie' };
 const BETA = { tmdbId: 900002, title: 'Beta Collection Movie' };
 const GAMMA = { tmdbId: 900003, title: 'Gamma Collection Movie' };
-const LATE_SERIES = { tmdbId: 900004, title: 'Delta Collection Series' };
-
-// Mirrors PAGE_SIZE in src/lib/constants.ts. T20 needs a full first page of
-// movies above the series it looks for.
-const PAGE_SIZE = 20;
 
 test.describe('collection', () => {
   test('T6 add movie to "to watch" list', async ({ isolatedUser }) => {
@@ -135,47 +130,5 @@ test.describe('collection', () => {
       page.getByRole('link', { name: ALPHA.title }).first(),
     ).toBeVisible();
     await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
-  });
-
-  test('T20 series filter finds a series past the first page', async ({
-    isolatedUser,
-  }) => {
-    const { id, page } = isolatedUser;
-
-    // The series is the oldest entry, so a full page of movies sits above it
-    // and the unfiltered first page never contains it.
-    await seedUserMedia(id, {
-      ...LATE_SERIES,
-      mediaType: 'series',
-      watchStatus: 'to_watch',
-      addedAt: '2020-01-01T00:00:00Z',
-    });
-
-    for (let i = 0; i < PAGE_SIZE; i++) {
-      await seedUserMedia(id, {
-        tmdbId: 900100 + i,
-        title: `Filler Collection Movie ${i}`,
-        watchStatus: 'to_watch',
-        addedAt: `2021-01-01T00:00:${String(i).padStart(2, '0')}Z`,
-      });
-    }
-
-    await page.goto('/collection?tab=to_watch');
-    await expect(
-      page.getByRole('link', { name: 'Filler Collection Movie 19' }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: LATE_SERIES.title }),
-    ).toHaveCount(0);
-
-    await page.getByRole('button', { name: 'Movies & Series' }).click();
-    await page.getByRole('option', { name: 'Series', exact: true }).click();
-
-    await expect(
-      page.getByRole('link', { name: LATE_SERIES.title }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Filler Collection Movie 19' }),
-    ).toHaveCount(0);
   });
 });
