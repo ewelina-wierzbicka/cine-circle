@@ -11,18 +11,12 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 
 type ResolvedRating = Exclude<RatingFilter, 'all'>;
 
-// rating is stored 1..10 in half-star steps, so a star filter doubles
-const starsToRating = (stars: Exclude<ResolvedRating, 'unrated'>) =>
-  Number(stars) * 2;
-
 const matchesRating = (entry: UserMedia, rating: ResolvedRating) => {
   const value = entry.rating;
 
   if (rating === 'unrated') return value === null || value === undefined;
 
-  return (
-    value !== null && value !== undefined && value >= starsToRating(rating)
-  );
+  return value !== null && value !== undefined && value >= Number(rating);
 };
 
 const fetchUserMediaPage = async ({
@@ -73,7 +67,7 @@ const fetchUserMediaPage = async ({
   if (rating === 'unrated') {
     query = query.is('rating', null);
   } else if (rating) {
-    query = query.gte('rating', starsToRating(rating));
+    query = query.gte('rating', Number(rating));
   }
 
   const { data, error } = await query;
