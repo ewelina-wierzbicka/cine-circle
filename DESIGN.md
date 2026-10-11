@@ -434,7 +434,7 @@ Layout & Header
 
 - Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-accent uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
 - Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
-- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering, plus a second `Select` (RATING_FILTER_OPTIONS) for minimum stars, Watched tab only.
+- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering. The rating filter control is pending; `useUserMedia` already takes an exact-match `RatingFilter` array.
 - Search filter is debounced via `useSearch` hook.
 
 List & Cards
