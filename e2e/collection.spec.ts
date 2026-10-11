@@ -132,7 +132,7 @@ test.describe('collection', () => {
     await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
   });
 
-  test('T20 rating filter narrows the watched tab only', async ({
+  test('T21 rating filter narrows the watched tab only', async ({
     isolatedUser,
   }) => {
     const { id, page } = isolatedUser;
