@@ -73,7 +73,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       {fromSearch && (
         <Link
           href="/"
-          className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
+          className="inline-flex items-center gap-2 font-mono text-sm tracking-label text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
         >
           ← BACK TO SEARCH
         </Link>
@@ -83,27 +83,24 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
           {genres.map((g) => (
             <span
               key={g.id}
-              className="font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent"
+              className="font-mono text-sm tracking-action uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent"
             >
               {g.name}
             </span>
           ))}
         </div>
       )}
-      <p className="font-mono text-sm tracking-[0.22em] text-secondary uppercase mb-4">
+      <p className="font-mono text-sm tracking-eyebrow text-secondary uppercase mb-4">
         {typeLabel}
       </p>
-      <h1
-        className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
-        style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
-      >
+      <h1 className="font-serif font-normal text-display tracking-display leading-[0.95] mb-5 text-balance">
         {title}
       </h1>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-7">
         {director && (
           <>
             <span className="text-sm text-secondary w-full sm:w-auto">
-              <span className="font-mono tracking-[0.08em] text-secondary mr-2">
+              <span className="font-mono tracking-action text-secondary mr-2">
                 {dirLabel}
               </span>
               <span className="text-primary">{director}</span>
@@ -111,12 +108,12 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
             <div className="w-0.75 h-0.75 rounded-full bg-secondary shrink-0 hidden sm:block " />
           </>
         )}
-        <span className="font-mono text-sm tracking-[0.04em] text-primary">
+        <span className="font-mono text-sm tracking-ui text-primary">
           {dateDisplay}
         </span>
       </div>
       {(hasRuntime || counts.length > 0) && (
-        <div className="-mt-5 mb-7 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm tracking-[0.04em] text-primary">
+        <div className="-mt-5 mb-7 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-sm tracking-ui text-primary">
           {hasRuntime && (
             <span className="flex items-center gap-1.5">
               <ClockIcon className="w-3.5 h-3.5 shrink-0 text-secondary" />
@@ -137,7 +134,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       )}
       {tmdbScore != null && (
         <div className="-mt-5 mb-7">
-          <span className="font-mono text-sm tracking-[0.04em]">
+          <span className="font-mono text-sm tracking-ui">
             <span className="text-amber-400">{tmdbScore}</span>
             {vote_count != null && vote_count > 0 && (
               <span className="text-secondary ml-1">

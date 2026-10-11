@@ -46,7 +46,7 @@ export function LoginForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="font-serif text-6xl font-normal tracking-heading leading-[1.1] mb-3">
           Welcome
           <br />
           <em className="text-accent">back</em>
@@ -61,7 +61,7 @@ export function LoginForm() {
         <div>
           <label
             htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="font-mono text-sm uppercase tracking-label text-secondary mb-2"
           >
             Email
           </label>
@@ -83,7 +83,7 @@ export function LoginForm() {
           <div className="flex items-center justify-between mb-2">
             <label
               htmlFor="password"
-              className="font-mono text-sm uppercase tracking-[0.14em] text-secondary"
+              className="font-mono text-sm uppercase tracking-label text-secondary"
             >
               Password
             </label>

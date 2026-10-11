@@ -39,7 +39,7 @@ export function ForgotPasswordForm() {
             <EnvelopeIcon className="text-accent" />
           </div>
 
-          <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+          <h1 className="font-serif text-4xl font-normal tracking-heading leading-[1.1] mb-2">
             Check your
             <br />
             <em className="text-accent">inbox</em>
@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
           </p>
 
           <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-            <p className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-1">
+            <p className="font-mono text-sm uppercase tracking-label text-secondary mb-1">
               Didn&apos;t receive it?
             </p>
             <p className="text-sm text-secondary leading-relaxed">
@@ -73,7 +73,7 @@ export function ForgotPasswordForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="font-serif text-6xl font-normal tracking-heading leading-[1.1] mb-3">
           Reset your
           <br />
           <em className="text-accent">password</em>
@@ -90,7 +90,7 @@ export function ForgotPasswordForm() {
         <div>
           <label
             htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="font-mono text-sm uppercase tracking-label text-secondary mb-2"
           >
             Email
           </label>

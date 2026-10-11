@@ -14,12 +14,12 @@ export async function RecentWatched({ recentPostersPromise }: Props) {
   return (
     <div className="px-6 md:px-12 pb-8 relative">
       <div className="flex justify-between mb-4">
-        <span className="font-mono text-sm tracking-[0.2em] text-secondary uppercase">
+        <span className="font-mono text-sm tracking-eyebrow text-secondary uppercase">
           Recently Watched
         </span>
         <Link
           href="/collection"
-          className="font-mono text-sm text-accent tracking-[0.08em] hover:opacity-70 transition-opacity"
+          className="font-mono text-sm text-accent tracking-action hover:opacity-70 transition-opacity"
         >
           SEE ALL →
         </Link>

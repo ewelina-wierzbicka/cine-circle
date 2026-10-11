@@ -7,6 +7,30 @@
   --font-serif: var(--font-dm-serif-display);
   --font-mono: var(--font-dm-mono);
 
+  /* Display type scale, serif page titles. Comment gives the px range. */
+  /* 42 to 72: media detail h1 */
+  --text-display: clamp(2.625rem, 5.5vw, 4.5rem);
+  /* 38 to 52: 404 and error titles */
+  --text-display-lg: clamp(2.375rem, 5vw, 3.25rem);
+  /* 32 to 48: collection h1, home about h2 */
+  --text-display-md: clamp(2rem, 5vw, 3rem);
+  /* 28 to 38: search h1, auth error title */
+  --text-display-sm: clamp(1.75rem, 4vw, 2.375rem);
+
+  /* Letter spacing, one token per typographic role */
+  /* serif page titles */
+  --tracking-display: -0.03em;
+  /* serif section and auth titles */
+  --tracking-heading: -0.02em;
+  /* mono uppercase labels, back links, footer nav */
+  --tracking-label: 0.15em;
+  /* mono uppercase section eyebrows */
+  --tracking-eyebrow: 0.2em;
+  /* buttons, pills, mono CTAs */
+  --tracking-action: 0.08em;
+  /* nav items, filter chips, meta rows */
+  --tracking-ui: 0.04em;
+
   /* colors */
   --color-primary: #ece9e3;
   --color-secondary: rgba(236, 233, 227, 0.75);

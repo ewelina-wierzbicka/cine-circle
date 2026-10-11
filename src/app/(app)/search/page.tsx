@@ -52,7 +52,7 @@ export default async function Page({ searchParams }: Props) {
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12">
-      <h1 className="font-serif text-[clamp(28px,4vw,36px)] tracking-[-0.03em] leading-none text-center mb-4 sm:mb-8">
+      <h1 className="font-serif text-display-sm tracking-display leading-none text-center mb-4 sm:mb-8">
         Search <em className="text-accent">movies and series</em>
       </h1>
       <div className="mb-8 w-full max-w-160">

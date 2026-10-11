@@ -35,7 +35,7 @@ export default function Button({
       onClick={handleClick}
       disabled={disabled}
       className={twMerge(
-        'w-full rounded-xl font-semibold uppercase tracking-[0.08em] cursor-pointer transition-opacity px-8',
+        'w-full rounded-xl font-semibold uppercase tracking-action cursor-pointer transition-opacity px-8',
         size === 'medium'
           ? 'py-3 text-base md:text-sm lg:text-base'
           : 'py-2 text-sm',

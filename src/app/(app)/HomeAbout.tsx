@@ -33,12 +33,12 @@ export function HomeAbout() {
     >
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
         <div>
-          <p className="font-mono text-sm tracking-[0.2em] text-secondary/60 uppercase mb-5">
+          <p className="font-mono text-sm tracking-eyebrow text-secondary/60 uppercase mb-5">
             About MidnightFrame
           </p>
           <h2
             id="what-is-midnightframe"
-            className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.15] mb-6"
+            className="font-serif text-display-md tracking-display leading-[1.15] mb-6"
           >
             A quiet place for the movies that{' '}
             <em className="text-accent">
@@ -103,7 +103,7 @@ export function HomeAbout() {
                 {index(position)}
               </span>
             </div>
-            <h3 className="font-mono text-sm tracking-[0.2em] text-accent uppercase mt-6">
+            <h3 className="font-mono text-sm tracking-eyebrow text-accent uppercase mt-6">
               {title}
             </h3>
             <p className="text-sm text-secondary leading-relaxed mt-3">
@@ -113,7 +113,7 @@ export function HomeAbout() {
         ))}
       </div>
 
-      <BackToTopLink className="inline-block font-mono text-sm tracking-[0.08em] mt-12">
+      <BackToTopLink className="inline-block font-mono text-sm tracking-action mt-12">
         Browse the full catalogue ↑
       </BackToTopLink>
     </section>

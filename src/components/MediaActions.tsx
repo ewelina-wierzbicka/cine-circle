@@ -107,12 +107,12 @@ export default function MediaActions({
         <div className="flex flex-col gap-8 mb-8">
           {rating != null && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-3">
+              <p className="font-mono text-sm tracking-eyebrow text-secondary uppercase mb-3">
                 Your Rating
               </p>
               <div className="flex items-center gap-3">
                 <StarRating rating={rating} />
-                <span className="font-mono text-sm tracking-[0.06em] text-primary">
+                <span className="font-mono text-sm tracking-ui text-primary">
                   {rating}/10
                 </span>
               </div>
@@ -120,7 +120,7 @@ export default function MediaActions({
           )}
           {formattedDate && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
+              <p className="font-mono text-sm tracking-eyebrow text-secondary uppercase mb-2">
                 Watched
               </p>
               <p className="text-sm text-primary">{formattedDate}</p>
@@ -128,7 +128,7 @@ export default function MediaActions({
           )}
           {review && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
+              <p className="font-mono text-sm tracking-eyebrow text-secondary uppercase mb-2">
                 Review
               </p>
               <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap">

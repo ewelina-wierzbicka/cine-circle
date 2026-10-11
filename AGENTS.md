@@ -195,6 +195,12 @@ export const colors = {
 - `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring
 - `animate-fade-in` — opacity 0→1, 400ms ease
 
+**Typography tokens (defined in `globals.css`):**
+
+- Display sizes: `text-display` (42→72px), `text-display-lg` (38→52px), `text-display-md` (32→48px), `text-display-sm` (28→38px). Font-size only, no paired line-height — keep an explicit `leading-*` at the call site.
+- Letter spacing: `tracking-display` (-0.03em, serif page titles), `tracking-heading` (-0.02em, serif section/auth titles), `tracking-label` (0.15em, mono uppercase labels/back links/footer), `tracking-eyebrow` (0.2em, section eyebrows), `tracking-action` (0.08em, buttons/pills/CTAs), `tracking-ui` (0.04em, nav items/chips/meta rows).
+- Never write `tracking-[…em]` or a `clamp()` font size at a call site — pick the role token. See DESIGN.md for the full table and the three deliberate exceptions.
+
 **Rules:**
 
 - Mobile-first — use base styles for mobile, `sm:` / `md:` / `lg:` for larger screens

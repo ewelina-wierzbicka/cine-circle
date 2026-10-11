@@ -230,7 +230,7 @@ export function ProfileContent({ profile, email }: Props) {
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
+          <p className="font-mono text-sm uppercase tracking-label text-secondary mb-3">
             Display name
           </p>
           {isEditingName ? (
@@ -255,7 +255,7 @@ export function ProfileContent({ profile, email }: Props) {
                 <button
                   type="button"
                   onClick={() => void handleSaveName()}
-                  className="text-accent text-sm font-mono uppercase tracking-wider cursor-pointer hover:opacity-80"
+                  className="text-accent text-sm font-mono uppercase tracking-action cursor-pointer hover:opacity-80"
                 >
                   Save
                 </button>
@@ -297,7 +297,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Account Card */}
       <div className="bg-bg2 border border-white/[0.07] rounded-2xl p-6 mb-4">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-secondary mb-6">
+        <p className="font-mono text-base uppercase tracking-label text-secondary mb-6">
           Account
         </p>
 
@@ -309,7 +309,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
             <div className="text-left pr-2">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
+              <p className="font-mono text-sm uppercase tracking-label text-secondary">
                 Email address
               </p>
               <p className="text-primary text-sm mt-2">{email}</p>
@@ -325,7 +325,7 @@ export function ProfileContent({ profile, email }: Props) {
           {emailOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-label text-secondary mb-2">
                   New email
                 </p>
                 <Input
@@ -355,7 +355,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
             <div className="text-left">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
+              <p className="font-mono text-sm uppercase tracking-label text-secondary">
                 Password
               </p>
               {!passwordOpen && (
@@ -375,7 +375,7 @@ export function ProfileContent({ profile, email }: Props) {
           {passwordOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-label text-secondary mb-2">
                   Current password
                 </p>
                 <Input
@@ -386,7 +386,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-label text-secondary mb-2">
                   New password
                 </p>
                 <Input
@@ -397,7 +397,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="font-mono text-sm uppercase tracking-label text-secondary mb-2">
                   Confirm new password
                 </p>
                 <Input
@@ -427,7 +427,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Danger Zone Card */}
       <div className="bg-bg2 border border-error/20 rounded-2xl p-6 mb-8">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-error mb-6">
+        <p className="font-mono text-base uppercase tracking-label text-error mb-6">
           Danger zone
         </p>
 
@@ -437,7 +437,7 @@ export function ProfileContent({ profile, email }: Props) {
           className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
         >
           <div className="text-left">
-            <p className="font-mono text-sm uppercase tracking-[0.15em] text-error">
+            <p className="font-mono text-sm uppercase tracking-label text-error">
               Delete account
             </p>
             <p className="text-secondary text-sm mt-4">
@@ -462,7 +462,7 @@ export function ProfileContent({ profile, email }: Props) {
               This cannot be undone.
             </p>
             <div className="mt-6">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
+              <p className="font-mono text-sm uppercase tracking-label text-secondary mb-5">
                 Type <span className="text-error font-semibold">DELETE</span> to
                 confirm
               </p>

@@ -17,7 +17,7 @@ export default function ConfirmEmailPage() {
           <EnvelopeIcon className="text-accent" />
         </div>
 
-        <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+        <h1 className="font-serif text-4xl font-normal tracking-heading leading-[1.1] mb-2">
           Check your
           <br />
           <em className="text-accent">inbox</em>
@@ -34,7 +34,7 @@ export default function ConfirmEmailPage() {
         </p>
 
         <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-          <p className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-1">
+          <p className="font-mono text-sm uppercase tracking-label text-secondary mb-1">
             Didn&apos;t receive it?
           </p>
           <p className="text-sm text-secondary leading-relaxed">
