@@ -125,7 +125,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, PasswordInput, etc.)
+  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
