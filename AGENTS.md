@@ -196,10 +196,17 @@ export const colors = {
 - `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring
 - `animate-fade-in` — opacity 0→1, 400ms ease
 
+**Body copy line-height:**
+
+- `body` sets `line-height: 1.625`, and `@theme inline` sets `--text-sm--line-height` and `--text-base--line-height` to `1.625`. **Both are needed.** Every `text-*` utility sets its own `line-height`, so the `body` rule only reaches text with no `text-*` class. The theme overrides are what put prose on 1.625.
+- So **never write `leading-relaxed`** — `text-sm` and `text-base` already are 1.625. It was removed from 16 call sites.
+- Sizes above `text-base` keep the Tailwind defaults: they are display type and single-line UI, not prose. A heading needs its own `leading-*`.
+- `leading-*` at a call site still overrides, the value is emitted as `var(--tw-leading, 1.625)`.
+
 **Typography utility (defined in `globals.css`):**
 
 - `label-mono` — the mono uppercase label: `font-mono` + `text-sm` + `letter-spacing: 0.15em` + `uppercase`. Use it for eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site.
-- Do not pair it with `font-mono`, `text-sm`, `uppercase` or a `tracking-*` class — it already sets all four. A `tracking-*` override does win (it is emitted after `label-mono`), but reach for it only when the value is genuinely different.
+- Do not pair it with `font-mono`, `text-sm`, `uppercase` or a `tracking-*` class — it already sets all four. Overrides do win, since Tailwind emits `label-mono` before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label (the two profile card headers). Reach for an override only when the value is genuinely different.
 - Mono text with deliberately tighter tracking (`0.04em`–`0.08em`: genre pills, filter chips, meta rows, the header wordmark) keeps its own `tracking-[…]` and is **not** a `label-mono` site.
 
 **Rules:**

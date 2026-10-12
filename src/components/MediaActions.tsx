@@ -125,7 +125,7 @@ export default function MediaActions({
           {review && (
             <div>
               <p className="label-mono text-secondary mb-2">Review</p>
-              <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-primary whitespace-pre-wrap">
                 {review}
               </p>
             </div>

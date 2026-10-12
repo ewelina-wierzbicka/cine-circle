@@ -28,7 +28,7 @@ export default function ConfirmEmailPage() {
       </div>
 
       <div className="w-full flex flex-col gap-4">
-        <p className="text-sm text-secondary leading-relaxed">
+        <p className="text-sm text-secondary">
           We sent a confirmation link to your email address. Click the link to
           activate your account.
         </p>
@@ -37,7 +37,7 @@ export default function ConfirmEmailPage() {
           <p className="label-mono text-secondary mb-1">
             Didn&apos;t receive it?
           </p>
-          <p className="text-sm text-secondary leading-relaxed">
+          <p className="text-sm text-secondary">
             Check your spam folder. It may take a few minutes to arrive.
           </p>
         </div>

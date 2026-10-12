@@ -106,6 +106,14 @@ export const type = {
 };
 ```
 
+#### Body copy line-height
+
+`body` sets `line-height: 1.625`, and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to `1.625`. Both are needed: every `text-*` utility sets its own `line-height`, so the `body` rule alone only reaches text with no `text-*` class.
+
+So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is never written** — it was removed from 16 call sites. Sizes above `text-base` keep the Tailwind defaults, being display type and single-line UI rather than prose, so a heading still needs its own `leading-*`.
+
+> This also raises every `text-sm` control by about 2.75px and every `text-base` control by 2px, buttons, chips, pills and inputs included, since they carry the same size classes as prose.
+
 #### `label-mono`
 
 The mono uppercase label ships as one `@utility` in `src/globals.css`, not as four classes at each call site:
@@ -119,13 +127,13 @@ The mono uppercase label ships as one `@utility` in `src/globals.css`, not as fo
 }
 ```
 
-It covers 43 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.14em` in the `type.label` reference block above, and the `0.1em`–`0.22em` spread the call sites used to carry.
+It covers 45 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.14em` in the `type.label` reference block above, and the `0.1em`–`0.22em` spread the call sites used to carry.
 
 > Never pair it with `font-mono`, `text-sm`, `uppercase` or `tracking-*`. A `tracking-*` override does win, since Tailwind emits `label-mono` before the `tracking-*` utilities, but only use one when the value is genuinely different.
 >
 > Mono text with deliberately tighter tracking is **not** a `label-mono` site and keeps its own `tracking-[…]`: the header wordmark and filter chips (`0.05em`), genre badge (`0.06em`), genre pills, director label and `SEE ALL →` (`0.08em`), the meta row (`0.04em`). Plain mono with no tracking (FAQ indices, dropdown subtitles, `tabular-nums` rating readout) also stays as is.
 >
-> Two exceptions are `text-base`, not `text-sm`, so they keep the long form: the profile section header and the delete-account header, both `font-mono text-base uppercase tracking-[0.15em]`.
+> Two call sites are 16px, not 14px, and pair it with `text-base` to override the font-size: the profile section header and the delete-account header (`label-mono text-base text-secondary`). Tailwind emits `label-mono` before `text-base`, so the override holds.
 
 ### Border Radius
 
@@ -518,7 +526,7 @@ Info & Form
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
   - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
-  - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
+  - Overview text (when available): `text-sm text-primary mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
 - Watched view (the `watched` branch of `MediaActions`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
@@ -607,7 +615,7 @@ Static content pages, open routes (no auth required). All three render through o
 - Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
 - Subtitle label: `label-mono text-secondary`.
 - Section headings (`h2`): `label-mono text-accent`.
-- Body text: `font-sans text-base text-secondary leading-relaxed`. Sections stack with `space-y-8`.
+- Body text: `font-sans text-base text-secondary`. Sections stack with `space-y-8`.
 
 ### About (`/about`)
 

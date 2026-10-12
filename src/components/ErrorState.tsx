@@ -26,7 +26,7 @@ export function ErrorState({ error, reset }: Props) {
         <h1 className="font-serif text-[clamp(34px,5vw,46px)] leading-none tracking-[-0.03em]">
           We hit a <em className="text-error">glitch</em>
         </h1>
-        <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">
+        <p className="mb-8 mt-3.5 text-sm text-secondary">
           Something on our end failed to load. Try again, or head back and pick
           up where you left off.
         </p>

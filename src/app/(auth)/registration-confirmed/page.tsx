@@ -23,7 +23,7 @@ export default function RegistrationConfirmedPage() {
           <br />
           <em className="text-accent">all set</em>
         </h1>
-        <p className="text-sm text-secondary leading-relaxed">
+        <p className="text-sm text-secondary">
           Your email is confirmed. Sign in to start building your collection.
         </p>
       </div>

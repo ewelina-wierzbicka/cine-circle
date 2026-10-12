@@ -7,6 +7,14 @@
   --font-serif: var(--font-dm-serif-display);
   --font-mono: var(--font-dm-mono);
 
+  /* Body copy line-height. The `line-height: 1.625` on `body` only reaches
+     text with no `text-*` class, because every `text-*` utility sets its own
+     line-height. These two put the body-copy sizes on 1.625 so prose does not
+     need `leading-relaxed` at the call site. Sizes above `text-base` are left
+     on the Tailwind defaults: they are display and single-line UI, not prose. */
+  --text-sm--line-height: 1.625;
+  --text-base--line-height: 1.625;
+
   /* colors */
   --color-primary: #ece9e3;
   --color-secondary: rgba(236, 233, 227, 0.75);
@@ -44,6 +52,7 @@ body {
   color: var(--color-primary);
   height: 100%;
   overflow: hidden;
+  line-height: 1.625;
 }
 
 #root {

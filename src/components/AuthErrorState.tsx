@@ -33,7 +33,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
           <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
             {title}
           </h1>
-          <p className="mb-7 text-sm leading-relaxed text-secondary">
+          <p className="mb-7 text-sm text-secondary">
             Something on our end failed. Try again, or continue as a guest.
           </p>
           <div className="flex flex-col gap-2.5">

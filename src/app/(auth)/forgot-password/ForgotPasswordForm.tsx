@@ -48,7 +48,7 @@ export function ForgotPasswordForm() {
         </div>
 
         <div className="w-full flex flex-col gap-4">
-          <p className="text-sm text-secondary leading-relaxed">
+          <p className="text-sm text-secondary">
             We sent a password reset link to your email address. Click the link
             to choose a new password.
           </p>
@@ -57,7 +57,7 @@ export function ForgotPasswordForm() {
             <p className="label-mono text-secondary mb-1">
               Didn&apos;t receive it?
             </p>
-            <p className="text-sm text-secondary leading-relaxed">
+            <p className="text-sm text-secondary">
               Check your spam folder. It may take a few minutes to arrive.
             </p>
           </div>
