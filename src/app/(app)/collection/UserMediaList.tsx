@@ -4,12 +4,12 @@ import Loader from '@/components/Loader';
 import MediaList from '@/components/MediaList';
 import { useUserMedia } from '@/hooks/useUserMedia';
 import { toUserMediaListProps } from '@/lib/mediaUtils';
-import { FilterMediaType, UserMediaPage } from '@/types';
+import { CollectionTab, FilterMediaType, UserMediaPage } from '@/types';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 type Props = {
-  watchStatus: 'to_watch' | 'watched';
+  watchStatus: CollectionTab;
   initialData: UserMediaPage;
   searchQuery?: string;
   mediaType: FilterMediaType;

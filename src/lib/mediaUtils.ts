@@ -1,4 +1,4 @@
-import { MediaType, NormalizedMedia, UserMedia } from '@/types';
+import { CollectionTab, MediaType, NormalizedMedia, UserMedia } from '@/types';
 
 function toSlug(title: string): string {
   return title
@@ -36,11 +36,9 @@ export function toSearchMediaListProps(media: NormalizedMedia) {
 
 export function toUserMediaListProps(
   userMedia: UserMedia,
-  fromTab?: 'to_watch' | 'watched',
+  fromTab?: CollectionTab,
 ) {
   const { media } = userMedia;
-  // The tab travels with the link so the detail page can send the user back
-  // to the tab they came from.
   const href = fromTab
     ? `${toHref(media.tmdb_id, media.title, media.media_type)}?tab=${fromTab}`
     : toHref(media.tmdb_id, media.title, media.media_type);

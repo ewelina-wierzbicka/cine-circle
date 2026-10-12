@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
-import { NormalizedMedia } from '@/types';
+import { CollectionTab, NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toHref } from '@/lib/mediaUtils';
 import { breadcrumbJsonLd, jsonLdScript, mediaJsonLd } from '@/lib/jsonLd';
@@ -23,8 +23,6 @@ type Props = {
   mediaType: 'movie' | 'series';
   searchParams?: MediaPageSearchParams;
 };
-
-type CollectionTab = 'to_watch' | 'watched';
 
 function toCollectionTab(
   value: string | string[] | undefined,

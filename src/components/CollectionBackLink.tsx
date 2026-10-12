@@ -1,7 +1,8 @@
+import { CollectionTab } from '@/types';
 import NextLink from 'next/link';
 
 type Props = {
-  tab?: 'to_watch' | 'watched';
+  tab?: CollectionTab;
 };
 
 export default function CollectionBackLink({ tab }: Props) {

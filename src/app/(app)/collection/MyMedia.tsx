@@ -4,13 +4,13 @@ import Input from '@/components/Input';
 import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
-import { FilterMediaType, UserMediaPage } from '@/types';
+import { CollectionTab, FilterMediaType, UserMediaPage } from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import UserMediaList from './UserMediaList';
 
 type Props = {
-  tab: 'to_watch' | 'watched';
+  tab: CollectionTab;
   initialData: UserMediaPage;
 };
 

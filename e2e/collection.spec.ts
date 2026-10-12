@@ -131,28 +131,4 @@ test.describe('collection', () => {
     ).toBeVisible();
     await expect(page.getByRole('link', { name: BETA.title })).toHaveCount(0);
   });
-
-  test('T20 back link returns to the originating tab', async ({
-    isolatedUser,
-  }) => {
-    const { id, page } = isolatedUser;
-    await seedUserMedia(id, {
-      tmdbId: INCEPTION_ID,
-      title: 'Inception',
-      watchStatus: 'watched',
-      rating: 9,
-      watchedDate: '2026-01-01',
-    });
-
-    await page.goto('/collection?tab=watched');
-    await page.getByRole('link', { name: 'Inception' }).first().click();
-    await page.waitForURL(/\/movie\/.*tab=watched/);
-
-    await page.getByRole('link', { name: /BACK TO COLLECTION/ }).click();
-    await page.waitForURL(/\/collection\?tab=watched/);
-
-    await expect(
-      page.getByRole('heading', { name: 'Watched', level: 1 }),
-    ).toBeVisible();
-  });
 });

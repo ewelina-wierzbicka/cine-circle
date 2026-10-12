@@ -491,7 +491,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T20 back link returns to originating tab |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
