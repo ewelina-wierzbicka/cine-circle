@@ -27,6 +27,17 @@
   background-image: var(--gradient-blue);
 }
 
+/* Mono uppercase label. Covers eyebrows, field labels, back links, nav items,
+   pills and meta rows. Colour and spacing stay at the call site.
+   Not for mono text whose letter-spacing is deliberately tighter
+   (0.04em to 0.08em) — those keep their own tracking-*. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
 html,
 body {
   background: var(--color-dark);

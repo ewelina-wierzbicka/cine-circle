@@ -53,10 +53,7 @@ export function ResetPasswordForm() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="password"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="password" className="label-mono text-secondary mb-2">
             New password
           </label>
           <Input
@@ -82,7 +79,7 @@ export function ResetPasswordForm() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="label-mono text-secondary mb-2"
           >
             Confirm password
           </label>

@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`.
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. One `@utility` covers the mono uppercase label: `label-mono` (see Typography below).
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -105,6 +105,27 @@ export const type = {
   },
 };
 ```
+
+#### `label-mono`
+
+The mono uppercase label ships as one `@utility` in `src/globals.css`, not as four classes at each call site:
+
+```css
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+```
+
+It covers 43 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.14em` in the `type.label` reference block above, and the `0.1em`–`0.22em` spread the call sites used to carry.
+
+> Never pair it with `font-mono`, `text-sm`, `uppercase` or `tracking-*`. A `tracking-*` override does win, since Tailwind emits `label-mono` before the `tracking-*` utilities, but only use one when the value is genuinely different.
+>
+> Mono text with deliberately tighter tracking is **not** a `label-mono` site and keeps its own `tracking-[…]`: the header wordmark and filter chips (`0.05em`), genre badge (`0.06em`), genre pills, director label and `SEE ALL →` (`0.08em`), the meta row (`0.04em`). Plain mono with no tracking (FAQ indices, dropdown subtitles, `tabular-nums` rating readout) also stays as is.
+>
+> Two exceptions are `text-base`, not `text-sm`, so they keep the long form: the profile section header and the delete-account header, both `font-mono text-base uppercase tracking-[0.15em]`.
 
 ### Border Radius
 
@@ -313,7 +334,7 @@ export const motion = {
 - `src/components/BackToTopLink.tsx` — client `button` styled like `Link`, scrolls `main` back to 0 with `behavior: 'smooth'`.
 - FAQ copy lives in `src/lib/homeFaq.ts` as `HOME_FAQ`, not in the component. `faqJsonLd()` serialises the same array, so edit the questions and answers there and the accordion and the `FAQPage` structured data stay identical.
 - FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-white/[0.08]` (`last:border-b`), `01`/`02`/`03` in `font-mono text-sm text-secondary/40`, question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
-- Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `font-mono tracking-[0.2em] text-accent uppercase` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
+- Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `label-mono text-accent` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders.
 
 ### Skeleton (loading.tsx skeletons)
@@ -349,7 +370,7 @@ Left column (Form)
 - Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
 - Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with accent-emphasized word (`<em class="text-accent">`).
 - Subtext: `text-base text-secondary`.
-- Labels: `font-mono text-sm uppercase tracking-[0.14em] text-secondary`.
+- Labels: `label-mono text-secondary`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
 - Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
@@ -414,7 +435,7 @@ Recently Watched
 - `RecentWatched` (`src/app/(app)/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
-- Section header: left label `font-mono text-sm tracking-[0.2em] text-secondary uppercase` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
+- Section header: left label `label-mono text-secondary` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
 
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
@@ -429,7 +450,7 @@ Search results page (`/search`)
 - Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
 - Copy stays the same with or without a query. The query itself is already shown by the results heading below.
 - SearchBox sits under it in `mb-8 w-full max-w-160`.
-- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-[0.2em] text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label.
+- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `label-mono text-accent`) over a `font-serif` `p` holding the quoted query and the type label.
 - `search/loading.tsx` mirrors the order: an `h-10 w-72` heading skeleton, then the SearchBox bar, then the results grid.
 
 ---
@@ -440,7 +461,7 @@ Search results page (`/search`)
 
 Layout & Header
 
-- Header area: eyebrow `font-mono text-sm tracking-[0.2em] text-accent uppercase` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
+- Header area: eyebrow `label-mono text-accent` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
 - Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
 - Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
@@ -482,9 +503,9 @@ Poster & Visuals
 Info & Form
 
 - Info view (`MediaInfoHeader` + `MediaActions`) shows:
-  - Back link (font-mono, text-sm, tracking-[0.12em]). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
+  - Back link (`label-mono`). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
-  - Eyebrow (type) using `font-mono text-sm tracking-[0.22em] text-secondary uppercase`.
+  - Eyebrow (type) using `label-mono text-secondary`.
   - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
   - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
@@ -502,7 +523,7 @@ Info & Form
 Recommendations ("More Like This")
 
 - Rendered in `MediaDetailWrapper` below the two-column layout, only on step 1 and when `recommendations` array is non-empty.
-- Section label: `font-mono text-sm tracking-[0.2em] text-secondary uppercase`.
+- Section label: `label-mono text-secondary`.
 - Horizontal scroll row (`flex gap-3 overflow-x-auto pb-1`) matching the home page "Recently Watched" pattern.
 - Each card: `w-27.5 h-41.25 rounded-xl overflow-hidden border border-white/[0.07]` with `MediaPoster` inside.
 - Genre badge overlay: `font-mono text-sm` in a `bg-dark/70 text-accent` pill at bottom-left of the card.
@@ -534,7 +555,7 @@ Profile Card
 - Avatar: `w-22 h-22 rounded-full border-2 border-accent` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
 - Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with accent pencil SVG icon. Triggers hidden file input.
 - Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
-- Display name: `font-mono text-sm uppercase tracking-[0.15em] text-secondary` label. Name shown as `text-2xl font-sans font-semibold` with pencil edit icon.
+- Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-sans font-semibold` with pencil edit icon.
 - Inline edit mode: `Input` component with Save (`text-accent font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
 
 Account Card
@@ -575,8 +596,8 @@ Static content pages, open routes (no auth required). All three render through o
 - `src/components/StaticContentPage.tsx` — server component, props `title`, `subtitle`, `sections`. Each page supplies only its metadata and its `StaticSection[]` copy.
 - Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
 - Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
-- Subtitle label: `font-mono text-sm text-secondary tracking-widest uppercase`.
-- Section headings (`h2`): `font-mono text-sm tracking-[0.15em] text-accent uppercase`.
+- Subtitle label: `label-mono text-secondary`.
+- Section headings (`h2`): `label-mono text-accent`.
 - Body text: `font-sans text-base text-secondary leading-relaxed`. Sections stack with `space-y-8`.
 
 ### About (`/about`)
@@ -610,9 +631,9 @@ Static content pages, open routes (no auth required). All three render through o
 - Left — the nav only, `items-center md:items-start`.
 - Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
 
-**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`. `0.14em` has no named Tailwind utility — `tracking-widest` is `0.1em`.
+**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `label-mono no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`.
 
-**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `font-mono text-sm tracking-[0.14em] text-secondary mt-4 md:mt-0`.
+**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `label-mono text-secondary mt-4 md:mt-0`.
 
 **TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
 

@@ -33,7 +33,7 @@ export function HomeAbout() {
     >
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
         <div>
-          <p className="font-mono text-sm tracking-[0.2em] text-secondary/60 uppercase mb-5">
+          <p className="label-mono text-secondary/60 mb-5">
             About MidnightFrame
           </p>
           <h2
@@ -103,9 +103,7 @@ export function HomeAbout() {
                 {index(position)}
               </span>
             </div>
-            <h3 className="font-mono text-sm tracking-[0.2em] text-accent uppercase mt-6">
-              {title}
-            </h3>
+            <h3 className="label-mono text-accent mt-6">{title}</h3>
             <p className="text-sm text-secondary leading-relaxed mt-3">
               {body}
             </p>

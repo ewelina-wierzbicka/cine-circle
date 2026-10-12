@@ -73,7 +73,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       {fromSearch && (
         <Link
           href="/"
-          className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
+          className="inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
         >
           ← BACK TO SEARCH
         </Link>
@@ -90,9 +90,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
           ))}
         </div>
       )}
-      <p className="font-mono text-sm tracking-[0.22em] text-secondary uppercase mb-4">
-        {typeLabel}
-      </p>
+      <p className="label-mono text-secondary mb-4">{typeLabel}</p>
       <h1
         className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
         style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
