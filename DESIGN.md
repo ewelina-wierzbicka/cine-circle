@@ -189,9 +189,9 @@ export const motion = {
 - Implemented in `src/components/Header.tsx`.
 - Relative header bar (`h-14`) with `px-6 md:px-12` padding.
 - Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
-- Nav links use `text-sm font-sans font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
+- Nav links use `text-sm font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
 - Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
-- Right (logged out): accent pill-shaped `Sign in` link to `/login` (`rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
+- Right (logged out): accent pill-shaped `Sign in` link to `/login` (`rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.
 
 ### StarRating
 
@@ -563,7 +563,7 @@ Profile Card
 - Avatar: `w-22 h-22 rounded-full border-2 border-accent` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
 - Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with accent pencil SVG icon. Triggers hidden file input.
 - Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
-- Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-sans font-semibold` with pencil edit icon.
+- Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-semibold` with pencil edit icon.
 - Inline edit mode: `Input` component with Save (`text-accent font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
 
 Account Card
@@ -606,7 +606,7 @@ Static content pages, open routes (no auth required). All three render through o
 - Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
 - Subtitle label: `label-mono text-secondary`.
 - Section headings (`h2`): `label-mono text-accent`.
-- Body text: `font-sans text-base text-secondary`. Sections stack with `space-y-8`.
+- Body text: `text-base text-secondary`. Sections stack with `space-y-8`.
 
 ### About (`/about`)
 

@@ -277,7 +277,7 @@ export function ProfileContent({ profile, email }: Props) {
               onClick={() => setIsEditingName(true)}
               className="flex items-center gap-4 cursor-pointer bg-transparent border-none p-0 group"
             >
-              <span className="text-2xl font-sans font-semibold text-primary">
+              <span className="text-2xl font-semibold text-primary">
                 {displayName || 'Set name'}
               </span>
               <svg
