@@ -8,8 +8,6 @@ export const MEDIA_TYPE_OPTIONS: { value: FilterMediaType; label: string }[] = [
   { value: 'all', label: 'Movies & Series' },
 ];
 
-// Stored ratings run 1..10 (half-star steps). The label is the accessible name
-// of each row: the rows themselves render stars, not text.
 export const ratingFilterLabel = (value: RatingValue) => {
   const stars = value / 2;
   if (stars === 0.5) return 'Half a star';

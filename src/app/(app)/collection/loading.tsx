@@ -14,7 +14,6 @@ export default function Loading() {
           <div className="flex gap-2.5 w-full sm:w-auto flex-wrap justify-end">
             <Skeleton className="h-10 w-full sm:w-53.25 rounded-xl" />
             <Skeleton className="h-10 w-full sm:w-53.25 rounded-xl" />
-            {/* ponytail: loading.tsx gets no tab, so the rating slot always shows */}
             <Skeleton className="h-10 w-full sm:w-44 rounded-xl" />
           </div>
         </div>

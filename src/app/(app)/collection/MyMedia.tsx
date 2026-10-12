@@ -18,7 +18,6 @@ type Props = {
 export default function MyMedia({ tab, initialData }: Props) {
   const [mediaType, setMediaType] = useState<FilterMediaType>('all');
   const [rating, setRating] = useState<RatingFilter>([]);
-  // to_watch entries carry no rating, so the filter only applies to watched.
   const appliedRating = tab === 'watched' ? rating : [];
   const { debouncedQuery, handleChange } = useSearch({
     onSearch: () => {},

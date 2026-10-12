@@ -8,9 +8,6 @@ export type MediaType = 'movie' | 'series';
 
 export type FilterMediaType = 'movie' | 'series' | 'all';
 
-// rating is stored 1..10 in half-star steps, so the filter values are the raw
-// stored ratings. Multi-select with exact-match semantics: an empty array means
-// no rating filter.
 export type RatingValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export type RatingFilter = RatingValue[];

@@ -42,7 +42,6 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // The list scrolls past ten rows, so keyboard navigation has to follow it.
   useEffect(() => {
     if (!open) return;
     document
@@ -99,8 +98,6 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         onKeyDown={handleKeyDown}
-        // The select-only combobox pattern: role="combobox" is the one role
-        // that may own aria-activedescendant on the listbox rows.
         role="combobox"
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -147,7 +144,6 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
                   role="option"
                   aria-selected={selected}
                   aria-label={option.label}
-                  // Keep focus on the trigger so the listbox survives the click.
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     setHighlighted(index);

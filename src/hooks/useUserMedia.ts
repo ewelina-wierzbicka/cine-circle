@@ -11,7 +11,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 
 const NO_RATINGS: RatingFilter = [];
 
-// The array identity changes on every render, so the key is a sorted string.
 const toRatingKey = (ratings: RatingFilter) =>
   [...ratings].sort((a, b) => a - b).join(',');
 
@@ -59,7 +58,6 @@ const fetchUserMediaPage = async ({
     query = query.eq('media.media_type', mediaType);
   }
 
-  // rating lives on user_media, so this needs no join change
   if (ratings.length) {
     query = query.in('rating', ratings);
   }
@@ -89,8 +87,6 @@ export const useUserMedia = (
     mediaType === 'all' || !mediaType ? undefined : mediaType;
   const ratingKey = toRatingKey(rating);
 
-  // initialData is the unfiltered first page, so seeding it under a filtered
-  // key would truncate the result set. Same rule as the media type filter.
   const canSeedInitialData = !isSearch && !resolvedMediaType && !rating.length;
 
   return useInfiniteQuery({
