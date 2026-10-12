@@ -196,6 +196,12 @@ export const colors = {
 - `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring
 - `animate-fade-in` — opacity 0→1, 400ms ease
 
+**Typography utility (defined in `globals.css`):**
+
+- `label-mono` — the mono uppercase label: `font-mono` + `text-sm` + `letter-spacing: 0.15em` + `uppercase`. Use it for eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site.
+- Do not pair it with `font-mono`, `text-sm`, `uppercase` or a `tracking-*` class — it already sets all four. A `tracking-*` override does win (it is emitted after `label-mono`), but reach for it only when the value is genuinely different.
+- Mono text with deliberately tighter tracking (`0.04em`–`0.08em`: genre pills, filter chips, meta rows, the header wordmark) keeps its own `tracking-[…]` and is **not** a `label-mono` site.
+
 **Rules:**
 
 - Mobile-first — use base styles for mobile, `sm:` / `md:` / `lg:` for larger screens

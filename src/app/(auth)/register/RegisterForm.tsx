@@ -46,10 +46,7 @@ export function RegisterForm() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="email" className="label-mono text-secondary mb-2">
             Email
           </label>
           <Input
@@ -67,10 +64,7 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="password"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="password" className="label-mono text-secondary mb-2">
             Password
           </label>
           <PasswordInput
@@ -95,7 +89,7 @@ export function RegisterForm() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="label-mono text-secondary mb-2"
           >
             Confirm Password
           </label>
