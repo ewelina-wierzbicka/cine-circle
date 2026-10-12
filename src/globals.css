@@ -46,6 +46,16 @@
   text-transform: uppercase;
 }
 
+/* Mono UI text. The other half of the mono usage: meta rows, filter chips,
+   counts, FAQ indices, inline links. Same font and size as label-mono but
+   tighter and with no text-transform, so mixed-case copy reads normally.
+   Add `uppercase` at the call site when the text is a short all-caps chip. */
+@utility ui-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+}
+
 html,
 body {
   background: var(--color-dark);

@@ -73,7 +73,7 @@ export default function MediaDetailWrapper({
                       sizes="110px"
                     />
                     {rec.genre && (
-                      <span className="absolute bottom-1.5 left-1.5 font-mono text-sm tracking-[0.06em] uppercase bg-dark/70 text-accent px-1.5 py-0.5 rounded-full">
+                      <span className="absolute bottom-1.5 left-1.5 ui-mono uppercase bg-dark/70 text-accent px-1.5 py-0.5 rounded-full">
                         {rec.genre}
                       </span>
                     )}

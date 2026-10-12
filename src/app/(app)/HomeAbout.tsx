@@ -64,7 +64,7 @@ export function HomeAbout() {
               <summary className="flex cursor-pointer list-none items-center gap-5 py-6 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
                 <span
                   aria-hidden="true"
-                  className="w-6 shrink-0 font-mono text-sm text-secondary/40 transition-colors group-open:text-accent"
+                  className="w-6 shrink-0 ui-mono text-secondary/40 transition-colors group-open:text-accent"
                 >
                   {index(position)}
                 </span>
@@ -94,10 +94,7 @@ export function HomeAbout() {
               >
                 <Icon className="w-5 h-5" />
               </span>
-              <span
-                aria-hidden="true"
-                className="font-mono text-sm text-secondary/40"
-              >
+              <span aria-hidden="true" className="ui-mono text-secondary/40">
                 {index(position)}
               </span>
             </div>
@@ -107,7 +104,7 @@ export function HomeAbout() {
         ))}
       </div>
 
-      <BackToTopLink className="inline-block font-mono text-sm tracking-[0.08em] mt-12">
+      <BackToTopLink className="inline-block ui-mono mt-12">
         Browse the full catalogue ↑
       </BackToTopLink>
     </section>
