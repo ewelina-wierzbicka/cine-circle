@@ -45,7 +45,7 @@ export function HomeAbout() {
               stay <span className=" whitespace-nowrap">with you.</span>
             </em>
           </h2>
-          <p className="font-sans text-base text-secondary">
+          <p className="text-base text-secondary">
             MidnightFrame is a personal film log for late-night watchers. Keep
             track of what you&apos;ve seen, line up what&apos;s next, and build
             a collection that reflects your taste — not an algorithm&apos;s.
@@ -68,7 +68,7 @@ export function HomeAbout() {
                 >
                   {index(position)}
                 </span>
-                <h3 className="flex-1 font-sans text-base md:text-lg text-secondary transition-colors group-open:text-primary">
+                <h3 className="flex-1 text-base md:text-lg text-secondary transition-colors group-open:text-primary">
                   {question}
                 </h3>
                 <span aria-hidden="true" className="shrink-0">

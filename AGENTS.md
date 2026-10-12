@@ -162,7 +162,7 @@ Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always u
 
 **Fonts:**
 
-- `font-sans` — DM Sans (primary body font, weights 300/400/500/600)
+- `font-sans` — DM Sans (primary body font, weights 300/400/500/600). **It is the inherited default**, set by the `font-sans` class on `<body>` in `app/layout.tsx`. Do not write it at a call site: it is a no-op unless an ancestor sets `font-serif` or `font-mono`, and the only such case is the type label inside the serif query line in `SearchResults`. The class on `<body>` must stay — the `next/font` `--font-dm-sans` variable is scoped to `<body>`, so Tailwind's preflight rule on `html` cannot resolve it.
 - `font-serif` — DM Serif Display (headings, display text)
 - `font-mono` — DM Mono (labels, nav items, monospaced text)
 
