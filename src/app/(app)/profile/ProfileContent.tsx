@@ -253,7 +253,7 @@ export function ProfileContent({ profile, email }: Props) {
                 <button
                   type="button"
                   onClick={() => void handleSaveName()}
-                  className="text-accent text-sm font-mono uppercase tracking-wider cursor-pointer hover:opacity-80"
+                  className="text-accent ui-mono uppercase cursor-pointer hover:opacity-80"
                 >
                   Save
                 </button>

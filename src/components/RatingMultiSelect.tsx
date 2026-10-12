@@ -175,7 +175,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => onChange([])}
-              className="w-full px-3.5 py-3 text-sm font-mono tracking-[0.05em] uppercase text-secondary hover:text-primary border-t border-secondary/25 cursor-pointer transition-colors"
+              className="w-full px-3.5 py-3 ui-mono uppercase text-secondary hover:text-primary border-t border-secondary/25 cursor-pointer transition-colors"
             >
               Clear ratings
             </button>

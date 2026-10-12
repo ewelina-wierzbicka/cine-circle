@@ -82,9 +82,7 @@ export default function MediaActions({
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col gap-3 pt-3">
-        <p className="font-mono text-sm text-secondary">
-          Sign in to add to collection
-        </p>
+        <p className="ui-mono text-secondary">Sign in to add to collection</p>
         <Button handleClick={() => router.push(`/login?rurl=${pathname}`)}>
           SIGN IN
         </Button>
@@ -110,9 +108,7 @@ export default function MediaActions({
               <p className="label-mono text-secondary mb-3">Your Rating</p>
               <div className="flex items-center gap-3">
                 <StarRating rating={rating} />
-                <span className="font-mono text-sm tracking-[0.06em] text-primary">
-                  {rating}/10
-                </span>
+                <span className="ui-mono text-primary">{rating}/10</span>
               </div>
             </div>
           )}

@@ -114,7 +114,7 @@ So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is nev
 
 > This also raises every `text-sm` control by about 2.75px and every `text-base` control by 2px, buttons, chips, pills and inputs included, since they carry the same size classes as prose.
 
-#### `label-mono`
+#### `label-mono` and `ui-mono`
 
 The mono uppercase label ships as one `@utility` in `src/globals.css`, not as four classes at each call site:
 
@@ -131,9 +131,25 @@ It covers 45 call sites: eyebrows, field labels, back links, footer nav, section
 
 > Never pair it with `font-mono`, `text-sm`, `uppercase` or `tracking-*`. A `tracking-*` override does win, since Tailwind emits `label-mono` before the `tracking-*` utilities, but only use one when the value is genuinely different.
 >
-> Mono text with deliberately tighter tracking is **not** a `label-mono` site and keeps its own `tracking-[…]`: the header wordmark and filter chips (`0.05em`), genre badge (`0.06em`), genre pills, director label and `SEE ALL →` (`0.08em`), the meta row (`0.04em`). Plain mono with no tracking (FAQ indices, dropdown subtitles, `tabular-nums` rating readout) also stays as is.
+> The tighter mono is `ui-mono`, below. Between the two utilities, `font-mono` no longer appears anywhere in `src/`.
 >
 > Two call sites are 16px, not 14px, and pair it with `text-base` to override the font-size: the profile section header and the delete-account header (`label-mono text-base text-secondary`). Tailwind emits `label-mono` before `text-base`, so the override holds.
+
+The other half of the mono usage is `ui-mono`, same font and size but tighter and with no `text-transform`, so mixed-case copy reads normally:
+
+```css
+@utility ui-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+}
+```
+
+19 call sites: the detail meta row (director, date, runtime, season and episode counts, TMDB score), filter chips, `SEE ALL →`, back-to-top, FAQ indices, dropdown subtitles, the `tabular-nums` rating readout, the rating value in `MediaActions` and its signed-out prompt. They previously spread across `0.04em`, `0.05em`, `0.06em`, `0.08em`, `tracking-wider` and no tracking at all.
+
+> Four call sites are all-caps chips and add `uppercase`: the genre pill, the poster genre badge, the rating-filter clear button, the profile Save button.
+>
+> Going from no tracking to `0.05em` is the largest shift here, about 0.7px per character on the FAQ indices, dropdown subtitles and rating readout.
 
 ### Border Radius
 
@@ -188,7 +204,7 @@ export const motion = {
 
 - Implemented in `src/components/Header.tsx`.
 - Relative header bar (`h-14`) with `px-6 md:px-12` padding.
-- Logo 26×26 + `font-mono text-sm font-medium tracking-[0.05em]` wordmark.
+- Logo is `public/logo.webp` at 200×50 via `next/image`, `priority`. There is no text wordmark.
 - Nav links use `text-sm font-medium tracking-[0.02em]` and active `bg-white/4 border-secondary/50 text-primary`.
 - Right (logged in): avatar button with accessible dropdown, keyboard support and route handlers.
 - Right (logged out): accent pill-shaped `Sign in` link to `/login` (`rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-semibold tracking-[0.02em]`), replacing the avatar and dropdown entirely.

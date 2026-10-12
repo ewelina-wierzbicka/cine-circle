@@ -42,15 +42,13 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
 
         <span className="flex-1 min-w-0">
           <span className="block line-clamp-1">{item.title}</span>
-          <span className="block text-sm text-secondary font-mono mt-0.5">
+          <span className="block ui-mono text-secondary mt-0.5">
             {item.director ? `${item.director} · ` : ''}
             {item.release_date ? item.release_date.slice(0, 4) : ''}
           </span>
         </span>
 
-        <span className="text-secondary text-sm font-mono">
-          {item.media_type}
-        </span>
+        <span className="text-secondary ui-mono">{item.media_type}</span>
       </button>
     );
   },
