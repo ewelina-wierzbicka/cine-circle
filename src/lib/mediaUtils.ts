@@ -1,4 +1,4 @@
-import { MediaType, NormalizedMedia, UserMedia } from '@/types';
+import { CollectionTab, MediaType, NormalizedMedia, UserMedia } from '@/types';
 
 function toSlug(title: string): string {
   return title
@@ -34,9 +34,14 @@ export function toSearchMediaListProps(media: NormalizedMedia) {
   };
 }
 
-export function toUserMediaListProps(userMedia: UserMedia) {
+export function toUserMediaListProps(
+  userMedia: UserMedia,
+  fromTab?: CollectionTab,
+) {
   const { media } = userMedia;
-  const href = toHref(media.tmdb_id, media.title, media.media_type);
+  const href = fromTab
+    ? `${toHref(media.tmdb_id, media.title, media.media_type)}?tab=${fromTab}`
+    : toHref(media.tmdb_id, media.title, media.media_type);
   return {
     id: userMedia.id,
     tmdb_id: media.tmdb_id,

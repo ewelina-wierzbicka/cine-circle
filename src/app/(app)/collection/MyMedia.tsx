@@ -1,21 +1,29 @@
 'use client';
 
 import Input from '@/components/Input';
+import { RatingMultiSelect } from '@/components/RatingMultiSelect';
 import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
-import { FilterMediaType, UserMediaPage } from '@/types';
+import {
+  CollectionTab,
+  FilterMediaType,
+  RatingFilter,
+  UserMediaPage,
+} from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import UserMediaList from './UserMediaList';
 
 type Props = {
-  tab: 'to_watch' | 'watched';
+  tab: CollectionTab;
   initialData: UserMediaPage;
 };
 
 export default function MyMedia({ tab, initialData }: Props) {
   const [mediaType, setMediaType] = useState<FilterMediaType>('all');
+  const [rating, setRating] = useState<RatingFilter>([]);
+  const appliedRating = tab === 'watched' ? rating : [];
   const { debouncedQuery, handleChange } = useSearch({
     onSearch: () => {},
     debounceMs: 400,
@@ -79,6 +87,14 @@ export default function MyMedia({ tab, initialData }: Props) {
               onChange={setMediaType}
               className="w-full sm:w-53.25"
             />
+
+            {tab === 'watched' && (
+              <RatingMultiSelect
+                value={rating}
+                onChange={setRating}
+                className="w-full sm:w-44"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -88,6 +104,7 @@ export default function MyMedia({ tab, initialData }: Props) {
         initialData={initialData}
         searchQuery={debouncedQuery}
         mediaType={mediaType}
+        rating={appliedRating}
       />
     </>
   );

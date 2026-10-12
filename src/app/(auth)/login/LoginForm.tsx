@@ -3,6 +3,7 @@
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
+import { PasswordInput } from '@/components/PasswordInput';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -94,7 +95,7 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
-          <Input id="password" type="password" {...register('password')} />
+          <PasswordInput id="password" {...register('password')} />
         </div>
 
         <Button type="submit" className="mt-3" disabled={isPending}>

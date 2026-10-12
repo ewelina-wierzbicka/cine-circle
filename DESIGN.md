@@ -192,6 +192,14 @@ export const motion = {
 - Filled: `text-amber-400`; empty: `text-white/15`.
 - Display-only component; used where ratings exist.
 
+### RatingMultiSelect
+
+- `src/components/RatingMultiSelect.tsx`.
+- Select-only combobox trigger matching `Select` (`rounded-xl bg-bg2 border border-secondary/25 px-3.5 h-9.5`) with a rotating `ChevronIcon`.
+- Ten icon-only rows (stored values 10 down to 1) rendered with `StarRating`; selected row adds `text-primary bg-bg3` plus an accent `CheckCircleIcon`.
+- Trigger reads "Any rating", one `StarRating`, or "N ratings"; a "Clear ratings" footer appears once anything is selected.
+- Listbox is `aria-multiselectable`, stays open on click, and each row carries an `aria-label` like "3.5 stars".
+
 ### MovieCard (MediaCard)
 
 - `src/components/MediaCard.tsx`.
@@ -245,6 +253,12 @@ export const motion = {
 - Controlled input with `variant` prop: `search` adds an icon and padding; `rating` shows `/10` suffix.
 - Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `accent` and `bg3`.
 - Forwards ref and renders error text when provided.
+
+### PasswordInput
+
+- `src/components/PasswordInput.tsx` — `Input` with a show/hide toggle. Used by `LoginForm` and `RegisterForm`.
+- Toggle is a `w-11 h-11.5` button pinned to the right edge of the field, `EyeIcon` / `EyeOffIcon` in `text-secondary`, `hover:text-primary`.
+- Accessible name flips between "Show password" and "Hide password", with `aria-pressed`. Query the field with `getByLabel('Password', { exact: true })` in tests, or the toggle matches too.
 
 ### SearchBox
 
@@ -358,6 +372,7 @@ Left column (Form)
 - Subtext: `text-base text-secondary`.
 - Labels: `font-mono text-sm uppercase tracking-label text-secondary`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
+- Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
 - Footer link toggles between Login and Register using `text-accent` links.
 
@@ -448,7 +463,7 @@ Layout & Header
 
 - Header area: eyebrow `font-mono text-sm tracking-eyebrow text-accent uppercase` and heading `font-serif text-display-md`.
 - Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
-- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering.
+- Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
 
 List & Cards
