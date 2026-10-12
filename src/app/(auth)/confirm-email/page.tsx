@@ -17,7 +17,7 @@ export default function ConfirmEmailPage() {
           <EnvelopeIcon className="text-accent" />
         </div>
 
-        <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+        <h1 className="title-serif text-4xl mb-2">
           Check your
           <br />
           <em className="text-accent">inbox</em>

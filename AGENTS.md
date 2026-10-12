@@ -210,7 +210,10 @@ export const colors = {
 - `ui-mono` — the other half of the mono usage: `font-mono` + `text-sm` + `letter-spacing: 0.05em`, **no** `text-transform`. Meta rows, filter chips, counts, FAQ indices, inline mono links. Covers the 19 sites that used to carry `tracking-[0.04em]` through `tracking-[0.08em]` or no tracking at all.
   - Add `uppercase` at the call site for the four all-caps chips: the genre pill, the poster genre badge, the rating-filter clear button and the profile Save button.
   - Same rule as `label-mono`: do not pair it with `font-mono`, `text-sm` or a `tracking-*` class. Both utilities are emitted before the `text-*` and `tracking-*` utilities, so overrides win when you genuinely need one.
-- **Every mono call site is now one of the two utilities.** `font-mono` appears nowhere else in `src/`. If you reach for `font-mono text-sm tracking-[…]` again, pick `label-mono` (uppercase label, 0.15em) or `ui-mono` (UI and meta text, 0.05em) instead.
+- `title-serif` — the serif title: `font-serif` + `text-6xl` (60px) + `font-weight: 400` + `letter-spacing: -0.02em` + `line-height: 1.1`. The auth headings, the entry-form title and the auth error state, 9 call sites.
+  - It sets `--tw-leading: 1.1` as well as `line-height`, so a smaller size at the call site keeps the 1.1. `title-serif text-4xl` is the 36px variant; without the variable, `text-4xl` would have reset the line-height to its own default. Four sites use the 60px default, five override the size.
+  - `font-normal` is redundant next to it, and DM Serif Display only ships 400 anyway.
+- **Every mono call site is now one of the two mono utilities.** `font-mono` appears nowhere else in `src/`. If you reach for `font-mono text-sm tracking-[…]` again, pick `label-mono` (uppercase label, 0.15em) or `ui-mono` (UI and meta text, 0.05em) instead.
 
 **Rules:**
 

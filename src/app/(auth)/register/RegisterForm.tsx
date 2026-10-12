@@ -31,7 +31,7 @@ export function RegisterForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="title-serif mb-3">
           Your movies.
           <br />
           <em className="text-accent">Your list.</em>
