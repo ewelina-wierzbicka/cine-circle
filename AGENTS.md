@@ -207,7 +207,10 @@ export const colors = {
 
 - `label-mono` — the mono uppercase label: `font-mono` + `text-sm` + `letter-spacing: 0.15em` + `uppercase`. Use it for eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site.
 - Do not pair it with `font-mono`, `text-sm`, `uppercase` or a `tracking-*` class — it already sets all four. Overrides do win, since Tailwind emits `label-mono` before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label (the two profile card headers). Reach for an override only when the value is genuinely different.
-- Mono text with deliberately tighter tracking (`0.04em`–`0.08em`: genre pills, filter chips, meta rows, the header wordmark) keeps its own `tracking-[…]` and is **not** a `label-mono` site.
+- `ui-mono` — the other half of the mono usage: `font-mono` + `text-sm` + `letter-spacing: 0.05em`, **no** `text-transform`. Meta rows, filter chips, counts, FAQ indices, inline mono links. Covers the 19 sites that used to carry `tracking-[0.04em]` through `tracking-[0.08em]` or no tracking at all.
+  - Add `uppercase` at the call site for the four all-caps chips: the genre pill, the poster genre badge, the rating-filter clear button and the profile Save button.
+  - Same rule as `label-mono`: do not pair it with `font-mono`, `text-sm` or a `tracking-*` class. Both utilities are emitted before the `text-*` and `tracking-*` utilities, so overrides win when you genuinely need one.
+- **Every mono call site is now one of the two utilities.** `font-mono` appears nowhere else in `src/`. If you reach for `font-mono text-sm tracking-[…]` again, pick `label-mono` (uppercase label, 0.15em) or `ui-mono` (UI and meta text, 0.05em) instead.
 
 **Rules:**
 
