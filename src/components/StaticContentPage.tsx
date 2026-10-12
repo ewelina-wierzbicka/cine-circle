@@ -23,9 +23,7 @@ export function StaticContentPage({
           {sections.map(({ heading, body }) => (
             <div key={heading}>
               <h2 className="label-mono text-accent mb-3">{heading}</h2>
-              <p className="font-sans text-base text-secondary leading-relaxed">
-                {body}
-              </p>
+              <p className="font-sans text-base text-secondary">{body}</p>
             </div>
           ))}
         </div>

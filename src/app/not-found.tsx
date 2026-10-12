@@ -21,7 +21,7 @@ export default function NotFound() {
         <h1 className="font-serif text-[clamp(38px,5vw,52px)] leading-none tracking-[-0.03em]">
           This <em className="text-accent">scene</em> doesn&rsquo;t exist
         </h1>
-        <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">
+        <p className="mb-8 mt-3.5 text-sm text-secondary">
           The page you&rsquo;re looking for was cut from the final edit.
           Let&rsquo;s get you back to the story.
         </p>

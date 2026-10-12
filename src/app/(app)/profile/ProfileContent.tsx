@@ -295,9 +295,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Account Card */}
       <div className="bg-bg2 border border-white/[0.07] rounded-2xl p-6 mb-4">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-secondary mb-6">
-          Account
-        </p>
+        <p className="label-mono text-base text-secondary mb-6">Account</p>
 
         {/* Email row */}
         <div className="border-b border-white/[0.07] pb-4 mb-4">
@@ -417,9 +415,7 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Danger Zone Card */}
       <div className="bg-bg2 border border-error/20 rounded-2xl p-6 mb-8">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-error mb-6">
-          Danger zone
-        </p>
+        <p className="label-mono text-base text-error mb-6">Danger zone</p>
 
         <button
           type="button"

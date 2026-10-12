@@ -147,9 +147,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
         </div>
       )}
       <div className="mb-8 shrink-0 w-12 h-px bg-accent opacity-60" />
-      {overview && (
-        <p className="text-sm text-primary leading-relaxed mb-8">{overview}</p>
-      )}
+      {overview && <p className="text-sm text-primary mb-8">{overview}</p>}
     </>
   );
 }
