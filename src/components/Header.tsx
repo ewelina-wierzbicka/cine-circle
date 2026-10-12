@@ -58,7 +58,7 @@ export default function Header({ profile }: HeaderProps) {
             key={href}
             href={href}
             className={twMerge(
-              'px-3 py-1.5 rounded-full border text-sm font-sans font-medium tracking-[0.02em] transition-all duration-150',
+              'px-3 py-1.5 rounded-full border text-sm font-medium tracking-[0.02em] transition-all duration-150',
               match(pathname)
                 ? 'border-secondary/50 bg-white/4 text-primary'
                 : 'border-transparent text-secondary hover:text-primary',
@@ -71,7 +71,7 @@ export default function Header({ profile }: HeaderProps) {
       {!profile ? (
         <Link
           href="/login"
-          className="rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-sans font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
+          className="rounded-full bg-accent text-dark px-4 py-1.5 text-sm font-semibold tracking-[0.02em] transition-opacity hover:opacity-[0.82]"
         >
           Sign in
         </Link>
@@ -96,7 +96,7 @@ export default function Header({ profile }: HeaderProps) {
             onClick={() => setDropdownOpen((p) => !p)}
           >
             {displayName && (
-              <span className="hidden sm:inline text-[14px] font-sans text-primary tracking-[0.02em]">
+              <span className="hidden sm:inline text-[14px] text-primary tracking-[0.02em]">
                 Hello <span className="text-accent">{displayName}</span>!
               </span>
             )}
