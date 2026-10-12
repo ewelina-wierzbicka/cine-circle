@@ -114,6 +114,29 @@ So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is nev
 
 > This also raises every `text-sm` control by about 2.75px and every `text-base` control by 2px, buttons, chips, pills and inputs included, since they carry the same size classes as prose.
 
+#### `title-serif`
+
+The serif title ships as one `@utility`:
+
+```css
+@utility title-serif {
+  font-family: var(--font-serif);
+  font-size: var(--text-6xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  --tw-leading: 1.1;
+  line-height: 1.1;
+}
+```
+
+9 call sites: login, register, reset-password, forgot-password (both states), confirm-email, registration-confirmed, the entry-form title and `AuthErrorState`.
+
+> It sets `--tw-leading` as well as `line-height`. That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of falling back to the `text-4xl` default. Four sites take the 60px default; five override (`text-4xl`, `text-[40px] lg:text-5xl`, `text-[clamp(32px,5vw,38px)]`).
+>
+> Do not add `font-normal` next to it. The utility sets 400, and DM Serif Display ships no other weight.
+>
+> The serif display titles are a separate matter and keep their own classes: they run `-0.03em` with `leading-none` or `leading-[0.95]`, not `-0.02em`/1.1. So does the search results query (`-0.02em` but `leading-none`).
+
 #### `label-mono` and `ui-mono`
 
 The mono uppercase label ships as one `@utility` in `src/globals.css`, not as four classes at each call site:

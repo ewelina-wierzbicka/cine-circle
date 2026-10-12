@@ -46,6 +46,20 @@
   text-transform: uppercase;
 }
 
+/* Serif title. The auth and entry-form headings: login, register,
+   reset-password, confirm-email, registration-confirmed, the entry form and
+   the auth error state. Pins the 60px step; a call site that needs a smaller
+   one adds its own text-* and keeps the 1.1 line-height, because --tw-leading
+   is what every text-* utility reads. */
+@utility title-serif {
+  font-family: var(--font-serif);
+  font-size: var(--text-6xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  --tw-leading: 1.1;
+  line-height: 1.1;
+}
+
 /* Mono UI text. The other half of the mono usage: meta rows, filter chips,
    counts, FAQ indices, inline links. Same font and size as label-mono but
    tighter and with no text-transform, so mixed-case copy reads normally.
