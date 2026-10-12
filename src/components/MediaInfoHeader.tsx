@@ -93,9 +93,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
       <p className="font-mono text-sm tracking-eyebrow text-secondary uppercase mb-4">
         {typeLabel}
       </p>
-      <h1 className="font-serif font-normal text-display tracking-display leading-[0.95] mb-5 text-balance">
-        {title}
-      </h1>
+      <h1 className="font-serif text-display mb-5 text-balance">{title}</h1>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-7">
         {director && (
           <>

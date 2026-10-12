@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, `--color-error`, font aliases `--font-sans`, `--font-serif`, `--font-mono`, and the typography tokens `--text-display{,-lg,-md,-sm}` and `--tracking-{display,heading,label,eyebrow,action,ui}`.
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, `--color-error`, font aliases `--font-sans`, `--font-serif`, `--font-mono`, and the composite serif title tokens `--text-display{,-lg,-md,-sm}` and `--text-heading{,-sm}` (each with its own `--line-height`, `--letter-spacing` and `--font-weight`), plus `--tracking-{display,heading,label,eyebrow,action,ui}` and `--leading-heading`.
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -108,24 +108,36 @@ export const type = {
 
 #### Typography tokens
 
-Defined in `src/globals.css` `@theme inline`. Use the utility, never the arbitrary value. These are what the code ships and they supersede the per-role `letterSpacing` values in the reference block above.
+Defined in `src/globals.css` `@theme inline`. Use the utility, never the arbitrary value. These are what the code ships and they supersede the per-role `fontSize`, `lineHeight` and `letterSpacing` values in the reference block above.
 
-| Utility            | Value                      | Use                                       |
-| ------------------ | -------------------------- | ----------------------------------------- |
-| `text-display`     | `clamp(42px, 5.5vw, 72px)` | Media detail `h1`                         |
-| `text-display-lg`  | `clamp(38px, 5vw, 52px)`   | 404 and error titles                      |
-| `text-display-md`  | `clamp(32px, 5vw, 48px)`   | Collection `h1`, home about `h2`          |
-| `text-display-sm`  | `clamp(28px, 4vw, 38px)`   | Search `h1`, auth error title             |
-| `tracking-display` | `-0.03em`                  | Serif page titles                         |
-| `tracking-heading` | `-0.02em`                  | Serif section and auth titles             |
-| `tracking-label`   | `0.15em`                   | Mono uppercase labels, back links, footer |
-| `tracking-eyebrow` | `0.2em`                    | Mono uppercase section eyebrows           |
-| `tracking-action`  | `0.08em`                   | Buttons, pills, mono CTAs                 |
-| `tracking-ui`      | `0.04em`                   | Nav items, filter chips, meta rows        |
+**Serif title sizes are composite.** Each token bundles size, line-height, letter-spacing and weight, so `font-serif text-display-lg` is the whole style. No `leading-*`, no `tracking-*`, no `font-normal`.
 
-> The display tokens set font-size only, no paired line-height. Every call site keeps its own `leading-*`.
+| Utility           | Size                       | Leading | Tracking  | Use                                                   |
+| ----------------- | -------------------------- | ------- | --------- | ----------------------------------------------------- |
+| `text-display`    | `clamp(42px, 5.5vw, 72px)` | `0.95`  | `-0.03em` | Media detail `h1`                                     |
+| `text-display-lg` | `clamp(38px, 5vw, 52px)`   | `1`     | `-0.03em` | 404 and error titles                                  |
+| `text-display-md` | `clamp(32px, 5vw, 48px)`   | `0.95`  | `-0.03em` | Collection `h1`, home about `h2`                      |
+| `text-display-sm` | `clamp(28px, 4vw, 38px)`   | `1`     | `-0.03em` | Search `h1`, auth error title                         |
+| `text-heading`    | `60px`                     | `1.1`   | `-0.02em` | Login, register, reset-password, forgot-password sent |
+| `text-heading-sm` | `36px`                     | `1.1`   | `-0.02em` | Confirm-email, registration-confirmed, forgot form    |
+
+Standalone letter-spacing and line-height roles, for text the composite tokens do not cover:
+
+| Utility            | Value     | Use                                                |
+| ------------------ | --------- | -------------------------------------------------- |
+| `tracking-label`   | `0.15em`  | Mono uppercase labels, back links, footer          |
+| `tracking-eyebrow` | `0.2em`   | Mono uppercase section eyebrows                    |
+| `tracking-action`  | `0.08em`  | Buttons, pills, mono CTAs                          |
+| `tracking-ui`      | `0.04em`  | Nav items, filter chips, meta rows                 |
+| `tracking-display` | `-0.03em` | Serif titles whose size is not a composite token   |
+| `tracking-heading` | `-0.02em` | Entry form title, search results query, auth error |
+| `leading-heading`  | `1.1`     | Serif titles outside the two scales above          |
+
+> Overrides still work. Tailwind emits the composite values as `var(--tw-leading, …)`, `var(--tw-tracking, …)` and `var(--tw-font-weight, …)`, so `leading-*` / `tracking-*` / `font-*` at a call site wins regardless of class order. `AuthErrorState` uses that: `text-display-sm leading-heading tracking-heading`.
 >
-> Fixed non-fluid sizes stay arbitrary on purpose: home hero `h1` (`text-[46px] xl:text-[52px]`), the entry form title (`text-[40px] lg:text-5xl`) and the search results query (`text-[clamp(24px,3.5vw,38px)]`).
+> Two sizes stay arbitrary on purpose, both fixed steps rather than scale members: home hero `h1` (`text-[46px] xl:text-[52px]`) and the search results query (`text-[clamp(24px,3.5vw,38px)]`). The entry form title keeps `text-[40px] lg:text-5xl` for the same reason. `HomeAbout`'s `h2` keeps `leading-[1.15]`, looser than its token default by design.
+>
+> `ProfileContent` and `StaticContentPage` titles use plain Tailwind sizes with no tracking. They are not display titles and are deliberately outside this scale.
 
 ### Border Radius
 
@@ -368,7 +380,7 @@ Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
 - Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
-- Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with accent-emphasized word (`<em class="text-accent">`).
+- Heading: `font-serif text-heading` with accent-emphasized word (`<em class="text-accent">`).
 - Subtext: `text-base text-secondary`.
 - Labels: `font-mono text-sm uppercase tracking-label text-secondary`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
@@ -391,7 +403,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
 - `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
-- Both: `font-serif text-6xl` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
+- Both: `font-serif text-heading` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
 
 ---
 
@@ -400,7 +412,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 - Implemented by `src/app/(auth)/registration-confirmed/page.tsx` — server component, no data fetching. Reached via `api/auth/confirm-callback` after Supabase's confirmation link verifies the email; the callback creates no session, so the visitor is not authenticated. Auth route in `AUTH_ROUTES`; not in `OPEN_ROUTES_EXACT` — logged-in users are redirected to `/`.
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
 - Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
-- Heading: `font-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
+- Heading: `font-serif text-heading-sm` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
 - CTA: `SignInButton` (`SignInButton.tsx`, client) — medium filled accent `Button` ("SIGN IN") navigating to `/login` via `router.push`. Page stays a Server Component.
 
 ---
@@ -447,7 +459,7 @@ About section
 Search results page (`/search`)
 
 - Implemented in `src/app/(app)/search/page.tsx`. Column is `flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12`.
-- Page `h1`: "Search _movies and series_" in `font-serif text-display-sm tracking-display leading-none text-center mb-4 sm:mb-8`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
+- Page `h1`: "Search _movies and series_" in `font-serif text-display-sm text-center mb-4 sm:mb-8`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
 - Copy stays the same with or without a query. The query itself is already shown by the results heading below.
 - SearchBox sits under it in `mb-8 w-full max-w-160`.
 - Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `font-mono text-sm tracking-eyebrow text-accent uppercase`) over a `font-serif` `p` holding the quoted query and the type label.
@@ -506,7 +518,7 @@ Info & Form
   - Back link (font-mono, text-sm, tracking-label). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-action uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `font-mono text-sm tracking-eyebrow text-secondary uppercase`.
-  - Title: `font-serif text-display tracking-display leading-[0.95]`.
+  - Title: `font-serif text-display`.
   - Meta row: director label `font-mono text-sm tracking-action` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
   - Overview text (when available): `text-sm text-primary leading-relaxed mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.

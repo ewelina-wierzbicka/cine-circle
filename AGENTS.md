@@ -198,9 +198,11 @@ export const colors = {
 
 **Typography tokens (defined in `globals.css`):**
 
-- Display sizes: `text-display` (42→72px), `text-display-lg` (38→52px), `text-display-md` (32→48px), `text-display-sm` (28→38px). Font-size only, no paired line-height — keep an explicit `leading-*` at the call site.
-- Letter spacing: `tracking-display` (-0.03em, serif page titles), `tracking-heading` (-0.02em, serif section/auth titles), `tracking-label` (0.15em, mono uppercase labels/back links/footer), `tracking-eyebrow` (0.2em, section eyebrows), `tracking-action` (0.08em, buttons/pills/CTAs), `tracking-ui` (0.04em, nav items/chips/meta rows).
-- Never write `tracking-[…em]` or a `clamp()` font size at a call site — pick the role token. See DESIGN.md for the full table and the three deliberate exceptions.
+- Serif title sizes are **composite**: each `--text-*` token carries its own `--line-height`, `--letter-spacing` and `--font-weight`, so one class replaces four. Fluid display scale: `text-display` (42→72px), `text-display-lg` (38→52px), `text-display-md` (32→48px), `text-display-sm` (28→38px), all at `-0.03em`. Fixed auth titles: `text-heading` (60px), `text-heading-sm` (36px), both at `-0.02em` / `1.1`.
+  - Never add `leading-*`, `tracking-*` or `font-normal` next to one of these unless you mean to override it. Tailwind emits them as `var(--tw-leading, …)` / `var(--tw-tracking, …)` / `var(--tw-font-weight, …)`, so an override still works from any class order — but a redundant one is noise.
+- Letter spacing for everything else: `tracking-label` (0.15em, mono uppercase labels/back links/footer), `tracking-eyebrow` (0.2em, section eyebrows), `tracking-action` (0.08em, buttons/pills/CTAs), `tracking-ui` (0.04em, nav items/chips/meta rows). `tracking-display` and `tracking-heading` still exist for the two call sites that pair a non-token size with a title tracking.
+- `leading-heading` (1.1) covers serif titles outside the two scales.
+- Never write `tracking-[…em]`, `leading-[…]` or a `clamp()` font size at a call site — pick the role token. See DESIGN.md for the full table and the two deliberate exceptions.
 
 **Rules:**
 

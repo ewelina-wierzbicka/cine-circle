@@ -40,7 +40,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
           <p className="mb-6 font-mono text-sm uppercase tracking-eyebrow text-error">
             {eyebrow}
           </p>
-          <h1 className="mb-3.5 font-serif text-display-sm font-normal leading-[1.1] tracking-heading">
+          <h1 className="mb-3.5 font-serif text-display-sm leading-heading tracking-heading">
             {title}
           </h1>
           <p className="mb-7 text-sm leading-relaxed text-secondary">

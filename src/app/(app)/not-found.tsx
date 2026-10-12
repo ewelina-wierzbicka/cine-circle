@@ -15,7 +15,7 @@ export default function NotFound() {
         <p className="mb-2.5 font-mono text-sm uppercase tracking-eyebrow text-accent">
           Error 404
         </p>
-        <h1 className="font-serif text-display-lg leading-none tracking-display">
+        <h1 className="font-serif text-display-lg">
           This <em className="text-accent">scene</em> doesn&rsquo;t exist
         </h1>
         <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">

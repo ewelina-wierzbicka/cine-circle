@@ -37,7 +37,7 @@ export function ResetPasswordForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-heading leading-[1.1] mb-3">
+        <h1 className="font-serif text-heading mb-3">
           Choose a new
           <br />
           <em className="text-accent">password</em>

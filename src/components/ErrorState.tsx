@@ -25,7 +25,7 @@ export function ErrorState({ error, reset }: Props) {
         <p className="mb-2.5 font-mono text-sm uppercase tracking-eyebrow text-error">
           Something went wrong
         </p>
-        <h1 className="font-serif text-display-lg leading-none tracking-display">
+        <h1 className="font-serif text-display-lg">
           We hit a <em className="text-error">glitch</em>
         </h1>
         <p className="mb-8 mt-3.5 text-sm leading-relaxed text-secondary">

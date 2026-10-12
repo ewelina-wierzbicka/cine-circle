@@ -7,15 +7,45 @@
   --font-serif: var(--font-dm-serif-display);
   --font-mono: var(--font-dm-mono);
 
-  /* Display type scale, serif page titles. Comment gives the px range. */
+  /* Display type scale, serif page titles. Each token carries its own
+     line-height, letter-spacing and weight, so one class replaces four.
+     Tailwind emits them through --tw-leading / --tw-tracking / --tw-font-weight,
+     so a call site can still override with leading-*, tracking-* or font-*. */
   /* 42 to 72: media detail h1 */
   --text-display: clamp(2.625rem, 5.5vw, 4.5rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 400;
   /* 38 to 52: 404 and error titles */
   --text-display-lg: clamp(2.375rem, 5vw, 3.25rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: 400;
   /* 32 to 48: collection h1, home about h2 */
   --text-display-md: clamp(2rem, 5vw, 3rem);
+  --text-display-md--line-height: 0.95;
+  --text-display-md--letter-spacing: -0.03em;
+  --text-display-md--font-weight: 400;
   /* 28 to 38: search h1, auth error title */
   --text-display-sm: clamp(1.75rem, 4vw, 2.375rem);
+  --text-display-sm--line-height: 1;
+  --text-display-sm--letter-spacing: -0.03em;
+  --text-display-sm--font-weight: 400;
+
+  /* Serif auth and section titles. Fixed steps, not a fluid scale. */
+  /* 60px: login, register, reset-password, forgot-password sent */
+  --text-heading: 3.75rem;
+  --text-heading--line-height: 1.1;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading--font-weight: 400;
+  /* 36px: confirm-email, registration-confirmed, forgot-password form */
+  --text-heading-sm: 2.25rem;
+  --text-heading-sm--line-height: 1.1;
+  --text-heading-sm--letter-spacing: -0.02em;
+  --text-heading-sm--font-weight: 400;
+
+  /* Line height, for serif titles outside the two scales above */
+  --leading-heading: 1.1;
 
   /* Letter spacing, one token per typographic role */
   /* serif page titles */

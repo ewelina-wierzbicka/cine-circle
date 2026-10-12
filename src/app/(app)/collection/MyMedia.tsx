@@ -36,7 +36,7 @@ export default function MyMedia({ tab, initialData }: Props) {
           <p className="font-mono text-sm tracking-eyebrow text-accent uppercase mb-2">
             My Collection
           </p>
-          <h1 className="font-serif text-display-md tracking-display leading-[0.95]">
+          <h1 className="font-serif text-display-md">
             {tab === 'watched' ? (
               <em className="text-primary">Watched</em>
             ) : (

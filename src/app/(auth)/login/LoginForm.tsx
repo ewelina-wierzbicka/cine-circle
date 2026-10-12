@@ -47,7 +47,7 @@ export function LoginForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-heading leading-[1.1] mb-3">
+        <h1 className="font-serif text-heading mb-3">
           Welcome
           <br />
           <em className="text-accent">back</em>
