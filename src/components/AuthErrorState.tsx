@@ -38,7 +38,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
         <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
           <LockXIcon className="mx-auto mb-5 text-error" />
           <p className="mb-6 label-mono text-error">{eyebrow}</p>
-          <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
+          <h1 className="mb-3.5 title-serif text-[clamp(32px,5vw,38px)]">
             {title}
           </h1>
           <p className="mb-7 text-sm text-secondary">
