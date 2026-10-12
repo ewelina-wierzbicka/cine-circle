@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
-import { NormalizedMedia } from '@/types';
+import { CollectionTab, NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toHref } from '@/lib/mediaUtils';
 import { breadcrumbJsonLd, jsonLdScript, mediaJsonLd } from '@/lib/jsonLd';
@@ -23,6 +23,13 @@ type Props = {
   mediaType: 'movie' | 'series';
   searchParams?: MediaPageSearchParams;
 };
+
+function toCollectionTab(
+  value: string | string[] | undefined,
+): CollectionTab | undefined {
+  if (value === 'watched' || value === 'to_watch') return value;
+  return undefined;
+}
 
 function toQueryString(searchParams: MediaPageSearchParams): string {
   const params = new URLSearchParams();
@@ -57,6 +64,7 @@ export default async function MediaPage({
 
   const initialStep = searchParams.step === '2' ? 2 : 1;
   const fromSearch = searchParams.from === 'search';
+  const fromTab = toCollectionTab(searchParams.tab);
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
   const tmdbId = Number(id);
 
@@ -82,7 +90,7 @@ export default async function MediaPage({
         navLink={
           !fromSearch ? (
             <Suspense fallback={null}>
-              <UserCollectionBackLink />
+              <UserCollectionBackLink tab={fromTab} />
             </Suspense>
           ) : undefined
         }
@@ -115,10 +123,10 @@ type EnrichedProps = {
   mediaType: 'movie' | 'series';
 };
 
-async function UserCollectionBackLink() {
+async function UserCollectionBackLink({ tab }: { tab?: CollectionTab }) {
   const user = await getCurrentUser();
   if (!user) return null;
-  return <CollectionBackLink />;
+  return <CollectionBackLink tab={tab} />;
 }
 
 async function UserEnrichedActions({

@@ -1,3 +1,4 @@
+import { CollectionTab } from '@/types';
 import { admin } from '../admin';
 
 // Seed helpers for collection tests. Uses the service-role admin client so it
@@ -13,7 +14,7 @@ type SeedMedia = {
 };
 
 type SeedEntry = SeedMedia & {
-  watchStatus: 'to_watch' | 'watched';
+  watchStatus: CollectionTab;
   rating?: number;
   watchedDate?: string;
   review?: string;

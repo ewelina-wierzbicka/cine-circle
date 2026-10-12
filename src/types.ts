@@ -8,6 +8,8 @@ export type MediaType = 'movie' | 'series';
 
 export type FilterMediaType = 'movie' | 'series' | 'all';
 
+export type CollectionTab = 'to_watch' | 'watched';
+
 export type RatingValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export type RatingFilter = RatingValue[];

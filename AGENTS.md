@@ -152,6 +152,7 @@ series/[id]/             # /series/:id
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---
 
