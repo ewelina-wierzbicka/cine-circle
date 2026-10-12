@@ -17,16 +17,12 @@ export function StaticContentPage({
         <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
           {title}
         </h1>
-        <p className="font-mono text-sm text-secondary tracking-widest uppercase mb-10">
-          {subtitle}
-        </p>
+        <p className="label-mono text-secondary mb-10">{subtitle}</p>
 
         <div className="space-y-8">
           {sections.map(({ heading, body }) => (
             <div key={heading}>
-              <h2 className="font-mono text-sm tracking-[0.15em] text-accent uppercase mb-3">
-                {heading}
-              </h2>
+              <h2 className="label-mono text-accent mb-3">{heading}</h2>
               <p className="font-sans text-base text-secondary leading-relaxed">
                 {body}
               </p>

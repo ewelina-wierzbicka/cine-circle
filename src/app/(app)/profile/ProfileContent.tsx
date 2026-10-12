@@ -230,9 +230,7 @@ export function ProfileContent({ profile, email }: Props) {
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
-            Display name
-          </p>
+          <p className="label-mono text-secondary mb-3">Display name</p>
           {isEditingName ? (
             <div>
               <div className="flex items-center gap-2">
@@ -309,9 +307,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
             <div className="text-left pr-2">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
-                Email address
-              </p>
+              <p className="label-mono text-secondary">Email address</p>
               <p className="text-primary text-sm mt-2">{email}</p>
             </div>
             <ChevronIcon
@@ -325,9 +321,7 @@ export function ProfileContent({ profile, email }: Props) {
           {emailOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  New email
-                </p>
+                <p className="label-mono text-secondary mb-2">New email</p>
                 <Input
                   id="new-email"
                   type="email"
@@ -355,9 +349,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
           >
             <div className="text-left">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
-                Password
-              </p>
+              <p className="label-mono text-secondary">Password</p>
               {!passwordOpen && (
                 <p className="text-secondary text-sm mt-2 tracking-widest">
                   ••••••••
@@ -375,7 +367,7 @@ export function ProfileContent({ profile, email }: Props) {
           {passwordOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="label-mono text-secondary mb-2">
                   Current password
                 </p>
                 <Input
@@ -386,9 +378,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  New password
-                </p>
+                <p className="label-mono text-secondary mb-2">New password</p>
                 <Input
                   id="new-password"
                   type="password"
@@ -397,7 +387,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <p className="label-mono text-secondary mb-2">
                   Confirm new password
                 </p>
                 <Input
@@ -437,9 +427,7 @@ export function ProfileContent({ profile, email }: Props) {
           className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
         >
           <div className="text-left">
-            <p className="font-mono text-sm uppercase tracking-[0.15em] text-error">
-              Delete account
-            </p>
+            <p className="label-mono text-error">Delete account</p>
             <p className="text-secondary text-sm mt-4">
               Permanently remove your account and data
             </p>
@@ -462,7 +450,7 @@ export function ProfileContent({ profile, email }: Props) {
               This cannot be undone.
             </p>
             <div className="mt-6">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
+              <p className="label-mono text-secondary mb-5">
                 Type <span className="text-error font-semibold">DELETE</span> to
                 confirm
               </p>
