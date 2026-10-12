@@ -152,6 +152,7 @@ series/[id]/             # /series/:id
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---
 
@@ -490,7 +491,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T20 back link returns to originating tab |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**

@@ -34,9 +34,16 @@ export function toSearchMediaListProps(media: NormalizedMedia) {
   };
 }
 
-export function toUserMediaListProps(userMedia: UserMedia) {
+export function toUserMediaListProps(
+  userMedia: UserMedia,
+  fromTab?: 'to_watch' | 'watched',
+) {
   const { media } = userMedia;
-  const href = toHref(media.tmdb_id, media.title, media.media_type);
+  // The tab travels with the link so the detail page can send the user back
+  // to the tab they came from.
+  const href = fromTab
+    ? `${toHref(media.tmdb_id, media.title, media.media_type)}?tab=${fromTab}`
+    : toHref(media.tmdb_id, media.title, media.media_type);
   return {
     id: userMedia.id,
     tmdb_id: media.tmdb_id,

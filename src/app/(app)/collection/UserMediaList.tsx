@@ -43,7 +43,7 @@ export default function UserMediaList({
     <>
       {isLoading && <Loader fullScreen={true} />}
       <MediaList
-        media={media.map(toUserMediaListProps)}
+        media={media.map((entry) => toUserMediaListProps(entry, watchStatus))}
         emptyMessage="No entries added yet"
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
