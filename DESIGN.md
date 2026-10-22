@@ -161,7 +161,7 @@ One component per repeated link style. Never retype the classes at a call site.
 
 - `Link` (`src/components/Link.tsx`) — inline accent link, `text-accent hover:opacity-80 transition-opacity`. Auth form footers.
 - `BackLink` (`src/components/BackLink.tsx`) — the `← LABEL` page back link, `inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start`. Renders the arrow itself (`aria-hidden`), so children are the label only. Used by `MediaInfoHeader` (BACK TO SEARCH) and `CollectionBackLink` (BACK TO COLLECTION), which is now a thin wrapper that picks the tab href.
-- `LogoLink` (`src/components/LogoLink.tsx`) — `/logo.webp` 200×50 linking home, `flex items-center gap-2.5`. Props: `className` for positioning, `priority` for the LCP preload. Used by `Header`, `HeaderSkeleton`, `AuthFormLayout` (all `priority`) and `AuthErrorState`.
+- `Logo` (`src/components/Logo.tsx`) — `/logo.webp` 200×50 linking home, `flex items-center gap-2.5`. Props: `className` for positioning, `priority` for the LCP preload. Used by `Header`, `HeaderSkeleton`, `AuthFormLayout` (all `priority`) and `AuthErrorState`.
 - `MediaPosterLink` (`src/components/MediaPosterLink.tsx`) — 110×165 poster tile link (`w-27.5 h-41.25 rounded-xl border border-white/[0.07]`), optional genre badge and truncated title below. Used by the home "Recently Watched" strip and the "More like this" row.
 
 ### TopBar (Header)

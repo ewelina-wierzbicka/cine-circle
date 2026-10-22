@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/Button';
-import { LogoLink } from '@/components/LogoLink';
+import { Logo } from '@/components/Logo';
 import { LockXIcon } from '@/icons/LockX';
 import Link from 'next/link';
 
@@ -24,7 +24,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
       <div className="pointer-events-none absolute -bottom-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,oklch(65%_0.18_25/0.10)_0%,transparent_65%)]" />
 
       <header className="absolute top-7 left-6 z-10 h-16">
-        <LogoLink />
+        <Logo />
       </header>
       <main className="relative flex h-full items-center justify-center p-6">
         <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">

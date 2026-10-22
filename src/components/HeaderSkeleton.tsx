@@ -1,10 +1,10 @@
-import { LogoLink } from '@/components/LogoLink';
+import { Logo } from '@/components/Logo';
 import AvatarIcon from '@/icons/Avatar';
 
 export function HeaderSkeleton() {
   return (
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
-      <LogoLink priority />
+      <Logo priority />
       <nav
         className="hidden md:flex items-center gap-1"
         aria-label="Main navigation"

@@ -1,6 +1,6 @@
 'use client';
 
-import { LogoLink } from '@/components/LogoLink';
+import { Logo } from '@/components/Logo';
 import AvatarIcon from '@/icons/Avatar';
 import { twMerge } from '@/lib/cn';
 import { logout } from '@/services/auth';
@@ -40,7 +40,7 @@ export default function Header({ profile }: HeaderProps) {
 
   return (
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
-      <LogoLink priority />
+      <Logo priority />
       <nav
         className="hidden md:flex items-center gap-1"
         aria-label="Main navigation"

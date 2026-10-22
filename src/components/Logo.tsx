@@ -1,18 +1,15 @@
 import { twMerge } from '@/lib/cn';
 import Image from 'next/image';
-import NextLink from 'next/link';
+import Link from 'next/link';
 
 type Props = {
   className?: string;
   priority?: boolean;
 };
 
-export function LogoLink({ className, priority = false }: Props) {
+export function Logo({ className, priority = false }: Props) {
   return (
-    <NextLink
-      href="/"
-      className={twMerge('flex items-center gap-2.5', className)}
-    >
+    <Link href="/" className={twMerge('flex items-center gap-2.5', className)}>
       <Image
         src="/logo.webp"
         alt="MidnightFrame logo"
@@ -21,6 +18,6 @@ export function LogoLink({ className, priority = false }: Props) {
         className="object-contain"
         priority={priority}
       />
-    </NextLink>
+    </Link>
   );
 }

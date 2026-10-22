@@ -203,7 +203,6 @@ export const colors = {
 - Before adding a new color, check if an existing token fits
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
-- Repeated links have a component — never retype their classes: `Link` (inline accent link), `BackLink` (`← LABEL` page back link, wrapped by `CollectionBackLink`), `LogoLink` (logo link to `/`), `MediaPosterLink` (110x165 poster tile, optional genre badge and title)
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
@@ -245,7 +244,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
-- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`, all through `<LogoLink priority />`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single largest image per page, and the only call site is the detail poster in `MediaDetailWrapper`.
+- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`, all through `<Logo priority />`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single largest image per page, and the only call site is the detail poster in `MediaDetailWrapper`.
 - Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site. For social/OG images use `tmdbSocialImageUrl(path)` — crawlers fetch the raw URL with no loader in front of it, so it pins the `w780` bucket.
 
 ### Metadata & SEO
