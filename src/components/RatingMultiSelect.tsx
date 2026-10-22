@@ -1,5 +1,6 @@
 'use client';
 
+import { MenuOption } from '@/components/MenuOption';
 import StarRating from '@/components/StarRating';
 import ChevronIcon from '@/icons/Chevron';
 import { CheckCircleIcon } from '@/icons/CheckCircle';
@@ -138,12 +139,13 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
               const selected = value.includes(option.value);
 
               return (
-                <li
+                <MenuOption
                   key={option.value}
                   id={optionId(option.value)}
                   role="option"
                   aria-selected={selected}
                   aria-label={option.label}
+                  selected={selected}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     setHighlighted(index);
@@ -151,8 +153,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
                   }}
                   onMouseEnter={() => setHighlighted(index)}
                   className={twMerge(
-                    'flex items-center justify-between gap-3 px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                    selected && 'text-primary bg-bg3',
+                    'flex items-center justify-between gap-3',
                     index === highlighted && 'bg-bg3',
                   )}
                 >
@@ -165,7 +166,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
                       selected ? 'opacity-100' : 'opacity-0',
                     )}
                   />
-                </li>
+                </MenuOption>
               );
             })}
           </ul>

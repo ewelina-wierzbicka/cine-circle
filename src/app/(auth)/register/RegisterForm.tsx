@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthFormFooter } from '../AuthFormFooter';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
@@ -122,9 +123,9 @@ export function RegisterForm() {
         </p>
       </form>
 
-      <p className="mt-6 text-center text-sm text-secondary">
+      <AuthFormFooter>
         Already have an account? <Link href="/login">Sign in</Link>
-      </p>
+      </AuthFormFooter>
     </>
   );
 }

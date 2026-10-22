@@ -1,5 +1,6 @@
 'use client';
 
+import { MenuOption } from '@/components/MenuOption';
 import AvatarIcon from '@/icons/Avatar';
 import { twMerge } from '@/lib/cn';
 import { logout } from '@/services/auth';
@@ -122,14 +123,12 @@ export default function Header({ profile }: HeaderProps) {
                 aria-label="User menu"
               >
                 {NAV_ITEMS.map(({ label, href, match }) => (
-                  <li
+                  <MenuOption
                     key={href}
                     role="menuitem"
                     tabIndex={0}
-                    className={twMerge(
-                      'md:hidden px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                      match(pathname) && 'text-primary bg-bg3',
-                    )}
+                    selected={match(pathname)}
+                    className="md:hidden"
                     onClick={() => {
                       router.push(href);
                       setDropdownOpen(false);
@@ -145,15 +144,12 @@ export default function Header({ profile }: HeaderProps) {
                     }}
                   >
                     {label}
-                  </li>
+                  </MenuOption>
                 ))}
-                <li
+                <MenuOption
                   role="menuitem"
                   tabIndex={0}
-                  className={twMerge(
-                    'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                    pathname === '/profile' && 'text-primary bg-bg3',
-                  )}
+                  selected={pathname === '/profile'}
                   onClick={() => {
                     router.push('/profile');
                     setDropdownOpen(false);
@@ -169,12 +165,11 @@ export default function Header({ profile }: HeaderProps) {
                   }}
                 >
                   Profile
-                </li>
+                </MenuOption>
 
-                <li
+                <MenuOption
                   role="menuitem"
                   tabIndex={0}
-                  className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0"
                   onClick={handleLogout}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -186,7 +181,7 @@ export default function Header({ profile }: HeaderProps) {
                   }}
                 >
                   Logout
-                </li>
+                </MenuOption>
               </ul>
             </div>
           )}

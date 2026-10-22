@@ -1,5 +1,6 @@
 'use client';
 
+import { MenuOption } from '@/components/MenuOption';
 import ChevronIcon from '@/icons/Chevron';
 import { twMerge } from '@/lib/cn';
 import { useEffect, useRef, useState } from 'react';
@@ -89,18 +90,15 @@ export default function Select<T extends string = string>({
           className="absolute z-50 mt-1.5 w-full min-w-max rounded-xl bg-bg2 border border-secondary/25 overflow-hidden shadow-xl"
         >
           {options.map((option) => (
-            <li
+            <MenuOption
               key={option.value}
               role="option"
               aria-selected={option.value === value}
+              selected={option.value === value}
               onClick={() => handleChange(option.value)}
-              className={twMerge(
-                'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                option.value === value && 'text-primary bg-bg3',
-              )}
             >
               {option.label}
-            </li>
+            </MenuOption>
           ))}
         </ul>
       )}
