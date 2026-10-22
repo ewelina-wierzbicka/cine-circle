@@ -1,6 +1,5 @@
 'use client';
 
-import { FieldError } from '@/components/FieldError';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
@@ -31,8 +30,6 @@ const Input = forwardRef<HTMLInputElement, Props>(
     },
     ref,
   ) => {
-    const errorId = `${id}-error`;
-
     return (
       <>
         <div className="relative w-full">
@@ -52,13 +49,11 @@ const Input = forwardRef<HTMLInputElement, Props>(
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
             ref={ref}
             {...rest}
           />
         </div>
-        <FieldError id={errorId} error={error} />
+        {error && <p className="text-error text-sm mt-2">{error}</p>}{' '}
       </>
     );
   },

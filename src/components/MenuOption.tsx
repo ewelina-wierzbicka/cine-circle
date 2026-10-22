@@ -4,12 +4,6 @@ type Props = React.LiHTMLAttributes<HTMLLIElement> & {
   selected?: boolean;
 };
 
-/**
- * The shared row inside a dropdown panel: `Select`, `RatingMultiSelect` and the
- * `Header` user menu. Only the look is shared. The role, the keyboard handling
- * and the ARIA state stay at the call site, because a listbox option and a
- * menuitem need different ones.
- */
 export function MenuOption({ selected, className, children, ...rest }: Props) {
   return (
     <li

@@ -1,9 +1,8 @@
 'use client';
 
-import { FieldError } from '@/components/FieldError';
 import StarIcon from '@/icons/Star';
 import { twMerge } from '@/lib/cn';
-import { useId, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Props = {
   value?: number;
@@ -18,7 +17,6 @@ export default function StarRatingInput({
   error,
   ariaLabelledby,
 }: Props) {
-  const errorId = useId();
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   const displayValue = hoverValue ?? value;
   // The radio that lives in the tab order: the checked one, or the first
@@ -67,8 +65,6 @@ export default function StarRatingInput({
         onKeyDown={handleKeyDown}
         role="radiogroup"
         aria-label="Rating out of 5 stars"
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
         {...(ariaLabelledby ? { 'aria-labelledby': ariaLabelledby } : {})}
       >
         {Array.from({ length: 5 }).map((_, i) => {
@@ -127,7 +123,7 @@ export default function StarRatingInput({
           </button>
         )}
       </div>
-      <FieldError id={errorId} error={error} />
+      {error && <p className="text-error text-sm mt-2">{error}</p>}{' '}
     </div>
   );
 }

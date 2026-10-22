@@ -44,7 +44,7 @@ export default function ConfirmEmailPage() {
         </div>
       </div>
 
-      <AuthFormFooter className="mt-8">
+      <AuthFormFooter>
         Back to <Link href="/login">Sign in</Link>
       </AuthFormFooter>
     </AuthFormLayout>

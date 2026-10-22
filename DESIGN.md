@@ -232,18 +232,11 @@ export const motion = {
 - The shared dropdown row: `px-3.5 py-4 text-sm`, `text-secondary hover:text-primary`, `border-b border-secondary/15 last:border-0`. `selected` adds `text-primary bg-bg3`.
 - Used by `Select`, `RatingMultiSelect` and the `Header` user menu. Renders an `<li>` and forwards every `li` prop, so the role, ARIA state and keyboard handling stay at the call site. Only the look is shared.
 
-### FieldError
-
-- `src/components/FieldError.tsx`.
-- The validation message under a field: `text-error text-sm mt-2`. Renders nothing without an error.
-- Used by `Input`, `Textarea` and `StarRatingInput`. Each passes an `id` and sets `aria-describedby` plus `aria-invalid` on the control.
-
 ### Input
 
 - `src/components/Input.tsx`.
 - Controlled input with `variant` prop: `search` adds an icon and padding; `rating` shows `/10` suffix.
 - Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `accent` and `bg3`.
-- Forwards ref and renders `FieldError` when `error` is set.
 
 ### PasswordInput
 
@@ -286,7 +279,6 @@ export const motion = {
 ### Textarea
 
 - `src/components/Textarea.tsx`.
-- Styled rounded textarea (`h-30`) with focus styles, forwards ref and shows `FieldError`.
 
 ### Button
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { FieldError } from '@/components/FieldError';
 import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
 
@@ -13,8 +12,6 @@ type Props = {
 
 const Textarea = forwardRef<HTMLTextAreaElement, Props>(
   ({ id, handleChange, className, error, ...rest }, ref) => {
-    const errorId = `${id}-error`;
-
     return (
       <>
         <textarea
@@ -24,12 +21,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
             className,
           )}
           onChange={handleChange}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
           ref={ref}
           {...rest}
         />
-        <FieldError id={errorId} error={error} />
+        {error && <p className="text-error text-sm mt-2">{error}</p>}{' '}
       </>
     );
   },
