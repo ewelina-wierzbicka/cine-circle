@@ -18,7 +18,7 @@ export default function NotFound() {
       <div className="relative z-10 max-w-[420px] animate-fade-up text-center">
         <ClapperboardIcon className="mx-auto mb-5 h-14 w-14 text-accent opacity-50" />
         <p className="mb-2.5 label-mono text-accent">Error 404</p>
-        <h1 className="font-serif text-[clamp(38px,5vw,52px)] leading-none tracking-[-0.03em]">
+        <h1 className="display-serif">
           This <em className="text-accent">scene</em> doesn&rsquo;t exist
         </h1>
         <p className="mb-8 mt-3.5 text-sm text-secondary">

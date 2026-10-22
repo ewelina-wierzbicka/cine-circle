@@ -84,10 +84,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
         </div>
       )}
       <p className="label-mono text-secondary mb-4">{typeLabel}</p>
-      <h1
-        className="font-serif font-normal tracking-[-0.03em] leading-[0.95] mb-5 text-balance"
-        style={{ fontSize: 'clamp(42px, 5.5vw, 72px)' }}
-      >
+      <h1 className="display-serif text-[clamp(42px,5.5vw,72px)] mb-5 text-balance">
         {title}
       </h1>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-7">

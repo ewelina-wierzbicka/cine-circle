@@ -173,7 +173,7 @@ export function ProfileContent({ profile, email }: Props) {
 
   return (
     <div className="mx-auto max-w-xl px-6 py-10 md:py-16 animate-fade-up min-h-full flex flex-col justify-center">
-      <h1 className="text-4xl md:text-5xl mb-8 font-serif">
+      <h1 className="title-serif text-4xl md:text-5xl mb-8">
         <span>Your </span>
         <em className="text-accent">Profile</em>
       </h1>

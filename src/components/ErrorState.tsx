@@ -23,7 +23,7 @@ export function ErrorState({ error, reset }: Props) {
       <div className="relative z-10 max-w-105 animate-fade-up text-center">
         <AlertCircleIcon className="mx-auto mb-5 h-14 w-14 text-error opacity-55" />
         <p className="mb-2.5 label-mono text-error">Something went wrong</p>
-        <h1 className="font-serif text-[clamp(34px,5vw,46px)] leading-none tracking-[-0.03em]">
+        <h1 className="display-serif">
           We hit a <em className="text-error">glitch</em>
         </h1>
         <p className="mb-8 mt-3.5 text-sm text-secondary">

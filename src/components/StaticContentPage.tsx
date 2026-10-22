@@ -14,7 +14,7 @@ export function StaticContentPage({
   return (
     <div className="px-6 md:px-12 py-12">
       <div className="max-w-2xl mx-auto">
-        <h1 className="font-serif text-3xl sm:text-4xl text-primary mb-2">
+        <h1 className="title-serif text-3xl sm:text-4xl text-primary mb-2">
           {title}
         </h1>
         <p className="label-mono text-secondary mb-10">{subtitle}</p>

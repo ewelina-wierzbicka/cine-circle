@@ -55,28 +55,16 @@ export const fonts = {
 };
 
 export const type = {
-  heroTitle: {
-    fontFamily: fonts.serif,
-    fontSize: 'clamp(42px, 5.5vw, 72px)',
-    fontWeight: 400,
-    letterSpacing: '-0.03em',
-    lineHeight: 0.95,
-  },
-  searchHero: {
-    fontFamily: fonts.serif,
-    fontSize: '46px (52px at xl)',
-    fontWeight: 400,
-    letterSpacing: '-0.03em',
-    lineHeight: 1.0,
-  },
-  sectionTitle: {
+  // `display-serif` — every page-level serif title
+  displaySerif: {
     fontFamily: fonts.serif,
     fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 400,
     letterSpacing: '-0.03em',
     lineHeight: 0.95,
   },
-  loginTitle: {
+  // `title-serif` — the auth and form headings
+  titleSerif: {
     fontFamily: fonts.serif,
     fontSize: 60,
     fontWeight: 400,
@@ -84,12 +72,20 @@ export const type = {
     lineHeight: 1.1,
   },
   body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
+  // `label-mono`
   label: {
     fontFamily: fonts.mono,
     fontSize: 14,
     fontWeight: 400,
-    letterSpacing: '0.14em',
+    letterSpacing: '0.15em',
     textTransform: 'uppercase',
+  },
+  // `ui-mono`
+  uiMono: {
+    fontFamily: fonts.mono,
+    fontSize: 14,
+    fontWeight: 400,
+    letterSpacing: '0.05em',
   },
   navItem: {
     fontFamily: fonts.sans,
@@ -129,13 +125,40 @@ The serif title ships as one `@utility`:
 }
 ```
 
-9 call sites: login, register, reset-password, forgot-password (both states), confirm-email, registration-confirmed, the entry-form title and `AuthErrorState`.
+12 call sites: login, register, reset-password, forgot-password (both states), confirm-email, registration-confirmed, the entry-form title, `AuthErrorState`, the profile h1, the `StaticContentPage` h1 and the search results query.
 
-> It sets `--tw-leading` as well as `line-height`. That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of falling back to the `text-4xl` default. Four sites take the 60px default; five override (`text-4xl`, `text-[40px] lg:text-5xl`, `text-[clamp(32px,5vw,38px)]`).
+> It sets `--tw-leading` as well as `line-height`. That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of falling back to the `text-4xl` default. Four sites take the 60px default; eight override (`text-4xl`, `text-4xl md:text-5xl`, `text-3xl sm:text-4xl`, `text-[40px] lg:text-5xl`, `text-[clamp(32px,5vw,38px)]`, `text-[clamp(24px,3.5vw,38px)]`).
 >
 > Do not add `font-normal` next to it. The utility sets 400, and DM Serif Display ships no other weight.
 >
-> The serif display titles are a separate matter and keep their own classes: they run `-0.03em` with `leading-none` or `leading-[0.95]`, not `-0.02em`/1.1. So does the search results query (`-0.02em` but `leading-none`).
+> The search results query is the one site that also overrides the leading, back to `leading-none`.
+
+#### `display-serif`
+
+The page-level serif title, one step tighter than `title-serif` on both axes:
+
+```css
+@utility display-serif {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  --tw-leading: 0.95;
+  line-height: 0.95;
+}
+```
+
+8 call sites: the collection h1, the home hero, the home about h2, both 404 pages, `ErrorState`, the search h1 and the media detail title.
+
+> Same `--tw-leading` mechanic as `title-serif`. Five sites take the clamp default; the search h1 keeps `text-[clamp(28px,4vw,36px)]` and the media title `text-[clamp(42px,5.5vw,72px)]`, both genuinely outside the range.
+>
+> `HomeAbout` is the only site that overrides the leading, to `leading-[1.15]`. Its h2 wraps to several lines and 0.95 closes it up too far.
+>
+> It replaced a `style={{ fontSize }}` attribute on the media detail h1. No inline style in `src/` sets a font size any more.
+>
+> The avatar initials span in `ProfileContent` keeps plain `font-serif text-3xl`. One glyph in a circle is not a heading, and the tracking would nudge it off centre.
+>
+> Pick between the two by role, not size: `title-serif` is the auth and form heading at `-0.02em`/1.1, `display-serif` is the page title at `-0.03em`/0.95.
 
 #### `label-mono` and `ui-mono`
 
@@ -150,7 +173,7 @@ The mono uppercase label ships as one `@utility` in `src/globals.css`, not as fo
 }
 ```
 
-It covers 45 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.14em` in the `type.label` reference block above, and the `0.1em`–`0.22em` spread the call sites used to carry.
+It covers 45 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.1em`–`0.22em` spread the call sites used to carry.
 
 > Never pair it with `font-mono`, `text-sm`, `uppercase` or `tracking-*`. A `tracking-*` override does win, since Tailwind emits `label-mono` before the `tracking-*` utilities, but only use one when the value is genuinely different.
 >
@@ -282,7 +305,7 @@ One component per repeated link style. Never retype the classes at a call site.
 
 ### MediaInfoHeader & MediaActions
 
-- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: search back link, genre pills, type label, `h1` (`font-serif`, `clamp(42px, 5.5vw, 72px)`), director/date/runtime/score meta row, accent divider, overview. `font-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop. The collection back link is not part of it — see `CollectionBackLink` under Info & Form.
+- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: search back link, genre pills, type label, `h1` (`display-serif text-[clamp(42px,5.5vw,72px)]`), director/date/runtime/score meta row, accent divider, overview. `label-mono` and `ui-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop. The collection back link is not part of it — see `CollectionBackLink` under Info & Form.
 - `src/components/MediaActions.tsx` renders everything below the divider that depends on the signed-in user: the signed-out sign-in prompt, the `to_watch` buttons, the default add buttons, and the `watched` body (rating via `StarRating`, watched date, review) with its UPDATE / DELETE buttons.
 - `src/components/MediaActionsSkeleton.tsx` is its Suspense fallback. Two `Skeleton` blocks, no text.
 
@@ -424,7 +447,7 @@ Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
 - Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
-- Heading: `font-serif text-6xl` (Login) or `font-serif text-6xl` (Register) with accent-emphasized word (`<em class="text-accent">`).
+- Heading: `title-serif` (Login and Register alike) with accent-emphasized word (`<em class="text-accent">`).
 - Subtext: `text-base text-secondary`.
 - Labels: `label-mono text-secondary`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
@@ -447,7 +470,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
 - `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
-- Both: `font-serif text-6xl` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
+- Both: `title-serif` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
 
 ---
 
@@ -456,7 +479,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 - Implemented by `src/app/(auth)/registration-confirmed/page.tsx` — server component, no data fetching. Reached via `api/auth/confirm-callback` after Supabase's confirmation link verifies the email; the callback creates no session, so the visitor is not authenticated. Auth route in `AUTH_ROUTES`; not in `OPEN_ROUTES_EXACT` — logged-in users are redirected to `/`.
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
 - Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
-- Heading: `font-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
+- Heading: `title-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
 - CTA: `SignInButton` (`SignInButton.tsx`, client) — medium filled accent `Button` ("SIGN IN") navigating to `/login` via `router.push`. Page stays a Server Component.
 
 ---
@@ -474,7 +497,7 @@ Layout & Ambient
 
 Hero
 
-- Heading is the page `h1` ("Track the movies you watch") using `font-serif text-[46px] xl:text-[52px] tracking-[-0.03em] leading-none` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
+- Heading is the page `h1` ("Track the movies you watch") using `display-serif text-center` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
@@ -503,10 +526,10 @@ About section
 Search results page (`/search`)
 
 - Implemented in `src/app/(app)/search/page.tsx`. Column is `flex-1 flex flex-col justify-center items-center py-8 px-6 md:px-12`.
-- Page `h1`: "Search _movies and series_" in `font-serif text-[clamp(28px,4vw,40px)] tracking-[-0.03em] leading-none text-center mb-6`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
+- Page `h1`: "Search _movies and series_" in `display-serif text-[clamp(28px,4vw,36px)] text-center mb-4 sm:mb-8`, accent emphasis via `<em class="text-accent">`. Server-rendered above the SearchBox.
 - Copy stays the same with or without a query. The query itself is already shown by the results heading below.
 - SearchBox sits under it in `mb-8 w-full max-w-160`.
-- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `label-mono text-accent`) over a `font-serif` `p` holding the quoted query and the type label.
+- Results heading (`SearchResults` → `MediaList heading`) is an eyebrow `p` ("SEARCH RESULTS", `label-mono text-accent`) over a `title-serif text-[clamp(24px,3.5vw,38px)] leading-none` `p` holding the quoted query and the type label.
 - `search/loading.tsx` mirrors the order: an `h-10 w-72` heading skeleton, then the SearchBox bar, then the results grid.
 
 ---
@@ -517,7 +540,7 @@ Search results page (`/search`)
 
 Layout & Header
 
-- Header area: eyebrow `label-mono text-accent` and heading `font-serif text-[clamp(32px,5vw,48px)]`.
+- Header area: eyebrow `label-mono text-accent` and heading `display-serif`.
 - Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
 - Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
@@ -560,10 +583,10 @@ Info & Form
 
 - Info view (`MediaInfoHeader` + `MediaActions`) shows:
   - Back link (`label-mono`). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
-  - Genre pills (when available): flex-wrap row of `font-mono text-sm tracking-[0.08em] uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
+  - Genre pills (when available): flex-wrap row of `ui-mono uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `label-mono text-secondary`.
-  - Title: `font-serif` with inline style `fontSize: 'clamp(42px, 5.5vw, 72px)'`, `tracking-[-0.03em]`, `leading-[0.95]`.
-  - Meta row: director label `font-mono text-sm tracking-[0.08em]` and date `font-mono text-sm`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
+  - Title: `display-serif text-[clamp(42px,5.5vw,72px)]`.
+  - Meta row: director label and date both `ui-mono`. Optional blocks join the same row, separated by `w-0.75 h-0.75 rounded-full bg-secondary` dots: runtime (`Clock` icon + `2h 28m` for movies, `avg 56m / episode` for series), season and episode counts (series only, `5 seasons` and `62 episodes`, pluralised) and TMDB score (`text-amber-400` value, muted vote count in parentheses, `text-primary` `avg on TMDB` attribution).
   - Accent divider `w-12 h-px bg-accent opacity-60`.
   - Overview text (when available): `text-sm text-primary mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
@@ -603,7 +626,7 @@ Layout
 
 - Centered single column `max-w-xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center`.
 - Entry animation: `animate-fade-up`.
-- Heading: `font-serif text-4xl md:text-5xl` with accent emphasis (`<em class="text-accent">`): "Your _Profile_".
+- Heading: `title-serif text-4xl md:text-5xl` with accent emphasis (`<em class="text-accent">`): "Your _Profile_".
 
 Profile Card
 
@@ -651,7 +674,7 @@ Static content pages, open routes (no auth required). All three render through o
 
 - `src/components/StaticContentPage.tsx` — server component, props `title`, `subtitle`, `sections`. Each page supplies only its metadata and its `StaticSection[]` copy.
 - Layout: `min-h-full px-6 md:px-12 py-12`, `max-w-2xl mx-auto`.
-- Title (`h1`): `font-serif text-3xl sm:text-4xl text-primary`.
+- Title (`h1`): `title-serif text-3xl sm:text-4xl text-primary`.
 - Subtitle label: `label-mono text-secondary`.
 - Section headings (`h2`): `label-mono text-accent`.
 - Body text: `text-base text-secondary`. Sections stack with `space-y-8`.

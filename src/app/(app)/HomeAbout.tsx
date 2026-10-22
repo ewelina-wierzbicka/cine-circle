@@ -38,7 +38,7 @@ export function HomeAbout() {
           </p>
           <h2
             id="what-is-midnightframe"
-            className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.15] mb-6"
+            className="display-serif leading-[1.15] mb-6"
           >
             A quiet place for the movies that{' '}
             <em className="text-accent">
