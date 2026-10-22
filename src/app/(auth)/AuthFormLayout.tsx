@@ -1,8 +1,7 @@
+import { LogoLink } from '@/components/LogoLink';
 import MediaPoster from '@/components/MediaPoster';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
-import Image from 'next/image';
-import Link from 'next/link';
 import { ReactNode } from 'react';
 
 type AuthFormLayoutProps = {
@@ -31,19 +30,7 @@ export default async function AuthFormLayout({
         />
         <div className="absolute -top-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.50_0.1_250/0.1)_0%,transparent_65%)]" />
         <div className="absolute -bottom-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.60_0.1_165/0.1)_0%,transparent_65%)]" />
-        <Link
-          href="/"
-          className="absolute top-4 left-6 z-10 flex items-center gap-2.5"
-        >
-          <Image
-            src="/logo.webp"
-            alt="MidnightFrame logo"
-            width={200}
-            height={50}
-            className="object-contain"
-            priority
-          />
-        </Link>
+        <LogoLink className="absolute top-4 left-6 z-10" priority />
 
         <div className="relative flex items-center justify-center h-full px-6 md:px-12">
           <div className="w-full max-w-90 animate-fade-up">{children}</div>

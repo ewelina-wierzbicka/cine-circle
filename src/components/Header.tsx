@@ -1,5 +1,6 @@
 'use client';
 
+import { LogoLink } from '@/components/LogoLink';
 import AvatarIcon from '@/icons/Avatar';
 import { twMerge } from '@/lib/cn';
 import { logout } from '@/services/auth';
@@ -39,16 +40,7 @@ export default function Header({ profile }: HeaderProps) {
 
   return (
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
-      <Link href="/" className="flex items-center gap-2.5">
-        <Image
-          src="/logo.webp"
-          alt="MidnightFrame logo"
-          width={200}
-          height={50}
-          className="object-contain"
-          priority
-        />
-      </Link>
+      <LogoLink priority />
       <nav
         className="hidden md:flex items-center gap-1"
         aria-label="Main navigation"
