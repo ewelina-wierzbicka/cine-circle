@@ -60,6 +60,20 @@
   line-height: 1.1;
 }
 
+/* Serif display title. The page-level serif headings: the collection and home
+   titles, the 404 and error states, the search and media titles. Tighter than
+   title-serif on both axes, which is what separates display type from the auth
+   headings. Same --tw-leading trick: a call site that needs a different size
+   adds its own text-* and keeps the 0.95. */
+@utility display-serif {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  --tw-leading: 0.95;
+  line-height: 0.95;
+}
+
 /* Mono UI text. The other half of the mono usage: meta rows, filter chips,
    counts, FAQ indices, inline links. Same font and size as label-mono but
    tighter and with no text-transform, so mixed-case copy reads normally.
