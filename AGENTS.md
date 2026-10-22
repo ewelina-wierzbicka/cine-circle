@@ -46,6 +46,7 @@ src/
   app/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
+      AuthFormFooter.tsx      # shared closing line under an auth form; mt-6 default, mt-8 override
       layout.tsx
       login/
         page.tsx
@@ -125,7 +126,7 @@ series/[id]/             # /series/:id
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
+  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, MenuOption, FieldError, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -203,6 +204,8 @@ export const colors = {
 - Before adding a new color, check if an existing token fits
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
+- `MenuOption` is the dropdown row for `Select`, `RatingMultiSelect` and the `Header` menu. It renders an `<li>` and ships only the look — pass the role, ARIA state and key handlers at the call site, since a listbox option and a menuitem need different ones
+- `FieldError` is the message under a form field. `Input`, `Textarea` and `StarRatingInput` already render it and wire `aria-describedby` plus `aria-invalid`. Never retype `text-error text-sm mt-2`
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 

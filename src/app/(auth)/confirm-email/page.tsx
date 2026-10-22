@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   description: 'Check your inbox for the MidnightFrame confirmation link.',
 };
 
+import { AuthFormFooter } from '../AuthFormFooter';
 import { Link } from '@/components/Link';
 import { EnvelopeIcon } from '@/icons/Envelope';
 import AuthFormLayout from '../AuthFormLayout';
@@ -43,9 +44,9 @@ export default function ConfirmEmailPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-center text-sm text-secondary">
+      <AuthFormFooter className="mt-8">
         Back to <Link href="/login">Sign in</Link>
-      </p>
+      </AuthFormFooter>
     </AuthFormLayout>
   );
 }

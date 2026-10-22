@@ -1,5 +1,6 @@
 'use client';
 
+import { AuthFormFooter } from '../AuthFormFooter';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
@@ -63,9 +64,9 @@ export function ForgotPasswordForm() {
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-secondary">
+        <AuthFormFooter className="mt-8">
           Back to <Link href="/login">Sign in</Link>
-        </p>
+        </AuthFormFooter>
       </>
     );
   }
@@ -113,9 +114,9 @@ export function ForgotPasswordForm() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-secondary">
+      <AuthFormFooter>
         Back to <Link href="/login">Sign in</Link>
-      </p>
+      </AuthFormFooter>
     </>
   );
 }
