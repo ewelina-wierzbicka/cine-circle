@@ -217,6 +217,8 @@ export const colors = {
   - Same `--tw-leading` mechanic. Five sites take the clamp; the search h1 and the media title keep their own, both outside the range. `HomeAbout` is the one leading override, `leading-[1.15]`, because its h2 wraps.
   - **Pick between the two serif utilities by role, not size.** `title-serif` is the auth and form heading at -0.02em/1.1, `display-serif` is the page title at -0.03em/0.95.
   - It removed the `style={{ fontSize }}` on the media detail h1, the last inline font size in `src/`. `fontSize` now appears in no inline style — use a `text-*` class.
+- **The four utilities are the whole set. Do not add a fifth for body copy.** A bare `text-sm` or `text-base` is already the answer: it carries 1.625 from the `@theme` pins, DM Sans is inherited, and there is no tracking or weight to bundle. The 67 `text-sm` and 14 `text-base` call sites stay as they are. A `body-copy` utility would have to bake `text-secondary` in, which all four existing utilities deliberately leave at the call site.
+- **Never write an arbitrary px font size.** `text-[14px]` is `text-sm`, and the arbitrary value silently skips the 1.625 theme line-height. No `text-[…px]` remains in `src/`.
 - **Every mono call site is one of the two mono utilities, and every serif heading one of the two serif utilities.** `font-mono` appears nowhere else in `src/`. The only `font-serif` left is the avatar initials span in `ProfileContent` — one glyph in a circle, so it is not a heading and the tracking would shift it off centre. If you reach for `font-mono text-sm tracking-[…]` again, pick `label-mono` (uppercase label, 0.15em) or `ui-mono` (UI and meta text, 0.05em); for `font-serif … tracking-[…] leading-[…]`, pick `title-serif` or `display-serif`.
 
 **Rules:**

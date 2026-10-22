@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. One `@utility` covers the mono uppercase label: `label-mono` (see Typography below).
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. Four typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below).
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -197,6 +197,14 @@ The other half of the mono usage is `ui-mono`, same font and size but tighter an
 >
 > Going from no tracking to `0.05em` is the largest shift here, about 0.7px per character on the FAQ indices, dropdown subtitles and rating readout.
 
+#### Body copy needs no utility
+
+The four above are the whole set. Everything else is a bare `text-sm` (67 sites) or `text-base` (14), and that is already correct: the size class carries 1.625 from the `@theme` pins, DM Sans is inherited from `<body>`, and there is no tracking, weight or family left to bundle. A fifth utility would have to bake `text-secondary` in, and all four existing ones deliberately leave colour at the call site.
+
+> Never write an arbitrary px font size. `text-[14px]` is `text-sm`, and the arbitrary value silently skips the 1.625 theme line-height. No `text-[…px]` remains in `src/`.
+>
+> What repeats in the remaining call sites is component-shaped, not type-shaped: the menu option row (5 sites), the field error (3) and the auth footer line (6). Tracked in CIN-270, not as a utility.
+
 ### Border Radius
 
 ```ts
@@ -276,7 +284,7 @@ export const motion = {
 - Card: `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
 - Hover lift (`-translate-y-1.25`) and hover border tint to accent.
 - Poster image fills card; placeholder gradient when missing.
-- Hover overlay exposes actions or a `VIEW →` label (`font-mono text-sm text-accent`).
+- Hover overlay (`MediaCardOverlay`) slides up from the bottom and holds `Button` actions. There is no text label in it; the `VIEW →` affordance this line used to describe does not exist in `src/`.
 - Title/date use `text-sm`; title `font-medium`.
 - Shows `StarRating` when `watchStatus === 'watched'` and `rating` present.
 
@@ -403,7 +411,7 @@ export const motion = {
 - `src/app/(app)/HomeAbout.tsx` — static about section below the home hero. Two-column editorial block on `lg:` (`grid lg:grid-cols-2 gap-12 lg:gap-16`): left is eyebrow + `h2` + two paragraphs, right is the FAQ accordion. Below it a three-up feature card grid, then a `BackToTopLink`.
 - `src/components/BackToTopLink.tsx` — client `button` styled like `Link`, scrolls `main` back to 0 with `behavior: 'smooth'`.
 - FAQ copy lives in `src/lib/homeFaq.ts` as `HOME_FAQ`, not in the component. `faqJsonLd()` serialises the same array, so edit the questions and answers there and the accordion and the `FAQPage` structured data stay identical.
-- FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-white/[0.08]` (`last:border-b`), `01`/`02`/`03` in `font-mono text-sm text-secondary/40`, question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
+- FAQ is native `<details>` / `<summary>`. Each row: hairline `border-t border-secondary/15` on the `details` (`last:border-b`), `01`/`02`/`03` in `ui-mono text-secondary/40` (accent on `group-open`), question as `h3` (`text-base md:text-lg`), and `PlusIcon` that rotates to an × via `group-open:rotate-45`. Marker hidden with `list-none [&::-webkit-details-marker]:hidden`. The "Common questions" `h2` is `sr-only` so the heading outline survives the layout.
 - Feature cards: `rounded-2xl border border-white/[0.07] bg-bg2/60 p-6`, icon in a `w-11 h-11 rounded-xl bg-accent/12` tile, index top-right, `label-mono text-accent` title, `text-sm text-secondary` body. Hover lifts the border to `white/[0.14]` and the fill to `bg-bg2`.
 - **Signed-out visitors only.** `src/app/(app)/SignedOutAbout.tsx` reads the session and renders it or `null`, inside `<Suspense fallback={null}>` so the home shell still prerenders.
 
@@ -451,7 +459,7 @@ Right column (Visuals)
 - Rendered only on `lg` and up (`hidden lg:block`).
 - 3×2 grid of `MediaPoster` components; each tile fills its cell.
 - Two overlay gradients: a right-to-left dark fade and a top/bottom vignette applied via absolute layers.
-- Top-left logo (26×26) and `font-mono` wordmark are positioned absolutely.
+- Top-left logo is positioned absolutely: `/logo.webp` through `next/image` with `priority`. There is no text wordmark beside it.
 
 ---
 
@@ -461,7 +469,7 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
 - `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
-- Both: `title-serif` title with accent `<em>`, `text-base text-secondary` subtext, `font-mono text-sm` labels, `Button` accent medium CTA, "Back to Sign in" footer link.
+- Both: `title-serif` title with accent `<em>`, `text-base text-secondary` subtext, `label-mono` field labels, `Button` accent medium CTA, "Back to Sign in" footer link.
 
 ---
 
@@ -496,7 +504,7 @@ Search
 
 - Central SearchBox (`src/components/SearchBox.tsx`) placed in a `max-w-160` wrapper.
 - SearchBox internals: `Input` with transparent background in the centered layout, container toggles focus state to `bg-bg2` and `border-accent` plus focus shadow `shadow-[0_0_0_3px_oklch(82%_0.10_165/0.12)]`.
-- Filter chips are buttons with `font-mono text-sm tracking-[0.05em]`; active chip uses `bg-accent text-dark font-medium`.
+- Filter chips are buttons with `ui-mono`; active chip uses `bg-accent text-dark font-medium`.
 - SearchBox provides `hintTitles` from `getTrendingMovies()` and renders an animated dropdown with infinite-scroll via IntersectionObserver.
 
 Recently Watched
@@ -505,7 +513,7 @@ Recently Watched
 - `RecentWatched` (`src/app/(app)/RecentWatched.tsx`) is an async Server Component wrapped in `<Suspense fallback={null}>`; it `await`s the promise and renders nothing when empty.
 - `HomeHero` reads the same promise with `use(promise)` inside a `Suspense` to toggle the `hasRecentMedia` flag for the dropdown-shift behavior.
 - Each poster link: `shrink-0 rounded-[10px] overflow-hidden border border-white/[0.07] w-27.5 h-41.25` (sized for 110×165px posters).
-- Section header: left label `label-mono text-secondary` and right-side `SEE ALL →` link `font-mono text-sm text-accent tracking-[0.08em]`.
+- Section header: left label `label-mono text-secondary` and right-side `SEE ALL →` link `ui-mono text-accent`.
 
 - Label "RECENTLY WATCHED" DM Mono 14px secondary + "SEE ALL →" accent
 - Horizontal scroll of `110×165px` MediaPoster cards, `border-radius: 10px`, `gap: 12px`
@@ -541,7 +549,7 @@ List & Cards
 - `UserMediaList` (client) fetches paginated data via `useUserMedia` and renders `MediaList`.
 - `MediaList` uses a responsive CSS grid: `grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5`.
 - Cards are `MediaCard` components with `rounded-xl`, `border border-white/[0.07]`, `aspect-2/3`.
-- Empty state shows a centered `font-mono text-sm` message.
+- Empty state shows a centered `label-mono text-secondary` message (`MediaList`, `emptyMessage` prop).
 - Pagination uses IntersectionObserver to fetch next pages and shows `Loader` while loading.
 
 Notes
@@ -596,7 +604,7 @@ Recommendations ("More Like This")
 - Section label: `label-mono text-secondary`.
 - Horizontal scroll row (`flex gap-3 overflow-x-auto pb-1`) matching the home page "Recently Watched" pattern.
 - Each card: `w-27.5 h-41.25 rounded-xl overflow-hidden border border-white/[0.07]` with `MediaPoster` inside.
-- Genre badge overlay: `font-mono text-sm` in a `bg-dark/70 text-accent` pill at bottom-left of the card.
+- Genre badge overlay: `ui-mono uppercase` in a `bg-dark/70 text-accent` pill at bottom-left of the card.
 - Title below card: `text-sm text-secondary truncate`, transitions to `text-primary` on hover.
 - Cards link to `/movie/{id}-{slug}` or `/series/{id}-{slug}`.
 - Padding: `px-6 md:px-12 pb-8`.
@@ -626,12 +634,12 @@ Profile Card
 - Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with accent pencil SVG icon. Triggers hidden file input.
 - Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
 - Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-semibold` with pencil edit icon.
-- Inline edit mode: `Input` component with Save (`text-accent font-mono uppercase`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
+- Inline edit mode: `Input` component with Save (`ui-mono uppercase text-accent`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
 
 Account Card
 
 - `bg-bg2 border border-white/[0.07] rounded-2xl p-6`.
-- Section header: `font-mono text-base uppercase tracking-[0.15em] text-secondary`.
+- Section header: `label-mono text-base text-secondary`.
 - Collapsible rows use `ChevronIcon` that rotates on open/close (`rotate-90` / `-rotate-90`).
 
 - **Email row**: shows current email, expands to `Input` for new email + `Button` "Update email". Calls `updateEmail` service.
@@ -640,7 +648,7 @@ Account Card
 Danger Zone Card
 
 - `bg-bg2 border border-red-400/20 rounded-2xl p-6`.
-- Header: `font-mono text-base uppercase tracking-[0.15em] text-red-400`.
+- Header: `label-mono text-base text-error`.
 - Collapsible delete section with confirmation: user must type "DELETE" in input.
 - Delete button: `bg-red-800 hover:bg-red-900 text-primary`. Calls `deleteAccount` service.
 
