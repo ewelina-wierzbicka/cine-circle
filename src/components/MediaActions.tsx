@@ -82,9 +82,7 @@ export default function MediaActions({
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col gap-3 pt-3">
-        <p className="font-mono text-sm text-secondary">
-          Sign in to add to collection
-        </p>
+        <p className="ui-mono text-secondary">Sign in to add to collection</p>
         <Button handleClick={() => router.push(`/login?rurl=${pathname}`)}>
           SIGN IN
         </Button>
@@ -107,31 +105,23 @@ export default function MediaActions({
         <div className="flex flex-col gap-8 mb-8">
           {rating != null && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-3">
-                Your Rating
-              </p>
+              <p className="label-mono text-secondary mb-3">Your Rating</p>
               <div className="flex items-center gap-3">
                 <StarRating rating={rating} />
-                <span className="font-mono text-sm tracking-[0.06em] text-primary">
-                  {rating}/10
-                </span>
+                <span className="ui-mono text-primary">{rating}/10</span>
               </div>
             </div>
           )}
           {formattedDate && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
-                Watched
-              </p>
+              <p className="label-mono text-secondary mb-2">Watched</p>
               <p className="text-sm text-primary">{formattedDate}</p>
             </div>
           )}
           {review && (
             <div>
-              <p className="font-mono text-sm tracking-[0.18em] text-secondary uppercase mb-2">
-                Review
-              </p>
-              <p className="text-sm text-primary leading-relaxed whitespace-pre-wrap">
+              <p className="label-mono text-secondary mb-2">Review</p>
+              <p className="text-sm text-primary whitespace-pre-wrap">
                 {review}
               </p>
             </div>

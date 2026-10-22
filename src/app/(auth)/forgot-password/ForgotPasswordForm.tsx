@@ -39,7 +39,7 @@ export function ForgotPasswordForm() {
             <EnvelopeIcon className="text-accent" />
           </div>
 
-          <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+          <h1 className="title-serif text-4xl mb-2">
             Check your
             <br />
             <em className="text-accent">inbox</em>
@@ -48,16 +48,16 @@ export function ForgotPasswordForm() {
         </div>
 
         <div className="w-full flex flex-col gap-4">
-          <p className="text-sm text-secondary leading-relaxed">
+          <p className="text-sm text-secondary">
             We sent a password reset link to your email address. Click the link
             to choose a new password.
           </p>
 
           <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-            <p className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-1">
+            <p className="label-mono text-secondary mb-1">
               Didn&apos;t receive it?
             </p>
-            <p className="text-sm text-secondary leading-relaxed">
+            <p className="text-sm text-secondary">
               Check your spam folder. It may take a few minutes to arrive.
             </p>
           </div>
@@ -73,7 +73,7 @@ export function ForgotPasswordForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="title-serif mb-3">
           Reset your
           <br />
           <em className="text-accent">password</em>
@@ -88,10 +88,7 @@ export function ForgotPasswordForm() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="email" className="label-mono text-secondary mb-2">
             Email
           </label>
           <Input

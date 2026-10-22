@@ -37,13 +37,11 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
       <main className="relative flex h-full items-center justify-center p-6">
         <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">
           <LockXIcon className="mx-auto mb-5 text-error" />
-          <p className="mb-6 font-mono text-sm uppercase tracking-[0.22em] text-error">
-            {eyebrow}
-          </p>
-          <h1 className="mb-3.5 font-serif text-[clamp(32px,5vw,38px)] font-normal leading-[1.1] tracking-[-0.02em]">
+          <p className="mb-6 label-mono text-error">{eyebrow}</p>
+          <h1 className="mb-3.5 title-serif text-[clamp(32px,5vw,38px)]">
             {title}
           </h1>
-          <p className="mb-7 text-sm leading-relaxed text-secondary">
+          <p className="mb-7 text-sm text-secondary">
             Something on our end failed. Try again, or continue as a guest.
           </p>
           <div className="flex flex-col gap-2.5">

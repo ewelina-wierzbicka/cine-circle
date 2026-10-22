@@ -7,6 +7,14 @@
   --font-serif: var(--font-dm-serif-display);
   --font-mono: var(--font-dm-mono);
 
+  /* Body copy line-height. The `line-height: 1.625` on `body` only reaches
+     text with no `text-*` class, because every `text-*` utility sets its own
+     line-height. These two put the body-copy sizes on 1.625 so prose does not
+     need `leading-relaxed` at the call site. Sizes above `text-base` are left
+     on the Tailwind defaults: they are display and single-line UI, not prose. */
+  --text-sm--line-height: 1.625;
+  --text-base--line-height: 1.625;
+
   /* colors */
   --color-primary: #ece9e3;
   --color-secondary: rgba(236, 233, 227, 0.75);
@@ -27,12 +35,62 @@
   background-image: var(--gradient-blue);
 }
 
+/* Mono uppercase label. Covers eyebrows, field labels, back links, nav items,
+   pills and meta rows. Colour and spacing stay at the call site.
+   Not for mono text whose letter-spacing is deliberately tighter
+   (0.04em to 0.08em) — those keep their own tracking-*. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Serif title. The auth and entry-form headings: login, register,
+   reset-password, confirm-email, registration-confirmed, the entry form and
+   the auth error state. Pins the 60px step; a call site that needs a smaller
+   one adds its own text-* and keeps the 1.1 line-height, because --tw-leading
+   is what every text-* utility reads. */
+@utility title-serif {
+  font-family: var(--font-serif);
+  font-size: var(--text-6xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  --tw-leading: 1.1;
+  line-height: 1.1;
+}
+
+/* Serif display title. The page-level serif headings: the collection and home
+   titles, the 404 and error states, the search and media titles. Tighter than
+   title-serif on both axes, which is what separates display type from the auth
+   headings. Same --tw-leading trick: a call site that needs a different size
+   adds its own text-* and keeps the 0.95. */
+@utility display-serif {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  --tw-leading: 0.95;
+  line-height: 0.95;
+}
+
+/* Mono UI text. The other half of the mono usage: meta rows, filter chips,
+   counts, FAQ indices, inline links. Same font and size as label-mono but
+   tighter and with no text-transform, so mixed-case copy reads normally.
+   Add `uppercase` at the call site when the text is a short all-caps chip. */
+@utility ui-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+}
+
 html,
 body {
   background: var(--color-dark);
   color: var(--color-primary);
   height: 100%;
   overflow: hidden;
+  line-height: 1.625;
 }
 
 #root {
