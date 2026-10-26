@@ -38,6 +38,21 @@ export default function Header({ profile }: HeaderProps) {
     await logout();
   };
 
+  const navigateTo = (href: string) => {
+    router.push(href);
+    setDropdownOpen(false);
+  };
+
+  const activateOnKeyDown =
+    (activate: () => void) => (e: React.KeyboardEvent<HTMLLIElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activate();
+      } else if (e.key === 'Escape') {
+        setDropdownOpen(false);
+      }
+    };
+
   return (
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
       <Link href="/" className="flex items-center gap-2.5">
@@ -129,19 +144,8 @@ export default function Header({ profile }: HeaderProps) {
                     tabIndex={0}
                     selected={match(pathname)}
                     className="md:hidden"
-                    onClick={() => {
-                      router.push(href);
-                      setDropdownOpen(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        router.push(href);
-                        setDropdownOpen(false);
-                      } else if (e.key === 'Escape') {
-                        setDropdownOpen(false);
-                      }
-                    }}
+                    onClick={() => navigateTo(href)}
+                    onKeyDown={activateOnKeyDown(() => navigateTo(href))}
                   >
                     {label}
                   </MenuOption>
@@ -150,19 +154,8 @@ export default function Header({ profile }: HeaderProps) {
                   role="menuitem"
                   tabIndex={0}
                   selected={pathname === '/profile'}
-                  onClick={() => {
-                    router.push('/profile');
-                    setDropdownOpen(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      router.push('/profile');
-                      setDropdownOpen(false);
-                    } else if (e.key === 'Escape') {
-                      setDropdownOpen(false);
-                    }
-                  }}
+                  onClick={() => navigateTo('/profile')}
+                  onKeyDown={activateOnKeyDown(() => navigateTo('/profile'))}
                 >
                   Profile
                 </MenuOption>
@@ -171,14 +164,7 @@ export default function Header({ profile }: HeaderProps) {
                   role="menuitem"
                   tabIndex={0}
                   onClick={handleLogout}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      void handleLogout();
-                    } else if (e.key === 'Escape') {
-                      setDropdownOpen(false);
-                    }
-                  }}
+                  onKeyDown={activateOnKeyDown(() => void handleLogout())}
                 >
                   Logout
                 </MenuOption>
