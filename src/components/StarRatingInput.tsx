@@ -123,7 +123,7 @@ export default function StarRatingInput({
           </button>
         )}
       </div>
-      {error && <p className="text-error text-sm mt-2">{error}</p>}{' '}
+      {error && <p className="text-error text-sm mt-2">{error}</p>}
     </div>
   );
 }

@@ -46,7 +46,7 @@ src/
   app/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
-      AuthFormFooter.tsx      # shared closing line under an auth form; mt-6 default, mt-8 override
+      AuthFormFooter.tsx      # shared closing line under an auth form
       layout.tsx
       login/
         page.tsx

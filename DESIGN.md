@@ -237,6 +237,7 @@ export const motion = {
 - `src/components/Input.tsx`.
 - Controlled input with `variant` prop: `search` adds an icon and padding; `rating` shows `/10` suffix.
 - Styles: rounded-xl, `h-11.5`, `bg-bg2`, focus border `accent` and `bg3`.
+- Forwards ref and renders error text when provided.
 
 ### PasswordInput
 
@@ -279,6 +280,7 @@ export const motion = {
 ### Textarea
 
 - `src/components/Textarea.tsx`.
+- Styled rounded textarea (`h-30`) with focus styles, forwards ref and shows error messages.
 
 ### Button
 
@@ -358,7 +360,7 @@ Left column (Form)
 - Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
 - Footer link toggles between Login and Register using `text-accent` links.
-- The closing line is `(auth)/AuthFormFooter.tsx` — `mt-6 text-center text-sm text-secondary`. The two card-ending screens, the forgot-password success state and `/confirm-email`, pass `className="mt-8"`.
+- The closing line is `(auth)/AuthFormFooter.tsx` — `mt-6 text-center text-sm text-secondary`.
 
 Right column (Visuals)
 
