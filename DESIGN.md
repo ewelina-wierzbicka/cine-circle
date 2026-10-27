@@ -540,7 +540,7 @@ Interactions & Accessibility
 
 Layout
 
-- Centered single column `max-w-xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center`.
+- Centered single column `max-w-2xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center-safe`. `-safe` falls back to top alignment once content overflows the viewport, so the heading never scrolls out of reach above the fold.
 - Entry animation: `animate-fade-up`.
 - Heading: `font-serif text-4xl md:text-5xl` with accent emphasis (`<em class="text-accent">`): "Your _Profile_".
 
