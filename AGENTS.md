@@ -205,6 +205,8 @@ export const colors = {
 
 **Typography utility (defined in `globals.css`):**
 
+- **All four name the `next/font` variable directly, `var(--font-dm-serif-display)` and `var(--font-dm-mono)`, never the `--font-serif` / `--font-mono` theme key. Do not "tidy" them onto the theme key: the font silently falls back to DM Sans.** `dmSerifDisplay.variable` sits on `<body>`, so `--font-dm-serif-display` is undefined at `:root`. The theme key is declared at `:root` as `var(--font-dm-serif-display)`, and a custom property is substituted where it is declared, so there it resolves to nothing and inherits down invalid. Tailwind's own `.font-serif` escapes this only because `@theme inline` substitutes the value at build time and emits `var(--font-dm-serif-display)`. A hand-written `@utility` gets no such treatment. This is the same body-scoping caveat as the `font-sans` note above.
+
 - `label-mono` — the mono uppercase label: `font-mono` + `text-sm` + `letter-spacing: 0.15em` + `uppercase`. Use it for eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site.
 - Do not pair it with `font-mono`, `text-sm`, `uppercase` or a `tracking-*` class — it already sets all four. Overrides do win, since Tailwind emits `label-mono` before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label (the two profile card headers). Reach for an override only when the value is genuinely different.
 - `ui-mono` — the other half of the mono usage: `font-mono` + `text-sm` + `letter-spacing: 0.05em`, **no** `text-transform`. Meta rows, filter chips, counts, FAQ indices, inline mono links. Covers the 19 sites that used to carry `tracking-[0.04em]` through `tracking-[0.08em]` or no tracking at all.

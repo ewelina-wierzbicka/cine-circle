@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. Four typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below).
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. Four typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below). All four set `font-family` from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key: the key is declared at `:root` but the `next/font` variable is scoped to `<body>`, so a theme-key reference resolves to nothing and the font falls back to DM Sans.
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -116,7 +116,7 @@ The serif title ships as one `@utility`:
 
 ```css
 @utility title-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-dm-serif-display);
   font-size: var(--text-6xl);
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -139,7 +139,7 @@ The page-level serif title, one step tighter than `title-serif` on both axes:
 
 ```css
 @utility display-serif {
-  font-family: var(--font-serif);
+  font-family: var(--font-dm-serif-display);
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 400;
   letter-spacing: -0.03em;
@@ -166,7 +166,7 @@ The mono uppercase label ships as one `@utility` in `src/globals.css`, not as fo
 
 ```css
 @utility label-mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-dm-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -185,7 +185,7 @@ The other half of the mono usage is `ui-mono`, same font and size but tighter an
 
 ```css
 @utility ui-mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-dm-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.05em;
 }
