@@ -150,7 +150,7 @@ The page-level serif title, one step tighter than `title-serif` on both axes:
 
 8 call sites: the collection h1, the home hero, the home about h2, both 404 pages, `ErrorState`, the search h1 and the media detail title.
 
-> Same `--tw-leading` mechanic as `title-serif`. Five sites take the clamp default; the search h1 keeps `text-[clamp(28px,4vw,36px)]` and the media title `text-[clamp(42px,5.5vw,72px)]`, both genuinely outside the range.
+> Same `--tw-leading` mechanic as `title-serif`. Four sites take the clamp default. Three keep their own size: the home hero at `text-[46px] xl:text-[52px]`, the search h1 at `text-[clamp(28px,4vw,36px)]` and the media title at `text-[clamp(42px,5.5vw,72px)]`.
 >
 > `HomeAbout` is the only site that overrides the leading, to `leading-[1.15]`. Its h2 wraps to several lines and 0.95 closes it up too far.
 >
@@ -505,7 +505,7 @@ Layout & Ambient
 
 Hero
 
-- Heading is the page `h1` ("Track the movies you watch") using `display-serif text-center` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
+- Heading is the page `h1` ("Track the movies you watch") using `display-serif text-[46px] xl:text-[52px] text-center` with accent emphasis via `<em class="text-accent">`. It renders for everyone, signed in or out, and is the only `h1` on `/`; for signed-out visitors `HomeAbout` below supplies the `h2` and `h3` levels.
 - Subtext: `text-secondary text-md` and centered.
 - Animations: `animate-fade-up` and `animate-fade-in` with small delays applied to hero and subtext.
 
