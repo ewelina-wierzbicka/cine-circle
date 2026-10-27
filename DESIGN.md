@@ -235,6 +235,12 @@ One component per repeated link style. Never retype the classes at a call site.
 - Implements intersection-observer pagination and shows `Loader` while fetching.
 - Only the first cards (6) get `priority`. That is one row at `xl` and about the mobile fold. The rest stay lazy.
 
+### MenuOption
+
+- `src/components/MenuOption.tsx`.
+- The shared dropdown row: `px-3.5 py-4 text-sm`, `text-secondary hover:text-primary`, `border-b border-secondary/15 last:border-0`. `selected` adds `text-primary bg-bg3`.
+- Used by `Select`, `RatingMultiSelect` and the `Header` user menu. Renders an `<li>` and forwards every `li` prop, so the role, ARIA state and keyboard handling stay at the call site. Only the look is shared.
+
 ### Input
 
 - `src/components/Input.tsx`.
@@ -363,6 +369,7 @@ Left column (Form)
 - Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
 - Footer link toggles between Login and Register using `text-accent` links.
+- The closing line is `(auth)/AuthFormFooter.tsx` — `mt-6 text-center text-sm text-secondary`.
 
 Right column (Visuals)
 

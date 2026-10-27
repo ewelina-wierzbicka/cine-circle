@@ -46,6 +46,7 @@ src/
   app/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
+      AuthFormFooter.tsx      # shared closing line under an auth form
       layout.tsx
       login/
         page.tsx
@@ -203,6 +204,7 @@ export const colors = {
 - Before adding a new color, check if an existing token fits
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
+- `MenuOption` is the dropdown row for `Select`, `RatingMultiSelect` and the `Header` menu. It renders an `<li>` and ships only the look — pass the role, ARIA state and key handlers at the call site, since a listbox option and a menuitem need different ones
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 

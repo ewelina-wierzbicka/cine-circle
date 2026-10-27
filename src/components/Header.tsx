@@ -1,5 +1,6 @@
 'use client';
 
+import { MenuOption } from '@/components/MenuOption';
 import { Logo } from '@/components/Logo';
 import AvatarIcon from '@/icons/Avatar';
 import { twMerge } from '@/lib/cn';
@@ -37,6 +38,21 @@ export default function Header({ profile }: HeaderProps) {
     setDropdownOpen(false);
     await logout();
   };
+
+  const navigateTo = (href: string) => {
+    router.push(href);
+    setDropdownOpen(false);
+  };
+
+  const activateOnKeyDown =
+    (activate: () => void) => (e: React.KeyboardEvent<HTMLLIElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activate();
+      } else if (e.key === 'Escape') {
+        setDropdownOpen(false);
+      }
+    };
 
   return (
     <header className="relative z-50 flex items-center justify-between h-16 px-6 md:px-12 shrink-0">
@@ -114,71 +130,36 @@ export default function Header({ profile }: HeaderProps) {
                 aria-label="User menu"
               >
                 {NAV_ITEMS.map(({ label, href, match }) => (
-                  <li
+                  <MenuOption
                     key={href}
                     role="menuitem"
                     tabIndex={0}
-                    className={twMerge(
-                      'md:hidden px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                      match(pathname) && 'text-primary bg-bg3',
-                    )}
-                    onClick={() => {
-                      router.push(href);
-                      setDropdownOpen(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        router.push(href);
-                        setDropdownOpen(false);
-                      } else if (e.key === 'Escape') {
-                        setDropdownOpen(false);
-                      }
-                    }}
+                    selected={match(pathname)}
+                    className="md:hidden"
+                    onClick={() => navigateTo(href)}
+                    onKeyDown={activateOnKeyDown(() => navigateTo(href))}
                   >
                     {label}
-                  </li>
+                  </MenuOption>
                 ))}
-                <li
+                <MenuOption
                   role="menuitem"
                   tabIndex={0}
-                  className={twMerge(
-                    'px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0',
-                    pathname === '/profile' && 'text-primary bg-bg3',
-                  )}
-                  onClick={() => {
-                    router.push('/profile');
-                    setDropdownOpen(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      router.push('/profile');
-                      setDropdownOpen(false);
-                    } else if (e.key === 'Escape') {
-                      setDropdownOpen(false);
-                    }
-                  }}
+                  selected={pathname === '/profile'}
+                  onClick={() => navigateTo('/profile')}
+                  onKeyDown={activateOnKeyDown(() => navigateTo('/profile'))}
                 >
                   Profile
-                </li>
+                </MenuOption>
 
-                <li
+                <MenuOption
                   role="menuitem"
                   tabIndex={0}
-                  className="px-3.5 py-4 text-sm cursor-pointer transition-colors select-none text-secondary hover:text-primary border-b border-secondary/15 last:border-0"
                   onClick={handleLogout}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      void handleLogout();
-                    } else if (e.key === 'Escape') {
-                      setDropdownOpen(false);
-                    }
-                  }}
+                  onKeyDown={activateOnKeyDown(() => void handleLogout())}
                 >
                   Logout
-                </li>
+                </MenuOption>
               </ul>
             </div>
           )}
