@@ -1,8 +1,8 @@
 'use client';
 
 import Button from '@/components/Button';
+import { Logo } from '@/components/Logo';
 import { LockXIcon } from '@/icons/LockX';
-import Image from 'next/image';
 import Link from 'next/link';
 
 type Props = {
@@ -24,15 +24,7 @@ export function AuthErrorState({ eyebrow, title, ctaLabel, reset }: Props) {
       <div className="pointer-events-none absolute -bottom-40 left-1/2 h-130 w-130 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,oklch(65%_0.18_25/0.10)_0%,transparent_65%)]" />
 
       <header className="absolute top-7 left-6 z-10 h-16">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Image
-            src="/logo.webp"
-            alt="MidnightFrame logo"
-            width={200}
-            height={50}
-            className="object-contain"
-          />
-        </Link>
+        <Logo />
       </header>
       <main className="relative flex h-full items-center justify-center p-6">
         <div className="relative z-10 w-full max-w-[380px] animate-fade-up text-center">

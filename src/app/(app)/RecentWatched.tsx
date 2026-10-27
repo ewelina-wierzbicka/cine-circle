@@ -1,4 +1,4 @@
-import MediaPoster from '@/components/MediaPoster';
+import { MediaPosterLink } from '@/components/MediaPosterLink';
 import { toHref } from '@/lib/mediaUtils';
 import { TrendingMovie } from '@/types';
 import Link from 'next/link';
@@ -25,23 +25,14 @@ export async function RecentWatched({ recentPostersPromise }: Props) {
         </Link>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1">
-        {recentPosters.map((poster, i) => {
-          const href = toHref(poster.id, poster.title, poster.type);
-          return (
-            <Link
-              key={i}
-              href={href}
-              className="shrink-0 rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25"
-            >
-              <MediaPoster
-                title={poster.title}
-                src={poster.posterUrl}
-                className="w-full h-full max-w-none rounded-xl"
-                sizes="110px"
-              />
-            </Link>
-          );
-        })}
+        {recentPosters.map((poster, i) => (
+          <MediaPosterLink
+            key={i}
+            href={toHref(poster.id, poster.title, poster.type)}
+            title={poster.title}
+            src={poster.posterUrl}
+          />
+        ))}
       </div>
     </div>
   );

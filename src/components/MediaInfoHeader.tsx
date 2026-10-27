@@ -1,6 +1,6 @@
+import { BackLink } from '@/components/BackLink';
 import ClockIcon from '@/icons/Clock';
 import { NormalizedMedia } from '@/types';
-import Link from 'next/link';
 
 type Props = {
   media: Pick<
@@ -70,14 +70,7 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
 
   return (
     <>
-      {fromSearch && (
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start"
-        >
-          ← BACK TO SEARCH
-        </Link>
-      )}
+      {fromSearch && <BackLink href="/">BACK TO SEARCH</BackLink>}
       {genres && genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {genres.map((g) => (
