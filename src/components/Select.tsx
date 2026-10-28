@@ -1,9 +1,10 @@
 'use client';
 
 import { MenuOption } from '@/components/MenuOption';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import ChevronIcon from '@/icons/Chevron';
 import { twMerge } from '@/lib/cn';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 type Option<T extends string = string> = {
   value: T;
@@ -28,18 +29,7 @@ export default function Select<T extends string = string>({
 
   const selectedLabel = options.find((o) => o.value === value)?.label ?? value;
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(containerRef, () => setOpen(false));
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {

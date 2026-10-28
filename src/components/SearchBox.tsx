@@ -2,6 +2,7 @@
 
 import Input from '@/components/Input';
 import SearchDropdownItem from '@/components/SearchDropdownItem';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useGetMedia } from '@/hooks/useGetMedia';
 import { useGetMediaDetails } from '@/hooks/useGetMediaDetails';
 import SearchIcon from '@/icons/MagnifyingGlass';
@@ -79,21 +80,10 @@ export function SearchBox({
     onDropdownVisibleChange?.(showDropdown);
   }, [showDropdown, onDropdownVisibleChange]);
 
-  // Click outside handler to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowResults(false);
-        setActiveIndex(-1);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(containerRef, () => {
+    setShowResults(false);
+    setActiveIndex(-1);
+  });
 
   const navigate = useCallback(
     (q: string, t?: FilterMediaType) => {
