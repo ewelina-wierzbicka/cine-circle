@@ -1,6 +1,8 @@
 'use client';
 
+import { AuthDivider } from '../AuthDivider';
 import { AuthFormFooter } from '../AuthFormFooter';
+import { GoogleSignInButton } from '../GoogleSignInButton';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
@@ -41,6 +43,9 @@ export function RegisterForm() {
           Track every movie. Build your list.
         </p>
       </div>
+
+      <GoogleSignInButton />
+      <AuthDivider />
 
       <form
         className="w-full flex flex-col gap-6"
