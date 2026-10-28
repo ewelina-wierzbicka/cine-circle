@@ -16,7 +16,14 @@ export default function PrivateLayout({
   // with no way to scroll to it.
   return (
     <div className="relative h-dvh flex flex-col bg-dark">
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Ambient layer, explicitly below everything. It used to rely on paint
+          order: `main` carried an opaque bg-dark, and the blobs only showed
+          through it because a positioned element paints above a static one.
+          Anything that promotes `main` to its own layer flips that, and the
+          blobs survive only in the transparent header strip — a hard seam
+          under the navbar. `main` is transparent now, so the shell bg-dark
+          plus this layer are the one background both of them share. */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute rounded-full blur-[55px] opacity-35 top-[-30%] left-[-5%] w-[60%] h-[130%] bg-[radial-gradient(#224c78_0%,transparent_65%)]" />
         <div className="absolute rounded-full blur-[55px] opacity-25 top-[10%] right-[-10%] w-[50%] h-[80%] bg-[radial-gradient(#755214_0%,transparent_65%)]" />
         <div className="absolute rounded-full blur-2xl bottom-[-20%] left-[30%] w-[40%] h-[80%] bg-[radial-gradient(oklch(82%_0.10_165/0.15)_0%,transparent_65%)]" />
@@ -27,7 +34,7 @@ export default function PrivateLayout({
       <Suspense fallback={null}>
         <ScrollReset />
       </Suspense>
-      <main className="flex-1 flex flex-col overflow-y-auto bg-dark">
+      <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
         <Suspense fallback={null}>
           <SessionAwareFooter />
