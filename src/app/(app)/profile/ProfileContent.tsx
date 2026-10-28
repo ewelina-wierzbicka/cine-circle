@@ -20,7 +20,7 @@ type Props = {
   hasPassword: boolean;
 };
 
-export function ProfileContent({ profile, email }: Props) {
+export function ProfileContent({ profile, email, hasPassword }: Props) {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
   const [isEditingName, setIsEditingName] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
@@ -304,7 +304,12 @@ export function ProfileContent({ profile, email }: Props) {
         </p>
 
         {/* Email row */}
-        <div className="border-b border-white/[0.07] pb-4 mb-4">
+        <div
+          className={twMerge(
+            // The rule only separates the two rows; it goes with the password row.
+            hasPassword && 'border-b border-white/[0.07] pb-4 mb-4',
+          )}
+        >
           <button
             type="button"
             onClick={() => setEmailOpen(!emailOpen)}
@@ -349,82 +354,84 @@ export function ProfileContent({ profile, email }: Props) {
           )}
         </div>
 
-        {/* Password row */}
-        <div>
-          <button
-            type="button"
-            onClick={() => setPasswordOpen(!passwordOpen)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-          >
-            <div className="text-left">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
-                Password
-              </p>
-              {!passwordOpen && (
-                <p className="text-secondary text-sm mt-2 tracking-widest">
-                  ••••••••
+        {/* Password row — absent for a Google-only account, which has no password */}
+        {hasPassword && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setPasswordOpen(!passwordOpen)}
+              className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
+            >
+              <div className="text-left">
+                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
+                  Password
                 </p>
-              )}
-            </div>
-            <ChevronIcon
-              className={twMerge(
-                'w-5 h-5 text-secondary transition-transform duration-200',
-                passwordOpen ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
+                {!passwordOpen && (
+                  <p className="text-secondary text-sm mt-2 tracking-widest">
+                    ••••••••
+                  </p>
+                )}
+              </div>
+              <ChevronIcon
+                className={twMerge(
+                  'w-5 h-5 text-secondary transition-transform duration-200',
+                  passwordOpen ? 'rotate-90' : '-rotate-90',
+                )}
+              />
+            </button>
 
-          {passwordOpen && (
-            <div className="mt-6 space-y-6">
-              <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  Current password
-                </p>
-                <Input
-                  id="current-password"
-                  type="password"
-                  value={currentPassword}
-                  handleChange={(e) => setCurrentPassword(e.target.value)}
-                />
+            {passwordOpen && (
+              <div className="mt-6 space-y-6">
+                <div>
+                  <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                    Current password
+                  </p>
+                  <Input
+                    id="current-password"
+                    type="password"
+                    value={currentPassword}
+                    handleChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                    New password
+                  </p>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    handleChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                    Confirm new password
+                  </p>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    handleChange={(e) => setConfirmPassword(e.target.value)}
+                    error={passwordError}
+                  />
+                </div>
+                <Button
+                  handleClick={() => void handleUpdatePassword()}
+                  disabled={
+                    !currentPassword ||
+                    !newPassword ||
+                    !confirmPassword ||
+                    passwordLoading
+                  }
+                  className="w-auto"
+                >
+                  Update password
+                </Button>
               </div>
-              <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  New password
-                </p>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  handleChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  Confirm new password
-                </p>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  handleChange={(e) => setConfirmPassword(e.target.value)}
-                  error={passwordError}
-                />
-              </div>
-              <Button
-                handleClick={() => void handleUpdatePassword()}
-                disabled={
-                  !currentPassword ||
-                  !newPassword ||
-                  !confirmPassword ||
-                  passwordLoading
-                }
-                className="w-auto"
-              >
-                Update password
-              </Button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Danger Zone Card */}

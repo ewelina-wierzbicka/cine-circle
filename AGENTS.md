@@ -47,6 +47,8 @@ src/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
       AuthFormFooter.tsx      # shared closing line under an auth form
+      GoogleSignInButton.tsx  # client — outlined Button calling signInWithGoogle; login passes rurl
+      AuthDivider.tsx         # "or" rule between the Google button and the email form
       layout.tsx
       login/
         page.tsx
@@ -490,9 +492,9 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path, T13 oauth-callback no code → /login?error=oauth_failed |
+| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path, T13 oauth-callback no code → /login?error=oauth_failed, T14 login Google button starts the OAuth flow, T15 register offers Google sign-in, T16 oauth_failed toast |
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
