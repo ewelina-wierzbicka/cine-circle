@@ -410,6 +410,7 @@ Layout & Ambient
 - Signed-out visitors collapse that full-height wrapper to `min-h-0`, so the hero sits at the top and the About section starts above the fold instead of hiding behind a blind scroll. Driven by `group-has-data-home-about` on the page container, keyed off the `data-home-about` wrapper `SignedOutAbout` renders, so it stays pure CSS and the shell still prerenders.
 - Three absolute radial blobs implemented as blurred rounded divs live in the `(app)` layout.
 - Blobs mimic movie color accents and a accent blob in the lower-left; implemented via inline `bg-[radial-gradient(...)]` utility classes.
+- The blob layer is `z-0` and `main` is `relative z-10` with **no background of its own** — the shell's `bg-dark` is the only opaque surface, so header and `main` sit on one background. Never give `main` a background again: it used to carry `bg-dark` and the blobs reached it only through paint order, since a positioned layer paints above a static sibling. Any compositing promotion of the scroller (Safari and iOS do it routinely) flipped that and left the blobs in the 64px header strip alone, a hard seam under the navbar.
 
 Hero
 
@@ -488,7 +489,7 @@ Overall structure
 - `MediaDetailWrapper` provides the backdrop layers and two-column layout. The left poster column contains `MediaPoster`; it is `h-[50vh]` on small screens, `md:w-1/2` above that, and hidden on step 2 (form).
 - **The page scrolls in `main`, never inside the detail layout.** The wrapper carries `shrink-0` alongside its `overflow-hidden`: `overflow-hidden` zeroes the element's automatic minimum size, so as a flex child of the `(app)` layout's `main` it would otherwise shrink to the viewport and silently clip everything past the fold. That was the mobile "cannot scroll" bug — `main` reported 907px of scroll while the wrapper held 1326px of content, so the overview, actions and "More like this" were unreachable. The info column must stay free of `overflow-y-auto` for the same reason: a nested scroll area there swallows the gesture on touch. `MediaDetailSkeleton` mirrors both rules so the streamed skeleton and the real tree measure the same.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
-- On home (and other non-cinematic routes) the `(app)` layout's ambient blobs show only in the 56px `Header` strip because `main` is opaque `bg-dark`; that subtle soft transition reads as one continuous background.
+- On home (and other non-cinematic routes) the `(app)` layout's ambient blobs run behind the header and `main` alike, since `main` has no background of its own. See the Search / Home "Layout & Ambient" note.
 
 Poster & Visuals
 
