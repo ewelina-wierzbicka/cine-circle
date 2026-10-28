@@ -1,6 +1,7 @@
 'use client';
 
 import Input from '@/components/Input';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
@@ -57,25 +58,7 @@ export default function DatePicker({
     }
   }, [isOpen]);
 
-  // Close picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
+  useClickOutside(containerRef, () => setIsOpen(false));
 
   const handleDateSelect = (date?: Date) => {
     handleChange(date);
