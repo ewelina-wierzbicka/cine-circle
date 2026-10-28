@@ -1,5 +1,6 @@
 'use server';
 
+import { safeRedirectPath } from '@/lib/safeRedirectPath';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { redirect } from 'next/navigation';
@@ -13,8 +14,38 @@ export async function login(email: string, password: string, rurl?: string) {
     return { error: error.message };
   }
 
-  const destination = rurl?.startsWith('/') ? rurl : '/';
-  redirect(destination);
+  redirect(safeRedirectPath(rurl) ?? '/');
+}
+
+export async function signInWithGoogle(rurl?: string) {
+  const supabase = await createClient();
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!origin)
+    return {
+      error: 'Server misconfiguration: NEXT_PUBLIC_SITE_URL is not set.',
+    };
+
+  // The server client writes the PKCE code-verifier cookie here;
+  // /api/auth/oauth-callback reads it back to exchange the code.
+  const callback = new URL('/api/auth/oauth-callback', origin);
+  const destination = safeRedirectPath(rurl);
+  if (destination) callback.searchParams.set('rurl', destination);
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: callback.toString() },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (!data.url) {
+    return { error: 'Could not start Google sign-in. Please try again.' };
+  }
+
+  redirect(data.url);
 }
 
 export async function register(email: string, password: string) {
