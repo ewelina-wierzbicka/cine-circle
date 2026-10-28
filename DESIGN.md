@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. Four typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below). All four set `font-family` from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key: the key is declared at `:root` but the `next/font` variable is scoped to `<body>`, so a theme-key reference resolves to nothing and the font falls back to DM Sans.
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. The typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below).
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -54,39 +54,11 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
+// Headings, labels and mono text come from the four @utility rules below.
+// These are the sans roles that have no utility:
+
 export const type = {
-  // `display-serif` — every page-level serif title
-  displaySerif: {
-    fontFamily: fonts.serif,
-    fontSize: 'clamp(32px, 5vw, 48px)',
-    fontWeight: 400,
-    letterSpacing: '-0.03em',
-    lineHeight: 0.95,
-  },
-  // `title-serif` — the auth and form headings
-  titleSerif: {
-    fontFamily: fonts.serif,
-    fontSize: 60,
-    fontWeight: 400,
-    letterSpacing: '-0.02em',
-    lineHeight: 1.1,
-  },
   body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
-  // `label-mono`
-  label: {
-    fontFamily: fonts.mono,
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: '0.15em',
-    textTransform: 'uppercase',
-  },
-  // `ui-mono`
-  uiMono: {
-    fontFamily: fonts.mono,
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: '0.05em',
-  },
   navItem: {
     fontFamily: fonts.sans,
     fontSize: 14,
@@ -106,16 +78,32 @@ export const type = {
 
 `body` sets `line-height: 1.625`, and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to `1.625`. Both are needed: every `text-*` utility sets its own `line-height`, so the `body` rule alone only reaches text with no `text-*` class.
 
-So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is never written** — it was removed from 16 call sites. Sizes above `text-base` keep the Tailwind defaults, being display type and single-line UI rather than prose, so a heading still needs its own `leading-*`.
+So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is never written**. Sizes above `text-base` keep the Tailwind defaults, being display type and single-line UI rather than prose, so a heading still needs its own `leading-*`.
 
 > This also raises every `text-sm` control by about 2.75px and every `text-base` control by 2px, buttons, chips, pills and inputs included, since they carry the same size classes as prose.
 
-#### `title-serif`
+#### Typography utilities
 
-The serif title ships as one `@utility`:
+Four `@utility` rules in `src/globals.css`. Colour and margins always stay at the call site.
 
 ```css
+@utility label-mono {
+  /* eyebrows, field labels, back links, nav, section labels */
+  font-family: var(--font-dm-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility ui-mono {
+  /* meta rows, chips, counts, inline mono — mixed case reads normally */
+  font-family: var(--font-dm-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+}
+
 @utility title-serif {
+  /* the auth and form heading */
   font-family: var(--font-dm-serif-display);
   font-size: var(--text-6xl);
   font-weight: 400;
@@ -123,22 +111,9 @@ The serif title ships as one `@utility`:
   --tw-leading: 1.1;
   line-height: 1.1;
 }
-```
 
-12 call sites: login, register, reset-password, forgot-password (both states), confirm-email, registration-confirmed, the entry-form title, `AuthErrorState`, the profile h1, the `StaticContentPage` h1 and the search results query.
-
-> It sets `--tw-leading` as well as `line-height`. That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of falling back to the `text-4xl` default. Four sites take the 60px default; eight override (`text-4xl`, `text-4xl md:text-5xl`, `text-3xl sm:text-4xl`, `text-[40px] lg:text-5xl`, `text-[clamp(32px,5vw,38px)]`, `text-[clamp(24px,3.5vw,38px)]`).
->
-> Do not add `font-normal` next to it. The utility sets 400, and DM Serif Display ships no other weight.
->
-> The search results query is the one site that also overrides the leading, back to `leading-none`.
-
-#### `display-serif`
-
-The page-level serif title, one step tighter than `title-serif` on both axes:
-
-```css
 @utility display-serif {
+  /* the page-level title, one step tighter on both axes */
   font-family: var(--font-dm-serif-display);
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 400;
@@ -148,62 +123,29 @@ The page-level serif title, one step tighter than `title-serif` on both axes:
 }
 ```
 
-8 call sites: the collection h1, the home hero, the home about h2, both 404 pages, `ErrorState`, the search h1 and the media detail title.
-
-> Same `--tw-leading` mechanic as `title-serif`. Four sites take the clamp default. Three keep their own size: the home hero at `text-[46px] xl:text-[52px]`, the search h1 at `text-[clamp(28px,4vw,36px)]` and the media title at `text-[clamp(42px,5.5vw,72px)]`.
+> **Pick a serif utility by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable, so size is never the reason to choose.
 >
-> `HomeAbout` is the only site that overrides the leading, to `leading-[1.15]`. Its h2 wraps to several lines and 0.95 closes it up too far.
+> Add `uppercase` beside `ui-mono` for an all-caps chip.
 >
-> It replaced a `style={{ fontSize }}` attribute on the media detail h1. No inline style in `src/` sets a font size any more.
+> Never pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`). An override does win, since Tailwind emits these before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label. Only use one when the value is genuinely different.
 >
-> The avatar initials span in `ProfileContent` keeps plain `font-serif text-3xl`. One glyph in a circle is not a heading, and the tracking would nudge it off centre.
+> **The serif utilities set `--tw-leading` as well as `line-height`.** That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of the `text-4xl` default. `font-normal` is redundant beside them, and DM Serif Display ships no other weight.
 >
-> Pick between the two by role, not size: `title-serif` is the auth and form heading at `-0.02em`/1.1, `display-serif` is the page title at `-0.03em`/0.95.
-
-#### `label-mono` and `ui-mono`
-
-The mono uppercase label ships as one `@utility` in `src/globals.css`, not as four classes at each call site:
-
-```css
-@utility label-mono {
-  font-family: var(--font-dm-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-```
-
-It covers 45 call sites: eyebrows, field labels, back links, footer nav, section labels. Colour and margins stay at the call site (`label-mono text-secondary mb-2`). It supersedes the `0.1em`–`0.22em` spread the call sites used to carry.
-
-> Never pair it with `font-mono`, `text-sm`, `uppercase` or `tracking-*`. A `tracking-*` override does win, since Tailwind emits `label-mono` before the `tracking-*` utilities, but only use one when the value is genuinely different.
+> **`font-family` comes from the `next/font` variable, never the `--font-serif` / `--font-mono` theme key.** The key is declared at `:root`, but the `next/font` variable is scoped to `<body>`, so resolving it at `:root` yields nothing and the font falls back to DM Sans. Tailwind's own `.font-serif` escapes this only because `@theme inline` substitutes the value at build time.
 >
-> The tighter mono is `ui-mono`, below. Between the two utilities, `font-mono` no longer appears anywhere in `src/`.
->
-> Two call sites are 16px, not 14px, and pair it with `text-base` to override the font-size: the profile section header and the delete-account header (`label-mono text-base text-secondary`). Tailwind emits `label-mono` before `text-base`, so the override holds.
-
-The other half of the mono usage is `ui-mono`, same font and size but tighter and with no `text-transform`, so mixed-case copy reads normally:
-
-```css
-@utility ui-mono {
-  font-family: var(--font-dm-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.05em;
-}
-```
-
-19 call sites: the detail meta row (director, date, runtime, season and episode counts, TMDB score), filter chips, `SEE ALL →`, back-to-top, FAQ indices, dropdown subtitles, the `tabular-nums` rating readout, the rating value in `MediaActions` and its signed-out prompt. They previously spread across `0.04em`, `0.05em`, `0.06em`, `0.08em`, `tracking-wider` and no tracking at all.
-
-> Four call sites are all-caps chips and add `uppercase`: the genre pill, the poster genre badge, the rating-filter clear button, the profile Save button.
->
-> Going from no tracking to `0.05em` is the largest shift here, about 0.7px per character on the FAQ indices, dropdown subtitles and rating readout.
+> A bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
 
 #### Body copy needs no utility
 
-The four above are the whole set. Everything else is a bare `text-sm` (67 sites) or `text-base` (14), and that is already correct: the size class carries 1.625 from the `@theme` pins, DM Sans is inherited from `<body>`, and there is no tracking, weight or family left to bundle. A fifth utility would have to bake `text-secondary` in, and all four existing ones deliberately leave colour at the call site.
+The four above are the whole set. Everything else is a bare `text-sm` or `text-base`, and that is already correct: the size class carries 1.625 from the `@theme` pins, DM Sans is inherited from `<body>`, and there is no tracking, weight or family left to bundle. A fifth utility would have to bake `text-secondary` in, and the existing four deliberately leave colour at the call site.
 
-> Never write an arbitrary px font size. `text-[14px]` is `text-sm`, and the arbitrary value silently skips the 1.625 theme line-height. No `text-[…px]` remains in `src/`.
+> Never write an arbitrary px font size for body copy. `text-[14px]` is `text-sm`, and the arbitrary value silently skips the 1.625 theme line-height.
 >
-> What repeats in the remaining call sites is component-shaped, not type-shaped: the menu option row (5 sites), the field error (3) and the auth footer line (6). Tracked in CIN-270, not as a utility.
+> Display type is the exception, and only on top of a serif utility, for a size on no Tailwind step. There the bare `font-size` overrides the size without resetting the leading the utility sets.
+>
+> There is no `text-md`. It matches no theme key, emits no rule and fails silently.
+>
+> What repeats in the remaining call sites is component-shaped, not type-shaped: the menu option row, the field error and the auth footer line. Tracked in CIN-270, not as a utility.
 
 ### Border Radius
 
@@ -632,7 +574,7 @@ Interactions & Accessibility
 
 Layout
 
-- Centered single column `max-w-xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center`.
+- Centered single column `max-w-2xl px-6 py-10 md:py-16`, vertically centered via `min-h-full flex flex-col justify-center-safe`. `-safe` falls back to top alignment once content overflows the viewport, so the heading never scrolls out of reach above the fold.
 - Entry animation: `animate-fade-up`.
 - Heading: `title-serif text-4xl md:text-5xl` with accent emphasis (`<em class="text-accent">`): "Your _Profile_".
 
