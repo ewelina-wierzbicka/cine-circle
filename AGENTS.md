@@ -219,7 +219,6 @@ export const colors = {
 - **`font-family` must come from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key.** The key resolves to nothing at `:root`, so the font silently falls back to DM Sans. Same body-scoping caveat as the `font-sans` note above.
 - **No fifth utility.** Body copy is a bare `text-sm` or `text-base`: 1.625 is already pinned, DM Sans is inherited, and colour belongs at the call site.
 - **No arbitrary px font size for body copy** — `text-[14px]` emits a bare `font-size` and skips the 1.625 pin. The one exception is a display size on no Tailwind step, written on top of a serif utility, where overriding size without resetting leading is the point.
-- **There is no `text-md`.** It matches no theme key, emits no rule and fails silently.
 
 **Rules:**
 

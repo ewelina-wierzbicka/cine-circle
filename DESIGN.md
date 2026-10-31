@@ -54,9 +54,6 @@ export const fonts = {
   mono: "'DM Mono', monospace",
 };
 
-// Headings, labels and mono text come from the four @utility rules below.
-// These are the sans roles that have no utility:
-
 export const type = {
   body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
   navItem: {
@@ -133,7 +130,7 @@ Four `@utility` rules in `src/globals.css`. Colour and margins always stay at th
 
 The four above are the whole set. Everything else is a bare `text-sm` or `text-base`, already correct: 1.625 comes from the `@theme` pins, DM Sans is inherited, and a fifth utility would have to bake `text-secondary` in.
 
-> Never write an arbitrary px font size for body copy; it skips the 1.625 pin. Display type is the exception, on top of a serif utility, for a size on no Tailwind step. There is no `text-md` — it emits no rule and fails silently.
+> Never write an arbitrary px font size for body copy; it skips the 1.625 pin. Display type is the exception, on top of a serif utility, for a size on no Tailwind step.
 
 ### Border Radius
 
