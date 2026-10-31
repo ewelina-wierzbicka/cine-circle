@@ -53,22 +53,6 @@ export const fonts = {
   serif: "'DM Serif Display', serif",
   mono: "'DM Mono', monospace",
 };
-
-export const type = {
-  body: { fontFamily: fonts.sans, fontSize: 14, fontWeight: 400 },
-  navItem: {
-    fontFamily: fonts.sans,
-    fontSize: 14,
-    fontWeight: 500,
-    letterSpacing: '0.02em',
-  },
-  btnLabel: {
-    fontFamily: fonts.sans,
-    fontSize: 'medium: 16px (14px at md), small: 14px',
-    fontWeight: 600,
-    letterSpacing: '0.08em',
-  },
-};
 ```
 
 #### Body copy line-height
