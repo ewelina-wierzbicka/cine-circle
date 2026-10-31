@@ -47,6 +47,8 @@ src/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
       AuthFormFooter.tsx      # shared closing line under an auth form
+      AuthFormHeading.tsx     # icon chip + title + subtitle block every auth screen opens with
+      InboxNotice.tsx         # "we emailed you" body + spam-folder tip card
       layout.tsx
       login/
         page.tsx
@@ -86,12 +88,14 @@ src/
         page.tsx
         loading.tsx           # streams MyMedia header + grid skeleton
         MyMedia.tsx            # filters: title, media type, rating multi-select (watched tab only)
+        CollectionTabs.tsx     # Watched / To Watch segmented control
         UserMediaList.tsx
       profile/                # /profile
         page.tsx
         loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
         ProfileSkeleton.tsx
+        SettingsRow.tsx        # collapsible account row (email, password, delete)
 series/[id]/             # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
@@ -102,7 +106,7 @@ series/[id]/             # /series/:id
       privacy/                # /privacy — static Privacy Policy page (open route)
         page.tsx              # copy only; renders <StaticContentPage />
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
-      not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
+      not-found.tsx           # (app) 404 — wrapper around <NotFoundState />, renders for notFound() calls inside (app)
       layout.tsx
     api/                      # Route Handlers
       auth/
@@ -114,7 +118,7 @@ series/[id]/             # /series/:id
         inbound/
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
-    not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
+    not-found.tsx             # root 404 — same <NotFoundState />, full-screen wrapper; renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     llms.txt/
@@ -229,6 +233,7 @@ export const colors = {
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
 - `MenuOption` is the dropdown row for `Select`, `RatingMultiSelect` and the `Header` menu. It renders an `<li>` and ships only the look — pass the role, ARIA state and key handlers at the call site, since a listbox option and a menuitem need different ones
+- `FieldLabel` is the mono label above a form field and `FieldError` the message under it. `Input`, `Textarea` and `StarRatingInput` already render `FieldError` from their `error` prop — never retype `text-error text-sm mt-2`. `FieldLabel` stays inline, so an added `mb-*` behaves as it did before it was a component
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
