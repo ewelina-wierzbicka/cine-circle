@@ -1,10 +1,13 @@
 'use client';
 
 import { AuthFormFooter } from '../AuthFormFooter';
+import { AuthFormHeading } from '../AuthFormHeading';
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
 import { PasswordInput } from '@/components/PasswordInput';
+import { EMAIL_RULES, passwordRules } from '@/lib/validation';
 import { register as registerAction } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useState } from 'react';
@@ -31,69 +34,42 @@ export function RegisterForm() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="title-serif mb-3">
-          Your movies.
-          <br />
-          <em className="text-accent">Your list.</em>
-        </h1>
-        <p className="text-base text-secondary">
-          Track every movie. Build your list.
-        </p>
-      </div>
+      <AuthFormHeading
+        title={
+          <>
+            Your movies.
+            <br />
+            <em className="text-accent">Your list.</em>
+          </>
+        }
+        subtitle="Track every movie. Build your list."
+      />
 
       <form
         className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label htmlFor="email" className="label-mono text-secondary mb-2">
-            Email
-          </label>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
-            {...register('email', {
-              required: 'Please enter your email address',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Please enter a valid email address',
-              },
-            })}
+            {...register('email', EMAIL_RULES)}
             error={errors.email?.message}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="label-mono text-secondary mb-2">
-            Password
-          </label>
+          <FieldLabel htmlFor="password">Password</FieldLabel>
           <PasswordInput
             id="password"
-            {...register('password', {
-              required: 'Please enter a password',
-              minLength: {
-                value: 8,
-                message: 'Password must be at least 8 characters',
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/,
-                message:
-                  'Password must contain uppercase, lowercase, number, and special character',
-              },
-            })}
+            {...register('password', passwordRules('Please enter a password'))}
             error={errors.password?.message}
           />
         </div>
 
         <div>
-          <label
-            htmlFor="confirmPassword"
-            className="label-mono text-secondary mb-2"
-          >
-            Confirm Password
-          </label>
+          <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
           <PasswordInput
             id="confirmPassword"
             {...register('confirmPassword', {

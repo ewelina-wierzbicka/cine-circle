@@ -11,6 +11,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
+const ACTION_ROW = 'flex gap-2.5 flex-col md:flex-row';
+
 type Props = {
   media: NormalizedMedia | SavedMedia;
   isAuthenticated?: boolean;
@@ -79,6 +81,14 @@ export default function MediaActions({
     }
   };
 
+  // Rendered beside UPDATE on a watched entry and beside MOVE TO WATCHED on a
+  // to-watch one, so it is built once here.
+  const deleteButton = (
+    <Button variant="outlined" handleClick={handleDelete} disabled={isDeleting}>
+      {isDeleting ? 'DELETING…' : 'DELETE'}
+    </Button>
+  );
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col gap-3 pt-3">
@@ -127,34 +137,22 @@ export default function MediaActions({
             </div>
           )}
         </div>
-        <div className="flex gap-2.5 flex-col md:flex-row">
+        <div className={ACTION_ROW}>
           <Button handleClick={goToForm}>UPDATE</Button>
-          <Button
-            variant="outlined"
-            handleClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'DELETING…' : 'DELETE'}
-          </Button>
+          {deleteButton}
         </div>
       </>
     );
   }
 
   return (
-    <div className="flex gap-2.5 flex-col md:flex-row">
+    <div className={ACTION_ROW}>
       {watchStatus === 'to_watch' ? (
         <>
           <Button handleClick={goToForm} className="px-0">
             MOVE TO WATCHED
           </Button>
-          <Button
-            variant="outlined"
-            handleClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'DELETING…' : 'DELETE'}
-          </Button>
+          {deleteButton}
         </>
       ) : (
         <>

@@ -1,5 +1,6 @@
 'use client';
 
+import { FieldError } from '@/components/FieldError';
 import StarIcon from '@/icons/Star';
 import { twMerge } from '@/lib/cn';
 import { useRef, useState } from 'react';
@@ -123,7 +124,7 @@ export default function StarRatingInput({
           </button>
         )}
       </div>
-      {error && <p className="text-error text-sm mt-2">{error}</p>}
+      <FieldError error={error} />
     </div>
   );
 }

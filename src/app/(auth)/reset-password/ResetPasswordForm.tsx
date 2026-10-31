@@ -1,9 +1,12 @@
 'use client';
 
 import { AuthFormFooter } from '../AuthFormFooter';
+import { AuthFormHeading } from '../AuthFormHeading';
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
+import { passwordRules } from '@/lib/validation';
 import { signOutOnly, updatePasswordAfterReset } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -37,53 +40,36 @@ export function ResetPasswordForm() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="title-serif mb-3">
-          Choose a new
-          <br />
-          <em className="text-accent">password</em>
-        </h1>
-        <p className="text-base text-secondary">
-          At least 8 characters with uppercase, lowercase, number, and special
-          character.
-        </p>
-      </div>
+      <AuthFormHeading
+        title={
+          <>
+            Choose a new
+            <br />
+            <em className="text-accent">password</em>
+          </>
+        }
+        subtitle="At least 8 characters with uppercase, lowercase, number, and special character."
+      />
 
       <form
         className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label htmlFor="password" className="label-mono text-secondary mb-2">
-            New password
-          </label>
+          <FieldLabel htmlFor="password">New password</FieldLabel>
           <Input
             id="password"
             type="password"
-            {...register('password', {
-              required: 'Please enter a new password',
-              minLength: {
-                value: 8,
-                message: 'Password must be at least 8 characters',
-              },
-              pattern: {
-                value:
-                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/,
-                message:
-                  'Password must contain uppercase, lowercase, number, and special character',
-              },
-            })}
+            {...register(
+              'password',
+              passwordRules('Please enter a new password'),
+            )}
             error={errors.password?.message}
           />
         </div>
 
         <div>
-          <label
-            htmlFor="confirmPassword"
-            className="label-mono text-secondary mb-2"
-          >
-            Confirm password
-          </label>
+          <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
           <Input
             id="confirmPassword"
             type="password"

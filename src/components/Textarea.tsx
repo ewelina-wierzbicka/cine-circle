@@ -1,5 +1,6 @@
 'use client';
 
+import { FieldError } from '@/components/FieldError';
 import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
 
@@ -24,7 +25,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
           ref={ref}
           {...rest}
         />
-        {error && <p className="text-error text-sm mt-2">{error}</p>}
+        <FieldError error={error} />
       </>
     );
   },

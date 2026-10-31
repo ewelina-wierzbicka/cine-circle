@@ -1,8 +1,9 @@
 'use client';
 
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
-import ChevronIcon from '@/icons/Chevron';
+import { PencilIcon } from '@/icons/Pencil';
 import { twMerge } from '@/lib/cn';
 import { resizeImage } from '@/lib/resizeImage';
 import { createClient } from '@/lib/supabase/client';
@@ -12,6 +13,7 @@ import { updateAvatarPath, updateDisplayName } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { SettingsRow } from './SettingsRow';
 
 type Props = {
   profile: UserProfile | null;
@@ -205,14 +207,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-secondary/50 flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
             aria-label="Change avatar"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-3.5 h-3.5 text-accent"
-            >
-              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-            </svg>
+            <PencilIcon className="w-3.5 h-3.5 text-accent" />
           </button>
 
           <input
@@ -280,14 +275,7 @@ export function ProfileContent({ profile, email }: Props) {
               <span className="text-2xl font-semibold text-primary">
                 {displayName || 'Set name'}
               </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-4 h-4 text-secondary group-hover:text-accent transition-colors"
-              >
-                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-              </svg>
+              <PencilIcon className="w-4 h-4 text-secondary group-hover:text-accent transition-colors" />
             </button>
           )}
         </div>
@@ -299,27 +287,16 @@ export function ProfileContent({ profile, email }: Props) {
 
         {/* Email row */}
         <div className="border-b border-white/[0.07] pb-4 mb-4">
-          <button
-            type="button"
-            onClick={() => setEmailOpen(!emailOpen)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
+          <SettingsRow
+            id="email-settings"
+            label="Email address"
+            summary={<p className="text-primary text-sm mt-2">{email}</p>}
+            open={emailOpen}
+            onToggle={() => setEmailOpen(!emailOpen)}
           >
-            <div className="text-left pr-2">
-              <p className="label-mono text-secondary">Email address</p>
-              <p className="text-primary text-sm mt-2">{email}</p>
-            </div>
-            <ChevronIcon
-              className={twMerge(
-                'w-5 h-5 text-secondary transition-transform duration-200',
-                emailOpen ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
-
-          {emailOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="label-mono text-secondary mb-2">New email</p>
+                <FieldLabel htmlFor="new-email">New email</FieldLabel>
                 <Input
                   id="new-email"
                   type="email"
@@ -336,107 +313,88 @@ export function ProfileContent({ profile, email }: Props) {
                 Update email
               </Button>
             </div>
-          )}
+          </SettingsRow>
         </div>
 
         {/* Password row */}
-        <div>
-          <button
-            type="button"
-            onClick={() => setPasswordOpen(!passwordOpen)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-          >
-            <div className="text-left">
-              <p className="label-mono text-secondary">Password</p>
-              {!passwordOpen && (
-                <p className="text-secondary text-sm mt-2 tracking-widest">
-                  ••••••••
-                </p>
-              )}
+        <SettingsRow
+          id="password-settings"
+          label="Password"
+          summary={
+            !passwordOpen && (
+              <p className="text-secondary text-sm mt-2 tracking-widest">
+                ••••••••
+              </p>
+            )
+          }
+          open={passwordOpen}
+          onToggle={() => setPasswordOpen(!passwordOpen)}
+        >
+          <div className="mt-6 space-y-6">
+            <div>
+              <FieldLabel htmlFor="current-password">
+                Current password
+              </FieldLabel>
+              <Input
+                id="current-password"
+                type="password"
+                value={currentPassword}
+                handleChange={(e) => setCurrentPassword(e.target.value)}
+              />
             </div>
-            <ChevronIcon
-              className={twMerge(
-                'w-5 h-5 text-secondary transition-transform duration-200',
-                passwordOpen ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
-
-          {passwordOpen && (
-            <div className="mt-6 space-y-6">
-              <div>
-                <p className="label-mono text-secondary mb-2">
-                  Current password
-                </p>
-                <Input
-                  id="current-password"
-                  type="password"
-                  value={currentPassword}
-                  handleChange={(e) => setCurrentPassword(e.target.value)}
-                />
-              </div>
-              <div>
-                <p className="label-mono text-secondary mb-2">New password</p>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  handleChange={(e) => setNewPassword(e.target.value)}
-                />
-              </div>
-              <div>
-                <p className="label-mono text-secondary mb-2">
-                  Confirm new password
-                </p>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  handleChange={(e) => setConfirmPassword(e.target.value)}
-                  error={passwordError}
-                />
-              </div>
-              <Button
-                handleClick={() => void handleUpdatePassword()}
-                disabled={
-                  !currentPassword ||
-                  !newPassword ||
-                  !confirmPassword ||
-                  passwordLoading
-                }
-                className="w-auto"
-              >
-                Update password
-              </Button>
+            <div>
+              <FieldLabel htmlFor="new-password">New password</FieldLabel>
+              <Input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                handleChange={(e) => setNewPassword(e.target.value)}
+              />
             </div>
-          )}
-        </div>
+            <div>
+              <FieldLabel htmlFor="confirm-password">
+                Confirm new password
+              </FieldLabel>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                handleChange={(e) => setConfirmPassword(e.target.value)}
+                error={passwordError}
+              />
+            </div>
+            <Button
+              handleClick={() => void handleUpdatePassword()}
+              disabled={
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword ||
+                passwordLoading
+              }
+              className="w-auto"
+            >
+              Update password
+            </Button>
+          </div>
+        </SettingsRow>
       </div>
 
       {/* Danger Zone Card */}
       <div className="bg-bg2 border border-error/20 rounded-2xl p-6 mb-8">
         <p className="label-mono text-base text-error mb-6">Danger zone</p>
 
-        <button
-          type="button"
-          onClick={() => setDeleteOpen(!deleteOpen)}
-          className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-        >
-          <div className="text-left">
-            <p className="label-mono text-error">Delete account</p>
+        <SettingsRow
+          id="delete-account"
+          label="Delete account"
+          tone="error"
+          summary={
             <p className="text-secondary text-sm mt-4">
               Permanently remove your account and data
             </p>
-          </div>
-          <ChevronIcon
-            className={twMerge(
-              'w-5 h-5 text-error transition-transform duration-200',
-              deleteOpen ? 'rotate-90' : '-rotate-90',
-            )}
-          />
-        </button>
-
-        {deleteOpen && (
+          }
+          open={deleteOpen}
+          onToggle={() => setDeleteOpen(!deleteOpen)}
+        >
           <div className="mt-2 space-y-3">
             <p className="text-sm text-secondary">
               This will permanently erase your profile, collection, ratings and
@@ -446,10 +404,10 @@ export function ProfileContent({ profile, email }: Props) {
               This cannot be undone.
             </p>
             <div className="mt-6">
-              <p className="label-mono text-secondary mb-5">
+              <FieldLabel htmlFor="delete-confirm" className="mb-5">
                 Type <span className="text-error font-semibold">DELETE</span> to
                 confirm
-              </p>
+              </FieldLabel>
               <Input
                 id="delete-confirm"
                 value={deleteConfirm}
@@ -466,7 +424,7 @@ export function ProfileContent({ profile, email }: Props) {
               Delete my account
             </Button>
           </div>
-        )}
+        </SettingsRow>
       </div>
 
       {/* Sign Out */}

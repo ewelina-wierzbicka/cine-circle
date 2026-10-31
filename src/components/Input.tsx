@@ -1,5 +1,6 @@
 'use client';
 
+import { FieldError } from '@/components/FieldError';
 import SearchIcon from '@/icons/MagnifyingGlass';
 import { twMerge } from '@/lib/cn';
 import { forwardRef } from 'react';
@@ -53,7 +54,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
             {...rest}
           />
         </div>
-        {error && <p className="text-error text-sm mt-2">{error}</p>}
+        <FieldError error={error} />
       </>
     );
   },

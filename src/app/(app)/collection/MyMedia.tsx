@@ -11,8 +11,8 @@ import {
   RatingFilter,
   UserMediaPage,
 } from '@/types';
-import Link from 'next/link';
 import { useState } from 'react';
+import { CollectionTabs } from './CollectionTabs';
 import UserMediaList from './UserMediaList';
 
 type Props = {
@@ -45,28 +45,7 @@ export default function MyMedia({ tab, initialData }: Props) {
           </h1>
         </div>
         <div className="flex items-center justify-end gap-2.5 shrink-0 flex-wrap w-full sm:w-[75%]">
-          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0 w-full sm:w-auto ">
-            <Link
-              href="?tab=watched"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
-                tab === 'watched'
-                  ? 'bg-accent text-dark'
-                  : 'text-secondary hover:text-primary'
-              }`}
-            >
-              Watched
-            </Link>
-            <Link
-              href="?tab=to_watch"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
-                tab === 'to_watch'
-                  ? 'bg-accent text-dark'
-                  : 'text-secondary hover:text-primary'
-              }`}
-            >
-              To Watch
-            </Link>
-          </div>
+          <CollectionTabs active={tab} />
           <div className="flex gap-2.5 w-full sm:w-auto flex-wrap justify-end">
             <div className="w-full sm:w-53.25">
               <Input
