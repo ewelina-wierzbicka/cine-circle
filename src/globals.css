@@ -7,11 +7,6 @@
   --font-serif: var(--font-dm-serif-display);
   --font-mono: var(--font-dm-mono);
 
-  /* Body copy line-height. The `line-height: 1.625` on `body` only reaches
-     text with no `text-*` class, because every `text-*` utility sets its own
-     line-height. These two put the body-copy sizes on 1.625 so prose does not
-     need `leading-relaxed` at the call site. Sizes above `text-base` are left
-     on the Tailwind defaults: they are display and single-line UI, not prose. */
   --text-sm--line-height: 1.625;
   --text-base--line-height: 1.625;
 
@@ -35,33 +30,6 @@
   background-image: var(--gradient-blue);
 }
 
-/* All four utilities below name the next/font variable directly rather than the
-   --font-* theme key, and must keep doing so. `dmSerifDisplay.variable` sits on
-   <body>, so --font-dm-serif-display is not defined at :root. The theme key
-   --font-serif IS declared at :root, as `var(--font-dm-serif-display)`, and a
-   custom property is substituted where it is declared, so at :root it resolves
-   to nothing and inherits down as invalid. `font-family: var(--font-serif)`
-   then falls back to the inherited DM Sans and the heading renders sans.
-   Tailwind's own `.font-serif` sidesteps this because `@theme inline`
-   substitutes the value at build time, emitting `var(--font-dm-serif-display)`.
-   These utilities are hand-written, so they have to do the same by hand. */
-
-/* Mono uppercase label. Covers eyebrows, field labels, back links, nav items,
-   pills and meta rows. Colour and spacing stay at the call site.
-   Not for mono text whose letter-spacing is deliberately tighter
-   (0.04em to 0.08em) — those keep their own tracking-*. */
-@utility label-mono {
-  font-family: var(--font-dm-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-/* Serif title. The auth and entry-form headings: login, register,
-   reset-password, confirm-email, registration-confirmed, the entry form and
-   the auth error state. Pins the 60px step; a call site that needs a smaller
-   one adds its own text-* and keeps the 1.1 line-height, because --tw-leading
-   is what every text-* utility reads. */
 @utility title-serif {
   font-family: var(--font-dm-serif-display);
   font-size: var(--text-6xl);
@@ -71,11 +39,6 @@
   line-height: 1.1;
 }
 
-/* Serif display title. The page-level serif headings: the collection and home
-   titles, the 404 and error states, the search and media titles. Tighter than
-   title-serif on both axes, which is what separates display type from the auth
-   headings. Same --tw-leading trick: a call site that needs a different size
-   adds its own text-* and keeps the 0.95. */
 @utility display-serif {
   font-family: var(--font-dm-serif-display);
   font-size: clamp(32px, 5vw, 48px);
@@ -85,14 +48,17 @@
   line-height: 0.95;
 }
 
-/* Mono UI text. The other half of the mono usage: meta rows, filter chips,
-   counts, FAQ indices, inline links. Same font and size as label-mono but
-   tighter and with no text-transform, so mixed-case copy reads normally.
-   Add `uppercase` at the call site when the text is a short all-caps chip. */
 @utility ui-mono {
   font-family: var(--font-dm-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.05em;
+}
+
+@utility label-mono {
+  font-family: var(--font-dm-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 html,
