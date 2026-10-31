@@ -162,7 +162,7 @@ Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always u
 
 **Fonts:**
 
-- `font-sans` — DM Sans (primary body font, weights 300/400/500/600). **It is the inherited default**, set by the `font-sans` class on `<body>` in `app/layout.tsx`. Do not write it at a call site: it is a no-op unless an ancestor sets `font-serif` or `font-mono`, and the only such case is the type label inside the serif query line in `SearchResults`. The class on `<body>` must stay — the `next/font` `--font-dm-sans` variable is scoped to `<body>`, so Tailwind's preflight rule on `html` cannot resolve it.
+- `font-sans` — DM Sans (weights 300/400/500/600). **The inherited default**, from the `font-sans` class on `<body>` in `app/layout.tsx`. Do not write it at a call site: it is a no-op unless an ancestor sets `font-serif` or `font-mono`. The class on `<body>` must stay — the `next/font` `--font-dm-sans` variable is scoped there, so Tailwind's preflight rule on `html` cannot resolve it.
 - `font-serif` — DM Serif Display (headings, display text)
 - `font-mono` — DM Mono (labels, nav items, monospaced text)
 
@@ -198,9 +198,9 @@ export const colors = {
 
 **Body copy line-height:**
 
-- `body` sets `line-height: 1.625` and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to the same. **Both are needed:** every `text-*` utility sets its own `line-height`, so the `body` rule alone only reaches text with no `text-*` class.
-- So **never write `leading-relaxed`** — `text-sm` and `text-base` already are 1.625. A `leading-*` override still wins, the value is emitted as `var(--tw-leading, 1.625)`.
-- Sizes above `text-base` keep the Tailwind defaults. They are display type and single-line UI, not prose, so a heading needs its own `leading-*`.
+- `body` sets `line-height: 1.625` and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to the same. **Both are needed:** the `body` rule alone only reaches text with no `text-*` class.
+- So **never write `leading-relaxed`** — `text-sm` and `text-base` already are 1.625, and a `leading-*` override still wins.
+- Sizes above `text-base` keep the Tailwind defaults, so a heading needs its own `leading-*`.
 
 **Typography utilities (defined in `globals.css`):**
 
@@ -211,16 +211,15 @@ export const colors = {
 | `title-serif`   | serif + `text-6xl` + 400 + `-0.02em` + `1.1` leading                |
 | `display-serif` | serif + `clamp(32px, 5vw, 48px)` + 400 + `-0.03em` + `0.95` leading |
 
-- **Pick by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable, so size is never the reason to choose.
-- Colour and margins stay at the call site. Add `uppercase` next to `ui-mono` for an all-caps chip.
-- Do not pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`). An override does win, since Tailwind emits these before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label. Only use one when the value is genuinely different.
-- **The serif utilities set `--tw-leading` as well as `line-height`.** That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of the `text-4xl` default. Keep both declarations. `font-normal` is redundant beside them, and DM Serif Display ships no other weight.
-- **They set `font-family` from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key. Do not "tidy" them onto the key: the font silently falls back to DM Sans.** The key is declared at `:root`, but the `next/font` variable is scoped to `<body>`, so resolving it at `:root` yields nothing. Tailwind's own `.font-serif` escapes this only because `@theme inline` substitutes the value at build time; a hand-written `@utility` gets no such treatment. Same body-scoping caveat as the `font-sans` note above.
-- **This is the whole set. Do not add one for body copy.** A bare `text-sm` or `text-base` already carries 1.625 from the `@theme` pins, DM Sans is inherited, and there is no tracking or weight left to bundle. A `body-copy` utility would have to bake `text-secondary` in, which these deliberately leave at the call site.
-- **Never write an arbitrary px font size for body copy.** `text-[14px]` is `text-sm`, and the arbitrary value emits a bare `font-size`, so it skips the 1.625 theme line-height. Use the named size whenever one matches.
-  - Display type is the exception, and only on top of a serif utility, for a size on no Tailwind step. There the bare `font-size` is the point: it overrides the size without resetting the leading the utility sets. Never write one on its own.
-- **There is no `text-md`.** The scale is `xs`, `sm`, `base`, `lg`, `xl`, `2xl`… — `text-md` matches no theme key, emits no rule and fails silently.
-- **Every mono call site is a mono utility and every serif heading a serif utility.** Reach for a utility rather than writing `font-mono text-sm tracking-[…]` or `font-serif … tracking-[…] leading-[…]` again. Bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
+- **Every mono call site uses a mono utility, every serif heading a serif utility.** Never write `font-mono text-sm tracking-[…]` or `font-serif … leading-[…]` again. Bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
+- **Pick by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable.
+- Colour and margins stay at the call site. Add `uppercase` beside `ui-mono` for an all-caps chip.
+- Do not pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`). Overrides still win, so `label-mono text-base` is a valid 16px label.
+- **Keep `--tw-leading` beside `line-height` in the serif rules.** That is what makes the size overridable: `title-serif text-4xl` keeps 1.1. `font-normal` is redundant; DM Serif Display ships no other weight.
+- **`font-family` must come from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key.** The key resolves to nothing at `:root`, so the font silently falls back to DM Sans. Same body-scoping caveat as the `font-sans` note above.
+- **No fifth utility.** Body copy is a bare `text-sm` or `text-base`: 1.625 is already pinned, DM Sans is inherited, and colour belongs at the call site.
+- **No arbitrary px font size for body copy** — `text-[14px]` emits a bare `font-size` and skips the 1.625 pin. The one exception is a display size on no Tailwind step, written on top of a serif utility, where overriding size without resetting leading is the point.
+- **There is no `text-md`.** It matches no theme key, emits no rule and fails silently.
 
 **Rules:**
 

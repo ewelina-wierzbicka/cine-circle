@@ -34,7 +34,7 @@ export const colors = {
 > **Token notes:**
 >
 > - Named CSS variables (`--color-*`) are defined in `src/globals.css` and generate Tailwind utilities directly (e.g. `text-primary`, `bg-accent`).
-> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. The typography `@utility` rules live there too: `label-mono`, `ui-mono`, `title-serif`, `display-serif` (see Typography below).
+> - Currently defined CSS variables: `--color-primary`, `--color-secondary`, `--color-dark`, `--color-bg2`, `--color-bg3`, `--color-accent`, and font aliases `--font-sans`, `--font-serif`, `--font-mono`. The typography `@utility` rules live there too — see Typography below.
 > - Gradient variable: `--gradient-blue: linear-gradient(160deg, #1A3A5CED 0%, #1a3a5c66 45%, #0d0d10 100%)`. Use via `@utility bg-gradient-blue { background-image: var(--gradient-blue); }` or the Tailwind class `bg-gradient-blue`.
 > - Recommended token → CSS var mapping: `text` → `--color-primary`, `muted` → `--color-secondary`, `bg` → `--color-dark`, `bg2` → `--color-bg2`, `bg3` → `--color-bg3`, `accent` → `--color-accent`.
 > - Animation utilities `.animate-fade-up` and `.animate-fade-in` are provided in `src/globals.css`.
@@ -76,11 +76,9 @@ export const type = {
 
 #### Body copy line-height
 
-`body` sets `line-height: 1.625`, and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to `1.625`. Both are needed: every `text-*` utility sets its own `line-height`, so the `body` rule alone only reaches text with no `text-*` class.
+`body` sets `line-height: 1.625`, and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to `1.625`. Both are needed: the `body` rule alone only reaches text with no `text-*` class.
 
-So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is never written**. Sizes above `text-base` keep the Tailwind defaults, being display type and single-line UI rather than prose, so a heading still needs its own `leading-*`.
-
-> This also raises every `text-sm` control by about 2.75px and every `text-base` control by 2px, buttons, chips, pills and inputs included, since they carry the same size classes as prose.
+So `text-sm` and `text-base` are 1.625 by default and **`leading-relaxed` is never written**. Sizes above `text-base` keep the Tailwind defaults, so a heading still needs its own `leading-*`.
 
 #### Typography utilities
 
@@ -123,29 +121,19 @@ Four `@utility` rules in `src/globals.css`. Colour and margins always stay at th
 }
 ```
 
-> **Pick a serif utility by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable, so size is never the reason to choose.
+> **Pick a serif utility by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable. A bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
 >
-> Add `uppercase` beside `ui-mono` for an all-caps chip.
+> Add `uppercase` beside `ui-mono` for an all-caps chip. Never pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`); overrides still win, so `label-mono text-base` is a valid 16px label.
 >
-> Never pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`). An override does win, since Tailwind emits these before the `text-*` and `tracking-*` utilities, so `label-mono text-base` is a valid 16px label. Only use one when the value is genuinely different.
+> **The serif rules set `--tw-leading` as well as `line-height`** — that is what keeps `title-serif text-4xl` at 1.1. `font-normal` is redundant beside them.
 >
-> **The serif utilities set `--tw-leading` as well as `line-height`.** That is what makes the size overridable: every `text-*` utility emits `line-height: var(--tw-leading, …)`, so `title-serif text-4xl` keeps 1.1 instead of the `text-4xl` default. `font-normal` is redundant beside them, and DM Serif Display ships no other weight.
->
-> **`font-family` comes from the `next/font` variable, never the `--font-serif` / `--font-mono` theme key.** The key is declared at `:root`, but the `next/font` variable is scoped to `<body>`, so resolving it at `:root` yields nothing and the font falls back to DM Sans. Tailwind's own `.font-serif` escapes this only because `@theme inline` substitutes the value at build time.
->
-> A bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
+> **`font-family` comes from the `next/font` variable, never the `--font-serif` / `--font-mono` theme key.** The key resolves to nothing at `:root`, so the font falls back to DM Sans. Tailwind's own `.font-serif` escapes this only because `@theme inline` substitutes the value at build time.
 
 #### Body copy needs no utility
 
-The four above are the whole set. Everything else is a bare `text-sm` or `text-base`, and that is already correct: the size class carries 1.625 from the `@theme` pins, DM Sans is inherited from `<body>`, and there is no tracking, weight or family left to bundle. A fifth utility would have to bake `text-secondary` in, and the existing four deliberately leave colour at the call site.
+The four above are the whole set. Everything else is a bare `text-sm` or `text-base`, already correct: 1.625 comes from the `@theme` pins, DM Sans is inherited, and a fifth utility would have to bake `text-secondary` in.
 
-> Never write an arbitrary px font size for body copy. `text-[14px]` is `text-sm`, and the arbitrary value silently skips the 1.625 theme line-height.
->
-> Display type is the exception, and only on top of a serif utility, for a size on no Tailwind step. There the bare `font-size` overrides the size without resetting the leading the utility sets.
->
-> There is no `text-md`. It matches no theme key, emits no rule and fails silently.
->
-> What repeats in the remaining call sites is component-shaped, not type-shaped: the menu option row, the field error and the auth footer line. Tracked in CIN-270, not as a utility.
+> Never write an arbitrary px font size for body copy; it skips the 1.625 pin. Display type is the exception, on top of a serif utility, for a size on no Tailwind step. There is no `text-md` — it emits no rule and fails silently.
 
 ### Border Radius
 
