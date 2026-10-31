@@ -38,7 +38,7 @@ export function ResetPasswordForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="title-serif mb-3">
           Choose a new
           <br />
           <em className="text-accent">password</em>
@@ -54,10 +54,7 @@ export function ResetPasswordForm() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="password"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="password" className="label-mono text-secondary mb-2">
             New password
           </label>
           <Input
@@ -83,7 +80,7 @@ export function ResetPasswordForm() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="label-mono text-secondary mb-2"
           >
             Confirm password
           </label>

@@ -58,10 +58,8 @@ export default function SearchResults({
         isLoading={isLoading}
         heading={
           <div>
-            <p className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-2">
-              Search Results
-            </p>
-            <p className="font-serif text-[clamp(24px,3.5vw,38px)] tracking-[-0.02em] leading-none">
+            <p className="label-mono text-accent mb-2">Search Results</p>
+            <p className="title-serif text-[clamp(24px,3.5vw,38px)] leading-none">
               &ldquo;{query}&rdquo;{' '}
               <span className="text-secondary text-xl font-sans">
                 {TYPE_LABELS[type]}

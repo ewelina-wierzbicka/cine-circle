@@ -13,7 +13,7 @@ export function BackLink({ href, children, className }: Props) {
     <Link
       href={href}
       className={twMerge(
-        'inline-flex items-center gap-2 font-mono text-sm tracking-[0.12em] text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start',
+        'inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start',
         className,
       )}
     >

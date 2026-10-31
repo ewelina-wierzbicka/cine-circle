@@ -18,12 +18,12 @@ export default function RegistrationConfirmedPage() {
           <CheckCircleIcon className="text-accent" />
         </div>
 
-        <h1 className="font-serif text-4xl font-normal tracking-[-0.02em] leading-[1.1] mb-2">
+        <h1 className="title-serif text-4xl mb-2">
           You are
           <br />
           <em className="text-accent">all set</em>
         </h1>
-        <p className="text-sm text-secondary leading-relaxed">
+        <p className="text-sm text-secondary">
           Your email is confirmed. Sign in to start building your collection.
         </p>
       </div>

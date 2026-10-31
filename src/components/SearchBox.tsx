@@ -2,6 +2,7 @@
 
 import Input from '@/components/Input';
 import SearchDropdownItem from '@/components/SearchDropdownItem';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useGetMedia } from '@/hooks/useGetMedia';
 import { useGetMediaDetails } from '@/hooks/useGetMediaDetails';
 import SearchIcon from '@/icons/MagnifyingGlass';
@@ -79,21 +80,10 @@ export function SearchBox({
     onDropdownVisibleChange?.(showDropdown);
   }, [showDropdown, onDropdownVisibleChange]);
 
-  // Click outside handler to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setShowResults(false);
-        setActiveIndex(-1);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(containerRef, () => {
+    setShowResults(false);
+    setActiveIndex(-1);
+  });
 
   const navigate = useCallback(
     (q: string, t?: FilterMediaType) => {
@@ -298,7 +288,7 @@ export function SearchBox({
               type="button"
               onClick={() => setMediaType(value)}
               className={twMerge(
-                'px-3 py-1.5 rounded-xl text-sm font-mono tracking-[0.05em] transition-all duration-150 cursor-pointer whitespace-nowrap',
+                'px-3 py-1.5 rounded-xl ui-mono transition-all duration-150 cursor-pointer whitespace-nowrap',
                 mediaType === value
                   ? 'bg-accent text-dark font-medium'
                   : 'text-secondary hover:text-primary',
@@ -317,7 +307,7 @@ export function SearchBox({
             type="button"
             onClick={() => setMediaType(value)}
             className={twMerge(
-              'flex-1 py-2.5 rounded-xl text-sm font-mono tracking-[0.05em] transition-all duration-150 cursor-pointer',
+              'flex-1 py-2.5 rounded-xl ui-mono transition-all duration-150 cursor-pointer',
               mediaType === value
                 ? 'bg-accent text-dark font-medium'
                 : 'bg-bg3 text-secondary border border-secondary/20',

@@ -2,6 +2,7 @@
 
 import { MenuOption } from '@/components/MenuOption';
 import StarRating from '@/components/StarRating';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import ChevronIcon from '@/icons/Chevron';
 import { CheckCircleIcon } from '@/icons/CheckCircle';
 import { twMerge } from '@/lib/cn';
@@ -30,18 +31,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
   const [highlighted, setHighlighted] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(containerRef, () => setOpen(false));
 
   useEffect(() => {
     if (!open) return;
@@ -176,7 +166,7 @@ export function RatingMultiSelect({ value, onChange, className }: Props) {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => onChange([])}
-              className="w-full px-3.5 py-3 text-sm font-mono tracking-[0.05em] uppercase text-secondary hover:text-primary border-t border-secondary/25 cursor-pointer transition-colors"
+              className="w-full px-3.5 py-3 ui-mono uppercase text-secondary hover:text-primary border-t border-secondary/25 cursor-pointer transition-colors"
             >
               Clear ratings
             </button>

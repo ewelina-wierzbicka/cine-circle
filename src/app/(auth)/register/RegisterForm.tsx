@@ -32,7 +32,7 @@ export function RegisterForm() {
   return (
     <>
       <div className="mb-10">
-        <h1 className="font-serif text-6xl tracking-[-0.02em] leading-[1.1] mb-3">
+        <h1 className="title-serif mb-3">
           Your movies.
           <br />
           <em className="text-accent">Your list.</em>
@@ -47,10 +47,7 @@ export function RegisterForm() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="email" className="label-mono text-secondary mb-2">
             Email
           </label>
           <Input
@@ -68,10 +65,7 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="password"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
+          <label htmlFor="password" className="label-mono text-secondary mb-2">
             Password
           </label>
           <PasswordInput
@@ -96,7 +90,7 @@ export function RegisterForm() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
+            className="label-mono text-secondary mb-2"
           >
             Confirm Password
           </label>

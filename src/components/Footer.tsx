@@ -10,7 +10,7 @@ const NAV_LINKS = [
 const CONTACT_EMAIL = 'info.midnightframe@gmail.com';
 
 const linkClass =
-  'font-mono text-sm uppercase tracking-[0.14em] no-underline text-secondary hover:text-accent transition-colors';
+  'label-mono no-underline text-secondary hover:text-accent transition-colors';
 
 export function Footer() {
   return (
@@ -32,7 +32,7 @@ export function Footer() {
           </nav>
         </div>
         <div className="flex flex-col gap-4 items-center md:items-end">
-          <p className="font-mono text-sm tracking-[0.14em] text-secondary mt-4 md:mt-0">
+          <p className="label-mono text-secondary mt-4 md:mt-0">
             © 2026 MIDNIGHTFRAME
           </p>
           <a
