@@ -17,6 +17,10 @@ Verified against Supabase docs on 2026-10-28.
 
 **On the Free plan there is no backup of any kind.** Drop a table, run a bad migration, or lose the account, and the data is gone. Check the current plan in Dashboard → Settings → Billing before assuming anything below is already covered.
 
+The workflow in section 2 is a full backup and it runs on the Free plan. Nothing here needs a paid plan.
+
+One Free-plan-only interaction: Supabase pauses a Free project after roughly 7 days of low activity, and a paused project cannot be dumped. The nightly run is a real database connection every day, so in normal operation it also keeps the project awake. Supabase does not guarantee that, which is why the keep-alive ping is tracked separately in CIN-283. If a project does pause, the backup job fails loudly rather than writing an empty artifact.
+
 Platform backups have three limits that hold on **every** plan, paid ones included:
 
 - **Storage objects are not backed up.** Only the `storage.objects` metadata rows are. The bytes in the `avatar` bucket are not. A platform restore gives you avatar rows pointing at files that no longer exist.
