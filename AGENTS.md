@@ -113,6 +113,9 @@ series/[id]/             # /series/:id
           route.ts            # GET — redirect-only: Supabase's confirmation link verifies the email, then lands here with a code; code present → /registration-confirmed (no session ever created), no code → /login?error=confirm_failed
         reset-callback/
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
+      cron/
+        keep-alive/
+          route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
       email/
         inbound/
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
@@ -156,6 +159,7 @@ series/[id]/             # /series/:id
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- **`vercel.json` (repo root) holds the cron schedule.** One entry: `/api/cron/keep-alive` daily at `0 6 * * *`. Vercel Hobby caps cron at one invocation per day, and daily leaves headroom for a missed run inside Supabase's 7-day pause window. `CRON_SECRET` must be set in the Vercel project (Production), or Vercel sends no `Authorization` header, the handler 401s every run, and the project pauses silently. The ping is an ops call, not app data, so the query stays inline in the handler rather than in `services/`. No `proxy.ts` change: the matcher already excludes `api/`
 - Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---
