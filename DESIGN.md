@@ -251,10 +251,9 @@ One component per repeated link style. Never retype the classes at a call site.
 - The shared dropdown row: `px-3.5 py-4 text-sm`, `text-secondary hover:text-primary`, `border-b border-secondary/15 last:border-0`. `selected` adds `text-primary bg-bg3`.
 - Used by `Select`, `RatingMultiSelect` and the `Header` user menu. Renders an `<li>` and forwards every `li` prop, so the role, ARIA state and keyboard handling stay at the call site. Only the look is shared.
 
-### FieldLabel & FieldError
+### FieldLabel
 
 - `src/components/FieldLabel.tsx` — the `label-mono text-secondary mb-2` label above a form field. Inline, so an added `mb-*` behaves as it did before. Used by every auth form and the profile account rows.
-- `src/components/FieldError.tsx` — the `text-error text-sm mt-2` message under a field. Rendered by `Input`, `Textarea` and `StarRatingInput` from their `error` prop; returns `null` when there is none.
 
 ### Input
 
