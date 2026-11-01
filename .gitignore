@@ -55,3 +55,11 @@ node_modules/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Backups — never commit a dump, encrypted or not. See docs/BACKUPS.md
+# No bare *.sql here: that would silently swallow new supabase/migrations files.
+/backup-*
+*.age
+/roles.sql
+/schema.sql
+/data.sql
