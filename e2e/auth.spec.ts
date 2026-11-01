@@ -259,4 +259,19 @@ test.describe('auth', () => {
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await page.waitForURL('/');
   });
+
+  test('T13 oauth-callback with no code redirects to login', async ({
+    page,
+  }) => {
+    // The Google round trip is not automatable, so assert the failure branch.
+    // Read the redirect header: once LoginForm handles oauth_failed it strips
+    // the param, and a URL assertion after the toast would race that.
+    const response = await page.request.get('/api/auth/oauth-callback', {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain(
+      '/login?error=oauth_failed',
+    );
+  });
 });

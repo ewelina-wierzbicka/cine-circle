@@ -18,6 +18,8 @@ import { SettingsRow } from './SettingsRow';
 type Props = {
   profile: UserProfile | null;
   email: string;
+  /** False for a Google-only account: it has no password row to show. */
+  hasPassword: boolean;
 };
 
 export function ProfileContent({ profile, email }: Props) {

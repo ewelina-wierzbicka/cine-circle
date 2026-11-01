@@ -15,6 +15,7 @@ const WARM_ROUTES = [
   // handlers must already be compiled when the test navigates.
   '/api/auth/confirm-callback',
   '/api/auth/reset-callback',
+  '/api/auth/oauth-callback',
 ];
 
 async function warmRoutes(baseURL: string) {
