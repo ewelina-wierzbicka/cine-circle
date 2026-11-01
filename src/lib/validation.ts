@@ -1,5 +1,3 @@
-/** Shared `react-hook-form` rules, so every auth form rejects the same input. */
-
 export const EMAIL_RULES = {
   required: 'Please enter your email address',
   pattern: {
@@ -8,10 +6,6 @@ export const EMAIL_RULES = {
   },
 };
 
-/**
- * Takes the `required` message because "Please enter a password" (register)
- * and "Please enter a new password" (reset) differ.
- */
 export const passwordRules = (required: string) => ({
   required,
   minLength: {

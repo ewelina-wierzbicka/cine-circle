@@ -4,11 +4,6 @@ import Button from '@/components/Button';
 import { ClapperboardIcon } from '@/icons/Clapperboard';
 import { useRouter } from 'next/navigation';
 
-/**
- * The shared 404 content column. Both `not-found.tsx` files render it; each
- * supplies its own `<main>` wrapper, since the root one is full-screen with
- * ambient blobs and the `(app)` one sits inside the app shell.
- */
 export function NotFoundState() {
   const router = useRouter();
 

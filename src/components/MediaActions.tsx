@@ -81,8 +81,6 @@ export default function MediaActions({
     }
   };
 
-  // Rendered beside UPDATE on a watched entry and beside MOVE TO WATCHED on a
-  // to-watch one, so it is built once here.
   const deleteButton = (
     <Button variant="outlined" handleClick={handleDelete} disabled={isDeleting}>
       {isDeleting ? 'DELETING…' : 'DELETE'}

@@ -1,14 +1,9 @@
 import { ReactNode } from 'react';
 
 type Props = {
-  /** What was sent and what to do with it. */
   children: ReactNode;
 };
 
-/**
- * The "we emailed you" body: the lead line plus the spam-folder tip card.
- * Shared by `/confirm-email` and the sent state of `/forgot-password`.
- */
 export function InboxNotice({ children }: Props) {
   return (
     <div className="w-full flex flex-col gap-4">

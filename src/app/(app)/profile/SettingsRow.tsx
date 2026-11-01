@@ -7,16 +7,13 @@ import { ReactNode } from 'react';
 type Props = {
   id: string;
   label: string;
-  /** The collapsed preview under the label, e.g. the current email. */
   summary?: ReactNode;
   open: boolean;
   onToggle: () => void;
-  /** `error` tints the label and chevron red for the danger zone. */
   tone?: 'default' | 'error';
   children: ReactNode;
 };
 
-/** A profile card row that expands into its own form. */
 export function SettingsRow({
   id,
   label,
@@ -50,7 +47,6 @@ export function SettingsRow({
         />
       </button>
 
-      {/* Always rendered so `aria-controls` resolves while collapsed. */}
       <div id={id}>{open && children}</div>
     </div>
   );
