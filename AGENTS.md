@@ -253,6 +253,10 @@ export const colors = {
 | ---------- | ------------------------------------------------------------- | --------------------------------------- |
 | `profiles` | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call |
 
+On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
+
+`[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in.
+
 ### Storage
 
 | Bucket   | Public | Path pattern           | Notes                                                                                |
