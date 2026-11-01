@@ -232,7 +232,7 @@ export const colors = {
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
 - `MenuOption` is the dropdown row for `Select`, `RatingMultiSelect` and the `Header` menu. It renders an `<li>` and ships only the look — pass the role, ARIA state and key handlers at the call site, since a listbox option and a menuitem need different ones
-- `FieldLabel` is the mono label above a form field and `FieldError` the message under it. `Input`, `Textarea` and `StarRatingInput` already render `FieldError` from their `error` prop — never retype `text-error text-sm mt-2`. `FieldLabel` stays inline, so an added `mb-*` behaves as it did before it was a component
+- `FieldLabel` is the mono label above a form field. It stays inline, so an added `mb-*` behaves as it did before it was a component
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
