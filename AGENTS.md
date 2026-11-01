@@ -87,8 +87,7 @@ src/
       collection/               # /collection
         page.tsx
         loading.tsx           # streams MyMedia header + grid skeleton
-        MyMedia.tsx            # filters: title, media type, rating multi-select (watched tab only)
-        CollectionTabs.tsx     # Watched / To Watch segmented control
+        MyMedia.tsx            # tabs + filters: title, media type, rating multi-select (watched tab only)
         UserMediaList.tsx
       profile/                # /profile
         page.tsx

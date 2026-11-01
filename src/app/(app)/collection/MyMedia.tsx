@@ -4,6 +4,7 @@ import Input from '@/components/Input';
 import { RatingMultiSelect } from '@/components/RatingMultiSelect';
 import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
+import { twMerge } from '@/lib/cn';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
 import {
   CollectionTab,
@@ -11,9 +12,14 @@ import {
   RatingFilter,
   UserMediaPage,
 } from '@/types';
+import Link from 'next/link';
 import { useState } from 'react';
-import { CollectionTabs } from './CollectionTabs';
 import UserMediaList from './UserMediaList';
+
+const TABS: { tab: CollectionTab; label: string }[] = [
+  { tab: 'watched', label: 'Watched' },
+  { tab: 'to_watch', label: 'To Watch' },
+];
 
 type Props = {
   tab: CollectionTab;
@@ -45,7 +51,23 @@ export default function MyMedia({ tab, initialData }: Props) {
           </h1>
         </div>
         <div className="flex items-center justify-end gap-2.5 shrink-0 flex-wrap w-full sm:w-[75%]">
-          <CollectionTabs active={tab} />
+          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0 w-full sm:w-auto">
+            {TABS.map(({ tab: value, label }) => (
+              <Link
+                key={value}
+                href={`?tab=${value}`}
+                aria-current={value === tab ? 'page' : undefined}
+                className={twMerge(
+                  'px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto',
+                  value === tab
+                    ? 'bg-accent text-dark'
+                    : 'text-secondary hover:text-primary',
+                )}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
           <div className="flex gap-2.5 w-full sm:w-auto flex-wrap justify-end">
             <div className="w-full sm:w-53.25">
               <Input

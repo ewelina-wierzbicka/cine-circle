@@ -472,7 +472,7 @@ Search results page (`/search`)
 Layout & Header
 
 - Header area: eyebrow `label-mono text-accent` and heading `display-serif`.
-- Tabs: `collection/CollectionTabs.tsx` maps one `TABS` array to two Links, `rounded-[10px] px-4.5 py-1.75`, active uses `bg-accent text-dark` and `aria-current="page"`.
+- Tabs: `MyMedia` maps its `TABS` array to two Links, `rounded-[10px] px-4.5 py-1.75`, active uses `bg-accent text-dark` and `aria-current="page"`.
 - Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
 
