@@ -1,10 +1,14 @@
 'use client';
 
 import { AuthFormFooter } from '../AuthFormFooter';
+import { AuthFormHeading } from '../AuthFormHeading';
+import { InboxNotice } from '../InboxNotice';
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
 import { EnvelopeIcon } from '@/icons/Envelope';
+import { EMAIL_RULES } from '@/lib/validation';
 import { sendPasswordReset } from '@/services/auth';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -35,34 +39,23 @@ export function ForgotPasswordForm() {
   if (sent) {
     return (
       <>
-        <div className="mb-8">
-          <div className="mb-5 w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-            <EnvelopeIcon className="text-accent" />
-          </div>
+        <AuthFormHeading
+          compact
+          icon={<EnvelopeIcon className="text-accent" />}
+          title={
+            <>
+              Check your
+              <br />
+              <em className="text-accent">inbox</em>
+            </>
+          }
+          subtitle="A reset link is on its way."
+        />
 
-          <h1 className="title-serif text-4xl mb-2">
-            Check your
-            <br />
-            <em className="text-accent">inbox</em>
-          </h1>
-          <p className="text-sm text-secondary">A reset link is on its way.</p>
-        </div>
-
-        <div className="w-full flex flex-col gap-4">
-          <p className="text-sm text-secondary">
-            We sent a password reset link to your email address. Click the link
-            to choose a new password.
-          </p>
-
-          <div className="mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]">
-            <p className="label-mono text-secondary mb-1">
-              Didn&apos;t receive it?
-            </p>
-            <p className="text-sm text-secondary">
-              Check your spam folder. It may take a few minutes to arrive.
-            </p>
-          </div>
-        </div>
+        <InboxNotice>
+          We sent a password reset link to your email address. Click the link to
+          choose a new password.
+        </InboxNotice>
 
         <AuthFormFooter>
           Back to <Link href="/login">Sign in</Link>
@@ -73,35 +66,27 @@ export function ForgotPasswordForm() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="title-serif mb-3">
-          Reset your
-          <br />
-          <em className="text-accent">password</em>
-        </h1>
-        <p className="text-base text-secondary">
-          Enter your email and we&apos;ll send a reset link.
-        </p>
-      </div>
+      <AuthFormHeading
+        title={
+          <>
+            Reset your
+            <br />
+            <em className="text-accent">password</em>
+          </>
+        }
+        subtitle="Enter your email and we'll send a reset link."
+      />
 
       <form
         className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label htmlFor="email" className="label-mono text-secondary mb-2">
-            Email
-          </label>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
-            {...register('email', {
-              required: 'Please enter your email address',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Please enter a valid email address',
-              },
-            })}
+            {...register('email', EMAIL_RULES)}
             error={errors.email?.message}
           />
         </div>

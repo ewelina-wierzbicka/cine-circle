@@ -251,6 +251,10 @@ One component per repeated link style. Never retype the classes at a call site.
 - The shared dropdown row: `px-3.5 py-4 text-sm`, `text-secondary hover:text-primary`, `border-b border-secondary/15 last:border-0`. `selected` adds `text-primary bg-bg3`.
 - Used by `Select`, `RatingMultiSelect` and the `Header` user menu. Renders an `<li>` and forwards every `li` prop, so the role, ARIA state and keyboard handling stay at the call site. Only the look is shared.
 
+### FieldLabel
+
+- `src/components/FieldLabel.tsx` — the `label-mono text-secondary mb-2` label above a form field. Inline, so an added `mb-*` behaves as it did before. Used by every auth form and the profile account rows.
+
 ### Input
 
 - `src/components/Input.tsx`.
@@ -372,9 +376,8 @@ Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
 - Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
-- Heading: `title-serif` (Login and Register alike) with accent-emphasized word (`<em class="text-accent">`).
-- Subtext: `text-base text-secondary`.
-- Labels: `label-mono text-secondary`.
+- Heading and subtext come from `(auth)/AuthFormHeading.tsx`: `mb-10` block, `title-serif mb-3` `h1` with an accent-emphasized word (`<em class="text-accent">`), `text-base text-secondary` subtitle. Its `compact` variant is `mb-8` / `title-serif text-4xl mb-2` / `text-sm text-secondary`, and `icon` adds the `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` chip above the title. Every auth screen uses it; never retype the heading block.
+- Labels: `FieldLabel`.
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
 - Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
@@ -394,9 +397,10 @@ Right column (Visuals)
 
 Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients.
 
-- `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state with `EnvelopeIcon` chip and tip card. In `AUTH_ROUTES`.
+- `/forgot-password` (`ForgotPasswordForm.tsx`) — single email field; on success flips to a "Check your _inbox_" confirmation state, a `compact` `AuthFormHeading` with the `EnvelopeIcon` chip over `InboxNotice`. In `AUTH_ROUTES`.
 - `/reset-password` (`ResetPasswordForm.tsx`) — two password fields; reached via `reset-callback`. On success signs out and redirects to `/login`. Not in `AUTH_ROUTES`.
-- Both: `title-serif` title with accent `<em>`, `text-base text-secondary` subtext, `label-mono` field labels, `Button` accent medium CTA, "Back to Sign in" footer link.
+- Both: `AuthFormHeading` title and subtext, `FieldLabel` field labels, `Button` accent medium CTA, "Back to Sign in" footer link.
+- `(auth)/InboxNotice.tsx` is the "we emailed you" body: lead paragraph (`text-sm text-secondary`) plus a `mt-1 p-3.5 rounded-xl bg-bg2 border border-white/[0.07]` card headed "Didn't receive it?". Shared with `/confirm-email`; the lead line is the only thing that differs.
 
 ---
 
@@ -404,8 +408,8 @@ Both reuse `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form lef
 
 - Implemented by `src/app/(auth)/registration-confirmed/page.tsx` — server component, no data fetching. Reached via `api/auth/confirm-callback` after Supabase's confirmation link verifies the email; the callback creates no session, so the visitor is not authenticated. Auth route in `AUTH_ROUTES`; not in `OPEN_ROUTES_EXACT` — logged-in users are redirected to `/`.
 - Reuses `(auth)/AuthFormLayout.tsx` — same fixed two-column shell (form left, `MediaPoster` grid right on `lg+`), top-left logo, shared overlay gradients, `animate-fade-up` entry.
-- Mirrors `/confirm-email`: success chip `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` with `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
-- Heading: `title-serif text-4xl` two-line with accent `<em>` — "You are / _all set_". Body copy `text-sm text-secondary`: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
+- Mirrors `/confirm-email`: a `compact` `AuthFormHeading` whose `icon` is `CheckCircleIcon` (`src/icons/CheckCircle.tsx`) in `text-accent`.
+- Heading: two-line with accent `<em>` — "You are / _all set_". Subtitle: "Your email is confirmed. Sign in to start building your collection." (visitor is logged out).
 - CTA: `SignInButton` (`SignInButton.tsx`, client) — medium filled accent `Button` ("SIGN IN") navigating to `/login` via `router.push`. Page stays a Server Component.
 
 ---
@@ -467,7 +471,7 @@ Search results page (`/search`)
 Layout & Header
 
 - Header area: eyebrow `label-mono text-accent` and heading `display-serif`.
-- Tabs: `Watched` / `To Watch` are Link buttons styled with rounded-[10px], `px-4.5 py-1.75`, active uses `bg-accent text-dark`.
+- Tabs: `MyMedia` maps its `TABS` array to two Links, `rounded-[10px] px-4.5 py-1.75`, active uses `bg-accent text-dark` and `aria-current="page"`.
 - Filter: `Input` with `variant="search"` placed in top-right controls; `Select` (MEDIA_TYPE_OPTIONS) for media type filtering; `RatingMultiSelect` on the Watched tab only, since `to_watch` entries carry no rating.
 - Search filter is debounced via `useSearch` hook.
 
@@ -557,16 +561,16 @@ Profile Card
 
 - `bg-bg2 border border-secondary/25 rounded-2xl p-6`, horizontal flex with `gap-6`.
 - Avatar: `w-22 h-22 rounded-full border-2 border-accent` with overflow hidden. Shows uploaded image or serif initials fallback (`font-serif text-3xl`).
-- Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with accent pencil SVG icon. Triggers hidden file input.
+- Edit avatar button: absolute-positioned circle (`w-7 h-7 rounded-full bg-bg2 border border-secondary/50`) with `PencilIcon` (`src/icons/Pencil.tsx`) in `text-accent`. Triggers hidden file input.
 - Avatar upload: client-side validation (JPEG/PNG/WebP/GIF, max 1 MB), uploads to Supabase `avatar` bucket at `{user_id}/avatar.{ext}`, calls `updateAvatarPath` service.
-- Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-semibold` with pencil edit icon.
+- Display name: `label-mono text-secondary` label. Name shown as `text-2xl font-semibold` with the same `PencilIcon`.
 - Inline edit mode: `Input` component with Save (`ui-mono uppercase text-accent`) and Cancel buttons. Enter saves, Escape cancels. Max 50 characters.
 
 Account Card
 
 - `bg-bg2 border border-white/[0.07] rounded-2xl p-6`.
 - Section header: `label-mono text-base text-secondary`.
-- Collapsible rows use `ChevronIcon` that rotates on open/close (`rotate-90` / `-rotate-90`).
+- Collapsible rows are `profile/SettingsRow.tsx`: a full-width button holding a `label-mono` label plus an optional `summary` node, and a `ChevronIcon` that rotates on open/close (`rotate-90` / `-rotate-90`). `tone="error"` tints label and chevron red. The button carries `aria-expanded` and `aria-controls`. Used by the email, password and delete rows.
 
 - **Email row**: shows current email, expands to `Input` for new email + `Button` "Update email". Calls `updateEmail` service.
 - **Password row**: shows `••••••••` when collapsed. Expands to three inputs (current, new, confirm) + `Button` "Update password". Calls `updatePassword` service.
@@ -662,6 +666,7 @@ Static content pages, open routes (no auth required). All three render through o
 ## Error & Not-Found Pages
 
 - `(app)/error.tsx` and `(app)/not-found.tsx` render inside the (app) layout (Header visible). Root `src/app/not-found.tsx` is full-screen with its own bg and ambient gradients.
+- The 404 content column lives once, in `components/NotFoundState.tsx` (client, owns the `useRouter` push). Both `not-found.tsx` files are thin server wrappers supplying only their own `<main>`. `ErrorState.tsx` plays the same role for the error pages.
 - No card/panel. Centered content column with soft radial glow: accent for 404, red for error.
 - 56px icon above eyebrow: `ClapperboardIcon` (accent) for 404, `AlertCircleIcon` (red) for error.
 - Eyebrow: mono small uppercase. Title: serif display with one italicized accent word.

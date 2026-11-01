@@ -1,10 +1,13 @@
 'use client';
 
 import { AuthFormFooter } from '../AuthFormFooter';
+import { AuthFormHeading } from '../AuthFormHeading';
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
 import { PasswordInput } from '@/components/PasswordInput';
+import { EMAIL_RULES } from '@/lib/validation';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -47,42 +50,36 @@ export function LoginForm() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="title-serif mb-3">
-          Welcome
-          <br />
-          <em className="text-accent">back</em>
-        </h1>
-        <p className="text-base text-secondary">Sign in to your collection</p>
-      </div>
+      <AuthFormHeading
+        title={
+          <>
+            Welcome
+            <br />
+            <em className="text-accent">back</em>
+          </>
+        }
+        subtitle="Sign in to your collection"
+      />
 
       <form
         className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label htmlFor="email" className="label-mono text-secondary mb-2">
-            Email
-          </label>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
-            {...register('email', {
-              required: 'Please enter your email address',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Please enter a valid email address',
-              },
-            })}
+            {...register('email', EMAIL_RULES)}
             error={errors.email?.message}
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label htmlFor="password" className="label-mono text-secondary">
+            <FieldLabel htmlFor="password" className="mb-0">
               Password
-            </label>
+            </FieldLabel>
             <Link
               href="/forgot-password"
               className="text-sm text-secondary hover:text-primary"
