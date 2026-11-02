@@ -23,13 +23,29 @@ export const getProfile = async (): Promise<UserProfile | null> => {
 
   const { data: created, error: insertError } = await supabase
     .from('profiles')
-    .upsert({ user_id: user.id }, { onConflict: 'user_id' })
+    .upsert(
+      {
+        user_id: user.id,
+        display_name: identityDisplayName(user.user_metadata),
+      },
+      { onConflict: 'user_id' },
+    )
     .select('id, user_id, display_name, avatar_url')
     .single();
 
   if (insertError) throw insertError;
 
   return resolveAvatarUrl(supabase, created as UserProfile);
+};
+
+// OAuth providers put the account name in user_metadata; email signups leave it empty.
+// Only read on row creation, so an edited display_name is never overwritten.
+const identityDisplayName = (
+  metadata: Record<string, unknown>,
+): string | null => {
+  const name = metadata.full_name ?? metadata.name;
+  if (typeof name !== 'string') return null;
+  return name.trim() || null;
 };
 
 const resolveAvatarUrl = async (
