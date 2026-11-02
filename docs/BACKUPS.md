@@ -152,9 +152,23 @@ When a user deletes their account, the live rows go immediately. Copies inside a
 
 1. Keep retention short and fixed. 30 days is defensible; indefinite is not.
 2. Never query a backup to answer a support request. That breaks "beyond use".
-3. Keep a note of deletion requests so a restore can re-apply them. `profiles` and `user_media` cascade from `auth.users`, so re-running the account deletion against a restored database is sufficient.
+3. Keep a note of deletion requests so a restore can re-apply them. `public.deleted_accounts` is that note: `deleteAccount` writes a `user_id` and a `deleted_at` there before calling `deleteUser`. It has no FK to `auth.users`, so the row survives the cascade and survives the restore.
 
 Say this in the privacy policy, in one sentence: deleted data may persist in encrypted backups for up to 30 days before permanent erasure. `/privacy` currently does not mention backups — update it in the same change that enables the workflow.
+
+### Re-applying deletions after a restore
+
+Run this against the restored database, before letting users back in:
+
+```sql
+-- read the list first, then re-apply
+SELECT user_id, deleted_at FROM public.deleted_accounts ORDER BY deleted_at;
+DELETE FROM auth.users WHERE id IN (SELECT user_id FROM public.deleted_accounts);
+```
+
+`profiles` and `user_media` cascade from `auth.users`, so that covers the database. Storage does not cascade: also remove each `avatar/{user_id}/` folder.
+
+The table is service-role only, RLS on with no policies and no grants to `anon` or `authenticated`. It holds a uuid and a timestamp, no personal data, so it is kept indefinitely and is itself safe to back up.
 
 ### Not legal advice
 
