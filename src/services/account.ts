@@ -104,6 +104,18 @@ export const deleteAccount = async (): Promise<void> => {
       throw new Error('Failed to delete account. Please try again.');
   }
 
+  // Log the erasure before performing it. A backup taken before this moment
+  // still holds the user, so a restore has to re-apply the deletion, and this
+  // row is the only record that it is pending. Written first so a crash after
+  // deleteUser cannot lose it. See docs/BACKUPS.md section 6.
+  const { error: logError } = await adminSupabase
+    .from('deleted_accounts')
+    .upsert(
+      { user_id: user.id, deleted_at: new Date().toISOString() },
+      { onConflict: 'user_id', ignoreDuplicates: true },
+    );
+  if (logError) throw new Error('Failed to delete account. Please try again.');
+
   const { error } = await adminSupabase.auth.admin.deleteUser(user.id);
   if (error) throw new Error('Failed to delete account. Please try again.');
 
