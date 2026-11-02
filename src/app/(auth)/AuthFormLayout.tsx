@@ -21,7 +21,8 @@ export default async function AuthFormLayout({
 
   return (
     <div className="fixed inset-0 flex overflow-hidden">
-      <div className="relative w-full lg:w-1/2 bg-dark">
+      {/* Scrolls on short viewports: the register form is taller than 640px. */}
+      <div className="relative w-full lg:w-1/2 bg-dark overflow-y-auto">
         <div
           className="absolute inset-0 opacity-40 bg-size-[48px_48px]"
           style={{
@@ -32,7 +33,7 @@ export default async function AuthFormLayout({
         <div className="absolute -bottom-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.60_0.1_165/0.1)_0%,transparent_65%)]" />
         <Logo className="absolute top-4 left-6 z-10" priority />
 
-        <div className="relative flex items-center justify-center h-full px-6 md:px-12">
+        <div className="relative flex items-center justify-center min-h-full px-6 md:px-12 py-20">
           <div className="w-full max-w-90 animate-fade-up">{children}</div>
         </div>
       </div>

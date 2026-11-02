@@ -381,6 +381,8 @@ Left column (Form)
 - Inputs: use `Input` component — `rounded-xl`, `h-11.5`, `bg-bg2`, `border-secondary/25`, focus shows `border-accent` and `bg-bg3`.
 - Password fields use `PasswordInput` — same `Input` styling plus an eye toggle on the right.
 - Buttons: use `Button` component (color `accent`, medium size → `h-12 text-base`). Disabled/pending states handled.
+- Above the form: `(auth)/GoogleSignInButton.tsx` — outlined full-width `Button`, `GoogleIcon` (18px, brand colours) left of "CONTINUE WITH GOOGLE", `gap-3`.
+- Below it: `(auth)/AuthDivider.tsx` — `border-t border-secondary/25` rules either side of a mono "or", `my-6`.
 - Footer link toggles between Login and Register using `text-accent` links.
 - The closing line is `(auth)/AuthFormFooter.tsx` — `mt-6 text-center text-sm text-secondary`.
 
@@ -573,7 +575,7 @@ Account Card
 - Collapsible rows are `profile/SettingsRow.tsx`: a full-width button holding a `label-mono` label plus an optional `summary` node, and a `ChevronIcon` that rotates on open/close (`rotate-90` / `-rotate-90`). `tone="error"` tints label and chevron red. The button carries `aria-expanded` and `aria-controls`. Used by the email, password and delete rows.
 
 - **Email row**: shows current email, expands to `Input` for new email + `Button` "Update email". Calls `updateEmail` service.
-- **Password row**: shows `••••••••` when collapsed. Expands to three inputs (current, new, confirm) + `Button` "Update password". Calls `updatePassword` service.
+- **Password row**: shows `••••••••` when collapsed. Expands to three inputs (current, new, confirm) + `Button` "Update password". Calls `updatePassword` service. Omitted when `hasPassword` is false (Google-only account); the email row then drops its bottom rule.
 
 Danger Zone Card
 

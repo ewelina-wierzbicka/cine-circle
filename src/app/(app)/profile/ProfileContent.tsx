@@ -18,9 +18,11 @@ import { SettingsRow } from './SettingsRow';
 type Props = {
   profile: UserProfile | null;
   email: string;
+  /** False for a Google-only account: it has no password row to show. */
+  hasPassword: boolean;
 };
 
-export function ProfileContent({ profile, email }: Props) {
+export function ProfileContent({ profile, email, hasPassword }: Props) {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
   const [isEditingName, setIsEditingName] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
@@ -286,7 +288,12 @@ export function ProfileContent({ profile, email }: Props) {
         <p className="label-mono text-base text-secondary mb-6">Account</p>
 
         {/* Email row */}
-        <div className="border-b border-white/[0.07] pb-4 mb-4">
+        <div
+          className={twMerge(
+            // The rule only separates the two rows; it goes with the password row.
+            hasPassword && 'border-b border-white/[0.07] pb-4 mb-4',
+          )}
+        >
           <SettingsRow
             id="email-settings"
             label="Email address"
@@ -316,67 +323,69 @@ export function ProfileContent({ profile, email }: Props) {
           </SettingsRow>
         </div>
 
-        {/* Password row */}
-        <SettingsRow
-          id="password-settings"
-          label="Password"
-          summary={
-            !passwordOpen && (
-              <p className="text-secondary text-sm mt-2 tracking-widest">
-                ••••••••
-              </p>
-            )
-          }
-          open={passwordOpen}
-          onToggle={() => setPasswordOpen(!passwordOpen)}
-        >
-          <div className="mt-6 space-y-6">
-            <div>
-              <FieldLabel htmlFor="current-password">
-                Current password
-              </FieldLabel>
-              <Input
-                id="current-password"
-                type="password"
-                value={currentPassword}
-                handleChange={(e) => setCurrentPassword(e.target.value)}
-              />
+        {/* Password row — absent for a Google-only account, which has no password */}
+        {hasPassword && (
+          <SettingsRow
+            id="password-settings"
+            label="Password"
+            summary={
+              !passwordOpen && (
+                <p className="text-secondary text-sm mt-2 tracking-widest">
+                  ••••••••
+                </p>
+              )
+            }
+            open={passwordOpen}
+            onToggle={() => setPasswordOpen(!passwordOpen)}
+          >
+            <div className="mt-6 space-y-6">
+              <div>
+                <FieldLabel htmlFor="current-password">
+                  Current password
+                </FieldLabel>
+                <Input
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  handleChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </div>
+              <div>
+                <FieldLabel htmlFor="new-password">New password</FieldLabel>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  handleChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div>
+                <FieldLabel htmlFor="confirm-password">
+                  Confirm new password
+                </FieldLabel>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  handleChange={(e) => setConfirmPassword(e.target.value)}
+                  error={passwordError}
+                />
+              </div>
+              <Button
+                handleClick={() => void handleUpdatePassword()}
+                disabled={
+                  !currentPassword ||
+                  !newPassword ||
+                  !confirmPassword ||
+                  passwordLoading
+                }
+                className="w-auto"
+              >
+                Update password
+              </Button>
             </div>
-            <div>
-              <FieldLabel htmlFor="new-password">New password</FieldLabel>
-              <Input
-                id="new-password"
-                type="password"
-                value={newPassword}
-                handleChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-            <div>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm new password
-              </FieldLabel>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                handleChange={(e) => setConfirmPassword(e.target.value)}
-                error={passwordError}
-              />
-            </div>
-            <Button
-              handleClick={() => void handleUpdatePassword()}
-              disabled={
-                !currentPassword ||
-                !newPassword ||
-                !confirmPassword ||
-                passwordLoading
-              }
-              className="w-auto"
-            >
-              Update password
-            </Button>
-          </div>
-        </SettingsRow>
+          </SettingsRow>
+        )}
       </div>
 
       {/* Danger Zone Card */}
