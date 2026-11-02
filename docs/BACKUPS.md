@@ -170,6 +170,10 @@ DELETE FROM auth.users WHERE id IN (SELECT user_id FROM public.deleted_accounts)
 
 The table is service-role only, RLS on with no policies and no grants to `anon` or `authenticated`. It holds a uuid and a timestamp, no personal data, so it is kept indefinitely and is itself safe to back up.
 
+**Take the list from the newest dump, not necessarily the restored one.** `deleted_accounts` lives in the database, so a restore rewinds it along with everything else. Restoring the most recent backup is the normal case and the two coincide. But a deliberate rollback to an older backup rewinds the list past deletions it needs to know about, so load `public.deleted_accounts` out of the newest artifact's `data.sql` instead, and re-apply from that.
+
+Either way, deletions in the window after the last successful dump leave no record at all. That is the same up-to-24-hours of lost writes as the rest of the data (section 7), not a separate gap.
+
 ### Not legal advice
 
 This is an engineering read of the GDPR text. If MidnightFrame ever takes payments or grows past a hobby user base, have it reviewed.
