@@ -111,7 +111,7 @@ export const deleteAccount = async (): Promise<void> => {
   const { error: logError } = await adminSupabase
     .from('deleted_accounts')
     .upsert(
-      { user_id: user.id, deleted_at: new Date().toISOString() },
+      { user_id: user.id },
       { onConflict: 'user_id', ignoreDuplicates: true },
     );
   if (logError) throw new Error('Failed to delete account. Please try again.');

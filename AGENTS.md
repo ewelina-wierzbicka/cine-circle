@@ -249,10 +249,10 @@ export const colors = {
 
 ### Schema
 
-| Table              | Key columns                                                   | Notes                                                                                           |
-| ------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                         |
-| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all     |
+| Table              | Key columns                                                   | Notes                                                                                       |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                     |
+| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all |
 
 `deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
 
