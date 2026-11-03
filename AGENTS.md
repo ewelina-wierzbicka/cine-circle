@@ -95,7 +95,7 @@ src/
         ProfileContent.tsx
         ProfileSkeleton.tsx
         SettingsRow.tsx        # collapsible account row (email, password, delete)
-series/[id]/             # /series/:id
+      series/[id]/            # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       about/                  # /about — static About page (open route, indexable)
@@ -296,18 +296,15 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
-  <<<<<<< HEAD
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  - # `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  - `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
   - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false. `numberOfSeasons` and `numberOfEpisodes` are series only, from the TMDB scalars, omitted when absent or 0.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
-  - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
+  - **No `aggregateRating`.** No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
   - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
@@ -333,7 +330,7 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
 
-\*\*CSP ships as `Content-Security-Policy` — the browser blocks anything the policy does not list.
+**CSP ships as `Content-Security-Policy`** — the browser blocks anything the policy does not list.
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
 - `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
