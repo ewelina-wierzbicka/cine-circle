@@ -58,7 +58,7 @@ Consequence worth stating plainly: `data.sql` contains `auth.users`, so it holds
 
 ### Why the session pooler, not the direct connection
 
-Supabase's direct database host is IPv6-only. GitHub-hosted runners have no outbound IPv6 route, so `pg_dump` fails with `Network is unreachable`. Use the **Session pooler** string (Dashboard → Settings → Database → Connection string → Session pooler, port 5432). Note the username becomes `postgres.<project-ref>`. The **transaction** pooler does not work with `pg_dump`.
+Supabase's direct database host is IPv6-only. GitHub-hosted runners have no outbound IPv6 route, so `pg_dump` fails with `Network is unreachable`. Use the **Session pooler** string (project dashboard → **Connect** button in the top bar → Session pooler, port 5432). There is no Settings → Database → Connection string page any more; the strings live behind Connect. Note the username becomes `postgres.<project-ref>`. The **transaction** pooler does not work with `pg_dump`.
 
 ---
 
@@ -87,12 +87,12 @@ One-time setup. Until it is done the workflow fails on purpose, with the reason 
 
 3. **Add repo secrets.** GitHub → the repo → Settings → Secrets and variables → Actions → **Secrets** tab → New repository secret. All four are secrets, not variables; the workflow reads them from `secrets.*`.
 
-   | Secret                     | Where the value comes from                                                                                                |
-   | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-   | `SUPABASE_DB_URL`          | Supabase Dashboard → Settings → Database → Connection string → **Session pooler**, port 5432. Percent-encode the password |
-   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 2, the `age1…` string. Never the file contents                                               |
-   | `SUPABASE_SECRET_KEY`      | Dashboard → Settings → API keys → the `service_role` / secret key. Needed to read the private `avatar` bucket             |
-   | `NEXT_PUBLIC_SUPABASE_URL` | Dashboard → Settings → API → Project URL. Same value as in `.env.local`                                                   |
+   | Secret                     | Where the value comes from                                                                                                                           |
+   | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `SUPABASE_DB_URL`          | Supabase project dashboard → **Connect** → **Session pooler**, port 5432. Percent-encode the password. Reset it under Settings → Database if unknown |
+   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 2, the `age1…` string. Never the file contents                                                                          |
+   | `SUPABASE_SECRET_KEY`      | Dashboard → Settings → API keys → the `service_role` / secret key. Needed to read the private `avatar` bucket                                        |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Dashboard → Settings → API → Project URL. Same value as in `.env.local`                                                                              |
 
    `SUPABASE_SECRET_KEY` bypasses RLS. Rotate it if this repo's secret list is ever exposed.
 
