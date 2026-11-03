@@ -66,28 +66,39 @@ Supabase's direct database host is IPv6-only. GitHub-hosted runners have no outb
 
 One-time setup. Until it is done the workflow fails on purpose, with the reason in the step summary.
 
-1. **Generate a key pair on your machine, not in CI.**
+1. **Install age.** `age-keygen` ships with it and is not preinstalled on macOS.
 
    ```bash
-   age-keygen -o supabase-backup.key   # prints the public key
+   brew install age          # macOS; apt install age on Debian/Ubuntu
+   age-keygen --version
    ```
+
+   `command not found: age-keygen` in step 2 means this step was skipped.
+
+2. **Generate a key pair on your machine, not in CI.**
+
+   ```bash
+   age-keygen -o supabase-backup.key
+   ```
+
+   It writes the private key to the file and prints `Public key: age1…` to stderr. The same public key is also the `# public key:` comment line inside the file, so a lost scrollback is not a problem.
 
    Store `supabase-backup.key` in a password manager and nowhere else. Lose it and every backup is unreadable. Commit it and every backup is readable by the internet.
 
-2. **Add repo secrets** (Settings → Secrets and variables → Actions):
+3. **Add repo secrets.** GitHub → the repo → Settings → Secrets and variables → Actions → **Secrets** tab → New repository secret. All four are secrets, not variables; the workflow reads them from `secrets.*`.
 
-   | Secret                     | Value                                                         |
-   | -------------------------- | ------------------------------------------------------------- |
-   | `SUPABASE_DB_URL`          | Session pooler connection string, password percent-encoded    |
-   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 1 (`age1…`)                      |
-   | `SUPABASE_SECRET_KEY`      | Service role key — needed to read the private `avatar` bucket |
-   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL                                                   |
+   | Secret                     | Where the value comes from                                                                                                |
+   | -------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+   | `SUPABASE_DB_URL`          | Supabase Dashboard → Settings → Database → Connection string → **Session pooler**, port 5432. Percent-encode the password |
+   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 2, the `age1…` string. Never the file contents                                               |
+   | `SUPABASE_SECRET_KEY`      | Dashboard → Settings → API keys → the `service_role` / secret key. Needed to read the private `avatar` bucket             |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Dashboard → Settings → API → Project URL. Same value as in `.env.local`                                                   |
 
    `SUPABASE_SECRET_KEY` bypasses RLS. Rotate it if this repo's secret list is ever exposed.
 
-3. **Run it once manually** (Actions → Supabase backup → Run workflow) and confirm a green run with an artifact.
+4. **Run it once manually** (Actions → Supabase backup → Run workflow) and confirm a green run with an artifact.
 
-4. **Restore-test it** (section 5). A backup you have never restored is a hypothesis.
+5. **Restore-test it** (section 5). A backup you have never restored is a hypothesis.
 
 ---
 
