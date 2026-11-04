@@ -1,0 +1,81 @@
+name: Supabase backup
+
+# Nightly encrypted logical backup of the database and the avatar bucket.
+# Setup, restore steps and the legal rationale: docs/BACKUPS.md
+#
+# Requires four repo secrets. Until they exist the run fails on the first step
+# with the reason in the job summary.
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Session pooler string, port 5432. The direct host is IPv6-only and
+      # GitHub runners cannot reach it. See docs/BACKUPS.md.
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      AGE_RECIPIENT: ${{ secrets.SUPABASE_BACKUP_AGE_KEY }}
+
+    steps:
+      - name: Check required secrets
+        run: |
+          missing=()
+          [ -n "$SUPABASE_DB_URL" ] || missing+=(SUPABASE_DB_URL)
+          [ -n "$AGE_RECIPIENT" ] || missing+=(SUPABASE_BACKUP_AGE_KEY)
+          [ -n "$SUPABASE_SECRET_KEY" ] || missing+=(SUPABASE_SECRET_KEY)
+          [ -n "$NEXT_PUBLIC_SUPABASE_URL" ] || missing+=(NEXT_PUBLIC_SUPABASE_URL)
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Backup not configured. Missing secrets: ${missing[*]}. See docs/BACKUPS.md section 3."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install age
+        run: sudo apt-get update && sudo apt-get install -y age
+
+      - name: Dump roles, schema and data
+        run: |
+          mkdir -p "$RUNNER_TEMP/backup"
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$RUNNER_TEMP/backup/roles.sql" --role-only
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$RUNNER_TEMP/backup/schema.sql"
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f "$RUNNER_TEMP/backup/data.sql" --use-copy --data-only
+
+      - name: Dump the avatar bucket
+        run: node scripts/backup-storage.mjs avatar "$RUNNER_TEMP/backup/storage"
+
+      - name: Encrypt
+        run: |
+          tar -C "$RUNNER_TEMP/backup" -cz . \
+            | age -r "$AGE_RECIPIENT" -o "$RUNNER_TEMP/backup-$(date -u +%F).tar.gz.age"
+          # Plaintext must not survive into the artifact step.
+          rm -rf "$RUNNER_TEMP/backup"
+          ls -lh "$RUNNER_TEMP"/backup-*.tar.gz.age
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: supabase-backup-${{ github.run_id }}
+          path: ${{ runner.temp }}/backup-*.tar.gz.age
+          retention-days: 30
+          if-no-files-found: error
