@@ -13,8 +13,6 @@ export default async function ProfilePage() {
   const profile = await getProfile();
   const user = await getCurrentUser();
 
-  // A Google-only account has no email identity, so it has no password to change.
-  // Default to true when identities are unavailable: that is the current behaviour.
   const hasPassword = user?.identities
     ? user.identities.some((identity) => identity.provider === 'email')
     : true;

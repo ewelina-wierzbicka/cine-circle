@@ -1,4 +1,3 @@
-/** Hairline rule with a centred "or", between the Google button and the email form. */
 export function AuthDivider() {
   return (
     <div className="flex items-center gap-4 my-6">

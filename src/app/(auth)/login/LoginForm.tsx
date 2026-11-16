@@ -35,7 +35,6 @@ export function LoginForm() {
       toast.error('Google sign-in failed. Please try again.');
       router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
     }
-    // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {

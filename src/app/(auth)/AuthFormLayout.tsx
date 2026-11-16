@@ -21,7 +21,6 @@ export default async function AuthFormLayout({
 
   return (
     <div className="fixed inset-0 flex overflow-hidden">
-      {/* Scrolls on short viewports: the register form is taller than 640px. */}
       <div className="relative w-full lg:w-1/2 bg-dark overflow-y-auto">
         <div
           className="absolute inset-0 opacity-40 bg-size-[48px_48px]"

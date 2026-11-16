@@ -18,7 +18,6 @@ import { SettingsRow } from './SettingsRow';
 type Props = {
   profile: UserProfile | null;
   email: string;
-  /** False for a Google-only account: it has no password row to show. */
   hasPassword: boolean;
 };
 
@@ -290,7 +289,6 @@ export function ProfileContent({ profile, email, hasPassword }: Props) {
         {/* Email row */}
         <div
           className={twMerge(
-            // The rule only separates the two rows; it goes with the password row.
             hasPassword && 'border-b border-white/[0.07] pb-4 mb-4',
           )}
         >
@@ -323,7 +321,6 @@ export function ProfileContent({ profile, email, hasPassword }: Props) {
           </SettingsRow>
         </div>
 
-        {/* Password row — absent for a Google-only account, which has no password */}
         {hasPassword && (
           <SettingsRow
             id="password-settings"

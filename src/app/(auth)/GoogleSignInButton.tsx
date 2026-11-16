@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 type Props = {
-  /** Same-site path to land on after the callback. Login only. */
   rurl?: string;
 };
 
@@ -17,7 +16,6 @@ export function GoogleSignInButton({ rurl }: Props) {
   const handleSignIn = async () => {
     setIsPending(true);
     const result = await signInWithGoogle(rurl);
-    // A success redirects away, so only an error ever returns here.
     if (result?.error) {
       toast.error(result.error);
       setIsPending(false);
