@@ -97,7 +97,7 @@ src/
         ProfileContent.tsx
         ProfileSkeleton.tsx
         SettingsRow.tsx        # collapsible account row (email, password, delete)
-series/[id]/             # /series/:id
+      series/[id]/            # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       about/                  # /about — static About page (open route, indexable)
@@ -117,6 +117,9 @@ series/[id]/             # /series/:id
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
         oauth-callback/
           route.ts            # GET — exchanges the Google PKCE code for a session, redirects to the sanitised `rurl` or `/`; no code or exchange failure → /login?error=oauth_failed
+      cron/
+        keep-alive/
+          route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
       email/
         inbound/
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
@@ -161,6 +164,7 @@ series/[id]/             # /series/:id
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
 - `signInWithGoogle` (`services/auth.ts`) starts the Google PKCE flow on the **server** client, so the code-verifier cookie is written where `/api/auth/oauth-callback` can read it. Every `rurl` goes through `lib/safeRedirectPath.ts` first — same-site paths only, `//host` and `/\host` rejected.
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- **`vercel.json` (repo root) holds the cron schedule.** One entry: `/api/cron/keep-alive` daily at `0 6 * * *`. Vercel Hobby caps cron at one invocation per day, and daily leaves headroom for a missed run inside Supabase's 7-day pause window. `CRON_SECRET` must be set in the Vercel project (Production), or Vercel sends no `Authorization` header, the handler 401s every run, and the project pauses silently. The ping is an ops call, not app data, so the query stays inline in the handler rather than in `services/`. No `proxy.ts` change: the matcher already excludes `api/`
 - Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---
@@ -251,12 +255,16 @@ export const colors = {
 - Never expose the service role key — it must only be used server-side
 - Row Level Security (RLS) is enabled — always test that policies enforce access correctly
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
+- **Supabase CLI 3.x is required.** `supabase/config.toml` uses `[local_smtp]`, the section that replaced `[inbucket]` in v3. CLI 2.x rejects `local_smtp` and 3.x rejects `inbucket`, so the two cannot coexist — `supabase start` fails on the wrong major. Both workflows pin `supabase/setup-cli` to `3.0.0`; `version: latest` is what broke CI when v3 shipped. Upgrade locally with `brew upgrade supabase`.
 
 ### Schema
 
-| Table      | Key columns                                                   | Notes                                   |
-| ---------- | ------------------------------------------------------------- | --------------------------------------- |
-| `profiles` | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call |
+| Table              | Key columns                                                   | Notes                                                                                       |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                     |
+| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all |
+
+`deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
 
 On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
 
@@ -269,6 +277,15 @@ On creation only, `getProfile` seeds `display_name` from `user_metadata.full_nam
 | `avatar` | ❌     | `{user_id}/{filename}` | Private. Read and write limited to own folder. Served via signed URLs, 1 hour expiry |
 
 The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar_bucket.sql`, so `supabase db reset` gives a fresh local stack a working bucket. Storage RLS policies for it live in the base `remote_schema` migration.
+
+### Backups
+
+`.github/workflows/backup.yml` runs a nightly age-encrypted dump (roles, schema, data, plus the `avatar` bucket via `scripts/backup-storage.mjs`) and uploads it as a 30-day artifact. Setup, restore steps, security and GDPR rationale: `docs/BACKUPS.md`.
+
+- It fails until the four repo secrets exist. That is deliberate, not a bug.
+- Supabase platform backups never include Storage objects, on any plan, which is why the bucket is dumped separately.
+- `supabase db dump` without `--data-only` omits the `auth` and `storage` schemas. All three dump commands are needed or user accounts are lost.
+- Use the **session** pooler URL. The direct host is IPv6-only and GitHub runners cannot reach it.
 
 ---
 
@@ -305,18 +322,15 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
-  <<<<<<< HEAD
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  - # `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  - `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
   - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false. `numberOfSeasons` and `numberOfEpisodes` are series only, from the TMDB scalars, omitted when absent or 0.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
-  - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
+  - **No `aggregateRating`.** No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
   - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
@@ -342,7 +356,7 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
 
-\*\*CSP ships as `Content-Security-Policy` — the browser blocks anything the policy does not list.
+**CSP ships as `Content-Security-Policy`** — the browser blocks anything the policy does not list.
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
 - `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
