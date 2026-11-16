@@ -250,6 +250,7 @@ export const colors = {
 - Never expose the service role key — it must only be used server-side
 - Row Level Security (RLS) is enabled — always test that policies enforce access correctly
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
+- **Supabase CLI 3.x is required.** `supabase/config.toml` uses `[local_smtp]`, the section that replaced `[inbucket]` in v3. CLI 2.x rejects `local_smtp` and 3.x rejects `inbucket`, so the two cannot coexist — `supabase start` fails on the wrong major. Both workflows pin `supabase/setup-cli` to `3.0.0`; `version: latest` is what broke CI when v3 shipped. Upgrade locally with `brew upgrade supabase`.
 
 ### Schema
 
