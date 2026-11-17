@@ -9,8 +9,6 @@ type Props = {
   searchParams: Promise<MediaPageSearchParams>;
 };
 
-// Build-time ids, so the crawler-visible `<head>` is in the prerendered
-// shell instead of streaming into the body. `dynamicParams` stays default.
 export async function generateStaticParams() {
   return getStaticMediaParams('movie');
 }

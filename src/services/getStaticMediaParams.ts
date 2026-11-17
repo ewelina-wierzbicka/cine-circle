@@ -28,8 +28,6 @@ export async function getPopularMediaEntries(): Promise<PopularMedia[]> {
     ...popularPages.flat(),
   ];
 
-  // Trending and popular overlap heavily, and a duplicate URL wastes crawl
-  // budget. First entry wins: trending is the higher-priority source.
   const byKey = new Map<string, PopularMedia>();
   for (const item of media) {
     const key = `${item.mediaType}-${item.id}`;
@@ -39,17 +37,7 @@ export async function getPopularMediaEntries(): Promise<PopularMedia[]> {
   return [...byKey.values()];
 }
 
-/**
- * Build-time ids for `/movie/[id]` and `/series/[id]`.
- *
- * Without these the segment has no build-time param, so `generateMetadata`
- * awaits a fallback param, metadata postpones, and the crawler gets a `<head>`
- * with no title, description or canonical. A concrete param resolves the
- * metadata at build instead, into the real head of that id's shell.
- *
- * `dynamicParams` stays at its default, so an unlisted id still renders on
- * demand. A TMDB outage therefore costs prerendering, not the build.
- */
+// Build-time ids for `/movie/[id]` and `/series/[id]`.
 export async function getStaticMediaParams(
   mediaType: MediaType,
 ): Promise<{ id: string }[]> {
