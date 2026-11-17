@@ -1,12 +1,17 @@
 import type { Metadata } from 'next';
 import MediaPage, { type MediaPageSearchParams } from '@/components/MediaPage';
 import { getMovieDetails } from '@/services/getMedia';
+import { getStaticMediaParams } from '@/services/getStaticMediaParams';
 import { mediaMetadata, NOT_FOUND_METADATA } from '@/lib/seo';
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<MediaPageSearchParams>;
 };
+
+export async function generateStaticParams() {
+  return getStaticMediaParams('movie');
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: slug } = await params;
