@@ -268,7 +268,7 @@ export const colors = {
 
 On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
 
-`[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in.
+`[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in. Google Cloud and Supabase dashboard config the flow needs, with exact redirect URIs and a symptom table: `docs/GOOGLE_OAUTH.md`.
 
 ### Storage
 
