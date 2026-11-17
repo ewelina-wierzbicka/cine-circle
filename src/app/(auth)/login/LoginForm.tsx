@@ -1,7 +1,9 @@
 'use client';
 
+import { AuthDivider } from '../AuthDivider';
 import { AuthFormFooter } from '../AuthFormFooter';
 import { AuthFormHeading } from '../AuthFormHeading';
+import { GoogleSignInButton } from '../GoogleSignInButton';
 import Button from '@/components/Button';
 import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
@@ -29,8 +31,10 @@ export function LoginForm() {
     } else if (errorParam === 'confirm_failed') {
       toast.error('Email confirmation failed. Please try again.');
       router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+    } else if (errorParam === 'oauth_failed') {
+      toast.error('Google sign-in failed. Please try again.');
+      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
     }
-    // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
@@ -60,6 +64,9 @@ export function LoginForm() {
         }
         subtitle="Sign in to your collection"
       />
+
+      <GoogleSignInButton rurl={rurl} />
+      <AuthDivider />
 
       <form
         className="w-full flex flex-col gap-6"

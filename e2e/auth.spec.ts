@@ -259,4 +259,58 @@ test.describe('auth', () => {
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await page.waitForURL('/');
   });
+
+  test('T13 oauth-callback with no code redirects to login', async ({
+    page,
+  }) => {
+    // The Google round trip is not automatable, so assert the failure branch.
+    // Read the redirect header: once LoginForm handles oauth_failed it strips
+    // the param, and a URL assertion after the toast would race that.
+    const response = await page.request.get('/api/auth/oauth-callback', {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain(
+      '/login?error=oauth_failed',
+    );
+  });
+
+  test('T14 login Google button starts the OAuth flow', async ({ page }) => {
+    await page.goto('/login');
+    const google = page.getByRole('button', {
+      name: 'CONTINUE WITH GOOGLE',
+    });
+    await expect(google).toBeVisible();
+
+    // Stop at the Supabase authorize hop: the Google round trip is not
+    // automatable, and the redirect target is all this test needs to see.
+    let authorizeUrl = '';
+    await page.route('**/auth/v1/authorize**', async (route) => {
+      authorizeUrl = route.request().url();
+      await route.abort();
+    });
+
+    await google.click();
+    await expect.poll(() => authorizeUrl).toContain('provider=google');
+    expect(authorizeUrl).toContain('oauth-callback');
+  });
+
+  test('T15 register offers Google sign-in', async ({ page }) => {
+    await page.goto('/register');
+    await expect(
+      page.getByRole('button', { name: 'CONTINUE WITH GOOGLE' }),
+    ).toBeVisible();
+  });
+
+  test('T16 oauth_failed param shows a toast on login', async ({ page }) => {
+    // The toast auto-closes after 5s and LoginForm strips the param,
+    // so watch for the text while navigating.
+    await Promise.all([
+      page
+        .getByText('Google sign-in failed. Please try again.')
+        .waitFor({ timeout: 45_000 }),
+      page.goto('/login?error=oauth_failed'),
+    ]);
+    await page.waitForURL('/login');
+  });
 });

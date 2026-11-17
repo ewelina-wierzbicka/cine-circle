@@ -49,6 +49,8 @@ src/
       AuthFormFooter.tsx      # shared closing line under an auth form
       AuthFormHeading.tsx     # icon chip + title + subtitle block every auth screen opens with
       InboxNotice.tsx         # "we emailed you" body + spam-folder tip card
+      GoogleSignInButton.tsx  # client — outlined Button calling signInWithGoogle; login passes rurl
+      AuthDivider.tsx         # "or" rule between the Google button and the email form
       layout.tsx
       login/
         page.tsx
@@ -113,6 +115,8 @@ src/
           route.ts            # GET — redirect-only: Supabase's confirmation link verifies the email, then lands here with a code; code present → /registration-confirmed (no session ever created), no code → /login?error=confirm_failed
         reset-callback/
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
+        oauth-callback/
+          route.ts            # GET — exchanges the Google PKCE code for a session, redirects to the sanitised `rurl` or `/`; no code or exchange failure → /login?error=oauth_failed
       cron/
         keep-alive/
           route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
@@ -158,6 +162,7 @@ src/
   - `mediaExists` fails open on a missing `TMDB_TOKEN` or a TMDB outage. A soft 404 beats 404ing a real page.
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
+- `signInWithGoogle` (`services/auth.ts`) starts the Google PKCE flow on the **server** client, so the code-verifier cookie is written where `/api/auth/oauth-callback` can read it. Every `rurl` goes through `lib/safeRedirectPath.ts` first — same-site paths only, `//host` and `/\host` rejected.
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
 - **`vercel.json` (repo root) holds the cron schedule.** One entry: `/api/cron/keep-alive` daily at `0 6 * * *`. Vercel Hobby caps cron at one invocation per day, and daily leaves headroom for a missed run inside Supabase's 7-day pause window. `CRON_SECRET` must be set in the Vercel project (Production), or Vercel sends no `Authorization` header, the handler 401s every run, and the project pauses silently. The ping is an ops call, not app data, so the query stays inline in the handler rather than in `services/`. No `proxy.ts` change: the matcher already excludes `api/`
 - Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
@@ -260,6 +265,10 @@ export const colors = {
 | `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all |
 
 `deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
+
+On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
+
+`[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in.
 
 ### Storage
 
@@ -529,9 +538,9 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
+| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path, T13 oauth-callback no code → /login?error=oauth_failed, T14 login Google button starts the OAuth flow, T15 register offers Google sign-in, T16 oauth_failed toast |
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
