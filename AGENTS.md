@@ -46,6 +46,11 @@ src/
   app/
     (auth)/                   # auth routes — login, register, confirm-email
       AuthFormLayout.tsx      # shared layout for auth forms
+      AuthFormFooter.tsx      # shared closing line under an auth form
+      AuthFormHeading.tsx     # icon chip + title + subtitle block every auth screen opens with
+      InboxNotice.tsx         # "we emailed you" body + spam-folder tip card
+      GoogleSignInButton.tsx  # client — outlined Button calling signInWithGoogle; login passes rurl
+      AuthDivider.tsx         # "or" rule between the Google button and the email form
       layout.tsx
       login/
         page.tsx
@@ -84,14 +89,15 @@ src/
       collection/               # /collection
         page.tsx
         loading.tsx           # streams MyMedia header + grid skeleton
-        MyMedia.tsx
+        MyMedia.tsx            # tabs + filters: title, media type, rating multi-select (watched tab only)
         UserMediaList.tsx
       profile/                # /profile
         page.tsx
         loading.tsx           # streams profile skeleton via Suspense (PPR — uncached Supabase data)
         ProfileContent.tsx
         ProfileSkeleton.tsx
-series/[id]/             # /series/:id
+        SettingsRow.tsx        # collapsible account row (email, password, delete)
+      series/[id]/            # /series/:id
         page.tsx
         loading.tsx           # streams <MediaDetailSkeleton /> via Suspense
       about/                  # /about — static About page (open route, indexable)
@@ -101,7 +107,7 @@ series/[id]/             # /series/:id
       privacy/                # /privacy — static Privacy Policy page (open route)
         page.tsx              # copy only; renders <StaticContentPage />
       error.tsx               # (app) error boundary (client) — catches runtime errors in (app) routes
-      not-found.tsx           # (app) 404 (client) — renders for notFound() calls inside (app)
+      not-found.tsx           # (app) 404 — wrapper around <NotFoundState />, renders for notFound() calls inside (app)
       layout.tsx
     api/                      # Route Handlers
       auth/
@@ -109,11 +115,16 @@ series/[id]/             # /series/:id
           route.ts            # GET — redirect-only: Supabase's confirmation link verifies the email, then lands here with a code; code present → /registration-confirmed (no session ever created), no code → /login?error=confirm_failed
         reset-callback/
           route.ts            # GET — exchanges email-link code for session, redirects to /reset-password or /login?error=reset_failed
+        oauth-callback/
+          route.ts            # GET — exchanges the Google PKCE code for a session, redirects to the sanitised `rurl` or `/`; no code or exchange failure → /login?error=oauth_failed
+      cron/
+        keep-alive/
+          route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
       email/
         inbound/
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
     layout.tsx                # root layout
-    not-found.tsx             # root 404 (client) — renders for URLs that match no route at all
+    not-found.tsx             # root 404 — same <NotFoundState />, full-screen wrapper; renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     llms.txt/
@@ -151,7 +162,10 @@ series/[id]/             # /series/:id
   - `mediaExists` fails open on a missing `TMDB_TOKEN` or a TMDB outage. A soft 404 beats 404ing a real page.
   - `MediaPage` keeps its own `notFound()` calls. They cover RSC navigation and are the reason the body is correct today.
 - All other known routes require auth — unauthenticated users are redirected to `/login?rurl=<pathname>`
+- `signInWithGoogle` (`services/auth.ts`) starts the Google PKCE flow on the **server** client, so the code-verifier cookie is written where `/api/auth/oauth-callback` can read it. Every `rurl` goes through `lib/safeRedirectPath.ts` first — same-site paths only, `//host` and `/\host` rejected.
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
+- **`vercel.json` (repo root) holds the cron schedule.** One entry: `/api/cron/keep-alive` daily at `0 6 * * *`. Vercel Hobby caps cron at one invocation per day, and daily leaves headroom for a missed run inside Supabase's 7-day pause window. `CRON_SECRET` must be set in the Vercel project (Production), or Vercel sends no `Authorization` header, the handler 401s every run, and the project pauses silently. The ping is an ops call, not app data, so the query stays inline in the handler rather than in `services/`. No `proxy.ts` change: the matcher already excludes `api/`
+- Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---
 
@@ -161,7 +175,7 @@ Tailwind CSS v4 with custom design tokens defined in `src/globals.css`. Always u
 
 **Fonts:**
 
-- `font-sans` — DM Sans (primary body font, weights 300/400/500/600)
+- `font-sans` — DM Sans (weights 300/400/500/600). **The inherited default**, from the `font-sans` class on `<body>` in `app/layout.tsx`. Do not write it at a call site: it is a no-op unless an ancestor sets `font-serif` or `font-mono`. The class on `<body>` must stay — the `next/font` `--font-dm-sans` variable is scoped there, so Tailwind's preflight rule on `html` cannot resolve it.
 - `font-serif` — DM Serif Display (headings, display text)
 - `font-mono` — DM Mono (labels, nav items, monospaced text)
 
@@ -195,6 +209,30 @@ export const colors = {
 - `animate-fade-up` — opacity 0→1 + translateY 18px→0, 500ms spring
 - `animate-fade-in` — opacity 0→1, 400ms ease
 
+**Body copy line-height:**
+
+- `body` sets `line-height: 1.625` and `@theme inline` pins `--text-sm--line-height` and `--text-base--line-height` to the same. **Both are needed:** the `body` rule alone only reaches text with no `text-*` class.
+- So **never write `leading-relaxed`** — `text-sm` and `text-base` already are 1.625, and a `leading-*` override still wins.
+- Sizes above `text-base` keep the Tailwind defaults, so a heading needs its own `leading-*`.
+
+**Typography utilities (defined in `globals.css`):**
+
+| Utility         | Sets                                                                |
+| --------------- | ------------------------------------------------------------------- |
+| `label-mono`    | mono + `text-sm` + `0.18em` + `uppercase`                           |
+| `ui-mono`       | mono + `text-sm` + `0.05em`, no `text-transform`                    |
+| `title-serif`   | serif + `text-6xl` + 400 + `-0.02em` + `1.1` leading                |
+| `display-serif` | serif + `clamp(32px, 5vw, 48px)` + 400 + `-0.03em` + `0.95` leading |
+
+- **Every mono call site uses a mono utility, every serif heading a serif utility.** Never write `font-mono text-sm tracking-[…]` or `font-serif … leading-[…]` again. Bare `font-serif` is for the rare non-heading glyph, where tracking would throw off centring.
+- **Pick by role, not size.** `title-serif` is the auth and form heading, `display-serif` the page title. Both are size-overridable.
+- Colour and margins stay at the call site. Add `uppercase` beside `ui-mono` for an all-caps chip.
+- Do not pair a utility with what it already sets (`font-mono`, `font-serif`, `text-sm`, `uppercase`, `tracking-*`). Overrides still win, so `label-mono text-base` is a valid 16px label.
+- **Keep `--tw-leading` beside `line-height` in the serif rules.** That is what makes the size overridable: `title-serif text-4xl` keeps 1.1. `font-normal` is redundant; DM Serif Display ships no other weight.
+- **`font-family` must come from the `next/font` variable (`--font-dm-serif-display`, `--font-dm-mono`), never the `--font-serif` / `--font-mono` theme key.** The key resolves to nothing at `:root`, so the font silently falls back to DM Sans. Same body-scoping caveat as the `font-sans` note above.
+- **No fifth utility.** Body copy is a bare `text-sm` or `text-base`: 1.625 is already pinned, DM Sans is inherited, and colour belongs at the call site.
+- **No arbitrary px font size for body copy** — `text-[14px]` emits a bare `font-size` and skips the 1.625 pin. The one exception is a display size on no Tailwind step, written on top of a serif utility, where overriding size without resetting leading is the point.
+
 **Rules:**
 
 - Mobile-first — use base styles for mobile, `sm:` / `md:` / `lg:` for larger screens
@@ -202,6 +240,8 @@ export const colors = {
 - Before adding a new color, check if an existing token fits
 - For borders and overlays without a named token, use Tailwind opacity utilities: `border-white/[0.07]`, `bg-white/4`, etc.
 - Check existing components in `components/` for patterns before building new UI
+- `MenuOption` is the dropdown row for `Select`, `RatingMultiSelect` and the `Header` menu. It renders an `<li>` and ships only the look — pass the role, ARIA state and key handlers at the call site, since a listbox option and a menuitem need different ones
+- `FieldLabel` is the mono label above a form field. It stays inline, so an added `mb-*` behaves as it did before it was a component
 - Never use text smaller than `text-sm` — minimum font size is `text-sm` (14px)
 - SVG icons must live in `src/icons/` as named-export components — never inline raw `<svg>` in component files
 
@@ -215,12 +255,20 @@ export const colors = {
 - Never expose the service role key — it must only be used server-side
 - Row Level Security (RLS) is enabled — always test that policies enforce access correctly
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
+- **Supabase CLI 3.x is required.** `supabase/config.toml` uses `[local_smtp]`, the section that replaced `[inbucket]` in v3. CLI 2.x rejects `local_smtp` and 3.x rejects `inbucket`, so the two cannot coexist — `supabase start` fails on the wrong major. Both workflows pin `supabase/setup-cli` to `3.0.0`; `version: latest` is what broke CI when v3 shipped. Upgrade locally with `brew upgrade supabase`.
 
 ### Schema
 
-| Table      | Key columns                                                   | Notes                                   |
-| ---------- | ------------------------------------------------------------- | --------------------------------------- |
-| `profiles` | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call |
+| Table              | Key columns                                                   | Notes                                                                                       |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                     |
+| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all |
+
+`deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
+
+On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
+
+`[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in.
 
 ### Storage
 
@@ -229,6 +277,15 @@ export const colors = {
 | `avatar` | ❌     | `{user_id}/{filename}` | Private. Read and write limited to own folder. Served via signed URLs, 1 hour expiry |
 
 The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar_bucket.sql`, so `supabase db reset` gives a fresh local stack a working bucket. Storage RLS policies for it live in the base `remote_schema` migration.
+
+### Backups
+
+`.github/workflows/backup.yml` runs a nightly age-encrypted dump (roles, schema, data, plus the `avatar` bucket via `scripts/backup-storage.mjs`) and uploads it as a 30-day artifact. Setup, restore steps, security and GDPR rationale: `docs/BACKUPS.md`.
+
+- It fails until the four repo secrets exist. That is deliberate, not a bug.
+- Supabase platform backups never include Storage objects, on any plan, which is why the bucket is dumped separately.
+- `supabase db dump` without `--data-only` omits the `auth` and `storage` schemas. All three dump commands are needed or user accounts are lost.
+- Use the **session** pooler URL. The direct host is IPv6-only and GitHub runners cannot reach it.
 
 ---
 
@@ -243,7 +300,7 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 - `images.imageSizes` is `[92, 154]` and `images.deviceSizes` is `[185, 342, 500, 780]` — the TMDB buckets. Do not widen them: the Next.js defaults emit candidates up to 3840, and any candidate above 780 resolves to TMDB `original` (multi-MB) for a poster rendered at 500px.
 - Setting any non-default `images.loader` makes Next.js 404 the `/_next/image` optimizer route for every request. Do not write loader output that points at `/_next/image` — it is a dead link. `images.remotePatterns` is likewise inert while the custom loader is active, but the TMDB and Supabase entries are kept so the config stays correct if the loader is ever removed.
 - Never pass a `loader` function prop to `next/image` from a Server Component — functions cannot cross the RSC boundary. Use `loaderFile` instead.
-- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single largest image per page, and the only call site is the detail poster in `MediaDetailWrapper`.
+- **LCP images carry `priority`.** In Next 16 `priority` emits a `<link rel="preload" as="image">` and drops `loading="lazy"`; it does **not** set `fetchpriority`. That is the separate `fetchPriority` prop. Current `priority` call sites: the `/logo.webp` logo in `Header`, `HeaderSkeleton` and `AuthFormLayout`, all through `<Logo priority />`; the detail poster in `MediaDetailWrapper`; the auth poster grid in `AuthFormLayout`. `fetchPriority="high"` is reserved for the single largest image per page, and the only call site is the detail poster in `MediaDetailWrapper`.
 - Build every TMDB image URL with `tmdbImageUrl(path)` from `lib/tmdbImage.ts`. Never hardcode `https://image.tmdb.org/t/p/<size>` at a call site. For social/OG images use `tmdbSocialImageUrl(path)` — crawlers fetch the raw URL with no loader in front of it, so it pins the `w780` bucket.
 
 ### Metadata & SEO
@@ -269,18 +326,15 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
-  <<<<<<< HEAD
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  - # `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
-- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
-  > > > > > > > 279fbd00f514482bc29a6ba1829d37c4a00872e5
+- **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
+  - `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
   - Every script tag sits **outside every Suspense boundary** and is built from the cached TMDB `baseMedia`, never from `getEnrichedMedia`. Inside a boundary the block would stream after the shell and miss the prerendered HTML.
   - The Organization node comes from one shared `organizationNode()` helper, used by both `siteJsonLd()` and `aboutPageJsonLd()`. Never retype its fields at a second call site. `/about` ships the full node, not a bare `@id` reference: a cross-page reference does not resolve for a validator reading `/about` alone.
   - `mediaJsonLd()` sets `'@id'` to `` `${url}#media` ``, always present. `startDate` is series only, from `media.release_date` (`normalizeSeriesResult` maps TMDB `first_air_date` onto it). `duration` is ISO 8601 from `media.runtime` and **movies only**: for a series `runtime` is `episode_run_time[0]`, a per-episode value, so publishing it as the series duration would state something false. `numberOfSeasons` and `numberOfEpisodes` are series only, from the TMDB scalars, omitted when absent or 0.
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
-  - \*\*No `aggregateRating`. No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
+  - **No `aggregateRating`.** No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
   - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.
@@ -306,11 +360,12 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
 
-**CSP ships as `Content-Security-Policy-Report-Only`, not enforcing.** It logs violations without blocking, so a missing origin cannot break the app. Tighten it to the enforcing header only after the reports come back clean.
+**CSP ships as `Content-Security-Policy`** — the browser blocks anything the policy does not list.
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
-- `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason.
+- `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
 - Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`. `*.sentry.io` in `connect-src` for browser error reports, sent to the ingest host in the DSN in `src/instrumentation-client.ts`. The host wildcard matches any depth, so it covers `o4512091748106240.ingest.de.sentry.io`.
+- `img-src` and `connect-src` also carry the origin of `NEXT_PUBLIC_SUPABASE_URL`. Local development and the e2e suite point at it, which is neither `'self'` nor covered by the `*.supabase.co` wildcard, so without it every browser-side Supabase call is blocked locally.
 - Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
 - `manifest-src 'self'` is redundant next to `default-src 'self'`, but Safari has historically needed it named, so it stays. There is no `worker-src` because there is no service worker.
 - Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
@@ -487,19 +542,20 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 
 **Current coverage:**
 
-| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path |
+| File           | Tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path, T13 oauth-callback no code → /login?error=oauth_failed, T14 login Google button starts the OAuth flow, T15 register offers Google sign-in, T16 oauth_failed toast |
 
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
-| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter |
+| `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T21 rating multi-select (watched tab only) |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
 
 - Tests are self-contained; no shared state between tests.
 - Prefer `page.getByRole()`, `page.getByLabel()`, `page.getByText()` over CSS selectors.
+- Password fields need `getByLabel('Password', { exact: true })` — the `PasswordInput` toggle is labelled "Show password".
 - Auth helpers live in `e2e/fixtures/` and `e2e/admin.ts`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
 - `e2e/global-setup.ts` warms the routes the suite visits before any test runs. A cold `next dev` compile of `/movie/[id]` alone takes ~30s, which used to blow the per-test timeout. Add a route there when a new spec navigates somewhere new.

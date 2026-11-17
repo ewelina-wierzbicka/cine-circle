@@ -10,7 +10,7 @@ test.describe('auth', () => {
     await page.goto('/login');
 
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER_PASSWORD);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     await page.waitForURL('/');
@@ -35,7 +35,7 @@ test.describe('auth', () => {
 
     // Bad email format (passes native email check, fails app pattern).
     await page.getByLabel('Email').fill('foo@bar');
-    await page.getByLabel('Password').fill('whatever');
+    await page.getByLabel('Password', { exact: true }).fill('whatever');
     await signIn.click();
     await expect(
       page.getByText('Please enter a valid email address'),
@@ -43,7 +43,7 @@ test.describe('auth', () => {
 
     // Wrong credentials -> Supabase error toast.
     await page.getByLabel('Email').fill('nobody@midnightframe.test');
-    await page.getByLabel('Password').fill('WrongPass!1');
+    await page.getByLabel('Password', { exact: true }).fill('WrongPass!1');
     await signIn.click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
     await expect(page).toHaveURL('/login');
@@ -134,7 +134,7 @@ test.describe('auth', () => {
     await page.waitForURL(/\/login\?rurl=%2Fcollection/);
 
     await page.getByLabel('Email').fill(TEST_USER_EMAIL);
-    await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER_PASSWORD);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
 
     await page.waitForURL('/collection');
@@ -248,13 +248,69 @@ test.describe('auth', () => {
 
     // Old password no longer works.
     await page.getByLabel('Email').fill(isolatedUser.email);
-    await page.getByLabel('Password').fill(isolatedUser.password);
+    await page
+      .getByLabel('Password', { exact: true })
+      .fill(isolatedUser.password);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await expect(page.getByText('Invalid login credentials')).toBeVisible();
 
     // New password logs in.
-    await page.getByLabel('Password').fill(newPassword);
+    await page.getByLabel('Password', { exact: true }).fill(newPassword);
     await page.getByRole('button', { name: 'SIGN IN' }).click();
     await page.waitForURL('/');
+  });
+
+  test('T13 oauth-callback with no code redirects to login', async ({
+    page,
+  }) => {
+    // The Google round trip is not automatable, so assert the failure branch.
+    // Read the redirect header: once LoginForm handles oauth_failed it strips
+    // the param, and a URL assertion after the toast would race that.
+    const response = await page.request.get('/api/auth/oauth-callback', {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain(
+      '/login?error=oauth_failed',
+    );
+  });
+
+  test('T14 login Google button starts the OAuth flow', async ({ page }) => {
+    await page.goto('/login');
+    const google = page.getByRole('button', {
+      name: 'CONTINUE WITH GOOGLE',
+    });
+    await expect(google).toBeVisible();
+
+    // Stop at the Supabase authorize hop: the Google round trip is not
+    // automatable, and the redirect target is all this test needs to see.
+    let authorizeUrl = '';
+    await page.route('**/auth/v1/authorize**', async (route) => {
+      authorizeUrl = route.request().url();
+      await route.abort();
+    });
+
+    await google.click();
+    await expect.poll(() => authorizeUrl).toContain('provider=google');
+    expect(authorizeUrl).toContain('oauth-callback');
+  });
+
+  test('T15 register offers Google sign-in', async ({ page }) => {
+    await page.goto('/register');
+    await expect(
+      page.getByRole('button', { name: 'CONTINUE WITH GOOGLE' }),
+    ).toBeVisible();
+  });
+
+  test('T16 oauth_failed param shows a toast on login', async ({ page }) => {
+    // The toast auto-closes after 5s and LoginForm strips the param,
+    // so watch for the text while navigating.
+    await Promise.all([
+      page
+        .getByText('Google sign-in failed. Please try again.')
+        .waitFor({ timeout: 45_000 }),
+      page.goto('/login?error=oauth_failed'),
+    ]);
+    await page.waitForURL('/login');
   });
 });

@@ -1,9 +1,9 @@
 import MediaPoster from '@/components/MediaPoster';
+import { MediaPosterLink } from '@/components/MediaPosterLink';
 import { twMerge } from '@/lib/cn';
 import { toHref } from '@/lib/mediaUtils';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { RecommendedMedia } from '@/types';
-import Link from 'next/link';
 import { ReactNode } from 'react';
 
 type Props = {
@@ -53,37 +53,22 @@ export default function MediaDetailWrapper({
       </div>
       {recommendations && recommendations.length > 0 && step === 1 && (
         <div className="relative z-2 px-6 md:px-12 py-12">
-          <span className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-4 block">
+          <span className="label-mono text-accent mb-4 block">
             More like this
           </span>
           <div className="flex gap-3 overflow-x-auto pb-1">
-            {recommendations.map((rec) => {
-              const href = toHref(rec.id, rec.title, rec.media_type);
-              return (
-                <Link key={rec.id} href={href} className="shrink-0 group">
-                  <div className="rounded-xl overflow-hidden border border-white/[0.07] w-27.5 h-41.25 relative">
-                    <MediaPoster
-                      title={rec.title}
-                      src={
-                        rec.poster_path
-                          ? tmdbImageUrl(rec.poster_path)
-                          : undefined
-                      }
-                      className="w-full h-full max-w-none rounded-xl"
-                      sizes="110px"
-                    />
-                    {rec.genre && (
-                      <span className="absolute bottom-1.5 left-1.5 font-mono text-sm tracking-[0.06em] uppercase bg-dark/70 text-accent px-1.5 py-0.5 rounded-full">
-                        {rec.genre}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-secondary mt-1.5 w-27.5 truncate group-hover:text-primary transition-colors">
-                    {rec.title}
-                  </p>
-                </Link>
-              );
-            })}
+            {recommendations.map((rec) => (
+              <MediaPosterLink
+                key={rec.id}
+                href={toHref(rec.id, rec.title, rec.media_type)}
+                title={rec.title}
+                src={
+                  rec.poster_path ? tmdbImageUrl(rec.poster_path) : undefined
+                }
+                genre={rec.genre}
+                showTitle
+              />
+            ))}
           </div>
         </div>
       )}

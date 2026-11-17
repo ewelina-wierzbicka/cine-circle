@@ -1,21 +1,35 @@
 'use client';
 
 import Input from '@/components/Input';
+import { RatingMultiSelect } from '@/components/RatingMultiSelect';
 import Select from '@/components/Select';
 import { useSearch } from '@/hooks/useSearch';
+import { twMerge } from '@/lib/cn';
 import { MEDIA_TYPE_OPTIONS } from '@/lib/constants';
-import { FilterMediaType, UserMediaPage } from '@/types';
+import {
+  CollectionTab,
+  FilterMediaType,
+  RatingFilter,
+  UserMediaPage,
+} from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 import UserMediaList from './UserMediaList';
 
+const TABS: { tab: CollectionTab; label: string }[] = [
+  { tab: 'watched', label: 'Watched' },
+  { tab: 'to_watch', label: 'To Watch' },
+];
+
 type Props = {
-  tab: 'to_watch' | 'watched';
+  tab: CollectionTab;
   initialData: UserMediaPage;
 };
 
 export default function MyMedia({ tab, initialData }: Props) {
   const [mediaType, setMediaType] = useState<FilterMediaType>('all');
+  const [rating, setRating] = useState<RatingFilter>([]);
+  const appliedRating = tab === 'watched' ? rating : [];
   const { debouncedQuery, handleChange } = useSearch({
     onSearch: () => {},
     debounceMs: 400,
@@ -25,10 +39,8 @@ export default function MyMedia({ tab, initialData }: Props) {
     <>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pt-10 pb-12">
         <div className="w-full sm:w-[25%]">
-          <p className="font-mono text-sm tracking-[0.2em] text-accent uppercase mb-2">
-            My Collection
-          </p>
-          <h1 className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[0.95]">
+          <p className="label-mono text-accent mb-2">My Collection</p>
+          <h1 className="display-serif">
             {tab === 'watched' ? (
               <em className="text-primary">Watched</em>
             ) : (
@@ -39,27 +51,22 @@ export default function MyMedia({ tab, initialData }: Props) {
           </h1>
         </div>
         <div className="flex items-center justify-end gap-2.5 shrink-0 flex-wrap w-full sm:w-[75%]">
-          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0 w-full sm:w-auto ">
-            <Link
-              href="?tab=watched"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
-                tab === 'watched'
-                  ? 'bg-accent text-dark'
-                  : 'text-secondary hover:text-primary'
-              }`}
-            >
-              Watched
-            </Link>
-            <Link
-              href="?tab=to_watch"
-              className={`px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto ${
-                tab === 'to_watch'
-                  ? 'bg-accent text-dark'
-                  : 'text-secondary hover:text-primary'
-              }`}
-            >
-              To Watch
-            </Link>
+          <div className="flex bg-bg2 border border-secondary/25 rounded-xl p-0.5 gap-0.5 shrink-0 w-full sm:w-auto">
+            {TABS.map(({ tab: value, label }) => (
+              <Link
+                key={value}
+                href={`?tab=${value}`}
+                aria-current={value === tab ? 'page' : undefined}
+                className={twMerge(
+                  'px-4.5 py-1.75 rounded-[10px] text-sm font-semibold tracking-[0.04em] transition-all duration-200 w-1/2 sm:w-auto',
+                  value === tab
+                    ? 'bg-accent text-dark'
+                    : 'text-secondary hover:text-primary',
+                )}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
           <div className="flex gap-2.5 w-full sm:w-auto flex-wrap justify-end">
             <div className="w-full sm:w-53.25">
@@ -79,6 +86,14 @@ export default function MyMedia({ tab, initialData }: Props) {
               onChange={setMediaType}
               className="w-full sm:w-53.25"
             />
+
+            {tab === 'watched' && (
+              <RatingMultiSelect
+                value={rating}
+                onChange={setRating}
+                className="w-full sm:w-44"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -88,6 +103,7 @@ export default function MyMedia({ tab, initialData }: Props) {
         initialData={initialData}
         searchQuery={debouncedQuery}
         mediaType={mediaType}
+        rating={appliedRating}
       />
     </>
   );

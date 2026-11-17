@@ -58,9 +58,7 @@ export default function MediaList({
     }
     return (
       <div className="flex items-center justify-center h-48 w-full">
-        <p className="font-mono text-sm tracking-[0.12em] text-secondary uppercase">
-          {emptyMessage}
-        </p>
+        <p className="label-mono text-secondary">{emptyMessage}</p>
       </div>
     );
   }

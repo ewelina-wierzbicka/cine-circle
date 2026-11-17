@@ -1,8 +1,15 @@
 'use client';
 
+import { AuthDivider } from '../AuthDivider';
+import { AuthFormFooter } from '../AuthFormFooter';
+import { AuthFormHeading } from '../AuthFormHeading';
+import { GoogleSignInButton } from '../GoogleSignInButton';
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
 import { Link } from '@/components/Link';
+import { PasswordInput } from '@/components/PasswordInput';
+import { EMAIL_RULES } from '@/lib/validation';
 import { login } from '@/services/auth';
 import { RegistrationData } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -24,8 +31,10 @@ export function LoginForm() {
     } else if (errorParam === 'confirm_failed') {
       toast.error('Email confirmation failed. Please try again.');
       router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+    } else if (errorParam === 'oauth_failed') {
+      toast.error('Google sign-in failed. Please try again.');
+      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
     }
-    // fire once on mount: show toast then strip ?error= so it doesn't refire on re-render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const {
@@ -45,48 +54,39 @@ export function LoginForm() {
 
   return (
     <>
-      <div className="mb-10">
-        <h1 className="font-serif text-6xl font-normal tracking-[-0.02em] leading-[1.1] mb-3">
-          Welcome
-          <br />
-          <em className="text-accent">back</em>
-        </h1>
-        <p className="text-base text-secondary">Sign in to your collection</p>
-      </div>
+      <AuthFormHeading
+        title={
+          <>
+            Welcome
+            <br />
+            <em className="text-accent">back</em>
+          </>
+        }
+        subtitle="Sign in to your collection"
+      />
+
+      <GoogleSignInButton rurl={rurl} />
+      <AuthDivider />
 
       <form
         className="w-full flex flex-col gap-6"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div>
-          <label
-            htmlFor="email"
-            className="font-mono text-sm uppercase tracking-[0.14em] text-secondary mb-2"
-          >
-            Email
-          </label>
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
-            {...register('email', {
-              required: 'Please enter your email address',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Please enter a valid email address',
-              },
-            })}
+            {...register('email', EMAIL_RULES)}
             error={errors.email?.message}
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label
-              htmlFor="password"
-              className="font-mono text-sm uppercase tracking-[0.14em] text-secondary"
-            >
+            <FieldLabel htmlFor="password" className="mb-0">
               Password
-            </label>
+            </FieldLabel>
             <Link
               href="/forgot-password"
               className="text-sm text-secondary hover:text-primary"
@@ -94,7 +94,7 @@ export function LoginForm() {
               Forgot password?
             </Link>
           </div>
-          <Input id="password" type="password" {...register('password')} />
+          <PasswordInput id="password" {...register('password')} />
         </div>
 
         <Button type="submit" className="mt-3" disabled={isPending}>
@@ -102,9 +102,9 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-secondary">
+      <AuthFormFooter>
         Don&apos;t have an account? <Link href="/register">Register</Link>
-      </p>
+      </AuthFormFooter>
     </>
   );
 }

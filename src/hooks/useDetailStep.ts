@@ -8,9 +8,17 @@ export function useDetailStep(initialStep = 1) {
   const stepParam = searchParams.get('step');
   const step = stepParam === '2' ? 2 : initialStep;
 
+  const hrefForStep = (nextStep?: '2') => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextStep) params.set('step', nextStep);
+    else params.delete('step');
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  };
+
   return {
     step,
-    goToForm: () => router.push(`${pathname}?step=2`),
-    goToInfo: () => router.push(pathname),
+    goToForm: () => router.push(hrefForStep('2')),
+    goToInfo: () => router.push(hrefForStep()),
   };
 }

@@ -108,7 +108,7 @@ export default function StarRatingInput({
           );
         })}
         {displayValue > 0 && (
-          <span className="ml-2 text-sm text-secondary font-mono tabular-nums">
+          <span className="ml-2 ui-mono text-secondary tabular-nums">
             {displayValue}/10
           </span>
         )}

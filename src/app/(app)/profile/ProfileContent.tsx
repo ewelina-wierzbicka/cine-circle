@@ -1,8 +1,9 @@
 'use client';
 
 import Button from '@/components/Button';
+import { FieldLabel } from '@/components/FieldLabel';
 import Input from '@/components/Input';
-import ChevronIcon from '@/icons/Chevron';
+import { PencilIcon } from '@/icons/Pencil';
 import { twMerge } from '@/lib/cn';
 import { resizeImage } from '@/lib/resizeImage';
 import { createClient } from '@/lib/supabase/client';
@@ -12,13 +13,15 @@ import { updateAvatarPath, updateDisplayName } from '@/services/updateProfile';
 import { UserProfile } from '@/types';
 import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { SettingsRow } from './SettingsRow';
 
 type Props = {
   profile: UserProfile | null;
   email: string;
+  hasPassword: boolean;
 };
 
-export function ProfileContent({ profile, email }: Props) {
+export function ProfileContent({ profile, email, hasPassword }: Props) {
   const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
   const [isEditingName, setIsEditingName] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? '');
@@ -172,8 +175,8 @@ export function ProfileContent({ profile, email }: Props) {
   };
 
   return (
-    <div className="mx-auto max-w-xl px-6 py-10 md:py-16 animate-fade-up min-h-full flex flex-col justify-center">
-      <h1 className="text-4xl md:text-5xl mb-8 font-serif">
+    <div className="mx-auto my-auto min-w-full sm:min-w-150 px-6 py-10 md:py-16 animate-fade-up flex flex-col">
+      <h1 className="title-serif text-4xl md:text-5xl mb-8">
         <span>Your </span>
         <em className="text-accent">Profile</em>
       </h1>
@@ -205,14 +208,7 @@ export function ProfileContent({ profile, email }: Props) {
             className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-bg2 border border-secondary/50 flex items-center justify-center cursor-pointer hover:bg-bg3 transition-colors"
             aria-label="Change avatar"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-3.5 h-3.5 text-accent"
-            >
-              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-            </svg>
+            <PencilIcon className="w-3.5 h-3.5 text-accent" />
           </button>
 
           <input
@@ -230,9 +226,7 @@ export function ProfileContent({ profile, email }: Props) {
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-3">
-            Display name
-          </p>
+          <p className="label-mono text-secondary mb-3">Display name</p>
           {isEditingName ? (
             <div>
               <div className="flex items-center gap-2">
@@ -255,7 +249,7 @@ export function ProfileContent({ profile, email }: Props) {
                 <button
                   type="button"
                   onClick={() => void handleSaveName()}
-                  className="text-accent text-sm font-mono uppercase tracking-wider cursor-pointer hover:opacity-80"
+                  className="text-accent ui-mono uppercase cursor-pointer hover:opacity-80"
                 >
                   Save
                 </button>
@@ -279,17 +273,10 @@ export function ProfileContent({ profile, email }: Props) {
               onClick={() => setIsEditingName(true)}
               className="flex items-center gap-4 cursor-pointer bg-transparent border-none p-0 group"
             >
-              <span className="text-2xl font-sans font-semibold text-primary">
+              <span className="text-2xl font-semibold text-primary">
                 {displayName || 'Set name'}
               </span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-4 h-4 text-secondary group-hover:text-accent transition-colors"
-              >
-                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-              </svg>
+              <PencilIcon className="w-4 h-4 text-secondary group-hover:text-accent transition-colors" />
             </button>
           )}
         </div>
@@ -297,37 +284,24 @@ export function ProfileContent({ profile, email }: Props) {
 
       {/* Account Card */}
       <div className="bg-bg2 border border-white/[0.07] rounded-2xl p-6 mb-4">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-secondary mb-6">
-          Account
-        </p>
+        <p className="label-mono text-base text-secondary mb-6">Account</p>
 
         {/* Email row */}
-        <div className="border-b border-white/[0.07] pb-4 mb-4">
-          <button
-            type="button"
-            onClick={() => setEmailOpen(!emailOpen)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
+        <div
+          className={twMerge(
+            hasPassword && 'border-b border-white/[0.07] pb-4 mb-4',
+          )}
+        >
+          <SettingsRow
+            id="email-settings"
+            label="Email address"
+            summary={<p className="text-primary text-sm mt-2">{email}</p>}
+            open={emailOpen}
+            onToggle={() => setEmailOpen(!emailOpen)}
           >
-            <div className="text-left pr-2">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
-                Email address
-              </p>
-              <p className="text-primary text-sm mt-2">{email}</p>
-            </div>
-            <ChevronIcon
-              className={twMerge(
-                'w-5 h-5 text-secondary transition-transform duration-200',
-                emailOpen ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
-
-          {emailOpen && (
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  New email
-                </p>
+                <FieldLabel htmlFor="new-email">New email</FieldLabel>
                 <Input
                   id="new-email"
                   type="email"
@@ -344,40 +318,28 @@ export function ProfileContent({ profile, email }: Props) {
                 Update email
               </Button>
             </div>
-          )}
+          </SettingsRow>
         </div>
 
-        {/* Password row */}
-        <div>
-          <button
-            type="button"
-            onClick={() => setPasswordOpen(!passwordOpen)}
-            className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-          >
-            <div className="text-left">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary">
-                Password
-              </p>
-              {!passwordOpen && (
+        {hasPassword && (
+          <SettingsRow
+            id="password-settings"
+            label="Password"
+            summary={
+              !passwordOpen && (
                 <p className="text-secondary text-sm mt-2 tracking-widest">
                   ••••••••
                 </p>
-              )}
-            </div>
-            <ChevronIcon
-              className={twMerge(
-                'w-5 h-5 text-secondary transition-transform duration-200',
-                passwordOpen ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
-
-          {passwordOpen && (
+              )
+            }
+            open={passwordOpen}
+            onToggle={() => setPasswordOpen(!passwordOpen)}
+          >
             <div className="mt-6 space-y-6">
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <FieldLabel htmlFor="current-password">
                   Current password
-                </p>
+                </FieldLabel>
                 <Input
                   id="current-password"
                   type="password"
@@ -386,9 +348,7 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
-                  New password
-                </p>
+                <FieldLabel htmlFor="new-password">New password</FieldLabel>
                 <Input
                   id="new-password"
                   type="password"
@@ -397,9 +357,9 @@ export function ProfileContent({ profile, email }: Props) {
                 />
               </div>
               <div>
-                <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-2">
+                <FieldLabel htmlFor="confirm-password">
                   Confirm new password
-                </p>
+                </FieldLabel>
                 <Input
                   id="confirm-password"
                   type="password"
@@ -421,38 +381,26 @@ export function ProfileContent({ profile, email }: Props) {
                 Update password
               </Button>
             </div>
-          )}
-        </div>
+          </SettingsRow>
+        )}
       </div>
 
       {/* Danger Zone Card */}
       <div className="bg-bg2 border border-error/20 rounded-2xl p-6 mb-8">
-        <p className="font-mono text-base uppercase tracking-[0.15em] text-error mb-6">
-          Danger zone
-        </p>
+        <p className="label-mono text-base text-error mb-6">Danger zone</p>
 
-        <button
-          type="button"
-          onClick={() => setDeleteOpen(!deleteOpen)}
-          className="w-full flex items-center justify-between cursor-pointer bg-transparent border-none p-0"
-        >
-          <div className="text-left">
-            <p className="font-mono text-sm uppercase tracking-[0.15em] text-error">
-              Delete account
-            </p>
+        <SettingsRow
+          id="delete-account"
+          label="Delete account"
+          tone="error"
+          summary={
             <p className="text-secondary text-sm mt-4">
               Permanently remove your account and data
             </p>
-          </div>
-          <ChevronIcon
-            className={twMerge(
-              'w-5 h-5 text-error transition-transform duration-200',
-              deleteOpen ? 'rotate-90' : '-rotate-90',
-            )}
-          />
-        </button>
-
-        {deleteOpen && (
+          }
+          open={deleteOpen}
+          onToggle={() => setDeleteOpen(!deleteOpen)}
+        >
           <div className="mt-2 space-y-3">
             <p className="text-sm text-secondary">
               This will permanently erase your profile, collection, ratings and
@@ -462,10 +410,10 @@ export function ProfileContent({ profile, email }: Props) {
               This cannot be undone.
             </p>
             <div className="mt-6">
-              <p className="font-mono text-sm uppercase tracking-[0.15em] text-secondary mb-5">
+              <FieldLabel htmlFor="delete-confirm" className="mb-5">
                 Type <span className="text-error font-semibold">DELETE</span> to
                 confirm
-              </p>
+              </FieldLabel>
               <Input
                 id="delete-confirm"
                 value={deleteConfirm}
@@ -482,7 +430,7 @@ export function ProfileContent({ profile, email }: Props) {
               Delete my account
             </Button>
           </div>
-        )}
+        </SettingsRow>
       </div>
 
       {/* Sign Out */}

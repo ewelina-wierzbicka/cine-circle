@@ -33,19 +33,19 @@ export function HomeAbout() {
     >
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
         <div>
-          <p className="font-mono text-sm tracking-[0.2em] text-secondary/60 uppercase mb-5">
+          <p className="label-mono text-secondary/60 mb-5">
             About MidnightFrame
           </p>
           <h2
             id="what-is-midnightframe"
-            className="font-serif text-[clamp(32px,5vw,48px)] tracking-[-0.03em] leading-[1.15] mb-6"
+            className="display-serif leading-[1.15] mb-6"
           >
             A quiet place for the movies that{' '}
             <em className="text-accent">
               stay <span className=" whitespace-nowrap">with you.</span>
             </em>
           </h2>
-          <p className="font-sans text-base text-secondary leading-relaxed">
+          <p className="text-base text-secondary">
             MidnightFrame is a personal film log for late-night watchers. Keep
             track of what you&apos;ve seen, line up what&apos;s next, and build
             a collection that reflects your taste — not an algorithm&apos;s.
@@ -64,20 +64,18 @@ export function HomeAbout() {
               <summary className="flex cursor-pointer list-none items-center gap-5 py-6 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
                 <span
                   aria-hidden="true"
-                  className="w-6 shrink-0 font-mono text-sm text-secondary/40 transition-colors group-open:text-accent"
+                  className="w-6 shrink-0 ui-mono text-secondary/40 transition-colors group-open:text-accent"
                 >
                   {index(position)}
                 </span>
-                <h3 className="flex-1 font-sans text-base md:text-lg text-secondary transition-colors group-open:text-primary">
+                <h3 className="flex-1 text-base md:text-lg text-secondary transition-colors group-open:text-primary">
                   {question}
                 </h3>
                 <span aria-hidden="true" className="shrink-0">
                   <PlusIcon className="w-4 h-4 text-secondary/60 transition-[transform,color] duration-300 group-open:rotate-45 group-open:text-accent" />
                 </span>
               </summary>
-              <p className="pb-6 pl-11 pr-8 text-sm text-secondary leading-relaxed">
-                {answer}
-              </p>
+              <p className="pb-6 pl-11 pr-8 text-sm text-secondary">{answer}</p>
             </details>
           ))}
         </div>
@@ -96,24 +94,17 @@ export function HomeAbout() {
               >
                 <Icon className="w-5 h-5" />
               </span>
-              <span
-                aria-hidden="true"
-                className="font-mono text-sm text-secondary/40"
-              >
+              <span aria-hidden="true" className="ui-mono text-secondary/40">
                 {index(position)}
               </span>
             </div>
-            <h3 className="font-mono text-sm tracking-[0.2em] text-accent uppercase mt-6">
-              {title}
-            </h3>
-            <p className="text-sm text-secondary leading-relaxed mt-3">
-              {body}
-            </p>
+            <h3 className="label-mono text-accent mt-6">{title}</h3>
+            <p className="text-sm text-secondary mt-3">{body}</p>
           </div>
         ))}
       </div>
 
-      <BackToTopLink className="inline-block font-mono text-sm tracking-[0.08em] mt-12">
+      <BackToTopLink className="inline-block ui-mono mt-12">
         Browse the full catalogue ↑
       </BackToTopLink>
     </section>
