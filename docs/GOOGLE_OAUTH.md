@@ -34,6 +34,14 @@ The server client is required in step 1 because it writes the PKCE code-verifier
 
 ## 2. Google Cloud console — Authorized redirect URIs
 
+**The client must be of type Web application. Nothing else works.** Check this before touching the URI list.
+
+A **Desktop app** client has no Authorized redirect URIs section at all. Its allow list is implicit — loopback addresses and custom schemes — so `https://<project-ref>.supabase.co/auth/v1/callback` can never be registered on it. That missing section is the diagnosis, not a console bug and not a permissions problem.
+
+Google answers `redirect_uri_mismatch` for a desktop client handed an `https` URI, exactly as it does for a web client with an incomplete list. The error does not distinguish the two causes, so confirm the type before assuming the list is merely incomplete.
+
+Recovery is a new client, not an edit. Create a **Web application** client, add both URIs below, then swap the id and secret into the Supabase dashboard (section 5) and `.env.local` (section 6).
+
 On the OAuth 2.0 Client ID (APIs & Services → Credentials), both of these must be listed:
 
 | URI                                                  | Covers         |
@@ -98,7 +106,8 @@ The two `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` vars configure the **local** stack onl
 
 | Symptom                                                        | Cause                                                                                                                                                                                                                                  |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Google 400, `redirect_uri_mismatch`                            | The Supabase `/auth/v1/callback` for the instance in use is missing from the Google client. Section 2                                                                                                                                  |
+| Google 400, `redirect_uri_mismatch`                            | The Supabase `/auth/v1/callback` for the instance in use is missing from the web client's URI list. Section 2                                                                                                                          |
+| Google 400, `redirect_uri_mismatch`, no URI list to edit       | The client is not a **Web application** client. A Desktop app client shows no Authorized redirect URIs section, so the URI cannot be registered. Section 2                                                                             |
 | Signed in, but landed on `/` instead of `rurl`                 | The app callback is missing from the Supabase redirect allow list, so `redirect_to` was dropped. Section 4                                                                                                                             |
 | `/login?error=oauth_failed`                                    | The code exchange in `/api/auth/oauth-callback` failed, or no `code` arrived. Usually the PKCE code-verifier cookie is missing or expired — the sign-in started in a different browser, or the cookie was cleared between the two hops |
 | `supabase start` fails on the `[auth.external.google]` section | `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` or `_SECRET` is unset. Section 6                                                                                                                                                             |
@@ -109,6 +118,7 @@ The two `SUPABASE_AUTH_EXTERNAL_GOOGLE_*` vars configure the **local** stack onl
 
 ## 8. Checklist for a new environment
 
+0. Confirm the Google client is of type **Web application**, or create one. No redirect URI can be registered on any other type. Section 2.
 1. Add `https://<project-ref>.supabase.co/auth/v1/callback` to the Google client's redirect URIs.
 2. Enable the Google provider on the Supabase project with that client's id and secret.
 3. Add `https://<new-domain>/api/auth/oauth-callback` to the Supabase redirect allow list.
