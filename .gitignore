@@ -63,3 +63,4 @@ node_modules/
 /roles.sql
 /schema.sql
 /data.sql
+*.key

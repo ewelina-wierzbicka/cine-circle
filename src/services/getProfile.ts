@@ -38,8 +38,6 @@ export const getProfile = async (): Promise<UserProfile | null> => {
   return resolveAvatarUrl(supabase, created as UserProfile);
 };
 
-// OAuth providers put the account name in user_metadata; email signups leave it empty.
-// Only read on row creation, so an edited display_name is never overwritten.
 const identityDisplayName = (
   metadata: Record<string, unknown>,
 ): string | null => {

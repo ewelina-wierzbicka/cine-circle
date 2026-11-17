@@ -2,10 +2,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * The Google "G" mark. The four hex values are the brand asset itself,
- * not UI chrome, so they stay literal here and nowhere else.
- */
 export function GoogleIcon({ className }: Props) {
   return (
     <svg
