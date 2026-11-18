@@ -45,15 +45,6 @@ jobs:
             echo "::error::Backup not configured. Missing secrets: ${missing[*]}. See docs/BACKUPS.md section 3."
             exit 1
           fi
-          # The session pooler authenticates as postgres.<project-ref>. A bare
-          # "postgres" user fails with "password authentication failed" seven
-          # steps later, which reads like a wrong password. Catch it here.
-          case "$SUPABASE_DB_URL" in
-            *://postgres:*@*pooler.supabase.com*)
-              echo "::error::SUPABASE_DB_URL uses the bare user 'postgres'. The session pooler needs 'postgres.<project-ref>'. Re-copy the string from the dashboard Connect panel. See docs/BACKUPS.md section 2."
-              exit 1
-              ;;
-          esac
 
       - uses: actions/checkout@v6
 
