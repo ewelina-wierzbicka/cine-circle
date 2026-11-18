@@ -58,11 +58,17 @@ export function SearchBox({
     setActiveIndex(-1);
   }
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useGetMedia({
-      query: isSearchResultsPage ? '' : debouncedQuery,
-      type: mediaType,
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+  } = useGetMedia({
+    query: isSearchResultsPage ? '' : debouncedQuery,
+    type: mediaType,
+  });
 
   const allResults = data?.pages.flatMap((page) => page.results) ?? [];
   const visibleResults = allResults.slice(0, displayCount);
@@ -328,6 +334,10 @@ export function SearchBox({
         >
           {isLoading ? (
             <div className="p-4 text-secondary text-sm">Loading...</div>
+          ) : isError ? (
+            <div className="p-4 text-secondary text-sm">
+              Search failed. Try again.
+            </div>
           ) : displayResults.length === 0 ? (
             <div className="p-4 text-secondary text-sm">No results found</div>
           ) : (
