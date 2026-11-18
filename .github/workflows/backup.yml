@@ -8,7 +8,11 @@ name: Supabase backup
 
 on:
   schedule:
-    - cron: '17 3 * * *'
+    # GitHub's scheduler runs this repo's cron ~8h late, every day (measured
+    # 2026-11-09..18: a '17 3' cron fired between 10:18 and 11:46 UTC). The
+    # time below is the target minus that lag, so the run lands around
+    # 03:00 UTC instead of midday. Re-measure before changing it.
+    - cron: '17 19 * * *'
   workflow_dispatch:
 
 permissions:
@@ -41,6 +45,15 @@ jobs:
             echo "::error::Backup not configured. Missing secrets: ${missing[*]}. See docs/BACKUPS.md section 3."
             exit 1
           fi
+          # The session pooler authenticates as postgres.<project-ref>. A bare
+          # "postgres" user fails with "password authentication failed" seven
+          # steps later, which reads like a wrong password. Catch it here.
+          case "$SUPABASE_DB_URL" in
+            *://postgres:*@*pooler.supabase.com*)
+              echo "::error::SUPABASE_DB_URL uses the bare user 'postgres'. The session pooler needs 'postgres.<project-ref>'. Re-copy the string from the dashboard Connect panel. See docs/BACKUPS.md section 2."
+              exit 1
+              ;;
+          esac
 
       - uses: actions/checkout@v6
 

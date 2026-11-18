@@ -283,6 +283,8 @@ The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar
 `.github/workflows/backup.yml` runs a nightly age-encrypted dump (roles, schema, data, plus the `avatar` bucket via `scripts/backup-storage.mjs`) and uploads it as a 30-day artifact. Setup, restore steps, security and GDPR rationale: `docs/BACKUPS.md`.
 
 - It fails until the four repo secrets exist. That is deliberate, not a bug.
+- The cron is `17 19 * * *`, not the time it runs. GitHub fires this repo's schedule ~8h late, so the cron is the 03:00 UTC target minus that lag. See `docs/BACKUPS.md` section 2.
+- `SUPABASE_DB_URL` must use the pooler user `postgres.<project-ref>`. A bare `postgres` fails auth; the secret check step rejects it up front.
 - Supabase platform backups never include Storage objects, on any plan, which is why the bucket is dumped separately.
 - `supabase db dump` without `--data-only` omits the `auth` and `storage` schemas. All three dump commands are needed or user accounts are lost.
 - Use the **session** pooler URL. The direct host is IPv6-only and GitHub runners cannot reach it.
