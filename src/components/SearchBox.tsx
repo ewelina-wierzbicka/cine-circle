@@ -47,16 +47,17 @@ export function SearchBox({
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Reset the input on every arrival at a new route, so / never shows a stale query
-  const [lastPathname, setLastPathname] = useState(pathname);
-
-  if (pathname !== lastPathname) {
-    setLastPathname(pathname);
-    setQuery(initialQuery);
-    setDebouncedQuery(initialQuery);
-    setShowResults(false);
-    setActiveIndex(-1);
-  }
+  // Activity hides this instance instead of unmounting it, so wipe the leftovers on hide
+  useEffect(
+    () => () => {
+      setQuery(initialQuery);
+      setDebouncedQuery(initialQuery);
+      setShowResults(false);
+      setActiveIndex(-1);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // Plain effect timer, not use-debounce: its pending-timer ref wedges when the timer
   // fires while this instance sits in a hidden Activity, so the value never updates again
@@ -276,7 +277,6 @@ export function SearchBox({
           id="search-input"
           type="text"
           value={query}
-          autoComplete="off"
           placeholder="Search movies & series…"
           className="flex-1 bg-transparent border-none h-10 text-sm pl-0 pr-0 rounded-none focus:border-transparent focus:bg-transparent"
           handleChange={(e) => {
