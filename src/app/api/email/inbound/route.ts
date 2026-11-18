@@ -90,8 +90,13 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   const notifyFrom =
     process.env.RESEND_FROM_EMAIL ?? 'noreply@midnightframe.app';
-  if (notifyTo && apiKey) {
-    await fetch('https://api.resend.com/emails', {
+  if (!notifyTo || !apiKey) {
+    console.warn('[inbound email] notification skipped: missing env vars', {
+      hasNotifyTo: !!notifyTo,
+      hasApiKey: !!apiKey,
+    });
+  } else {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -111,6 +116,15 @@ export async function POST(request: NextRequest) {
             }),
       }),
     });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error('[inbound email] notification failed', {
+        status: res.status,
+        body,
+      });
+    } else {
+      console.warn('[inbound email] notification sent', { to: notifyTo });
+    }
   }
 
   return NextResponse.json({ received: true });
