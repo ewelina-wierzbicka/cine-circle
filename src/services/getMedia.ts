@@ -206,6 +206,7 @@ export const getMovieDetails = async (
   const {
     credits,
     recommendations: rawRecommendations,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to keep the country map out of the returned object
     'watch/providers': watchProviders,
     ...movie
   } = data;

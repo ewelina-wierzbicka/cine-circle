@@ -435,7 +435,9 @@ export async function getMovieDetails(id: string) {
 
 Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
 
-`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations,watch/providers` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+
+- `getWatchProviders(id, mediaType, region)` returns one region's slice of that same cached response, or `null`. The full country map is stripped before `NormalizedMedia`, which reaches a client component. `lib/watchRegion.ts` resolves the region (`toWatchRegion`, `DEFAULT_WATCH_REGION`); the caller reads `headers()`.
 
 - They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`. `getSeriesDetails` also passes through the TMDB scalars `number_of_seasons` and `number_of_episodes` — never `seasons.length`, which counts the Specials entry. Search results never carry them.
 
