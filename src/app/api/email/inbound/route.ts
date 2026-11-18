@@ -84,19 +84,15 @@ export async function POST(request: NextRequest) {
   }
 
   const { from, to, subject, text, html } = payload.data;
-  console.warn('[inbound email received]', { from, to, subject });
 
   const notifyTo = process.env.RESEND_NOTIFICATION_EMAIL;
   const apiKey = process.env.RESEND_API_KEY;
   const notifyFrom =
     process.env.RESEND_FROM_EMAIL ?? 'noreply@midnightframe.app';
-  if (!notifyTo || !apiKey) {
-    console.warn('[inbound email] notification skipped: missing env vars', {
-      hasNotifyTo: !!notifyTo,
-      hasApiKey: !!apiKey,
-    });
-  } else {
-    const res = await fetch('https://api.resend.com/emails', {
+  if (notifyTo && apiKey) {
+    const bodyHtml = html?.trim();
+    const bodyText = text?.trim();
+    await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -107,24 +103,15 @@ export async function POST(request: NextRequest) {
         to: [notifyTo],
         reply_to: from,
         subject: `New email from ${from}: ${subject}`,
-        ...(html
+        ...(bodyHtml
           ? {
-              html: `<p><strong>From:</strong> ${from}<br><strong>To:</strong> ${to.join(', ')}<br><strong>Subject:</strong> ${subject}</p><hr>${html}`,
+              html: `<p><strong>From:</strong> ${from}<br><strong>To:</strong> ${to.join(', ')}<br><strong>Subject:</strong> ${subject}</p><hr>${bodyHtml}`,
             }
           : {
-              text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}\n\n${text ?? '(no body)'}`,
+              text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}\n\n${bodyText ?? '(no body)'}`,
             }),
       }),
     });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error('[inbound email] notification failed', {
-        status: res.status,
-        body,
-      });
-    } else {
-      console.warn('[inbound email] notification sent', { to: notifyTo });
-    }
   }
 
   return NextResponse.json({ received: true });
