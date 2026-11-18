@@ -522,6 +522,8 @@ Info & Form
   - Overview text (when available): `text-sm text-primary mb-8`, placed below the accent divider and above the action buttons (or above the rating section for watched media). It is the last thing `MediaInfoHeader` renders; everything after it streams in.
   - Action buttons: `Button` (accent filled or outlined). Add/remove flows call `addUserMedia` / `deleteUserMedia` and invalidate queries via react-query.
 
+- Where to watch (`WhereToWatch`, streamed below `actions` in the `whereToWatch` slot): `label-mono` heading with region code, then Stream / Rent / Buy rows of `w-10 h-10 rounded-lg` provider logos, and a `text-sm text-secondary` JustWatch credit. Signed-in viewers get the block as one link to TMDB; hidden when the region has no providers. Fallback is the text-free `WhereToWatchSkeleton`.
+
 - Watched view (the `watched` branch of `MediaActions`) shows rating (uses `StarRating`), formatted watched date, and review text. Includes an Update button that switches to the form.
 
 - Form view (`UserEntryForm`) uses `react-hook-form` and includes:

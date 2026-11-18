@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import { getCurrentUser } from '@/services/getCurrentUser';
-import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
+import { headers } from 'next/headers';
+import {
+  getMovieDetails,
+  getSeriesDetails,
+  getWatchProviders,
+} from '@/services/getMedia';
+import { toWatchRegion } from '@/lib/watchRegion';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { CollectionTab, NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -12,6 +18,8 @@ import MediaDetail from './MediaDetail';
 import MediaEntryForm from './MediaEntryForm';
 import UserEntryFormSkeleton from './UserEntryFormSkeleton';
 import CollectionBackLink from './CollectionBackLink';
+import WhereToWatch from './WhereToWatch';
+import WhereToWatchSkeleton from './WhereToWatchSkeleton';
 
 export type MediaPageSearchParams = Record<
   string,
@@ -103,6 +111,15 @@ export default async function MediaPage({
             />
           </Suspense>
         }
+        whereToWatch={
+          <Suspense fallback={<WhereToWatchSkeleton />}>
+            <ViewerWatchProviders
+              tmdbId={id}
+              mediaType={mediaType}
+              title={baseMedia.title}
+            />
+          </Suspense>
+        }
         form={
           <Suspense fallback={<UserEntryFormSkeleton />}>
             <UserEnrichedForm
@@ -141,6 +158,32 @@ async function UserEnrichedActions({
   );
 
   return <MediaActions media={media} isAuthenticated={isAuthenticated} />;
+}
+
+async function ViewerWatchProviders({
+  tmdbId,
+  mediaType,
+  title,
+}: {
+  tmdbId: string;
+  mediaType: 'movie' | 'series';
+  title: string;
+}) {
+  const region = toWatchRegion((await headers()).get('x-vercel-ip-country'));
+  const [providers, user] = await Promise.all([
+    getWatchProviders(tmdbId, mediaType, region),
+    getCurrentUser(),
+  ]);
+  if (!providers) return null;
+
+  return (
+    <WhereToWatch
+      providers={providers}
+      region={region}
+      title={title}
+      isAuthenticated={Boolean(user)}
+    />
+  );
 }
 
 async function UserEnrichedForm({
