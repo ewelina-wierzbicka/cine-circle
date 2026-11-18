@@ -12,7 +12,6 @@ import { FilterMediaType, MediaType } from '@/types';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useDebounce } from 'use-debounce';
 
 const FILTER_CHIPS: { label: string; value: FilterMediaType }[] = [
   { label: 'All', value: 'all' },
@@ -39,7 +38,7 @@ export function SearchBox({
   const [mediaType, setMediaType] = useState<FilterMediaType>(initialType);
   const [focused, setFocused] = useState(false);
   const [query, setQuery] = useState(initialQuery);
-  const [debouncedQuery] = useDebounce(query, 300);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [displayCount, setDisplayCount] = useState(6);
   const [showResults, setShowResults] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -54,9 +53,17 @@ export function SearchBox({
   if (pathname !== lastPathname) {
     setLastPathname(pathname);
     setQuery(initialQuery);
+    setDebouncedQuery(initialQuery);
     setShowResults(false);
     setActiveIndex(-1);
   }
+
+  // Plain effect timer, not use-debounce: its pending-timer ref wedges when the timer
+  // fires while this instance sits in a hidden Activity, so the value never updates again
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(id);
+  }, [query]);
 
   // Track search key to reset display count when query or type changes
   const searchKey = `${debouncedQuery}-${mediaType}`;
