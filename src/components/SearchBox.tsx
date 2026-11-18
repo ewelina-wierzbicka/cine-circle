@@ -48,6 +48,16 @@ export function SearchBox({
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Reset the input on every arrival at a new route, so / never shows a stale query
+  const [lastPathname, setLastPathname] = useState(pathname);
+
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setQuery(initialQuery);
+    setShowResults(false);
+    setActiveIndex(-1);
+  }
+
   // Track search key to reset display count when query or type changes
   const searchKey = `${debouncedQuery}-${mediaType}`;
   const [lastSearchKey, setLastSearchKey] = useState(searchKey);
@@ -259,6 +269,7 @@ export function SearchBox({
           id="search-input"
           type="text"
           value={query}
+          autoComplete="off"
           placeholder="Search movies & series…"
           className="flex-1 bg-transparent border-none h-10 text-sm pl-0 pr-0 rounded-none focus:border-transparent focus:bg-transparent"
           handleChange={(e) => {
