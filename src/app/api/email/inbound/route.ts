@@ -127,15 +127,6 @@ export async function POST(request: NextRequest) {
             }),
       }),
     });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error('[inbound email] notification failed', {
-        status: res.status,
-        body,
-      });
-    } else {
-      console.warn('[inbound email] notification sent', { to: notifyTo });
-    }
   }
 
   return NextResponse.json({ received: true });
