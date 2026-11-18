@@ -50,6 +50,20 @@ export type TmdbRecommendation = {
   media_type?: 'movie' | 'tv';
 };
 
+export type WatchProvider = {
+  provider_id: number;
+  provider_name: string;
+  logo_path?: string;
+};
+
+/** One country's slice of TMDB `watch/providers.results`. */
+export type RegionWatchProviders = {
+  link: string;
+  flatrate?: WatchProvider[];
+  rent?: WatchProvider[];
+  buy?: WatchProvider[];
+};
+
 export type RecommendedMedia = {
   id: number;
   title: string;

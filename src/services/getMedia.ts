@@ -1,17 +1,36 @@
 import {
   FilterMediaType,
+  MediaType,
   Movie,
   NormalizedMedia,
   RecommendedMedia,
+  RegionWatchProviders,
   Series,
   TmdbRecommendation,
+  WatchProvider,
 } from '@/types';
 import { cacheLife, cacheTag } from 'next/cache';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /** One request per detail page — never split these into extra fetches. */
-const DETAIL_APPEND = 'credits,recommendations';
+const DETAIL_APPEND = 'credits,recommendations,watch/providers';
+
+/** Raw TMDB `watch/providers` block, keyed by ISO-3166-1 country. */
+type TmdbWatchProviders = {
+  results?: Record<string, RegionWatchProviders | undefined>;
+};
+
+type MovieDetailResponse = NormalizedMedia & {
+  credits?: { crew?: { job: string; name: string }[] };
+  recommendations?: { results?: TmdbRecommendation[] };
+  'watch/providers'?: TmdbWatchProviders;
+};
+
+type SeriesDetailResponse = Series & {
+  recommendations?: { results?: TmdbRecommendation[] };
+  'watch/providers'?: TmdbWatchProviders;
+};
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -40,11 +59,7 @@ async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
   return res.json() as Promise<T>;
 }
 
-function normalizeSeriesResult(
-  raw: Series & {
-    recommendations?: { results?: TmdbRecommendation[] };
-  },
-): NormalizedMedia {
+function normalizeSeriesResult(raw: SeriesDetailResponse): NormalizedMedia {
   const {
     id,
     name,
@@ -150,6 +165,32 @@ export const getMedia = async (
   };
 };
 
+/** The single cached TMDB detail request behind every movie consumer. */
+const getMovieDetailResponse = async (
+  id: string,
+): Promise<MovieDetailResponse | null> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`movie-${id}`);
+
+  return tmdbFetchOrNull<MovieDetailResponse>(
+    `/movie/${id}?append_to_response=${DETAIL_APPEND}`,
+  );
+};
+
+/** The single cached TMDB detail request behind every series consumer. */
+const getSeriesDetailResponse = async (
+  id: string,
+): Promise<SeriesDetailResponse | null> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`series-${id}`);
+
+  return tmdbFetchOrNull<SeriesDetailResponse>(
+    `/tv/${id}?append_to_response=${DETAIL_APPEND}`,
+  );
+};
+
 export const getMovieDetails = async (
   id: string,
 ): Promise<NormalizedMedia | null> => {
@@ -157,15 +198,17 @@ export const getMovieDetails = async (
   cacheLife('days');
   cacheTag(`movie-${id}`);
 
-  const data = await tmdbFetchOrNull<
-    NormalizedMedia & {
-      credits?: { crew?: { job: string; name: string }[] };
-      recommendations?: { results?: TmdbRecommendation[] };
-    }
-  >(`/movie/${id}?append_to_response=${DETAIL_APPEND}`);
+  const data = await getMovieDetailResponse(id);
   if (data === null) return null;
 
-  const { credits, recommendations: rawRecommendations, ...movie } = data;
+  // The country map is dropped here: NormalizedMedia reaches a client
+  // component, so the full `watch/providers` block must never ride along.
+  const {
+    credits,
+    recommendations: rawRecommendations,
+    'watch/providers': watchProviders,
+    ...movie
+  } = data;
 
   const director = credits?.crew?.find(
     (person) => person.job === 'Director',
@@ -197,8 +240,42 @@ export const getSeriesDetails = async (
   cacheLife('days');
   cacheTag(`series-${id}`);
 
-  const data = await tmdbFetchOrNull<
-    Series & { recommendations?: { results?: TmdbRecommendation[] } }
-  >(`/tv/${id}?append_to_response=${DETAIL_APPEND}`);
+  const data = await getSeriesDetailResponse(id);
   return data === null ? null : normalizeSeriesResult(data);
+};
+
+/** Narrow each provider to the fields the UI needs. */
+const pickProviders = (
+  providers: WatchProvider[] | undefined,
+): WatchProvider[] | undefined =>
+  providers?.map(({ provider_id, provider_name, logo_path }) => ({
+    provider_id,
+    provider_name,
+    logo_path,
+  }));
+
+/**
+ * One region's watch providers, or null when TMDB has none for it.
+ * Reuses the cached detail response, so it costs no extra TMDB request.
+ * `region` is applied after the fetch — it is never part of the cache key.
+ */
+export const getWatchProviders = async (
+  id: string,
+  mediaType: MediaType,
+  region: string,
+): Promise<RegionWatchProviders | null> => {
+  const data =
+    mediaType === 'series'
+      ? await getSeriesDetailResponse(id)
+      : await getMovieDetailResponse(id);
+
+  const regionProviders = data?.['watch/providers']?.results?.[region];
+  if (!regionProviders) return null;
+
+  return {
+    link: regionProviders.link,
+    flatrate: pickProviders(regionProviders.flatrate),
+    rent: pickProviders(regionProviders.rent),
+    buy: pickProviders(regionProviders.buy),
+  };
 };
