@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useDebounce } from 'use-debounce';
+import { useEffect, useState } from 'react';
 
 interface UseSearchOptions {
   onSearch: (query: string) => void;
@@ -13,7 +12,17 @@ export function useSearch({
   debounceMs,
 }: UseSearchOptions) {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [debouncedQuery] = useDebounce(searchQuery, debounceMs ?? 0);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+
+  // Plain effect timer, not use-debounce: its pending-timer ref wedges when the timer
+  // fires while this instance sits in a hidden Activity, so the value never updates again
+  useEffect(() => {
+    const id = setTimeout(
+      () => setDebouncedQuery(searchQuery),
+      debounceMs ?? 0,
+    );
+    return () => clearTimeout(id);
+  }, [searchQuery, debounceMs]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
