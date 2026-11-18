@@ -2,19 +2,21 @@ import { createHmac, timingSafeEqual } from 'crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 interface ResendInboundEmail {
+  email_id: string;
   from: string;
   to: string[];
   subject: string;
-  html?: string;
-  text?: string;
-  headers?: Record<string, string>;
-  attachments?: Array<{ filename: string; content: string }>;
 }
 
 interface ResendInboundPayload {
   type: 'email.received';
   created_at: string;
   data: ResendInboundEmail;
+}
+
+interface ResendEmailContent {
+  html?: string;
+  text?: string;
 }
 
 function verifySignature(
@@ -83,15 +85,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  const { from, to, subject, text, html } = payload.data;
+  const { email_id, from, to, subject } = payload.data;
 
   const notifyTo = process.env.RESEND_NOTIFICATION_EMAIL;
   const apiKey = process.env.RESEND_API_KEY;
   const notifyFrom =
     process.env.RESEND_FROM_EMAIL ?? 'noreply@midnightframe.app';
   if (notifyTo && apiKey) {
-    const bodyHtml = html?.trim();
-    const bodyText = text?.trim();
+    // Resend inbound webhook omits body — fetch it separately
+    let bodyHtml: string | undefined;
+    let bodyText: string | undefined;
+    if (email_id) {
+      const contentRes = await fetch(
+        `https://api.resend.com/emails/receiving/${email_id}`,
+        { headers: { Authorization: `Bearer ${apiKey}` } },
+      );
+      if (contentRes.ok) {
+        const content = (await contentRes.json()) as ResendEmailContent;
+        bodyHtml = content.html?.trim() || undefined;
+        bodyText = content.text?.trim() || undefined;
+      }
+    }
+
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
