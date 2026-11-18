@@ -33,7 +33,9 @@ PITR replaces daily backups when enabled; running both is not possible.
 
 ## 2. What this repo does
 
-`.github/workflows/backup.yml` runs a nightly logical dump at 03:17 UTC and on manual dispatch. It is the only backup on the Free plan and the off-site copy on a paid plan.
+`.github/workflows/backup.yml` runs a nightly logical dump and on manual dispatch. It is the only backup on the Free plan and the off-site copy on a paid plan.
+
+The cron reads `17 19 * * *`, which is not the time it runs. GitHub's scheduler fires this repo's cron roughly 8 hours late, consistently: measured 2026-11-09 to 2026-11-18, a `17 3` cron fired between 10:18 and 11:46 UTC. The cron is set to the target minus that lag so the run lands near 03:00 UTC. Re-measure a few runs before changing it. If GitHub ever gets punctual, the schedule drifts into the evening instead.
 
 Each run:
 
@@ -87,12 +89,12 @@ One-time setup. Until it is done the workflow fails on purpose, with the reason 
 
 3. **Add repo secrets.** GitHub → the repo → Settings → Secrets and variables → Actions → **Secrets** tab → New repository secret. All four are secrets, not variables; the workflow reads them from `secrets.*`.
 
-   | Secret                     | Where the value comes from                                                                                                                           |
-   | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `SUPABASE_DB_URL`          | Supabase project dashboard → **Connect** → **Session pooler**, port 5432. Percent-encode the password. Reset it under Settings → Database if unknown |
-   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 2, the `age1…` string. Never the file contents                                                                          |
-   | `SUPABASE_SECRET_KEY`      | Dashboard → Settings → API keys → the `service_role` / secret key. Needed to read the private `avatar` bucket                                        |
-   | `NEXT_PUBLIC_SUPABASE_URL` | Dashboard → Settings → API → Project URL. Same value as in `.env.local`                                                                              |
+   | Secret                     | Where the value comes from                                                                                              |
+   | -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+   | `SUPABASE_DB_URL`          | Supabase project dashboard → **Connect** → **Session pooler**, port 5432. Reset it under Settings → Database if unknown |
+   | `SUPABASE_BACKUP_AGE_KEY`  | The **public** key from step 2, the `age1…` string. Never the file contents                                             |
+   | `SUPABASE_SECRET_KEY`      | Dashboard → Settings → API keys → the `service_role` / secret key. Needed to read the private `avatar` bucket           |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Dashboard → Settings → API → Project URL. Same value as in `.env.local`                                                 |
 
    `SUPABASE_SECRET_KEY` bypasses RLS. Rotate it if this repo's secret list is ever exposed.
 
