@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  const { from, to, subject } = payload.data;
+  const { from, to, subject, text, html } = payload.data;
   console.warn('[inbound email received]', { from, to, subject });
 
   const notifyTo = process.env.RESEND_NOTIFICATION_EMAIL;
@@ -100,8 +100,15 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         from: notifyFrom,
         to: [notifyTo],
+        reply_to: from,
         subject: `New email from ${from}: ${subject}`,
-        text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}`,
+        ...(html
+          ? {
+              html: `<p><strong>From:</strong> ${from}<br><strong>To:</strong> ${to.join(', ')}<br><strong>Subject:</strong> ${subject}</p><hr>${html}`,
+            }
+          : {
+              text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}\n\n${text ?? '(no body)'}`,
+            }),
       }),
     });
   }
