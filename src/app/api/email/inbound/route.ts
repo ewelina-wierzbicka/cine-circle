@@ -83,8 +83,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  const { from, to, subject } = payload.data;
+  const { from, to, subject, text, html } = payload.data;
   console.warn('[inbound email received]', { from, to, subject });
+
+  const notifyTo = process.env.RESEND_NOTIFICATION_EMAIL;
+  const apiKey = process.env.RESEND_API_KEY;
+  const notifyFrom =
+    process.env.RESEND_FROM_EMAIL ?? 'noreply@midnightframe.app';
+  if (notifyTo && apiKey) {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: notifyFrom,
+        to: [notifyTo],
+        reply_to: from,
+        subject: `New email from ${from}: ${subject}`,
+        ...(html
+          ? {
+              html: `<p><strong>From:</strong> ${from}<br><strong>To:</strong> ${to.join(', ')}<br><strong>Subject:</strong> ${subject}</p><hr>${html}`,
+            }
+          : {
+              text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}\n\n${text ?? '(no body)'}`,
+            }),
+      }),
+    });
+  }
 
   return NextResponse.json({ received: true });
 }
