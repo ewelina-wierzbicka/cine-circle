@@ -20,7 +20,7 @@ import MediaDetail from './MediaDetail';
 import MediaEntryForm from './MediaEntryForm';
 import UserEntryFormSkeleton from './UserEntryFormSkeleton';
 import CollectionBackLink from './CollectionBackLink';
-import WhereToWatch from './WhereToWatch';
+import WhereToWatch, { WatchRegionUnknown } from './WhereToWatch';
 import WhereToWatchSkeleton from './WhereToWatchSkeleton';
 
 export type MediaPageSearchParams = Record<
@@ -172,10 +172,13 @@ async function ViewerWatchProviders({
   title: string;
 }) {
   const requestHeaders = await headers();
+  // ponytail: WATCH_REGION is the local-dev knob. There is no geo header off
+  // Vercel, so without it every local request lands on the unknown-region copy.
   const region = toWatchRegion(
-    process.env.WATCH_REGION ?? requestHeaders.get('x-vercel-ip-country'),
-    requestHeaders.get('accept-language'),
+    process.env.WATCH_REGION || requestHeaders.get('x-vercel-ip-country'),
   );
+  if (!region) return <WatchRegionUnknown />;
+
   const [providers, user, wikidataId] = await Promise.all([
     getWatchProviders(tmdbId, mediaType, region),
     getCurrentUser(),

@@ -20,6 +20,18 @@ const OFFER_GROUPS = [
   { key: 'free', label: 'Free' },
 ] as const;
 
+/** Shown when the request carries no country, rather than guessing one. */
+export function WatchRegionUnknown() {
+  return (
+    <section className="mt-8">
+      <h2 className="label-mono text-secondary mb-2">Where to watch</h2>
+      <p className="text-sm text-secondary">
+        We could not establish your region, so streaming options are hidden.
+      </p>
+    </section>
+  );
+}
+
 function uniqueProviders(list: WatchProvider[] | undefined): WatchProvider[] {
   if (!list) return [];
   const seen = new Set<string>();
