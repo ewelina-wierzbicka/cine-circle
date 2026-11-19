@@ -70,4 +70,24 @@ test.describe('where to watch', () => {
       ).toBeVisible();
     });
   });
+
+  test.describe('unresolvable region', () => {
+    // No geo header, and accept-language is never read, so the region is
+    // unknown. Say so rather than showing another country's providers.
+    test.use({ extraHTTPHeaders: {}, locale: 'pl-PL' });
+
+    test('T26 says the region is unknown instead of guessing', async ({
+      page,
+    }) => {
+      await page.goto(`/movie/${INCEPTION_ID}`);
+
+      await expect(
+        page.getByText(/could not establish your region/i),
+      ).toBeVisible();
+      await expect(page.getByText(/Where to watch ·/)).toHaveCount(0);
+      await expect(
+        page.getByText('Streaming data provided by JustWatch'),
+      ).toHaveCount(0);
+    });
+  });
 });

@@ -552,7 +552,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
 | `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T21 rating multi-select (watched tab only) |
-| `watch-providers.spec.ts` | T22 where to watch signed out links each logo to its provider, T24 brand variants dedupe to one logo |
+| `watch-providers.spec.ts` | T22 where to watch signed out links each logo to its provider, T24 brand variants dedupe to one logo, T25 ads-only region still renders, T26 no geo header says the region is unknown |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
@@ -564,6 +564,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
 - `e2e/global-setup.ts` warms the routes the suite visits before any test runs. A cold `next dev` compile of `/movie/[id]` alone takes ~30s, which used to blow the per-test timeout. Add a route there when a new spec navigates somewhere new.
 - `playwright.config.ts` derives the dev server port from `E2E_BASE_URL`; the suite runs on 3001 so it never fights the dev server on 3000.
+- `playwright.config.ts` pins the watch region: `extraHTTPHeaders` sends `x-vercel-ip-country: US`, and `webServer.env` blanks `WATCH_REGION` so a developer's `.env.local` cannot change which region the suite sees. Without the blank, every provider assertion silently tests whatever region that file names.
 - CI has no `E2E_BASE_URL`, so it uses the config default (port 3000) and reads `NEXT_PUBLIC_SITE_URL` from the GitHub repo variable. Those two must agree: `register()` and `sendPasswordReset()` return early when the site URL is unset, and T3/T8 then fail with no visible error.
 - `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
 - The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
