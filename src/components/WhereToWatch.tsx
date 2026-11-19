@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { providerBrandKey, providerWatchUrl } from '@/lib/providerWatchUrl';
+import { ProviderDeepLinks } from '@/lib/providerDeepLinks';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { RegionWatchProviders, WatchProvider } from '@/types';
 
@@ -8,6 +9,8 @@ type Props = {
   region: string;
   title: string;
   isAuthenticated: boolean;
+  /** Exact title URLs by brand key; empty when Wikidata has no ids. */
+  deepLinks?: ProviderDeepLinks;
 };
 
 const OFFER_GROUPS = [
@@ -34,6 +37,7 @@ export function WhereToWatch({
   region,
   title,
   isAuthenticated,
+  deepLinks,
 }: Props) {
   const groups = OFFER_GROUPS.map(({ key, label }) => ({
     key,
@@ -79,6 +83,7 @@ export function WhereToWatch({
                       provider.provider_id,
                       title,
                       providers.link,
+                      deepLinks,
                     )
                   : undefined;
 

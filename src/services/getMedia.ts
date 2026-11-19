@@ -14,22 +14,27 @@ import { cacheLife, cacheTag } from 'next/cache';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /** One request per detail page — never split these into extra fetches. */
-const DETAIL_APPEND = 'credits,recommendations,watch/providers';
+const DETAIL_APPEND = 'credits,recommendations,watch/providers,external_ids';
 
 /** Raw TMDB `watch/providers` block, keyed by ISO-3166-1 country. */
 type TmdbWatchProviders = {
   results?: Record<string, RegionWatchProviders | undefined>;
 };
 
+/** Only the Wikidata id is read; the rest of the block is ignored. */
+type TmdbExternalIds = { wikidata_id?: string | null };
+
 type MovieDetailResponse = NormalizedMedia & {
   credits?: { crew?: { job: string; name: string }[] };
   recommendations?: { results?: TmdbRecommendation[] };
   'watch/providers'?: TmdbWatchProviders;
+  external_ids?: TmdbExternalIds;
 };
 
 type SeriesDetailResponse = Series & {
   recommendations?: { results?: TmdbRecommendation[] };
   'watch/providers'?: TmdbWatchProviders;
+  external_ids?: TmdbExternalIds;
 };
 
 function getTmdbToken(): string {
@@ -208,6 +213,8 @@ export const getMovieDetails = async (
     recommendations: rawRecommendations,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to keep the country map out of the returned object
     'watch/providers': watchProviders,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to keep the external id block out of the returned object
+    external_ids: externalIds,
     ...movie
   } = data;
 
@@ -243,6 +250,22 @@ export const getSeriesDetails = async (
 
   const data = await getSeriesDetailResponse(id);
   return data === null ? null : normalizeSeriesResult(data);
+};
+
+/**
+ * The title's Wikidata entity id, or null when TMDB has none.
+ * Reuses the cached detail response, so it costs no extra TMDB request.
+ */
+export const getWikidataId = async (
+  id: string,
+  mediaType: MediaType,
+): Promise<string | null> => {
+  const data =
+    mediaType === 'series'
+      ? await getSeriesDetailResponse(id)
+      : await getMovieDetailResponse(id);
+
+  return data?.external_ids?.wikidata_id ?? null;
 };
 
 /** Narrow each provider to the fields the UI needs. */

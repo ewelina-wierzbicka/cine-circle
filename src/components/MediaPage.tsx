@@ -5,7 +5,9 @@ import {
   getMovieDetails,
   getSeriesDetails,
   getWatchProviders,
+  getWikidataId,
 } from '@/services/getMedia';
+import { getProviderDeepLinks } from '@/services/getProviderDeepLinks';
 import { toWatchRegion } from '@/lib/watchRegion';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { CollectionTab, NormalizedMedia } from '@/types';
@@ -177,11 +179,17 @@ async function ViewerWatchProviders({
     process.env.WATCH_REGION ?? requestHeaders.get('x-vercel-ip-country'),
     requestHeaders.get('accept-language'),
   );
-  const [providers, user] = await Promise.all([
+  const [providers, user, wikidataId] = await Promise.all([
     getWatchProviders(tmdbId, mediaType, region),
     getCurrentUser(),
+    getWikidataId(tmdbId, mediaType),
   ]);
   if (!providers) return null;
+
+  // Only signed-in viewers get links at all, so skip Wikidata otherwise.
+  const deepLinks = user
+    ? await getProviderDeepLinks(wikidataId, mediaType)
+    : undefined;
 
   return (
     <WhereToWatch
@@ -189,6 +197,7 @@ async function ViewerWatchProviders({
       region={region}
       title={title}
       isAuthenticated={Boolean(user)}
+      deepLinks={deepLinks}
     />
   );
 }

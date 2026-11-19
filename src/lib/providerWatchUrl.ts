@@ -1,5 +1,8 @@
 // ponytail: these are provider search URLs, not exact-title deep links. TMDB
 // ships one aggregate `link` per title and no per-provider offer URLs.
+// Exact URLs come from Wikidata when it has an id, see `providerDeepLinks.ts`.
+import type { ProviderDeepLinks } from './providerDeepLinks';
+
 type Brand = { ids: number[]; url: (q: string) => string };
 
 // One entry per streaming brand. TMDB lists a brand's tiers (ads, standard,
@@ -53,11 +56,14 @@ export function providerBrandKey(providerId: number): string {
   return BRAND_BY_ID.get(providerId) ?? `id:${providerId}`;
 }
 
+/** Exact deep link first, then the brand search URL, then TMDB's aggregate. */
 export function providerWatchUrl(
   providerId: number,
   title: string,
   fallback?: string,
+  deepLinks?: ProviderDeepLinks,
 ): string | undefined {
   const brand = BRAND_BY_ID.get(providerId);
-  return brand ? BRANDS[brand].url(encodeURIComponent(title)) : fallback;
+  if (!brand) return fallback;
+  return deepLinks?.[brand] ?? BRANDS[brand].url(encodeURIComponent(title));
 }
