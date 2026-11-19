@@ -18,9 +18,9 @@ test.describe('where to watch', () => {
     await expect(
       page.getByText('Streaming data provided by JustWatch'),
     ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: /where to watch/i }),
-    ).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Watch .+ on / })).toHaveCount(
+      0,
+    );
   });
 
   test('T23 signed in links each logo to its provider', async ({
@@ -28,14 +28,10 @@ test.describe('where to watch', () => {
   }) => {
     await authedPage.goto(`/movie/${INCEPTION_ID}`);
 
-    await expect(
-      authedPage.getByRole('link', { name: /where to watch/i }),
-    ).toHaveCount(0);
-
-    // Amazon Video is in both Rent and Buy, so take the first match.
+    // Amazon Video is in both Rent and Buy, so scope to one group.
     const amazon = authedPage
-      .getByRole('link', { name: 'Watch Inception on Amazon Video' })
-      .first();
+      .getByRole('list', { name: 'Rent' })
+      .getByRole('link', { name: 'Watch Inception on Amazon Video' });
     await expect(amazon).toBeVisible();
     await expect(amazon).toHaveAttribute(
       'href',
@@ -63,5 +59,24 @@ test.describe('where to watch', () => {
       'href',
       /^https:\/\/www\.netflix\.com\/search\?q=/,
     );
+  });
+
+  test.describe('ads-only region', () => {
+    // Movie 1396 in PL has only an `ads` offer on TMDB. The section must
+    // still render, grouped under "Free with ads".
+    test.use({ locale: 'pl-PL' });
+
+    test('T25 shows the section when only ads offers exist', async ({
+      page,
+    }) => {
+      await page.goto('/movie/1396');
+
+      await expect(
+        page.getByRole('heading', { name: 'Where to watch · PL' }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole('list', { name: 'Free with ads' }),
+      ).toBeVisible();
+    });
   });
 });

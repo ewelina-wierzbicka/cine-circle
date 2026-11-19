@@ -278,5 +278,7 @@ export const getWatchProviders = async (
     flatrate: pickProviders(regionProviders.flatrate),
     rent: pickProviders(regionProviders.rent),
     buy: pickProviders(regionProviders.buy),
+    ads: pickProviders(regionProviders.ads),
+    free: pickProviders(regionProviders.free),
   };
 };

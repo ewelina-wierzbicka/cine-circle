@@ -14,6 +14,8 @@ const OFFER_GROUPS = [
   { key: 'flatrate', label: 'Stream' },
   { key: 'rent', label: 'Rent' },
   { key: 'buy', label: 'Buy' },
+  { key: 'ads', label: 'Free with ads' },
+  { key: 'free', label: 'Free' },
 ] as const;
 
 function uniqueProviders(list: WatchProvider[] | undefined): WatchProvider[] {
@@ -49,8 +51,13 @@ export function WhereToWatch({
       <div className="flex flex-col gap-4">
         {groups.map(({ key, label, items }) => (
           <div key={key} className="flex flex-col gap-2">
-            <p className="ui-mono text-secondary">{label}</p>
-            <ul className="flex flex-wrap">
+            <p id={`watch-group-${key}`} className="ui-mono text-secondary">
+              {label}
+            </p>
+            <ul
+              aria-labelledby={`watch-group-${key}`}
+              className="flex flex-wrap gap-1"
+            >
               {items.map((provider) => {
                 const logo = provider.logo_path ? (
                   <Image

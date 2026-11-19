@@ -62,6 +62,8 @@ export type RegionWatchProviders = {
   flatrate?: WatchProvider[];
   rent?: WatchProvider[];
   buy?: WatchProvider[];
+  ads?: WatchProvider[];
+  free?: WatchProvider[];
 };
 
 export type RecommendedMedia = {
