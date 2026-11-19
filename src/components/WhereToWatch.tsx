@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { providerBrandKey, providerWatchUrl } from '@/lib/providerWatchUrl';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { RegionWatchProviders, WatchProvider } from '@/types';
 
@@ -17,10 +18,11 @@ const OFFER_GROUPS = [
 
 function uniqueProviders(list: WatchProvider[] | undefined): WatchProvider[] {
   if (!list) return [];
-  const seen = new Set<number>();
+  const seen = new Set<string>();
   return list.filter((provider) => {
-    if (seen.has(provider.provider_id)) return false;
-    seen.add(provider.provider_id);
+    const brand = providerBrandKey(provider.provider_id);
+    if (seen.has(brand)) return false;
+    seen.add(brand);
     return true;
   });
 }
@@ -39,8 +41,8 @@ export function WhereToWatch({
 
   if (groups.length === 0) return null;
 
-  const body = (
-    <>
+  return (
+    <section className="mt-8">
       <h2 className="label-mono text-secondary mb-4">
         Where to watch · {region}
       </h2>
@@ -48,47 +50,49 @@ export function WhereToWatch({
         {groups.map(({ key, label, items }) => (
           <div key={key} className="flex flex-col gap-2">
             <p className="ui-mono text-secondary">{label}</p>
-            <ul className="flex flex-wrap gap-2">
-              {items.map((provider) => (
-                <li key={provider.provider_id}>
-                  {provider.logo_path ? (
-                    <Image
-                      src={tmdbImageUrl(provider.logo_path)}
-                      alt={provider.provider_name}
-                      title={provider.provider_name}
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 rounded-lg border border-white/[0.07]"
-                    />
-                  ) : (
-                    <span className="ui-mono text-primary">
-                      {provider.provider_name}
-                    </span>
-                  )}
-                </li>
-              ))}
+            <ul className="flex flex-wrap">
+              {items.map((provider) => {
+                const logo = provider.logo_path ? (
+                  <Image
+                    src={tmdbImageUrl(provider.logo_path)}
+                    alt={provider.provider_name}
+                    title={provider.provider_name}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-lg border border-white/[0.07]"
+                  />
+                ) : (
+                  <span className="ui-mono text-primary">
+                    {provider.provider_name}
+                  </span>
+                );
+
+                return (
+                  <li key={provider.provider_id}>
+                    {isAuthenticated ? (
+                      <a
+                        href={providerWatchUrl(
+                          provider.provider_id,
+                          title,
+                          providers.link,
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Watch ${title} on ${provider.provider_name}`}
+                        className="block p-1 rounded-xl transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                      >
+                        {logo}
+                      </a>
+                    ) : (
+                      <div className="p-1">{logo}</div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
       </div>
-    </>
-  );
-
-  return (
-    <section className="mt-8">
-      {isAuthenticated ? (
-        <a
-          href={providers.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Where to watch ${title} in ${region} on TMDB`}
-          className="block rounded-xl transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-        >
-          {body}
-        </a>
-      ) : (
-        <div>{body}</div>
-      )}
       <p className="text-sm text-secondary mt-4">
         Streaming data provided by JustWatch
       </p>
