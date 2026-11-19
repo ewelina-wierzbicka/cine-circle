@@ -147,9 +147,7 @@ const DEEP_LINK_SAMPLES = [
 
 /** One Wikidata statement, shaped like `Special:EntityData` returns it. */
 const claimsFor = (property, value, rank = 'normal') => ({
-  [property]: [
-    { rank, mainsnak: { snaktype: 'value', datavalue: { value } } },
-  ],
+  [property]: [{ rank, mainsnak: { snaktype: 'value', datavalue: { value } } }],
 });
 
 for (const { brand, mediaType, property, value, url } of DEEP_LINK_SAMPLES) {
@@ -173,13 +171,26 @@ assert.deepEqual(
   {},
 );
 assert.deepEqual(
-  buildProviderDeepLinks({ P1874: [{ mainsnak: { snaktype: 'novalue' } }] }, 'movie'),
+  buildProviderDeepLinks(
+    { P1874: [{ mainsnak: { snaktype: 'novalue' } }] },
+    'movie',
+  ),
   {},
 );
-assert.deepEqual(buildProviderDeepLinks(claimsFor('P1874', 12345), 'movie'), {});
+assert.deepEqual(
+  buildProviderDeepLinks(claimsFor('P1874', 12345), 'movie'),
+  {},
+);
 
 // Wikidata is openly editable, so unsafe values must be dropped.
-for (const unsafe of ['../evil', '//evil.com', 'a?b', 'a b', '/leading', 'a#b']) {
+for (const unsafe of [
+  '../evil',
+  '//evil.com',
+  'a?b',
+  'a b',
+  '/leading',
+  'a#b',
+]) {
   assert.deepEqual(
     buildProviderDeepLinks(claimsFor('P1874', unsafe), 'movie'),
     {},
@@ -192,8 +203,14 @@ assert.equal(
   buildProviderDeepLinks(
     {
       P1874: [
-        { rank: 'normal', mainsnak: { snaktype: 'value', datavalue: { value: 'old' } } },
-        { rank: 'preferred', mainsnak: { snaktype: 'value', datavalue: { value: 'new' } } },
+        {
+          rank: 'normal',
+          mainsnak: { snaktype: 'value', datavalue: { value: 'old' } },
+        },
+        {
+          rank: 'preferred',
+          mainsnak: { snaktype: 'value', datavalue: { value: 'new' } },
+        },
       ],
     },
     'movie',

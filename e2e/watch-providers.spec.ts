@@ -55,9 +55,11 @@ test.describe('where to watch', () => {
       name: /^Watch .+ on Netflix/,
     });
     await expect(netflix).toHaveCount(1);
+    // Wikidata (Q122740095) holds P1874 for this series, so the href is the
+    // exact title page, not the Netflix search URL.
     await expect(netflix).toHaveAttribute(
       'href',
-      /^https:\/\/www\.netflix\.com\/search\?q=/,
+      'https://www.netflix.com/title/81653386',
     );
   });
 
