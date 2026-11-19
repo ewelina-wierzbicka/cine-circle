@@ -22,6 +22,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'on-first-retry',
+    // The watch region comes from the geo header only, and localhost has
+    // none. Without this every media page renders the unknown-region copy.
+    extraHTTPHeaders: { 'x-vercel-ip-country': 'US' },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

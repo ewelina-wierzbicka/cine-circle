@@ -179,23 +179,19 @@ async function ViewerWatchProviders({
   );
   if (!region) return <WatchRegionUnknown />;
 
-  const [providers, user, wikidataId] = await Promise.all([
+  const [providers, wikidataId] = await Promise.all([
     getWatchProviders(tmdbId, mediaType, region),
-    getCurrentUser(),
     getWikidataId(tmdbId, mediaType),
   ]);
   if (!providers) return null;
 
-  const deepLinks = user
-    ? await getProviderDeepLinks(wikidataId, mediaType)
-    : undefined;
+  const deepLinks = await getProviderDeepLinks(wikidataId, mediaType);
 
   return (
     <WhereToWatch
       providers={providers}
       region={region}
       title={title}
-      isAuthenticated={Boolean(user)}
       deepLinks={deepLinks}
     />
   );

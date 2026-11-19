@@ -8,7 +8,6 @@ type Props = {
   providers: RegionWatchProviders;
   region: string;
   title: string;
-  isAuthenticated: boolean;
   deepLinks?: ProviderDeepLinks;
 };
 
@@ -43,13 +42,7 @@ function uniqueProviders(list: WatchProvider[] | undefined): WatchProvider[] {
   });
 }
 
-export function WhereToWatch({
-  providers,
-  region,
-  title,
-  isAuthenticated,
-  deepLinks,
-}: Props) {
+export function WhereToWatch({ providers, region, title, deepLinks }: Props) {
   const groups = OFFER_GROUPS.map(({ key, label }) => ({
     key,
     label,
@@ -89,14 +82,12 @@ export function WhereToWatch({
                   </span>
                 );
 
-                const href = isAuthenticated
-                  ? providerWatchUrl(
-                      provider.provider_id,
-                      title,
-                      providers.link,
-                      deepLinks,
-                    )
-                  : undefined;
+                const href = providerWatchUrl(
+                  provider.provider_id,
+                  title,
+                  providers.link,
+                  deepLinks,
+                );
 
                 return (
                   <li key={provider.provider_id}>

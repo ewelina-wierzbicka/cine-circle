@@ -140,8 +140,8 @@ const DEEP_LINK_SAMPLES = [
     brand: 'hulu',
     mediaType: 'series',
     property: 'P6467',
-    value: '92c225ee-2d39-4cb3-a43b-fbcffbefeeb4',
-    url: 'https://www.hulu.com/series/92c225ee-2d39-4cb3-a43b-fbcffbefeeb4',
+    value: '3c3c0f8b-7366-4d15-88ab-18050285978e',
+    url: 'https://www.hulu.com/series/3c3c0f8b-7366-4d15-88ab-18050285978e',
   },
 ];
 

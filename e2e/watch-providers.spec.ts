@@ -1,7 +1,8 @@
 import { expect, test } from './fixtures/auth';
 
-// Inception. Rent and buy offers exist in the default region (US), which is
-// what the app falls back to when the request carries no geo header.
+// Inception. Rent and buy offers exist in US, the region the suite pins with
+// the `x-vercel-ip-country` header in `playwright.config.ts`. There is no
+// default region, so a test that drops that header sees no providers.
 const INCEPTION_ID = 27205;
 
 // The Devil's Plan. US streams it on both Netflix (8) and Netflix Standard
@@ -9,7 +10,7 @@ const INCEPTION_ID = 27205;
 const DEVILS_PLAN_ID = 214582;
 
 test.describe('where to watch', () => {
-  test('T22 signed out shows providers without a link', async ({ page }) => {
+  test('T22 signed out links each logo to its provider', async ({ page }) => {
     await page.goto(`/movie/${INCEPTION_ID}`);
 
     await expect(
@@ -18,18 +19,8 @@ test.describe('where to watch', () => {
     await expect(
       page.getByText('Streaming data provided by JustWatch'),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /^Watch .+ on / })).toHaveCount(
-      0,
-    );
-  });
 
-  test('T23 signed in links each logo to its provider', async ({
-    authedPage,
-  }) => {
-    await authedPage.goto(`/movie/${INCEPTION_ID}`);
-
-    // Amazon Video is in both Rent and Buy, so scope to one group.
-    const amazon = authedPage
+    const amazon = page
       .getByRole('list', { name: 'Rent' })
       .getByRole('link', { name: 'Watch Inception on Amazon Video' });
     await expect(amazon).toBeVisible();
@@ -40,9 +31,7 @@ test.describe('where to watch', () => {
     await expect(amazon).toHaveAttribute('target', '_blank');
 
     // Plex has no known URL pattern, so it keeps the TMDB watch page.
-    const plex = authedPage.getByRole('link', {
-      name: 'Watch Inception on Plex',
-    });
+    const plex = page.getByRole('link', { name: 'Watch Inception on Plex' });
     await expect(plex).toHaveAttribute('href', /themoviedb\.org.*locale=/);
   });
 
@@ -66,7 +55,7 @@ test.describe('where to watch', () => {
   test.describe('ads-only region', () => {
     // Movie 1396 in PL has only an `ads` offer on TMDB. The section must
     // still render, grouped under "Free with ads".
-    test.use({ locale: 'pl-PL' });
+    test.use({ extraHTTPHeaders: { 'x-vercel-ip-country': 'PL' } });
 
     test('T25 shows the section when only ads offers exist', async ({
       page,
