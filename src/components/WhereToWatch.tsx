@@ -9,7 +9,6 @@ type Props = {
   region: string;
   title: string;
   isAuthenticated: boolean;
-  /** Exact title URLs by brand key; empty when Wikidata has no ids. */
   deepLinks?: ProviderDeepLinks;
 };
 

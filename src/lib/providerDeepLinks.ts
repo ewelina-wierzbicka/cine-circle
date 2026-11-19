@@ -6,7 +6,6 @@ import type { MediaType } from '@/types';
  */
 export type ProviderDeepLinks = Record<string, string>;
 
-/** The slice of a Wikidata entity's `claims` block this module reads. */
 export type WikidataClaims = Record<
   string,
   | {
@@ -31,8 +30,6 @@ const MOVIE_RULES: readonly DeepLinkRule[] = [
     property: 'P1874',
     url: (id) => `https://www.netflix.com/title/${id}`,
   },
-  // P8298 values already carry their own path segment, e.g.
-  // `feature/urn:hbo:feature:…`, so nothing goes between host and id.
   {
     brand: 'max',
     property: 'P8298',
@@ -53,7 +50,6 @@ const MOVIE_RULES: readonly DeepLinkRule[] = [
     property: 'P8055',
     url: (id) => `https://www.amazon.com/gp/video/detail/${id}`,
   },
-  // `wd` and `wp` are literal Disney+ path segments, not placeholders.
   {
     brand: 'disney',
     property: 'P7595',
@@ -126,7 +122,6 @@ function claimValue(
   return ID_PATTERN.test(value) && !value.includes('//') ? value : undefined;
 }
 
-/** Build the brand-keyed deep links a Wikidata entity's claims support. */
 export function buildProviderDeepLinks(
   claims: WikidataClaims,
   mediaType: MediaType,

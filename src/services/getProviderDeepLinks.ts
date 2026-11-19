@@ -17,10 +17,6 @@ type EntityDataResponse = {
   entities?: Record<string, { claims?: WikidataClaims } | undefined>;
 };
 
-/**
- * Throws on any failure so a transient outage is never cached as "no links".
- * Only the built links are cached, not the whole multi-hundred-kB entity.
- */
 const fetchProviderDeepLinks = async (
   wikidataId: string,
   mediaType: MediaType,
@@ -41,10 +37,6 @@ const fetchProviderDeepLinks = async (
   return buildProviderDeepLinks(claims, mediaType);
 };
 
-/**
- * Exact provider URLs for a title, or `{}` when Wikidata has nothing usable.
- * Fails open on every error: callers keep the provider search URLs.
- */
 export const getProviderDeepLinks = async (
   wikidataId: string | null | undefined,
   mediaType: MediaType,

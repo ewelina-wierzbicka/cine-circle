@@ -172,9 +172,6 @@ async function ViewerWatchProviders({
   title: string;
 }) {
   const requestHeaders = await headers();
-  // ponytail: WATCH_REGION is the local-dev knob. No geo header off Vercel, and
-  // accept-language carries the browser's language, not the viewer's country, so
-  // an English browser in Poland resolves to US. Unset in production.
   const region = toWatchRegion(
     process.env.WATCH_REGION ?? requestHeaders.get('x-vercel-ip-country'),
     requestHeaders.get('accept-language'),
@@ -186,7 +183,6 @@ async function ViewerWatchProviders({
   ]);
   if (!providers) return null;
 
-  // Only signed-in viewers get links at all, so skip Wikidata otherwise.
   const deepLinks = user
     ? await getProviderDeepLinks(wikidataId, mediaType)
     : undefined;

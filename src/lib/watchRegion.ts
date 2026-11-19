@@ -1,10 +1,7 @@
-/** Region used when the request carries no usable country code. */
 export const DEFAULT_WATCH_REGION = 'US';
 
-// ponytail: the country comes from `x-vercel-ip-country`, then the region
-// subtag of the highest-weighted `accept-language` entry, then US. Both headers
-// are read with headers() at the call site so the dynamic access stays inside
-// the Suspense subtree. A region saved on the user profile is out of scope here.
+// the country comes from `x-vercel-ip-country`, then the region
+// subtag of the highest-weighted `accept-language` entry, then US.
 export function toWatchRegion(
   country: string | null,
   acceptLanguage: string | null = null,
@@ -16,17 +13,11 @@ export function toWatchRegion(
   );
 }
 
-/** Uppercased two-letter A-Z code, or null. Numeric UN M.49 regions are rejected. */
 function toCountryCode(value: string | null | undefined): string | null {
   const code = value?.trim().toUpperCase() ?? '';
   return /^[A-Z]{2}$/.test(code) ? code : null;
 }
 
-/**
- * First region subtag found scanning `accept-language` entries by descending
- * `q=` weight. A language with no region subtag (`pl`) carries no country, so
- * it is skipped rather than mapped to one.
- */
 function regionFromAcceptLanguage(header: string | null): string | null {
   if (!header) return null;
 
@@ -55,10 +46,6 @@ function parseLanguageRange(entry: string): { tag: string; weight: number } {
   };
 }
 
-/**
- * The region subtag of a BCP 47 tag: the first two-letter subtag after the
- * primary language. Script subtags are four letters, so they never match.
- */
 function regionSubtag(tag: string): string | null {
   const subtags = tag.split('-').slice(1);
   for (const subtag of subtags) {

@@ -1,4 +1,4 @@
-// ponytail: these are provider search URLs, not exact-title deep links. TMDB
+// these are provider search URLs, not exact-title deep links. TMDB
 // ships one aggregate `link` per title and no per-provider offer URLs.
 // Exact URLs come from Wikidata when it has an id, see `providerDeepLinks.ts`.
 import type { ProviderDeepLinks } from './providerDeepLinks';

@@ -16,7 +16,6 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 /** One request per detail page — never split these into extra fetches. */
 const DETAIL_APPEND = 'credits,recommendations,watch/providers,external_ids';
 
-/** Raw TMDB `watch/providers` block, keyed by ISO-3166-1 country. */
 type TmdbWatchProviders = {
   results?: Record<string, RegionWatchProviders | undefined>;
 };
@@ -170,7 +169,6 @@ export const getMedia = async (
   };
 };
 
-/** The single cached TMDB detail request behind every movie consumer. */
 const getMovieDetailResponse = async (
   id: string,
 ): Promise<MovieDetailResponse | null> => {
@@ -183,7 +181,6 @@ const getMovieDetailResponse = async (
   );
 };
 
-/** The single cached TMDB detail request behind every series consumer. */
 const getSeriesDetailResponse = async (
   id: string,
 ): Promise<SeriesDetailResponse | null> => {
@@ -206,8 +203,6 @@ export const getMovieDetails = async (
   const data = await getMovieDetailResponse(id);
   if (data === null) return null;
 
-  // The country map is dropped here: NormalizedMedia reaches a client
-  // component, so the full `watch/providers` block must never ride along.
   const {
     credits,
     recommendations: rawRecommendations,
@@ -252,10 +247,6 @@ export const getSeriesDetails = async (
   return data === null ? null : normalizeSeriesResult(data);
 };
 
-/**
- * The title's Wikidata entity id, or null when TMDB has none.
- * Reuses the cached detail response, so it costs no extra TMDB request.
- */
 export const getWikidataId = async (
   id: string,
   mediaType: MediaType,
@@ -268,7 +259,6 @@ export const getWikidataId = async (
   return data?.external_ids?.wikidata_id ?? null;
 };
 
-/** Narrow each provider to the fields the UI needs. */
 const pickProviders = (
   providers: WatchProvider[] | undefined,
 ): WatchProvider[] | undefined =>
@@ -278,11 +268,6 @@ const pickProviders = (
     logo_path,
   }));
 
-/**
- * One region's watch providers, or null when TMDB has none for it.
- * Reuses the cached detail response, so it costs no extra TMDB request.
- * `region` is applied after the fetch — it is never part of the cache key.
- */
 export const getWatchProviders = async (
   id: string,
   mediaType: MediaType,
