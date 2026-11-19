@@ -169,7 +169,11 @@ async function ViewerWatchProviders({
   mediaType: 'movie' | 'series';
   title: string;
 }) {
-  const region = toWatchRegion((await headers()).get('x-vercel-ip-country'));
+  const requestHeaders = await headers();
+  const region = toWatchRegion(
+    requestHeaders.get('x-vercel-ip-country'),
+    requestHeaders.get('accept-language'),
+  );
   const [providers, user] = await Promise.all([
     getWatchProviders(tmdbId, mediaType, region),
     getCurrentUser(),
