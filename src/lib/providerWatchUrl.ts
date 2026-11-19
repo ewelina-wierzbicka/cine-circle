@@ -56,8 +56,8 @@ export function providerBrandKey(providerId: number): string {
 export function providerWatchUrl(
   providerId: number,
   title: string,
-  fallback: string,
-): string {
+  fallback?: string,
+): string | undefined {
   const brand = BRAND_BY_ID.get(providerId);
   return brand ? BRANDS[brand].url(encodeURIComponent(title)) : fallback;
 }

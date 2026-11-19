@@ -18,6 +18,10 @@ assert.equal(
   'https://www.netflix.com/search?q=Tom%20%26%20Jerry',
 );
 
+// TMDB may omit the aggregate link, so an unmapped id has no URL at all.
+assert.equal(providerWatchUrl(999999, 'Fight Club', undefined), undefined);
+assert.ok(providerWatchUrl(8, 'Fight Club', undefined));
+
 assert.equal(providerBrandKey(8), providerBrandKey(1796));
 const amazon = new Set([9, 10, 613, 2100].map(providerBrandKey));
 assert.equal(amazon.size, 1);

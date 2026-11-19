@@ -58,7 +58,8 @@ export type WatchProvider = {
 
 /** One country's slice of TMDB `watch/providers.results`. */
 export type RegionWatchProviders = {
-  link: string;
+  /** TMDB may omit the aggregate watch link. */
+  link?: string;
   flatrate?: WatchProvider[];
   rent?: WatchProvider[];
   buy?: WatchProvider[];

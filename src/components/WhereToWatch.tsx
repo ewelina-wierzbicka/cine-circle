@@ -74,15 +74,19 @@ export function WhereToWatch({
                   </span>
                 );
 
+                const href = isAuthenticated
+                  ? providerWatchUrl(
+                      provider.provider_id,
+                      title,
+                      providers.link,
+                    )
+                  : undefined;
+
                 return (
                   <li key={provider.provider_id}>
-                    {isAuthenticated ? (
+                    {href ? (
                       <a
-                        href={providerWatchUrl(
-                          provider.provider_id,
-                          title,
-                          providers.link,
-                        )}
+                        href={href}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Watch ${title} on ${provider.provider_name}`}
