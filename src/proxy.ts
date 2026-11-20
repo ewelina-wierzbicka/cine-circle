@@ -91,7 +91,8 @@ async function resolveMediaRoute(
   if (!resolved.exists) return { kind: 'missing' };
   // Never redirect on an unknown title: a missing token or a TMDB error leaves
   // the id and title null, and guessing a canonical slug would be a wrong 308.
-  if (resolved.id === null || resolved.title === null) return { kind: 'ignore' };
+  if (resolved.id === null || resolved.title === null)
+    return { kind: 'ignore' };
 
   return {
     kind: 'canonical',
@@ -134,10 +135,7 @@ export default async function proxy(request: NextRequest) {
       data: { user },
     },
     mediaRoute,
-  ] = await Promise.all([
-    supabase.auth.getUser(),
-    resolveMediaRoute(request),
-  ]);
+  ] = await Promise.all([supabase.auth.getUser(), resolveMediaRoute(request)]);
 
   // Any response that replaces `supabaseResponse` must carry its cookies, or a
   // refreshed session token is dropped.
