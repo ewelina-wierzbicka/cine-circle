@@ -22,10 +22,16 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'on-first-retry',
+    // The watch region comes from the geo header only, and localhost has
+    // none. Without this every media page renders the unknown-region copy.
+    extraHTTPHeaders: { 'x-vercel-ip-country': 'US' },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     command: `npm run dev -- --port ${port}`,
+    // Blank out a developer's `.env.local` override so the region comes from
+    // the `x-vercel-ip-country` header above, the same path CI takes.
+    env: { WATCH_REGION: '' },
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     // A cold Turbopack boot plus the proxy compile can pass two minutes.

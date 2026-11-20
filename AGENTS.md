@@ -436,7 +436,10 @@ export async function getMovieDetails(id: string) {
 
 Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
 
-`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+`getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations,watch/providers` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
+
+- `getWatchProviders(id, mediaType, region)` returns one region's slice of that same cached response, or `null`. The full country map is stripped before `NormalizedMedia`, which reaches a client component. `lib/watchRegion.ts` resolves it: `toWatchRegion` takes `x-vercel-ip-country` and returns a two-letter code or **`null`**. There is no default country. A null region renders `WatchRegionUnknown` instead of another country's providers, and skips the provider fetch. `WATCH_REGION` in `.env.local` stands in for the geo header in local dev, which has none; leave it unset in production.
+- `components/WhereToWatch.tsx` renders it, fed by `ViewerWatchProviders` in `MediaPage` inside its own `<Suspense fallback={<WhereToWatchSkeleton />}>` (text-free), passed to `MediaDetail` as `whereToWatch`. Every viewer gets one link per logo via `lib/providerWatchUrl.ts`: the exact title page where Wikidata has a provider id, else that provider's search for the title, else `providers.link`. Deep links come from `services/getProviderDeepLinks.ts` (Wikidata `Special:EntityData`, `'use cache'` + `cacheLife('days')`, real `User-Agent`, fails open to `{}`) keyed by the brand keys in `lib/providerDeepLinks.ts`; the Wikidata id is `external_ids.wikidata_id` off the existing TMDB detail response via `getWikidataId`. Roughly 1 in 7 provider slots has one today — that is expected. Logos dedupe by brand, not id: `BRANDS` in that module groups tiers like Netflix `8`/`1796`, and `providerBrandKey()` is the one key both readers use; unmapped ids keep their own key. TMDB may omit `link`, so `providerWatchUrl` returns `undefined` and the logo renders unlinked. The "Streaming data provided by JustWatch" credit is mandatory. No JSON-LD for it.
 
 - They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`. `getSeriesDetails` also passes through the TMDB scalars `number_of_seasons` and `number_of_episodes` — never `seasons.length`, which counts the Specials entry. Search results never carry them.
 
@@ -550,6 +553,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
 | `search.spec.ts` | T5 search, filter movies, open detail |
 | `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T21 rating multi-select (watched tab only) |
+| `watch-providers.spec.ts` | T22 where to watch links each logo to its provider, T24 brand variants dedupe to one logo, T25 ads-only region still renders, T26 no geo header says the region is unknown |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |
 
 **Rules:**
@@ -561,6 +565,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Environment guard in `e2e/env.ts` blocks tests from running against remote/prod Supabase.
 - `e2e/global-setup.ts` warms the routes the suite visits before any test runs. A cold `next dev` compile of `/movie/[id]` alone takes ~30s, which used to blow the per-test timeout. Add a route there when a new spec navigates somewhere new.
 - `playwright.config.ts` derives the dev server port from `E2E_BASE_URL`; the suite runs on 3001 so it never fights the dev server on 3000.
+- `playwright.config.ts` pins the watch region: `extraHTTPHeaders` sends `x-vercel-ip-country: US`, and `webServer.env` blanks `WATCH_REGION` so a developer's `.env.local` cannot change which region the suite sees. Without the blank, every provider assertion silently tests whatever region that file names.
 - CI has no `E2E_BASE_URL`, so it uses the config default (port 3000) and reads `NEXT_PUBLIC_SITE_URL` from the GitHub repo variable. Those two must agree: `register()` and `sendPasswordReset()` return early when the site URL is unset, and T3/T8 then fail with no visible error.
 - `e2e/global-setup.ts` asserts the private `avatar` bucket exists; it does not create it. A failure there means the local database is behind — run `npx supabase db reset`.
 - The `isolatedUser` fixture clears the user's avatar folder on teardown. `storage.objects` has no FK to `auth.users`, so admin user deletion leaves objects behind.
