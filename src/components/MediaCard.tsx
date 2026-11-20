@@ -58,6 +58,8 @@ export default function MediaCard({
     try {
       await deleteUserMedia(userMediaId);
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
+      toast.success(`"${title}" deleted from your collection.`);
+      router.push(`/collection?tab=${watchStatus ?? 'to_watch'}`);
       router.refresh();
     } catch (err) {
       toast.error(
