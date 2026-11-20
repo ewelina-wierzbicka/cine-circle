@@ -26,8 +26,8 @@ export default function PrivateLayout({
       </Suspense>
       <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
-        <Footer />
       </main>
+      <Footer />
     </div>
   );
 }

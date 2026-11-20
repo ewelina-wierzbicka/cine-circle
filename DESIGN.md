@@ -633,20 +633,19 @@ Static content pages, open routes (no auth required). All three render through o
 
 `src/components/Footer.tsx` — presentational, no data fetching, no props.
 
-**Where it renders.** Every `(app)` route, for every viewer, signed in or out. `(app)/layout.tsx` renders `<Footer />` as the last child of `main`, with no session or pathname branch, because TMDB attribution must show wherever TMDB data appears.
+**Where it renders.** Every `(app)` route, for every viewer, signed in or out. `(app)/layout.tsx` renders `<Footer />` as a `shrink-0` sibling after `main` in the `h-dvh flex flex-col` shell, with no session or pathname branch. It never scrolls and never interleaves with lists, because `main` is the scroll container. TMDB attribution must show wherever TMDB data appears.
 
-**Viewport height.** The footer is the last thing inside `main`, so it is the first casualty when the app shell is taller than the visible viewport. The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of `main` sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. The home first-screen wrapper uses `calc(100dvh-4rem)` for the same reason. Do not reintroduce `vh` units in the app shell.
+**Scroll container.** `main` in `(app)/layout.tsx` scrolls, not the viewport. An `IntersectionObserver` inside it must set `root: element.closest('main')`.
 
-**Layout:** `relative z-10 border-t border-secondary/50 px-6 py-8 md:px-12`. Inner flex column, `gap-6 items-center`, `md:flex-row md:items-start md:justify-between` on desktop. Two columns:
+**Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `min-h-full` and flex, not a viewport calc, because the footer takes its own height.
 
-- Left — the nav only, `items-center md:items-start`.
-- Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
+**Layout:** `relative z-10 shrink-0 border-t border-secondary/50 px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
 
-**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `label-mono no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`.
+**Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
 
-**Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `label-mono text-secondary mt-4 md:mt-0`.
+**Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `sm` to save height.
 
-**TMDB credit (right):** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens. Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). The footer adds the card via `className`: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
+**TMDB credit:** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens, `max-w-xl`, no card.
 
 ## Social Share Image (Open Graph)
 

@@ -459,7 +459,7 @@ return (
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `<Footer />` renders unconditionally as the last child of `main` (TMDB attribution must show for every viewer). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `<Footer />` renders unconditionally as a sibling after `main`, outside the scroll container (TMDB attribution must show for every viewer). `main` is the scroll container, so an `IntersectionObserver` inside it must root on `main`, not the viewport. The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 
 **`services/getCurrentUser.ts` is the only server-side `auth.getUser()` call site.** It is wrapped in React `cache`, so every server component, service and server action in one request shares a single round trip. Use it for every server-side authentication check — never call `supabase.auth.getUser()` directly. Two exceptions: `proxy.ts` runs its own client outside React, and client components (`ProfileContent`, `hooks/useUserMedia`) use the browser client, where `cache` does not apply.
 
