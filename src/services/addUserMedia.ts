@@ -55,7 +55,14 @@ export const addUserMedia = async (
   if (checkError) throw new Error('Failed to save. Please try again.');
 
   if (existingEntry) {
-    return { status: 'duplicate' as const };
+    if (watchStatus !== 'watched') return { status: 'duplicate' as const };
+    const { error: updateError } = await supabase
+      .from('user_media')
+      .update({ watchStatus, watched_date, rating, review })
+      .eq('id', existingEntry.id)
+      .eq('user_id', user.id);
+    if (updateError) throw new Error('Failed to save. Please try again.');
+    return { status: 'inserted' as const };
   }
 
   const { error: entryError } = await supabase.from('user_media').insert({

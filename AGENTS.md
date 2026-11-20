@@ -165,6 +165,7 @@ src/
 - `signInWithGoogle` (`services/auth.ts`) starts the Google PKCE flow on the **server** client, so the code-verifier cookie is written where `/api/auth/oauth-callback` can read it. Every `rurl` goes through `lib/safeRedirectPath.ts` first — same-site paths only, `//host` and `/\host` rejected.
 - Keep data fetching logic in `services/` — don't inline fetch calls in components
 - **`vercel.json` (repo root) holds the cron schedule.** One entry: `/api/cron/keep-alive` daily at `0 6 * * *`. Vercel Hobby caps cron at one invocation per day, and daily leaves headroom for a missed run inside Supabase's 7-day pause window. `CRON_SECRET` must be set in the Vercel project (Production), or Vercel sends no `Authorization` header, the handler 401s every run, and the project pauses silently. The ping is an ops call, not app data, so the query stays inline in the handler rather than in `services/`. No `proxy.ts` change: the matcher already excludes `api/`
+- Search cards know saved status: `hooks/useSavedMediaStatus.ts` loads the user's `user_media` once (key `['user-movies','saved-status']`), `SearchResults` merges it in. Overlays match the collection page.
 - Collection card links carry `?tab=<to_watch|watched>`, so `CollectionBackLink` sends the user back to the tab they came from. `useDetailStep` preserves every other query param when it switches step, which is what keeps that tab alive through the entry form.
 
 ---

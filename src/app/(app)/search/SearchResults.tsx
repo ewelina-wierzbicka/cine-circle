@@ -3,6 +3,7 @@
 import Loader from '@/components/Loader';
 import MediaList from '@/components/MediaList';
 import { SearchMediaResponse, useGetMedia } from '@/hooks/useGetMedia';
+import { savedKey, useSavedMediaStatus } from '@/hooks/useSavedMediaStatus';
 import { toSearchMediaListProps } from '@/lib/mediaUtils';
 import { FilterMediaType } from '@/types';
 import { useEffect } from 'react';
@@ -40,6 +41,8 @@ export default function SearchResults({
     initialData,
   });
 
+  const { data: saved } = useSavedMediaStatus(isAuthenticated);
+
   useEffect(() => {
     if (error) {
       const message = (error as Error).message;
@@ -53,7 +56,18 @@ export default function SearchResults({
     <>
       {isLoading && <Loader fullScreen={true} />}
       <MediaList
-        media={allMedia.map(toSearchMediaListProps)}
+        media={allMedia.map((item) => {
+          const props = toSearchMediaListProps(item);
+          const status = saved?.get(savedKey(item.media_type, item.id));
+          return status
+            ? {
+                ...props,
+                id: status.userMediaId,
+                tmdb_id: item.id,
+                watchStatus: status.watchStatus,
+              }
+            : props;
+        })}
         isAuthenticated={isAuthenticated}
         isLoading={isLoading}
         heading={
