@@ -78,9 +78,6 @@ type MediaRouteOutcome =
 async function resolveMediaRoute(
   request: NextRequest,
 ): Promise<MediaRouteOutcome> {
-  // RSC navigations never reach a crawler and still render the not-found UI
-  // via `notFound()` and redirect via `permanentRedirect()`. Skip the lookup so
-  // in-app navigation stays cheap.
   if (request.headers.get('rsc')) return { kind: 'ignore' };
 
   const route = parseMediaRoute(request.nextUrl.pathname);
@@ -89,8 +86,6 @@ async function resolveMediaRoute(
 
   const resolved = await resolveMedia(route.mediaType, route.id);
   if (!resolved.exists) return { kind: 'missing' };
-  // Never redirect on an unknown title: a missing token or a TMDB error leaves
-  // the id and title null, and guessing a canonical slug would be a wrong 308.
   if (resolved.id === null || resolved.title === null)
     return { kind: 'ignore' };
 
@@ -137,8 +132,6 @@ export default async function proxy(request: NextRequest) {
     mediaRoute,
   ] = await Promise.all([supabase.auth.getUser(), resolveMediaRoute(request)]);
 
-  // Any response that replaces `supabaseResponse` must carry its cookies, or a
-  // refreshed session token is dropped.
   const withSessionCookies = (response: NextResponse) => {
     supabaseResponse.cookies
       .getAll()
