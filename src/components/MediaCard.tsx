@@ -19,7 +19,6 @@ type Props = {
   priority?: boolean;
   userMediaId?: number;
   isAuthenticated?: boolean;
-  updateWatched?: boolean;
 };
 
 export default function MediaCard({
@@ -27,7 +26,6 @@ export default function MediaCard({
   priority = false,
   userMediaId,
   isAuthenticated = true,
-  updateWatched = false,
 }: Props) {
   const {
     id,
@@ -184,13 +182,11 @@ export default function MediaCard({
         {userMediaId && watchStatus === 'watched' && (
           <MediaCardOverlay href={href}>
             <Button
-              handleClick={
-                updateWatched ? handleAddToWatched : handleSeeDetails
-              }
+              handleClick={handleSeeDetails}
               size="small"
               variant="outlined"
             >
-              {updateWatched ? 'Update' : 'See details'}
+              See details
             </Button>
             <Button
               handleClick={handleDelete}

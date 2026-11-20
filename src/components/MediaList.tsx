@@ -15,7 +15,6 @@ type Props = {
   className?: string;
   isAuthenticated?: boolean;
   isLoading?: boolean;
-  updateWatched?: boolean;
 };
 
 export default function MediaList({
@@ -27,7 +26,6 @@ export default function MediaList({
   fetchNextPage,
   isAuthenticated = true,
   isLoading = false,
-  updateWatched = false,
 }: Props) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -79,7 +77,6 @@ export default function MediaList({
               priority={index < 6}
               userMediaId={userMediaId}
               isAuthenticated={isAuthenticated}
-              updateWatched={updateWatched}
             />
           );
         })}

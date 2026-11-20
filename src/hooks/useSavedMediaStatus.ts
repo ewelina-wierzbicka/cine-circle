@@ -22,13 +22,13 @@ export const useSavedMediaStatus = (enabled: boolean) =>
     enabled,
     staleTime: 1000 * 30,
     queryFn: async () => {
+      const map = new Map<string, SavedStatus>();
       const supabase = createClient();
       const { data, error } = await supabase
         .from('user_media')
         .select('id, watchStatus, media(tmdb_id, media_type)')
         .returns<Row[]>();
-      if (error) throw new Error('Failed to load your saved media.');
-      const map = new Map<string, SavedStatus>();
+      if (error) return map;
       for (const row of data) {
         if (row.media) {
           map.set(savedKey(row.media.media_type, row.media.tmdb_id), {

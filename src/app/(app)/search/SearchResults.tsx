@@ -68,7 +68,6 @@ export default function SearchResults({
               }
             : props;
         })}
-        updateWatched
         isAuthenticated={isAuthenticated}
         isLoading={isLoading}
         heading={
