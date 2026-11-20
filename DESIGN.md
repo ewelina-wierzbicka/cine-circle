@@ -375,6 +375,7 @@ One component per repeated link style. Never retype the classes at a call site.
 Left column (Form)
 
 - Form container centered with `max-w-90` (approx 360px) and `animate-fade-up`.
+- Ambient layers (grid and both glows) sit in an `absolute inset-0 overflow-hidden pointer-events-none` wrapper. The `-bottom-30` glow would otherwise extend the `overflow-y-auto` column by 120px and give every auth page a phantom vertical scroll on mobile.
 - Ambient radial glows: a blue glow at the top (`-top-30`, `oklch(0.50_0.1_250/0.1)`) and a accent glow at the bottom (`-bottom-30`, `oklch(0.60_0.1_165/0.1)`), both `w-160 h-160` centered, over a 48px grid overlay at 40% opacity.
 - Heading and subtext come from `(auth)/AuthFormHeading.tsx`: `mb-10` block, `title-serif mb-3` `h1` with an accent-emphasized word (`<em class="text-accent">`), `text-base text-secondary` subtitle. Its `compact` variant is `mb-8` / `title-serif text-4xl mb-2` / `text-sm text-secondary`, and `icon` adds the `w-10 h-10 rounded-xl bg-accent/10 border border-accent/20` chip above the title. Every auth screen uses it; never retype the heading block.
 - Labels: `FieldLabel`.
