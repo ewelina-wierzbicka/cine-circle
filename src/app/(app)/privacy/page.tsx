@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const sections: StaticSection[] = [
   {
     heading: 'Who We Are',
-    body: 'MidnightFrame is built and run by an independent developer. There is no company behind it, no investors, and no team. That developer is the data controller for everything described below, and can be reached at info.midnightframe@gmail.com.',
+    body: 'MidnightFrame is built and run by an independent developer. There is no company behind it, no investors, and no team. That developer is the data controller for everything described below, and can be reached at info@midnightframe.app.',
   },
   {
     heading: 'What We Collect',
@@ -38,11 +38,11 @@ const sections: StaticSection[] = [
   },
   {
     heading: 'Your Rights',
-    body: 'To get a copy of your data, email info.midnightframe@gmail.com from the address on your account. We reply with your profile, watch history, ratings, and notes within 30 days, the same window as account deletion. There is no self-serve export in the app, so email is the only route. You can delete your account and everything in it yourself, from your profile page. If you are in the EU or UK, you have rights under GDPR including access, rectification, and erasure.',
+    body: 'To get a copy of your data, email info@midnightframe.app from the address on your account. We reply with your profile, watch history, ratings, and notes within 30 days, the same window as account deletion. There is no self-serve export in the app, so email is the only route. You can delete your account and everything in it yourself, from your profile page. If you are in the EU or UK, you have rights under GDPR including access, rectification, and erasure.',
   },
   {
     heading: 'Contact',
-    body: 'For any privacy questions, reach us at info.midnightframe@gmail.com',
+    body: 'For any privacy questions, reach us at info@midnightframe.app',
   },
 ];
 

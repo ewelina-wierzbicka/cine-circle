@@ -13,6 +13,7 @@ type Props = {
   fromSearch?: boolean;
   navLink?: ReactNode;
   actions: ReactNode;
+  whereToWatch?: ReactNode;
   form: ReactNode;
 };
 
@@ -22,6 +23,7 @@ export default function MediaDetail({
   fromSearch = false,
   navLink,
   actions,
+  whereToWatch,
   form,
 }: Props) {
   const { step } = useDetailStep(initialStep);
@@ -41,6 +43,7 @@ export default function MediaDetail({
         </div>
       }
       formSlot={form}
+      whereToWatchSlot={whereToWatch}
       recommendations={media.recommendations}
     />
   );

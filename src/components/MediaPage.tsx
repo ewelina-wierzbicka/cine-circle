@@ -1,6 +1,14 @@
 import { Suspense } from 'react';
 import { getCurrentUser } from '@/services/getCurrentUser';
-import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
+import { headers } from 'next/headers';
+import {
+  getMovieDetails,
+  getSeriesDetails,
+  getWatchProviders,
+  getWikidataId,
+} from '@/services/getMedia';
+import { getProviderDeepLinks } from '@/services/getProviderDeepLinks';
+import { toWatchRegion } from '@/lib/watchRegion';
 import { getEnrichedMedia } from '@/services/getEnrichedMedia';
 import { CollectionTab, NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -12,6 +20,8 @@ import MediaDetail from './MediaDetail';
 import MediaEntryForm from './MediaEntryForm';
 import UserEntryFormSkeleton from './UserEntryFormSkeleton';
 import CollectionBackLink from './CollectionBackLink';
+import WhereToWatch, { WatchRegionUnknown } from './WhereToWatch';
+import WhereToWatchSkeleton from './WhereToWatchSkeleton';
 
 export type MediaPageSearchParams = Record<
   string,
@@ -103,6 +113,15 @@ export default async function MediaPage({
             />
           </Suspense>
         }
+        whereToWatch={
+          <Suspense fallback={<WhereToWatchSkeleton />}>
+            <ViewerWatchProviders
+              tmdbId={id}
+              mediaType={mediaType}
+              title={baseMedia.title}
+            />
+          </Suspense>
+        }
         form={
           <Suspense fallback={<UserEntryFormSkeleton />}>
             <UserEnrichedForm
@@ -141,6 +160,39 @@ async function UserEnrichedActions({
   );
 
   return <MediaActions media={media} isAuthenticated={isAuthenticated} />;
+}
+
+async function ViewerWatchProviders({
+  tmdbId,
+  mediaType,
+  title,
+}: {
+  tmdbId: string;
+  mediaType: 'movie' | 'series';
+  title: string;
+}) {
+  const requestHeaders = await headers();
+  const region = toWatchRegion(
+    process.env.WATCH_REGION || requestHeaders.get('x-vercel-ip-country'),
+  );
+  if (!region) return <WatchRegionUnknown />;
+
+  const [providers, wikidataId] = await Promise.all([
+    getWatchProviders(tmdbId, mediaType, region),
+    getWikidataId(tmdbId, mediaType),
+  ]);
+  if (!providers) return null;
+
+  const deepLinks = await getProviderDeepLinks(wikidataId, mediaType);
+
+  return (
+    <WhereToWatch
+      providers={providers}
+      region={region}
+      title={title}
+      deepLinks={deepLinks}
+    />
+  );
 }
 
 async function UserEnrichedForm({

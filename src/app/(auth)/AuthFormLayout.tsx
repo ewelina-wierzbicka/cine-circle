@@ -23,14 +23,16 @@ export default async function AuthFormLayout({
   return (
     <div className="fixed inset-0 flex overflow-hidden">
       <div className="relative w-full lg:w-1/2 bg-dark overflow-y-auto">
-        <div
-          className="absolute inset-0 opacity-40 bg-size-[48px_48px]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)`,
-          }}
-        />
-        <div className="absolute -top-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.50_0.1_250/0.1)_0%,transparent_65%)]" />
-        <div className="absolute -bottom-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.60_0.1_165/0.1)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute inset-0 opacity-40 bg-size-[48px_48px]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)`,
+            }}
+          />
+          <div className="absolute -top-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.50_0.1_250/0.1)_0%,transparent_65%)]" />
+          <div className="absolute -bottom-30 left-1/2 w-160 h-160 -translate-x-1/2 bg-[radial-gradient(circle,oklch(0.60_0.1_165/0.1)_0%,transparent_65%)]" />
+        </div>
         <Logo className="absolute top-4 left-6 z-10" priority />
 
         <div className="relative flex flex-col min-h-full">

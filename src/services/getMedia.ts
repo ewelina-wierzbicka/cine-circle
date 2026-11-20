@@ -1,17 +1,40 @@
 import {
   FilterMediaType,
+  MediaType,
   Movie,
   NormalizedMedia,
   RecommendedMedia,
+  RegionWatchProviders,
   Series,
   TmdbRecommendation,
+  WatchProvider,
 } from '@/types';
 import { cacheLife, cacheTag } from 'next/cache';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 /** One request per detail page — never split these into extra fetches. */
-const DETAIL_APPEND = 'credits,recommendations';
+const DETAIL_APPEND = 'credits,recommendations,watch/providers,external_ids';
+
+type TmdbWatchProviders = {
+  results?: Record<string, RegionWatchProviders | undefined>;
+};
+
+/** Only the Wikidata id is read; the rest of the block is ignored. */
+type TmdbExternalIds = { wikidata_id?: string | null };
+
+type MovieDetailResponse = NormalizedMedia & {
+  credits?: { crew?: { job: string; name: string }[] };
+  recommendations?: { results?: TmdbRecommendation[] };
+  'watch/providers'?: TmdbWatchProviders;
+  external_ids?: TmdbExternalIds;
+};
+
+type SeriesDetailResponse = Series & {
+  recommendations?: { results?: TmdbRecommendation[] };
+  'watch/providers'?: TmdbWatchProviders;
+  external_ids?: TmdbExternalIds;
+};
 
 function getTmdbToken(): string {
   const token = process.env.TMDB_TOKEN;
@@ -40,11 +63,7 @@ async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
   return res.json() as Promise<T>;
 }
 
-function normalizeSeriesResult(
-  raw: Series & {
-    recommendations?: { results?: TmdbRecommendation[] };
-  },
-): NormalizedMedia {
+function normalizeSeriesResult(raw: SeriesDetailResponse): NormalizedMedia {
   const {
     id,
     name,
@@ -150,6 +169,30 @@ export const getMedia = async (
   };
 };
 
+const getMovieDetailResponse = async (
+  id: string,
+): Promise<MovieDetailResponse | null> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`movie-${id}`);
+
+  return tmdbFetchOrNull<MovieDetailResponse>(
+    `/movie/${id}?append_to_response=${DETAIL_APPEND}`,
+  );
+};
+
+const getSeriesDetailResponse = async (
+  id: string,
+): Promise<SeriesDetailResponse | null> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag(`series-${id}`);
+
+  return tmdbFetchOrNull<SeriesDetailResponse>(
+    `/tv/${id}?append_to_response=${DETAIL_APPEND}`,
+  );
+};
+
 export const getMovieDetails = async (
   id: string,
 ): Promise<NormalizedMedia | null> => {
@@ -157,15 +200,18 @@ export const getMovieDetails = async (
   cacheLife('days');
   cacheTag(`movie-${id}`);
 
-  const data = await tmdbFetchOrNull<
-    NormalizedMedia & {
-      credits?: { crew?: { job: string; name: string }[] };
-      recommendations?: { results?: TmdbRecommendation[] };
-    }
-  >(`/movie/${id}?append_to_response=${DETAIL_APPEND}`);
+  const data = await getMovieDetailResponse(id);
   if (data === null) return null;
 
-  const { credits, recommendations: rawRecommendations, ...movie } = data;
+  const {
+    credits,
+    recommendations: rawRecommendations,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to keep the country map out of the returned object
+    'watch/providers': watchProviders,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructured only to keep the external id block out of the returned object
+    external_ids: externalIds,
+    ...movie
+  } = data;
 
   const director = credits?.crew?.find(
     (person) => person.job === 'Director',
@@ -197,8 +243,50 @@ export const getSeriesDetails = async (
   cacheLife('days');
   cacheTag(`series-${id}`);
 
-  const data = await tmdbFetchOrNull<
-    Series & { recommendations?: { results?: TmdbRecommendation[] } }
-  >(`/tv/${id}?append_to_response=${DETAIL_APPEND}`);
+  const data = await getSeriesDetailResponse(id);
   return data === null ? null : normalizeSeriesResult(data);
+};
+
+export const getWikidataId = async (
+  id: string,
+  mediaType: MediaType,
+): Promise<string | null> => {
+  const data =
+    mediaType === 'series'
+      ? await getSeriesDetailResponse(id)
+      : await getMovieDetailResponse(id);
+
+  return data?.external_ids?.wikidata_id ?? null;
+};
+
+const pickProviders = (
+  providers: WatchProvider[] | undefined,
+): WatchProvider[] | undefined =>
+  providers?.map(({ provider_id, provider_name, logo_path }) => ({
+    provider_id,
+    provider_name,
+    logo_path,
+  }));
+
+export const getWatchProviders = async (
+  id: string,
+  mediaType: MediaType,
+  region: string,
+): Promise<RegionWatchProviders | null> => {
+  const data =
+    mediaType === 'series'
+      ? await getSeriesDetailResponse(id)
+      : await getMovieDetailResponse(id);
+
+  const regionProviders = data?.['watch/providers']?.results?.[region];
+  if (!regionProviders) return null;
+
+  return {
+    link: regionProviders.link,
+    flatrate: pickProviders(regionProviders.flatrate),
+    rent: pickProviders(regionProviders.rent),
+    buy: pickProviders(regionProviders.buy),
+    ads: pickProviders(regionProviders.ads),
+    free: pickProviders(regionProviders.free),
+  };
 };
