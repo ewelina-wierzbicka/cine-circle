@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { supabaseConfig } from './lib/supabase/config';
-import { mediaExists } from './services/mediaExists';
+import { toHref } from './lib/mediaUtils';
+import { resolveMedia } from './services/resolveMedia';
 
 // Auth-only routes: redirect authenticated users away
 const AUTH_ROUTES = [
@@ -62,20 +63,40 @@ function parseMediaRoute(pathname: string): MediaRoute | null {
   return null;
 }
 
+type MediaRouteOutcome =
+  // Not a media route, or TMDB could not be resolved: let the request through.
+  | { kind: 'ignore' }
+  | { kind: 'missing' }
+  | { kind: 'canonical'; path: string };
+
 // `/movie/[id]` is a PPR route: the prerendered shell flushes a 200 before the
-// page body runs, so `notFound()` in `MediaPage` can only swap the body and the
-// status stays 200. Crawlers read that as a soft 404. Resolve the id here,
-// before the response starts, so an unknown id gets a real 404.
-async function isMissingMediaRoute(request: NextRequest): Promise<boolean> {
+// page body runs, so `notFound()` and `permanentRedirect()` in `MediaPage` can
+// only swap the body and the status stays 200. Crawlers read that as a soft 404
+// and Next downgrades the redirect to a `<meta http-equiv="refresh">`. Resolve
+// the id here, before the response starts, so an unknown id gets a real 404 and
+// a mis-slugged URL a real 308.
+async function resolveMediaRoute(
+  request: NextRequest,
+): Promise<MediaRouteOutcome> {
   // RSC navigations never reach a crawler and still render the not-found UI
-  // via `notFound()`. Skip the lookup so in-app navigation stays cheap.
-  if (request.headers.get('rsc')) return false;
+  // via `notFound()` and redirect via `permanentRedirect()`. Skip the lookup so
+  // in-app navigation stays cheap.
+  if (request.headers.get('rsc')) return { kind: 'ignore' };
 
   const route = parseMediaRoute(request.nextUrl.pathname);
-  if (!route) return false;
-  if (!route.id) return true;
+  if (!route) return { kind: 'ignore' };
+  if (!route.id) return { kind: 'missing' };
 
-  return !(await mediaExists(route.mediaType, route.id));
+  const resolved = await resolveMedia(route.mediaType, route.id);
+  if (!resolved.exists) return { kind: 'missing' };
+  // Never redirect on an unknown title: a missing token or a TMDB error leaves
+  // the id and title null, and guessing a canonical slug would be a wrong 308.
+  if (resolved.id === null || resolved.title === null) return { kind: 'ignore' };
+
+  return {
+    kind: 'canonical',
+    path: toHref(resolved.id, resolved.title, route.mediaType),
+  };
 }
 
 export default async function proxy(request: NextRequest) {
@@ -112,20 +133,32 @@ export default async function proxy(request: NextRequest) {
     {
       data: { user },
     },
-    isMissingMedia,
+    mediaRoute,
   ] = await Promise.all([
     supabase.auth.getUser(),
-    isMissingMediaRoute(request),
+    resolveMediaRoute(request),
   ]);
 
-  if (isMissingMedia) {
-    const notFoundResponse = NextResponse.rewrite(
-      new URL('/_not-found', request.url),
-    );
+  // Any response that replaces `supabaseResponse` must carry its cookies, or a
+  // refreshed session token is dropped.
+  const withSessionCookies = (response: NextResponse) => {
     supabaseResponse.cookies
       .getAll()
-      .forEach((cookie) => notFoundResponse.cookies.set(cookie));
-    return notFoundResponse;
+      .forEach((cookie) => response.cookies.set(cookie));
+    return response;
+  };
+
+  if (mediaRoute.kind === 'missing') {
+    return withSessionCookies(
+      NextResponse.rewrite(new URL('/_not-found', request.url)),
+    );
+  }
+
+  // A mis-slugged URL answers a real 308 to the canonical slug, query intact.
+  if (mediaRoute.kind === 'canonical' && mediaRoute.path !== pathname) {
+    const canonicalUrl = new URL(mediaRoute.path, request.url);
+    canonicalUrl.search = request.nextUrl.search;
+    return withSessionCookies(NextResponse.redirect(canonicalUrl, 308));
   }
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
