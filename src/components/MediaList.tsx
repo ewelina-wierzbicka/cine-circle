@@ -43,7 +43,6 @@ export default function MediaList({
     if (!element) return;
 
     const observer = new IntersectionObserver(handleObserver, {
-      // main is the scroll container, so rootMargin only works with it as root
       root: element.closest('main'),
       rootMargin: '0px 0px 800px 0px',
       threshold: 0.1,

@@ -643,7 +643,7 @@ Static content pages, open routes (no auth required). All three render through o
 
 **Layout:** `relative z-10 shrink-0 border-t border-secondary/50 px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
 
-**Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
+**Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `nfo@midnightframe.app`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
 
 **Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `sm` to save height.
 
