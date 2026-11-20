@@ -641,13 +641,13 @@ Static content pages, open routes (no auth required). All three render through o
 
 **Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `min-h-full` and flex, not a viewport calc, because the footer takes its own height.
 
-**Layout:** `relative z-10 shrink-0 border-t border-secondary/50 px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
+**Layout:** `relative z-10 shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
 
 **Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `nfo@midnightframe.app`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
 
-**Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `sm` to save height.
+**Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `lg`, so small screens carry only nav and the TMDB credit.
 
-**TMDB credit:** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens, `max-w-xl`, no card.
+**TMDB credit:** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens, `max-w-xl`, no card. The whole anchor rests at `opacity-80` and goes to `opacity-100` on hover, the only hover effect. Resting contrast is about 6.2:1 on `bg-dark`, above AA. Logo `60×8`, `mt-2`. The auth screens get the same dimming.
 
 ## Social Share Image (Open Graph)
 

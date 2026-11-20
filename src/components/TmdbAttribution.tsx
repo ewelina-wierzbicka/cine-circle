@@ -14,19 +14,20 @@ export function TmdbAttribution({ className }: Props) {
       href="https://www.themoviedb.org"
       target="_blank"
       rel="noopener noreferrer"
-      className={twMerge('flex items-start gap-3 group', className)}
+      className={twMerge(
+        'flex items-start gap-3 opacity-80 transition-opacity hover:opacity-100',
+        className,
+      )}
       aria-label={`TMDB — ${TMDB_ATTRIBUTION}`}
     >
       <Image
         src="/tmdb.svg"
         alt="TMDB"
-        width={75}
-        height={10}
-        className="shrink-0 mt-1.5"
+        width={60}
+        height={8}
+        className="shrink-0 mt-2"
       />
-      <span className="text-sm text-secondary group-hover:text-primary transition-colors">
-        {TMDB_ATTRIBUTION}
-      </span>
+      <span className="text-sm text-secondary">{TMDB_ATTRIBUTION}</span>
     </a>
   );
 }
