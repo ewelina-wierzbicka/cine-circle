@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { FooterSlot } from '@/components/FooterSlot';
+import { Footer } from '@/components/Footer';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import ScrollReset from '@/components/ScrollReset';
@@ -26,17 +26,10 @@ export default function PrivateLayout({
       </Suspense>
       <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
-        <Suspense fallback={null}>
-          <SessionAwareFooter />
-        </Suspense>
+        <Footer />
       </main>
     </div>
   );
-}
-
-async function SessionAwareFooter() {
-  const user = await getCurrentUser();
-  return <FooterSlot signedIn={Boolean(user)} />;
 }
 
 async function AuthenticatedHeader() {

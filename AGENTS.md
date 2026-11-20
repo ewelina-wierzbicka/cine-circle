@@ -45,7 +45,7 @@ ESLint + Prettier are configured — follow them strictly. Do not disable rules 
 src/
   app/
     (auth)/                   # auth routes — login, register, confirm-email
-      AuthFormLayout.tsx      # shared layout for auth forms
+      AuthFormLayout.tsx      # shared layout for auth forms, ends with TMDB attribution
       AuthFormFooter.tsx      # shared closing line under an auth form
       AuthFormHeading.tsx     # icon chip + title + subtitle block every auth screen opens with
       InboxNotice.tsx         # "we emailed you" body + spam-folder tip card
@@ -136,7 +136,7 @@ src/
   providers.tsx               # app-wide React context providers
   proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
-  components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
+  components/                 # shared components (SearchBox, Header, Footer, TmdbAttribution, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
@@ -459,7 +459,7 @@ return (
 
 **Approved Suspense boundaries (do not remove):**
 
-- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `SessionAwareFooter` in `<Suspense fallback={null}>` (reads the Supabase user, hands the boolean to `FooterSlot`, which picks the footer by route: always on `/about`, `/terms`, `/privacy`, signed-out only everywhere else). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders. Both boundaries read the session through `services/getCurrentUser.ts`, so they share one `getUser()` round trip.
+- `(app)/layout.tsx` — `Header` wrapped with `HeaderSkeleton` fallback; `ScrollReset` in its own Suspense; `<Footer />` renders unconditionally as the last child of `main` (TMDB attribution must show for every viewer). The layout itself is a sync function (no top-level cookie access) so the static shell prerenders.
 
 **`services/getCurrentUser.ts` is the only server-side `auth.getUser()` call site.** It is wrapped in React `cache`, so every server component, service and server action in one request shares a single round trip. Use it for every server-side authentication check — never call `supabase.auth.getUser()` directly. Two exceptions: `proxy.ts` runs its own client outside React, and client components (`ProfileContent`, `hooks/useUserMedia`) use the browser client, where `cache` does not apply.
 
@@ -547,7 +547,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `auth.spec.ts` | T1 login + logout, T2 login validation, T3 registration validation + confirm-email, T4 confirm-callback → registration-confirmed, T5 confirm-callback no code → login toast, T6 registration-confirmed redirects logged-in user, T7 auth redirect + rurl, T8 forgot-password, T9 reset-callback failure, T10 reset-password validation, T11 reset-password rejects non-recovery session, T12 reset happy path, T13 oauth-callback no code → /login?error=oauth_failed, T14 login Google button starts the OAuth flow, T15 register offers Google sign-in, T16 oauth_failed toast |
 
-| `home.spec.ts` | T19 about section renders signed-out, hidden signed-in |
+| `home.spec.ts` | T27 TMDB attribution shows signed in on `/` and signed out on `/login` |
 | `search.spec.ts` | T5 search, filter movies, open detail |
 | `collection.spec.ts` | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T21 rating multi-select (watched tab only) |
 | `profile.spec.ts` | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows |

@@ -393,6 +393,10 @@ Right column (Visuals)
 - Two overlay gradients: a right-to-left dark fade and a top/bottom vignette applied via absolute layers.
 - Top-left logo is positioned absolutely: `/logo.webp` through `next/image` with `priority`. There is no text wordmark beside it.
 
+TMDB attribution
+
+- `AuthFormLayout` ends the left column with an uncarded `TmdbAttribution` (`max-w-90`, centred, `pb-6`) under the form. Every auth screen shows it, no nav links or copyright.
+
 ---
 
 ## Forgot Password / Reset Password
@@ -629,10 +633,7 @@ Static content pages, open routes (no auth required). All three render through o
 
 `src/components/Footer.tsx` — presentational, no data fetching, no props.
 
-**Where it renders.** `(app)/layout.tsx` renders `SessionAwareFooter` inside `<Suspense fallback={null}>`. That async component reads the Supabase user and hands the boolean to `FooterSlot` (`src/components/FooterSlot.tsx`, client, reads `usePathname()`), which decides:
-
-- `/about`, `/terms`, `/privacy` — always. The footer is the only navigation those pages have.
-- Every other `(app)` route — signed-out visitors only, so signed-in pages stay chrome-free and read as an app.
+**Where it renders.** Every `(app)` route, for every viewer, signed in or out. `(app)/layout.tsx` renders `<Footer />` as the last child of `main`, with no session or pathname branch, because TMDB attribution must show wherever TMDB data appears.
 
 **Viewport height.** The footer is the last thing inside `main`, so it is the first casualty when the app shell is taller than the visible viewport. The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of `main` sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. The home first-screen wrapper uses `calc(100dvh-4rem)` for the same reason. Do not reintroduce `vh` units in the app shell.
 
@@ -645,7 +646,7 @@ Static content pages, open routes (no auth required). All three render through o
 
 **Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `label-mono text-secondary mt-4 md:mt-0`.
 
-**TMDB credit (right):** Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). Carded: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
+**TMDB credit (right):** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens. Whole block is an `<a>` to `https://www.themoviedb.org` (`target="_blank" rel="noopener noreferrer"`, `group`). The footer adds the card via `className`: `max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4`. TMDB logo SVG (`public/tmdb.svg`, 75×10, `mt-1.5`) + "This product uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB." (`text-sm text-secondary group-hover:text-primary transition-colors`).
 
 ## Social Share Image (Open Graph)
 

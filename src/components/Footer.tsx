@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import NextLink from 'next/link';
+import { TmdbAttribution } from '@/components/TmdbAttribution';
 
 const NAV_LINKS = [
   { href: '/about', label: 'About' },
@@ -35,26 +35,7 @@ export function Footer() {
           <p className="label-mono text-secondary mt-4 md:mt-0">
             © 2026 MIDNIGHTFRAME
           </p>
-          <a
-            href="https://www.themoviedb.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-start gap-3 max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4 group"
-            aria-label="TMDB — This product uses TMDB and the TMDB APIs but is not endorsed,
-              certified, or otherwise approved by TMDB."
-          >
-            <Image
-              src="/tmdb.svg"
-              alt="TMDB"
-              width={75}
-              height={10}
-              className="shrink-0 mt-1.5"
-            />
-            <span className="text-sm text-secondary group-hover:text-primary transition-colors">
-              This product uses TMDB and the TMDB APIs but is not endorsed,
-              certified, or otherwise approved by TMDB.
-            </span>
-          </a>
+          <TmdbAttribution className="max-w-md bg-white/2 border border-secondary/15 rounded-2xl p-4" />
         </div>
       </div>
     </footer>
