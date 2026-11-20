@@ -16,7 +16,8 @@ const AUTH_ROUTES = [
 const OPEN_ROUTES_EXACT = ['/', '/about', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
-// IMPORTANT: a new page route MUST end up in KNOWN_ROUTES_EXACT or KNOWN_ROUTE_PREFIXES list, or it will 404.
+// Unlisted paths pass through, so Next.js 404s a URL that matches no route.
+// A real page left off this list does not 404: it renders with no auth gate.
 const KNOWN_ROUTES_EXACT = [
   ...AUTH_ROUTES,
   ...OPEN_ROUTES_EXACT,
