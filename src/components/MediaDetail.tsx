@@ -40,10 +40,10 @@ export default function MediaDetail({
           {navLink}
           <MediaInfoHeader media={media} fromSearch={fromSearch} />
           {actions}
-          {whereToWatch}
         </div>
       }
       formSlot={form}
+      whereToWatchSlot={whereToWatch}
       recommendations={media.recommendations}
     />
   );
