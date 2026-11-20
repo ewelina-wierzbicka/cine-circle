@@ -56,9 +56,7 @@ export type WatchProvider = {
   logo_path?: string;
 };
 
-/** One country's slice of TMDB `watch/providers.results`. */
 export type RegionWatchProviders = {
-  /** TMDB may omit the aggregate watch link. */
   link?: string;
   flatrate?: WatchProvider[];
   rent?: WatchProvider[];

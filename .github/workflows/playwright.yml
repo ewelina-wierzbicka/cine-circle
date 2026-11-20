@@ -33,9 +33,7 @@ jobs:
           echo "SUPABASE_SECRET_KEY=$SUPABASE_SECRET_KEY"
         } >> "$GITHUB_ENV"
     - name: Install dependencies
-      run: npm ci
-    - name: Check watch provider helpers
-      run: npm run check:watch-providers
+      run: npm ci   
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests

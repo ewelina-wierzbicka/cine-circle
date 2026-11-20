@@ -19,7 +19,6 @@ const OFFER_GROUPS = [
   { key: 'free', label: 'Free' },
 ] as const;
 
-/** Shown when the request carries no country, rather than guessing one. */
 export function WatchRegionUnknown() {
   return (
     <section className="mt-8">

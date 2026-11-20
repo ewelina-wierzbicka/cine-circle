@@ -10,7 +10,7 @@ const INCEPTION_ID = 27205;
 const DEVILS_PLAN_ID = 214582;
 
 test.describe('where to watch', () => {
-  test('T22 signed out links each logo to its provider', async ({ page }) => {
+  test('T22 links each logo to its provider', async ({ page }) => {
     await page.goto(`/movie/${INCEPTION_ID}`);
 
     await expect(
@@ -44,8 +44,6 @@ test.describe('where to watch', () => {
       name: /^Watch .+ on Netflix/,
     });
     await expect(netflix).toHaveCount(1);
-    // Wikidata (Q122740095) holds P1874 for this series, so the href is the
-    // exact title page, not the Netflix search URL.
     await expect(netflix).toHaveAttribute(
       'href',
       'https://www.netflix.com/title/81653386',
@@ -72,8 +70,7 @@ test.describe('where to watch', () => {
   });
 
   test.describe('unresolvable region', () => {
-    // No geo header, and accept-language is never read, so the region is
-    // unknown. Say so rather than showing another country's providers.
+    // No geo header, so the region is unknown
     test.use({ extraHTTPHeaders: {}, locale: 'pl-PL' });
 
     test('T26 says the region is unknown instead of guessing', async ({

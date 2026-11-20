@@ -172,8 +172,6 @@ async function ViewerWatchProviders({
   title: string;
 }) {
   const requestHeaders = await headers();
-  // ponytail: WATCH_REGION is the local-dev knob. There is no geo header off
-  // Vercel, so without it every local request lands on the unknown-region copy.
   const region = toWatchRegion(
     process.env.WATCH_REGION || requestHeaders.get('x-vercel-ip-country'),
   );
