@@ -43,8 +43,8 @@ export default function MediaList({
     if (!element) return;
 
     const observer = new IntersectionObserver(handleObserver, {
-      root: null,
-      rootMargin: '300px',
+      root: element.closest('main'),
+      rootMargin: '0px 0px 800px 0px',
       threshold: 0.1,
     });
 

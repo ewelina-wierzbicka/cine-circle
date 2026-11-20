@@ -1,5 +1,6 @@
 import { Logo } from '@/components/Logo';
 import MediaPoster from '@/components/MediaPoster';
+import { TmdbAttribution } from '@/components/TmdbAttribution';
 import { getTrendingMovies } from '@/services/getTrendingMovies';
 import { TrendingMovie } from '@/types';
 import { ReactNode } from 'react';
@@ -34,8 +35,13 @@ export default async function AuthFormLayout({
         </div>
         <Logo className="absolute top-4 left-6 z-10" priority />
 
-        <div className="relative flex items-center justify-center min-h-full px-6 md:px-12 py-20">
-          <div className="w-full max-w-90 animate-fade-up">{children}</div>
+        <div className="relative flex flex-col min-h-full">
+          <div className="flex-1 flex items-center justify-center px-6 md:px-12 pt-20 pb-8">
+            <div className="w-full max-w-90 animate-fade-up">{children}</div>
+          </div>
+          <div className="flex justify-center px-6 md:px-12 pb-6">
+            <TmdbAttribution className="max-w-90" />
+          </div>
         </div>
       </div>
       {posters && (
