@@ -16,13 +16,8 @@ const AUTH_ROUTES = [
 const OPEN_ROUTES_EXACT = ['/', '/about', '/terms', '/privacy'];
 const OPEN_ROUTE_PREFIXES = ['/search', '/movie/', '/series/'];
 
-// The proxy only acts on the routes listed here. Anything else returns
-// `NextResponse.next()` untouched, so Next.js answers it normally: the root 404
-// for a URL that matches no route, which is the point — `/nonexistent-xyz` must
-// 404 rather than redirect to `/login`.
-// IMPORTANT: a new page route left off this list does not 404. It renders for
-// everyone, skipping the auth gate and the session cookie refresh, so a private
-// route becomes public.
+// Unlisted paths pass through, so Next.js 404s a URL that matches no route.
+// A real page left off this list does not 404: it renders with no auth gate.
 const KNOWN_ROUTES_EXACT = [
   ...AUTH_ROUTES,
   ...OPEN_ROUTES_EXACT,
