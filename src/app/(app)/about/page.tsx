@@ -35,7 +35,7 @@ const sections: StaticSection[] = [
   },
   {
     heading: 'Contact',
-    body: 'Questions, bug reports, and feature requests are welcome at info.midnightframe@gmail.com',
+    body: 'Questions, bug reports, and feature requests are welcome at info@midnightframe.app',
   },
 ];
 

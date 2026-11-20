@@ -29,7 +29,7 @@ export function HomeAbout() {
   return (
     <section
       aria-labelledby="what-is-midnightframe"
-      className="relative z-10 px-6 md:px-12 py-8 md:py-32 max-w-7xl mx-auto"
+      className="relative z-10 px-6 md:px-12 py-8 sm:py-32 max-w-7xl mx-auto"
     >
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-start">
         <div>
@@ -38,7 +38,7 @@ export function HomeAbout() {
           </p>
           <h2
             id="what-is-midnightframe"
-            className="display-serif leading-[1.15] mb-6"
+            className="display-serif text-[34px] xl:text-[42px] leading-[1.15] mb-6"
           >
             A quiet place for the movies that{' '}
             <em className="text-accent">

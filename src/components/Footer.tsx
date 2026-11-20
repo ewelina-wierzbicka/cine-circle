@@ -7,7 +7,7 @@ const NAV_LINKS = [
   { href: '/terms', label: 'Terms & Conditions' },
 ] as const;
 
-const CONTACT_EMAIL = 'info.midnightframe@gmail.com';
+const CONTACT_EMAIL = 'info@midnightframe.app';
 
 const linkClass =
   'label-mono no-underline text-secondary hover:text-accent transition-colors';

@@ -643,7 +643,7 @@ Static content pages, open routes (no auth required). All three render through o
 - Left — the nav only, `items-center md:items-start`.
 - Right — copyright then TMDB credit, `gap-4 items-center md:items-end`.
 
-**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info.midnightframe@gmail.com`). `label-mono no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`.
+**Nav links (left):** About, Privacy Policy, Terms & Conditions (internal, NextLink), Contact (mailto: `info@midnightframe.app`). `label-mono no-underline text-secondary hover:text-accent transition-colors`. Flex-wrap with `gap-x-10 gap-y-3`.
 
 **Copyright (right, above the credit):** `© 2026 MIDNIGHTFRAME`. `label-mono text-secondary mt-4 md:mt-0`.
 
