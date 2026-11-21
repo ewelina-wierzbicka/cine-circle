@@ -1,43 +1,13 @@
 import type { Metadata } from 'next';
-import {
-  StaticContentPage,
-  type StaticSection,
-} from '@/components/StaticContentPage';
+import { StaticContentPage } from '@/components/StaticContentPage';
 import { aboutPageJsonLd, jsonLdScript } from '@/lib/jsonLd';
-
-const TITLE = 'About MidnightFrame';
-
-const DESCRIPTION =
-  'Who builds MidnightFrame, what the free private movie and TV tracker does, what it deliberately leaves out, and where the data comes from.';
+import { ABOUT_PAGE } from '@/lib/staticPages';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: DESCRIPTION,
+  description: ABOUT_PAGE.description,
   alternates: { canonical: '/about' },
 };
-
-const sections: StaticSection[] = [
-  {
-    heading: 'What MidnightFrame Is',
-    body: 'MidnightFrame is a free, private movie and TV tracker. Search for anything, mark it as watched or add it to your to-watch list, rate it, and keep a note on why it landed the way it did. Everything sits in one collection that only you can see.',
-  },
-  {
-    heading: 'Who Runs It',
-    body: 'MidnightFrame is built and run by an independent developer. There is no company behind it, no investors, and no team. It started as a tool to replace a messy notes app full of half-remembered film titles, and it is still built for that.',
-  },
-  {
-    heading: 'What It Is Not',
-    body: 'It is not a social network. There are no public profiles, no followers, no feeds, and no comment sections. It is not a streaming service: it hosts no video of its own, and it only points you to the services that carry a title, with no affiliate deals behind those links. It is not an ad business either: your watch history is never sold or used to target you.',
-  },
-  {
-    heading: 'Where the Data Comes From',
-    body: 'Titles, posters, genres, directors, and release dates come from The Movie Database. Streaming availability comes from JustWatch through the same API, and Wikidata supplies the direct provider links where it has them. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
-  },
-  {
-    heading: 'Contact',
-    body: 'Questions, bug reports, and feature requests are welcome at info@midnightframe.app',
-  },
-];
 
 export default function AboutPage() {
   return (
@@ -45,13 +15,15 @@ export default function AboutPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLdScript(aboutPageJsonLd(TITLE, DESCRIPTION)),
+          __html: jsonLdScript(
+            aboutPageJsonLd(ABOUT_PAGE.title, ABOUT_PAGE.description),
+          ),
         }}
       />
       <StaticContentPage
-        title={TITLE}
-        subtitle="A free, private movie and TV tracker"
-        sections={sections}
+        title={ABOUT_PAGE.title}
+        subtitle={ABOUT_PAGE.subtitle}
+        sections={ABOUT_PAGE.sections}
       />
     </>
   );
