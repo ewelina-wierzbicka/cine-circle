@@ -28,7 +28,7 @@ const KNOWN_ROUTES_EXACT = [
 ];
 const KNOWN_ROUTE_PREFIXES = ['/movie/', '/series/'];
 
-function isKnownRoute(pathname: string) {
+export function isKnownRoute(pathname: string) {
   const normalized =
     pathname.length > 1 && pathname.endsWith('/')
       ? pathname.slice(0, -1)
@@ -51,7 +51,7 @@ type MediaRoute = {
   id: string | null;
 };
 
-function parseMediaRoute(pathname: string): MediaRoute | null {
+export function parseMediaRoute(pathname: string): MediaRoute | null {
   for (const [prefix, mediaType] of MEDIA_ROUTES) {
     if (!pathname.startsWith(prefix)) continue;
 
