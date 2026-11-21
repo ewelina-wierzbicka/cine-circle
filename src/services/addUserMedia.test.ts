@@ -5,6 +5,14 @@ import { addUserMedia } from '@/services/addUserMedia';
 import type { NormalizedMedia, UserEntry } from '@/types';
 
 const supabase = createSupabaseMock();
+const admin = createSupabaseMock();
+const tmdb = vi.fn(
+  async (): Promise<Partial<NormalizedMedia> | null> => ({
+    title: 'Fight Club',
+    release_date: '1999-10-15',
+    poster_path: '/tmdb-poster.jpg',
+  }),
+);
 const currentUser = vi.fn(
   async (): Promise<{ id: string } | null> => ({
     id: 'user-1',
@@ -14,22 +22,27 @@ const currentUser = vi.fn(
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => supabase.createClient(),
 }));
+vi.mock('@/lib/supabase/admin', () => ({
+  get adminSupabase() {
+    return admin.client;
+  },
+}));
+vi.mock('@/services/getMedia', () => ({
+  getMovieDetails: () => tmdb(),
+  getSeriesDetails: () => tmdb(),
+}));
 vi.mock('@/services/getCurrentUser', () => ({
   getCurrentUser: () => currentUser(),
 }));
 
 afterEach(() => {
   supabase.reset();
+  admin.reset();
+  tmdb.mockClear();
   currentUser.mockClear();
 });
 
-const details: NormalizedMedia = {
-  id: 550,
-  title: 'Fight Club',
-  media_type: 'movie',
-  release_date: '1999-10-15',
-  poster_path: '/poster.jpg',
-};
+const details = { id: 550, media_type: 'movie' as const };
 
 const watched: UserEntry = {
   watchStatus: 'watched',
@@ -42,7 +55,7 @@ const watched: UserEntry = {
 const toWatch: UserEntry = { ...watched, watchStatus: 'to_watch' };
 
 function savedMedia(existingEntry: { id: number } | null) {
-  supabase.respond('media', { data: { id: 7 } });
+  admin.respond('media', { data: { id: 7 } });
   supabase.respond('user_media', { data: existingEntry }, {});
 }
 
@@ -54,14 +67,32 @@ describe('addUserMedia', () => {
     );
   });
 
-  it("upserts the media row on conflict of 'tmdb_id,media_type'", async () => {
+  it('writes the shared media row from TMDB, not the caller', async () => {
     savedMedia(null);
     await addUserMedia(details, watched);
 
-    const [media] = supabase.chains('media');
-    expect(argsOf(media, 'upsert')?.[1]).toEqual({
-      onConflict: 'tmdb_id,media_type',
-    });
+    const [media] = admin.chains('media');
+    expect(argsOf(media, 'upsert')).toEqual([
+      {
+        tmdb_id: 550,
+        media_type: 'movie',
+        title: 'Fight Club',
+        release_date: '1999-10-15',
+        last_air_date: undefined,
+        poster_path: '/tmdb-poster.jpg',
+      },
+      { onConflict: 'tmdb_id,media_type' },
+    ]);
+    expect(supabase.chains('media')).toHaveLength(0);
+  });
+
+  it('saves nothing when TMDB does not know the id', async () => {
+    tmdb.mockResolvedValueOnce(null);
+    await expect(addUserMedia(details, watched)).rejects.toThrow(
+      'Failed to save',
+    );
+    expect(admin.chains('media')).toHaveLength(0);
+    expect(supabase.chains('user_media')).toHaveLength(0);
   });
 
   it('drops watched_date, rating and review from a to_watch entry', async () => {

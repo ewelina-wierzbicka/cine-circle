@@ -1,21 +1,15 @@
 'use server';
 
+import { adminSupabase } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { NormalizedMedia, UserEntry } from '@/types';
 
 export const addUserMedia = async (
-  details: NormalizedMedia,
+  { id: tmdb_id, media_type }: Pick<NormalizedMedia, 'id' | 'media_type'>,
   userEntry: UserEntry,
 ) => {
-  const {
-    id: tmdb_id,
-    title,
-    release_date,
-    last_air_date,
-    poster_path,
-    media_type,
-  } = details;
   const { watchStatus } = userEntry;
   const { watched_date, rating, review } =
     userEntry.watchStatus === 'watched'
@@ -27,16 +21,23 @@ export const addUserMedia = async (
 
   if (!user) throw new Error('Not authenticated');
 
-  const { data: media, error: mediaError } = await supabase
+  const tmdb = await (
+    media_type === 'series'
+      ? getSeriesDetails(String(tmdb_id))
+      : getMovieDetails(String(tmdb_id))
+  ).catch(() => null);
+  if (!tmdb) throw new Error('Failed to save. Please try again.');
+
+  const { data: media, error: mediaError } = await adminSupabase
     .from('media')
     .upsert(
       {
         tmdb_id,
-        title,
-        release_date,
-        last_air_date,
-        poster_path,
         media_type,
+        title: tmdb.title,
+        release_date: tmdb.release_date,
+        last_air_date: tmdb.last_air_date,
+        poster_path: tmdb.poster_path,
       },
       { onConflict: 'tmdb_id,media_type' },
     )

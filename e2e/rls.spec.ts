@@ -208,6 +208,47 @@ test.describe('deleted_accounts', () => {
   }
 });
 
+// media rows are shared by every user who saved the title. The server writes
+// them from TMDB through the service role, so no app user may write one.
+test.describe('media', () => {
+  async function storedTitle() {
+    const { data } = await admin
+      .from('media')
+      .select('title')
+      .eq('id', victimMediaId)
+      .single();
+    return data?.title;
+  }
+
+  test('a signed-in user cannot rewrite a shared row', async () => {
+    await attacker.client
+      .from('media')
+      .update({ title: 'Defaced' })
+      .eq('id', victimMediaId);
+    expect(await storedTitle()).toBe('RLS fixture');
+  });
+
+  test('a signed-in user cannot upsert over a shared row', async () => {
+    const { error } = await attacker.client
+      .from('media')
+      .upsert(
+        { tmdb_id: FOREIGN_TMDB_ID, title: 'Defaced', media_type: 'movie' },
+        { onConflict: 'tmdb_id,media_type' },
+      );
+    expect(error?.code).toBe('42501');
+    expect(await storedTitle()).toBe('RLS fixture');
+  });
+
+  test('a signed-in user cannot plant a new row', async () => {
+    const { error } = await attacker.client.from('media').insert({
+      tmdb_id: FOREIGN_TMDB_ID + 1,
+      title: 'Planted',
+      media_type: 'movie',
+    });
+    expect(error?.code).toBe('42501');
+  });
+});
+
 test.describe('avatar storage', () => {
   test.beforeAll(async () => {
     const { error } = await admin.storage
