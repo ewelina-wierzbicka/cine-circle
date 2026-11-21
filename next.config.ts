@@ -27,13 +27,14 @@ const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const sources = (...values: string[]) => values.filter(Boolean).join(' ');
 
-const contentSecurityPolicy = [
+// Exported for `src/cspHeaders.test.ts` only. Next.js reads the default export.
+export const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",
   `img-src ${sources("'self'", 'data:', 'blob:', 'https://image.tmdb.org', 'https://*.supabase.co', supabaseOrigin)}`,
   "font-src 'self'",
-  `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com')}`,
+  `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com', 'https://*.sentry.io')}`,
   // Covered by default-src already, but Safari has historically needed it named.
   "manifest-src 'self'",
   "frame-ancestors 'none'",
