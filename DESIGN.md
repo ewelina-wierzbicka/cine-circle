@@ -635,13 +635,13 @@ Static content pages, open routes (no auth required). All three render through o
 
 `src/components/Footer.tsx` — presentational, no data fetching, no props.
 
-**Where it renders.** Every `(app)` route, for every viewer, signed in or out. `(app)/layout.tsx` renders `<Footer />` as a `shrink-0` sibling after `main` in the `h-dvh flex flex-col` shell, with no session or pathname branch. It never scrolls and never interleaves with lists, because `main` is the scroll container. TMDB attribution must show wherever TMDB data appears.
+**Where it renders.** Every `(app)` route, for every viewer, signed in or out, exactly once. `RouteFooter` (client, renders only `<Footer />`) picks the slot from the pathname. On `INFINITE_SCROLL_ROUTES` (`lib/infiniteScrollRoutes.ts`: `/search`, `/collection`) it is a `shrink-0` sibling after `main`, pinned outside the scroller, never sticky over cards. Every other route renders it as the last child of `main` with `mt-auto`: short pages put it at the viewport bottom, long pages scroll to it. Page roots that fill `main` use `grow`, not `min-h-full`. TMDB attribution must show wherever TMDB data appears.
 
 **Scroll container.** `main` in `(app)/layout.tsx` scrolls, not the viewport. An `IntersectionObserver` inside it must set `root: element.closest('main')`.
 
-**Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `min-h-full` and flex, not a viewport calc, because the footer takes its own height.
+**Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `grow` and flex, not a viewport calc.
 
-**Layout:** `relative z-10 shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
+**Layout:** `relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
 
 **Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `nfo@midnightframe.app`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
 

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import { Footer } from '@/components/Footer';
 import Header from '@/components/Header';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
+import { RouteFooter } from '@/components/RouteFooter';
 import ScrollReset from '@/components/ScrollReset';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { getProfile } from '@/services/getProfile';
@@ -26,8 +26,9 @@ export default function PrivateLayout({
       </Suspense>
       <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
+        <RouteFooter placement="in-flow" />
       </main>
-      <Footer />
+      <RouteFooter placement="pinned" />
     </div>
   );
 }

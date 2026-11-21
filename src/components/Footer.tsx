@@ -14,7 +14,7 @@ const linkClass =
 
 export function Footer() {
   return (
-    <footer className="relative z-10 shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
+    <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
       <div className="flex flex-col items-center gap-2 lg:flex-row lg:justify-between lg:gap-8">
         <div className="flex shrink-0 flex-col items-center gap-x-8 gap-y-1 lg:flex-row">
           <nav
