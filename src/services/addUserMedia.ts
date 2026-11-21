@@ -27,20 +27,27 @@ export const addUserMedia = async (
 
   if (!user) throw new Error('Not authenticated');
 
+  // Insert only. media rows are shared, so RLS denies UPDATE and an existing
+  // row is never overwritten with client-supplied values.
+  const { error: insertError } = await supabase.from('media').upsert(
+    {
+      tmdb_id,
+      title,
+      release_date,
+      last_air_date,
+      poster_path,
+      media_type,
+    },
+    { onConflict: 'tmdb_id,media_type', ignoreDuplicates: true },
+  );
+
+  if (insertError) throw new Error('Failed to save. Please try again.');
+
   const { data: media, error: mediaError } = await supabase
     .from('media')
-    .upsert(
-      {
-        tmdb_id,
-        title,
-        release_date,
-        last_air_date,
-        poster_path,
-        media_type,
-      },
-      { onConflict: 'tmdb_id,media_type' },
-    )
     .select('id')
+    .eq('tmdb_id', tmdb_id)
+    .eq('media_type', media_type)
     .single();
 
   if (mediaError) throw new Error('Failed to save. Please try again.');

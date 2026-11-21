@@ -41,7 +41,7 @@ const watched: UserEntry = {
 const toWatch: UserEntry = { ...watched, watchStatus: 'to_watch' };
 
 function savedMedia(existingEntry: { id: number } | null) {
-  supabase.respond('media', { data: { id: 7 } });
+  supabase.respond('media', {}, { data: { id: 7 } });
   supabase.respond('user_media', { data: existingEntry }, {});
 }
 
@@ -53,14 +53,19 @@ describe('addUserMedia', () => {
     );
   });
 
-  it("upserts the media row on conflict of 'tmdb_id,media_type'", async () => {
+  it('never overwrites an existing media row', async () => {
     savedMedia(null);
     await addUserMedia(details, watched);
 
-    const [media] = supabase.chains('media');
-    expect(argsOf(media, 'upsert')?.[1]).toEqual({
+    const [insert, lookup] = supabase.chains('media');
+    expect(argsOf(insert, 'upsert')?.[1]).toEqual({
       onConflict: 'tmdb_id,media_type',
+      ignoreDuplicates: true,
     });
+    expect(eqFilters(lookup)).toEqual([
+      ['tmdb_id', 550],
+      ['media_type', 'movie'],
+    ]);
   });
 
   it('drops watched_date, rating and review from a to_watch entry', async () => {
