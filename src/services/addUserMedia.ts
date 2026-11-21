@@ -1,21 +1,15 @@
 'use server';
 
+import { adminSupabase } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { NormalizedMedia, UserEntry } from '@/types';
 
 export const addUserMedia = async (
-  details: NormalizedMedia,
+  { id: tmdb_id, media_type }: Pick<NormalizedMedia, 'id' | 'media_type'>,
   userEntry: UserEntry,
 ) => {
-  const {
-    id: tmdb_id,
-    title,
-    release_date,
-    last_air_date,
-    poster_path,
-    media_type,
-  } = details;
   const { watchStatus } = userEntry;
   const { watched_date, rating, review } =
     userEntry.watchStatus === 'watched'
@@ -27,27 +21,30 @@ export const addUserMedia = async (
 
   if (!user) throw new Error('Not authenticated');
 
-  // Insert only. media rows are shared, so RLS denies UPDATE and an existing
-  // row is never overwritten with client-supplied values.
-  const { error: insertError } = await supabase.from('media').upsert(
-    {
-      tmdb_id,
-      title,
-      release_date,
-      last_air_date,
-      poster_path,
-      media_type,
-    },
-    { onConflict: 'tmdb_id,media_type', ignoreDuplicates: true },
-  );
+  // media rows are shared and RLS denies UPDATE to app users. The row is
+  // written from the cached TMDB detail on the server, never from the
+  // browser, so every save refreshes it with values nobody can forge.
+  const tmdb = await (
+    media_type === 'series'
+      ? getSeriesDetails(String(tmdb_id))
+      : getMovieDetails(String(tmdb_id))
+  ).catch(() => null);
+  if (!tmdb) throw new Error('Failed to save. Please try again.');
 
-  if (insertError) throw new Error('Failed to save. Please try again.');
-
-  const { data: media, error: mediaError } = await supabase
+  const { data: media, error: mediaError } = await adminSupabase
     .from('media')
+    .upsert(
+      {
+        tmdb_id,
+        media_type,
+        title: tmdb.title,
+        release_date: tmdb.release_date,
+        last_air_date: tmdb.last_air_date,
+        poster_path: tmdb.poster_path,
+      },
+      { onConflict: 'tmdb_id,media_type' },
+    )
     .select('id')
-    .eq('tmdb_id', tmdb_id)
-    .eq('media_type', media_type)
     .single();
 
   if (mediaError) throw new Error('Failed to save. Please try again.');

@@ -34,19 +34,11 @@ export default function MediaActions({
   const userMediaId = saved?.id;
 
   const addToToWatch = async () => {
-    const { id, title, release_date, last_air_date, poster_path, media_type } =
-      media;
+    const { id, title, media_type } = media;
     setIsSaving(true);
     try {
       const result = await addUserMedia(
-        {
-          id,
-          title,
-          release_date,
-          last_air_date,
-          poster_path,
-          media_type,
-        },
+        { id, media_type },
         { watchStatus: 'to_watch' },
       );
       await queryClient.invalidateQueries({ queryKey: ['user-movies'] });
