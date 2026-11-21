@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import imageLoader from '@/lib/imageLoader';
 
@@ -15,10 +16,19 @@ describe('imageLoader', () => {
     expect(load(src, 200)).toBe(src);
   });
 
+  // Every bucket in TMDB_WIDTHS has a case: dropping one from the list must
+  // fail here, since 185 and 500 are both in images.deviceSizes.
   it.each([
+    [92, 'w92'],
+    [93, 'w154'],
     [154, 'w154'],
+    [155, 'w185'],
+    [185, 'w185'],
     [200, 'w342'],
     [342, 'w342'],
+    [343, 'w500'],
+    [500, 'w500'],
+    [501, 'w780'],
     [780, 'w780'],
     [781, 'original'],
     [3840, 'original'],

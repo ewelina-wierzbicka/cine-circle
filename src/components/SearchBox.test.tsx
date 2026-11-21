@@ -124,11 +124,26 @@ describe('SearchBox', () => {
       `${toHref(550, 'Fight Club', 'movie')}?from=search`,
     );
   });
+});
 
-  it('renders no dropdown for an empty query', async () => {
+// Asserting an absence: fake timers run the debounce window out without
+// spending it in wall clock.
+describe('SearchBox with a blank query', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('renders no dropdown for an empty query', () => {
     const input = renderSearch();
     type(input, '   ');
-    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
 
     expect(listbox()).not.toBeInTheDocument();
     expect(searchCalls()).toEqual([]);

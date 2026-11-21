@@ -554,12 +554,18 @@ Vitest, jsdom and React Testing Library. Run with `npm run test`.
 
 - Test files are co-located as `src/**/<name>.test.ts(x)`, next to the module under test. `vitest.config.mts` `include` scopes to `src/`, so nothing outside it is collected.
 - `vitest.config.mts` reads the `@/` alias out of `tsconfig.json` — never restate the path there.
-- `vitest.setup.ts` registers the jest-dom matchers and runs the RTL `cleanup` after each test.
+- `vitest.setup.ts` registers the jest-dom matchers and runs the RTL `cleanup` after each test. Both are imported only `if (typeof document !== 'undefined')` — the setup file runs for the node-environment files too, where loading them cost seconds per file.
+- **A test with no DOM opens with `// @vitest-environment node`**, the first line of the file, above the imports. Every `src/lib`, `src/services`, `src/app` and route-handler test does. jsdom is the config default and costs seconds of environment setup per file. `environmentMatchGlobs` is gone in Vitest 4, so the docblock is the per-file switch; the config-level alternative is `test.projects`.
 - `globals` is off: import `describe`, `it`, `expect` and `vi` from `vitest` in every test file.
+- Assert an absence with fake timers or `await act(async () => {})`, never a real `setTimeout` sleep.
+- Do not assert Tailwind classes. Assert the behaviour (`toBeDisabled()`), so a restyle that keeps the contract cannot fail.
 - Playwright stays in `e2e/`. Vitest `exclude` covers it, and `playwright.config.ts` is scoped to `testDir: './e2e'`, so neither runner ever sees the other's files.
 - No network calls in the suite — mock `fetch` and `next/cache`.
-- Component tests: `vi.mock('next/navigation', () => import('@/test/navigation'))` gives a shared `router` spy and a settable `navigation.pathname` / `searchParams`; `renderWithQuery` from `src/test/render.tsx` wraps a fresh `QueryClient` with retries off. jsdom lacks `IntersectionObserver` and `scrollIntoView` — stub them in the test that needs them.
-- `src/test/supabaseMock.ts` is the chainable server-client mock for `services/` tests. Each `from(table)` records its builder calls and resolves to the next result queued with `respond(table, ...)`. Assert the recorded calls, never Postgres or RLS behaviour. Browser-client hooks mock `@/lib/supabase/client` with `createClient: () => supabase.client`; it also stubs `auth.getUser`.
+- Every route handler in `src/app/api/` has a `route.test.ts` beside it. They cover branch logic only, with the services, the Supabase clients and `fetch` mocked, and build the request with `new Request(...)` (`NextRequest` only where the handler reads `nextUrl`).
+- Component tests: `vi.mock('next/navigation', () => import('@/test/navigation'))` gives a shared `router` spy and a settable `navigation.pathname` / `searchParams`; `renderWithQuery` from `src/test/render.tsx` wraps a fresh `QueryClient` with retries off, and `queryWrapper()` beside it is the same provider as a `renderHook` wrapper. jsdom lacks `IntersectionObserver` and `scrollIntoView` — stub them in the test that needs them.
+- `src/test/supabaseMock.ts` is the chainable server-client mock for `services/` tests. Each `from(table)` records its builder calls and resolves to the next result queued with `respond(table, ...)`. `then`, `catch` and `finally` are delegated to that result rather than recorded as steps. Assert the recorded calls, never Postgres or RLS behaviour. Browser-client hooks mock `@/lib/supabase/client` with `createClient: () => supabase.client`; it also stubs `auth.getUser`, which `reset()` clears.
+- `src/test/imageSource.ts` `sourceOf(img)` reads the URL a component handed `next/image`. Vitest does not apply `images.loaderFile`, so the src is the `/_next/image?url=` fallback — never assert that shape at a call site.
+- `src/components/Skeletons.test.tsx` holds the text-free and `aria-busy` invariants for every skeleton in one `it.each` table, via `expectTextFree` in `src/test/textFree.tsx`. Add a new skeleton to that table. `HeaderSkeleton` is deliberately out: its nav copy is real text.
 
 ---
 

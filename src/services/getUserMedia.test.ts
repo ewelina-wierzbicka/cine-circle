@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PAGE_SIZE } from '@/lib/constants';
 import { argsOf, createSupabaseMock, eqFilters } from '@/test/supabaseMock';

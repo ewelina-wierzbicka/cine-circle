@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
   MAPPED_PROVIDER_IDS,

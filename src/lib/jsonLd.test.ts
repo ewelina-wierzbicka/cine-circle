@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HOME_FAQ } from '@/lib/homeFaq';
 import type { NormalizedMedia } from '@/types';

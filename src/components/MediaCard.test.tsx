@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import MediaCard from '@/components/MediaCard';
 import { toUserMediaListProps } from '@/lib/mediaUtils';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
+import { sourceOf } from '@/test/imageSource';
 import { resetNavigation } from '@/test/navigation';
 import { renderWithQuery } from '@/test/render';
 import type { NormalizedMedia, SavedMedia, UserMedia } from '@/types';
@@ -32,9 +33,7 @@ describe('MediaCard', () => {
     expect(screen.getByText('Fight Club')).toBeInTheDocument();
     expect(screen.getByText('1999')).toBeInTheDocument();
     const img = screen.getByRole('img', { name: 'Fight Club' });
-    expect(img.getAttribute('src')).toContain(
-      encodeURIComponent(tmdbImageUrl('/p.jpg')),
-    );
+    expect(sourceOf(img)).toBe(tmdbImageUrl('/p.jpg'));
   });
 
   it('renders the placeholder without a poster', () => {

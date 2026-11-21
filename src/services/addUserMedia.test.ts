@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { argsOf, createSupabaseMock, eqFilters } from '@/test/supabaseMock';
 import { addUserMedia } from '@/services/addUserMedia';
