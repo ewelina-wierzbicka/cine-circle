@@ -18,7 +18,7 @@ export function ErrorState({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <div className="relative flex min-h-full items-center justify-center px-6 py-16">
+    <div className="relative flex grow items-center justify-center px-6 py-16">
       <div className="pointer-events-none absolute left-1/2 top-[-10%] h-150 w-150 -translate-x-1/2 rounded-full bg-[radial-gradient(oklch(65%_0.18_25/0.08)_0%,transparent_65%)] blur-[40px]" />
       <div className="relative z-10 max-w-105 animate-fade-up text-center">
         <AlertCircleIcon className="mx-auto mb-5 h-14 w-14 text-error opacity-55" />

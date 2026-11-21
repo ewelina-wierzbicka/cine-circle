@@ -1,5 +1,5 @@
-import NextLink from 'next/link';
 import { TmdbAttribution } from '@/components/TmdbAttribution';
+import NextLink from 'next/link';
 
 const NAV_LINKS = [
   { href: '/about', label: 'About', extra: '' },
@@ -12,9 +12,21 @@ const CONTACT_EMAIL = 'info@midnightframe.app';
 const linkClass =
   'ui-mono uppercase no-underline text-secondary hover:text-accent transition-colors';
 
-export function Footer() {
+type Props = {
+  attributionOnly?: boolean;
+};
+
+export function Footer({ attributionOnly = false }: Props) {
+  if (attributionOnly) {
+    return (
+      <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12 flex justify-end">
+        <TmdbAttribution className="max-w-130 pl-4" />
+      </footer>
+    );
+  }
+
   return (
-    <footer className="relative z-10 shrink-0 border-t border-secondary/50 px-4 py-3 md:px-12">
+    <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
       <div className="flex flex-col items-center gap-2 lg:flex-row lg:justify-between lg:gap-8">
         <div className="flex shrink-0 flex-col items-center gap-x-8 gap-y-1 lg:flex-row">
           <nav
@@ -31,11 +43,11 @@ export function Footer() {
               Contact
             </a>
           </nav>
-          <p className="ui-mono uppercase text-secondary hidden whitespace-nowrap sm:block">
+          <p className="ui-mono uppercase text-secondary hidden whitespace-nowrap xl:block">
             © 2026 MidnightFrame
           </p>
         </div>
-        <TmdbAttribution className="max-w-xl" />
+        <TmdbAttribution className="max-w-130 pl-4" />
       </div>
     </footer>
   );

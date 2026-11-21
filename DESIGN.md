@@ -633,21 +633,23 @@ Static content pages, open routes (no auth required). All three render through o
 
 ## Footer
 
-`src/components/Footer.tsx` — presentational, no data fetching, no props.
+`src/components/Footer.tsx` — presentational, no data fetching. One optional prop, `attributionOnly`.
 
-**Where it renders.** Every `(app)` route, for every viewer, signed in or out. `(app)/layout.tsx` renders `<Footer />` as a `shrink-0` sibling after `main` in the `h-dvh flex flex-col` shell, with no session or pathname branch. It never scrolls and never interleaves with lists, because `main` is the scroll container. TMDB attribution must show wherever TMDB data appears.
+**Where it renders.** Every `(app)` route, for every viewer, signed in or out, exactly once. `RouteFooter` (client, renders only `<Footer />`) picks the slot from the pathname. On `INFINITE_SCROLL_ROUTES` (`lib/infiniteScrollRoutes.ts`: `/search`, `/collection`) it is a `shrink-0` sibling after `main`, pinned outside the scroller, never sticky over cards. Every other route renders it as the last child of `main` with `mt-auto`: short pages put it at the viewport bottom, long pages scroll to it. Page roots that fill `main` use `grow`, not `min-h-full`. TMDB attribution must show wherever TMDB data appears.
 
 **Scroll container.** `main` in `(app)/layout.tsx` scrolls, not the viewport. An `IntersectionObserver` inside it must set `root: element.closest('main')`.
 
-**Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `min-h-full` and flex, not a viewport calc, because the footer takes its own height.
+**Viewport height.** The `(app)` shell is sized `h-dvh`, never `h-screen`: `100vh` on mobile measures the viewport as if the browser toolbars were retracted, so the bottom ~90px of the shell sat below the fold, and `body { overflow: hidden }` left no way to scroll to it. Do not reintroduce `vh` units in the app shell. Home fills `main` with `grow` and flex, not a viewport calc.
 
-**Layout:** `relative z-10 shrink-0 border-t border-secondary/50 px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
+**Variants.** `RouteFooter` passes `attributionOnly` from the same `pinned` flag, so the set of routes is one list. Pinned (`/search`, `/collection`): `<footer>` plus `TmdbAttribution`, left-aligned, no nav, no copyright. Legal links are not reachable from those pages. In-flow (everywhere else): the full footer below.
+
+**Layout (in-flow):** `relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12`. Stacked and centred below `lg`, one row at `lg+` (`justify-between`): nav and copyright left, TMDB credit right.
 
 **Nav links:** About, Privacy Policy, Terms & Conditions (NextLink), Contact (mailto: `nfo@midnightframe.app`). `ui-mono uppercase text-secondary hover:text-accent`. Below `sm` the labels shorten to About, Privacy, Terms; the rest stays as `sr-only` so the accessible name is unchanged.
 
-**Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `sm` to save height.
+**Copyright:** `© 2026 MidnightFrame`, `ui-mono uppercase text-secondary`, hidden below `lg`, so small screens carry only nav and the TMDB credit.
 
-**TMDB credit:** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens, `max-w-xl`, no card.
+**TMDB credit:** `TmdbAttribution` (`src/components/TmdbAttribution.tsx`), shared with the auth screens, `max-w-xl`, no card. The whole anchor rests at `opacity-80` and goes to `opacity-100` on hover, the only hover effect. Resting contrast is about 6.2:1 on `bg-dark`, above AA. Logo `60×8`, `mt-2`. The auth screens get the same dimming.
 
 ## Social Share Image (Open Graph)
 

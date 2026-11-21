@@ -26,7 +26,7 @@ export default async function Home() {
   const recentPostersPromise = getRecentWatched();
 
   return (
-    <div className="group relative flex flex-col min-h-full">
+    <div className="group relative flex flex-col grow">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdScript(siteJsonLd()) }}
