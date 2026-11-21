@@ -28,6 +28,8 @@ Fix all ESLint errors before committing — warnings are acceptable, errors are 
 - **pre-commit** — lint-staged runs ESLint + Prettier on staged `.ts`/`.tsx` files
 - **pre-push** — `type-check` then `test` run on the full project
 
+**CI:** `.github/workflows/checks.yml` runs lint, type-check and the unit suite on every PR and push to `main`. No Supabase, browsers or secrets. Playwright runs separately in `playwright.yml`.
+
 ---
 
 ## Code Style
