@@ -27,11 +27,11 @@ const sections: StaticSection[] = [
   },
   {
     heading: 'What It Is Not',
-    body: 'It is not a social network. There are no public profiles, no followers, no feeds, and no comment sections. It is not a streaming service and it does not host or link to video. It is not an ad business either: your watch history is never sold or used to target you.',
+    body: 'It is not a social network. There are no public profiles, no followers, no feeds, and no comment sections. It is not a streaming service: it hosts no video of its own, and it only points you to the services that carry a title, with no affiliate deals behind those links. It is not an ad business either: your watch history is never sold or used to target you.',
   },
   {
     heading: 'Where the Data Comes From',
-    body: 'Titles, posters, genres, directors, and release dates come from The Movie Database. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
+    body: 'Titles, posters, genres, directors, and release dates come from The Movie Database. Streaming availability comes from JustWatch through the same API, and Wikidata supplies the direct provider links where it has them. This product uses the TMDB API but is not endorsed or certified by TMDB. Metadata occasionally has gaps or errors; when it does, the fix belongs upstream at TMDB.',
   },
   {
     heading: 'Contact',
