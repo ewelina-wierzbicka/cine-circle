@@ -43,9 +43,19 @@ export function createSupabaseMock() {
   const client = {
     from: startChain,
     storage: { from: (bucket: string) => startChain(`storage:${bucket}`) },
+    // Only the browser-client hooks read the user this way; server services
+    // go through the mocked getCurrentUser instead.
+    auth: {
+      getUser: vi.fn(async () => ({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      })),
+    },
   };
 
   return {
+    /** The client itself, for the synchronous browser `createClient`. */
+    client,
     createClient: vi.fn(async () => client),
     respond(table: string, ...results: Result[]) {
       queues.set(table, [...(queues.get(table) ?? []), ...results]);
