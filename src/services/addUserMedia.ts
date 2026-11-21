@@ -21,9 +21,6 @@ export const addUserMedia = async (
 
   if (!user) throw new Error('Not authenticated');
 
-  // media rows are shared and RLS denies UPDATE to app users. The row is
-  // written from the cached TMDB detail on the server, never from the
-  // browser, so every save refreshes it with values nobody can forge.
   const tmdb = await (
     media_type === 'series'
       ? getSeriesDetails(String(tmdb_id))
