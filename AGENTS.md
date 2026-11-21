@@ -607,3 +607,13 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 - Update `DESIGN.md` if the task added or changed any page, layout, or visual design. The added DESIGN.md description should be as short as possible.
 - Revisit the JSON-LD in `src/lib/jsonLd.ts` **only when the task changed something the structured data already claims, or added a page type Schema.org covers.** Needed when: an indexable page is added or removed, the copy a node quotes changes (`SITE_NAME`, `SITE_DESCRIPTION`, the `/about` consts), a media field a node emits starts or stops being fetched, or a URL a node points at moves. Not needed for styling, private routes, noindex pages, refactors that keep the same values, or any new field nothing in `jsonLd.ts` reads. Do not invent new nodes or properties to fill a gap the task did not touch — a wrong or stale claim is worse than an absent one
 - Bump `STATIC_PAGE_LAST_MODIFIED` in `src/lib/seo.ts` if the task changed the copy on `/`, `/about`, `/terms` or `/privacy` — it is the `lastmod` those sitemap entries carry, and nothing updates it automatically
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
