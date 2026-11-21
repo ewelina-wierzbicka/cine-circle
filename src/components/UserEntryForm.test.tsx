@@ -59,7 +59,7 @@ describe('UserEntryForm', () => {
 
     await waitFor(() => expect(addUserMedia).toHaveBeenCalledTimes(1));
     expect(addUserMedia).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 550, title: 'Fight Club' }),
+      { id: 550, media_type: 'movie' },
       expect.objectContaining({ watchStatus: 'watched', rating: 8 }),
     );
     expect(updateUserMedia).not.toHaveBeenCalled();

@@ -4,7 +4,8 @@ import { admin } from './admin';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './env';
 
 // media rows are shared by every user who saved the title, so no app user may
-// rewrite one. No browser: supabase-js with the anon key, as the app calls it.
+// write one. The server saves them from TMDB through the service role.
+// No browser: supabase-js with the anon key, as the app calls it.
 
 const TMDB_ID = 980_000_000 + Math.floor(Math.random() * 1_000_000);
 const PASSWORD = 'MediaRls!1';
@@ -61,13 +62,20 @@ test('a signed-in user cannot rewrite a shared media row', async () => {
   expect(await storedTitle()).toBe('Original');
 });
 
-test('saving an existing title leaves the shared row untouched', async () => {
+test('a signed-in user cannot upsert over a shared media row', async () => {
   const { error } = await client
     .from('media')
     .upsert(
       { tmdb_id: TMDB_ID, title: 'Defaced', media_type: 'movie' },
-      { onConflict: 'tmdb_id,media_type', ignoreDuplicates: true },
+      { onConflict: 'tmdb_id,media_type' },
     );
-  expect(error).toBeNull();
+  expect(error?.code).toBe('42501');
   expect(await storedTitle()).toBe('Original');
+});
+
+test('a signed-in user cannot plant a new media row', async () => {
+  const { error } = await client
+    .from('media')
+    .insert({ tmdb_id: TMDB_ID + 1, title: 'Planted', media_type: 'movie' });
+  expect(error?.code).toBe('42501');
 });
