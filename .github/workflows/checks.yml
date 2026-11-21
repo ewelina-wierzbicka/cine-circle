@@ -1,0 +1,27 @@
+name: Checks
+# Lint, type-check and the Vitest unit suite. Kept apart from Playwright so a
+# PR gets a fast result: the unit suite mocks every network call and Supabase,
+# so this job needs no database, no browsers and no secrets.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  checks:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Type-check
+        run: npm run type-check
+      - name: Unit tests
+        run: npm run test
