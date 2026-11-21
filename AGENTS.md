@@ -17,6 +17,8 @@ npm run lint         # run ESLint
 npm run lint:fix     # auto-fix lint issues
 npm run format       # run Prettier across all files
 npm run type-check   # tsc --noEmit
+npm run test         # run the Vitest unit suite once
+npm run test:watch   # Vitest in watch mode
 ```
 
 Fix all ESLint errors before committing — warnings are acceptable, errors are not. Do not use `// eslint-disable` without a comment explaining why.
@@ -24,7 +26,7 @@ Fix all ESLint errors before committing — warnings are acceptable, errors are 
 **Hooks (run automatically):**
 
 - **pre-commit** — lint-staged runs ESLint + Prettier on staged `.ts`/`.tsx` files
-- **pre-push** — `type-check` runs on the full project
+- **pre-push** — `type-check` then `test` run on the full project
 
 ---
 
@@ -488,7 +490,7 @@ Always create a PR
 - Keep commits small and focused
 - Commit message format: `type: short description` (e.g. `feat: add movie search`, `fix: correct rating display`)
 - Types: `feat`, `fix`, `chore`, `refactor`, `docs`, `style`, `test`
-- Run `npm run lint` before opening a PR — `type-check` runs automatically on pre-push
+- Run `npm run lint` before opening a PR — `type-check` and `test` run automatically on pre-push
 - PR title should match the commit format; include a brief description of what changed and why
 
 ---
@@ -541,6 +543,19 @@ Project-specific skills are in `.agents/skills/`. Consult them before working on
 - Adding a new npm dependency → confirm first
 - Changing Supabase schema or RLS policies → confirm first
 - Deleting or renaming files → confirm first
+
+---
+
+## Unit Tests
+
+Vitest, jsdom and React Testing Library. Run with `npm run test`.
+
+- Test files are co-located as `src/**/<name>.test.ts(x)`, next to the module under test. `vitest.config.mts` `include` scopes to `src/`, so nothing outside it is collected.
+- `vitest.config.mts` reads the `@/` alias out of `tsconfig.json` — never restate the path there.
+- `vitest.setup.ts` registers the jest-dom matchers and runs the RTL `cleanup` after each test.
+- `globals` is off: import `describe`, `it`, `expect` and `vi` from `vitest` in every test file.
+- Playwright stays in `e2e/`. Vitest `exclude` covers it, and `playwright.config.ts` is scoped to `testDir: './e2e'`, so neither runner ever sees the other's files.
+- No network calls in the suite — mock `fetch` and `next/cache`.
 
 ---
 
