@@ -556,6 +556,7 @@ Vitest, jsdom and React Testing Library. Run with `npm run test`.
 - `globals` is off: import `describe`, `it`, `expect` and `vi` from `vitest` in every test file.
 - Playwright stays in `e2e/`. Vitest `exclude` covers it, and `playwright.config.ts` is scoped to `testDir: './e2e'`, so neither runner ever sees the other's files.
 - No network calls in the suite — mock `fetch` and `next/cache`.
+- Component tests: `vi.mock('next/navigation', () => import('@/test/navigation'))` gives a shared `router` spy and a settable `navigation.pathname` / `searchParams`; `renderWithQuery` from `src/test/render.tsx` wraps a fresh `QueryClient` with retries off. jsdom lacks `IntersectionObserver` and `scrollIntoView` — stub them in the test that needs them.
 
 ---
 
