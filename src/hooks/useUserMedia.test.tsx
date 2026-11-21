@@ -1,8 +1,7 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useUserMedia } from '@/hooks/useUserMedia';
+import { queryWrapper } from '@/test/render';
 import { createSupabaseMock } from '@/test/supabaseMock';
 import type { FilterMediaType, RatingFilter, UserMediaPage } from '@/types';
 
@@ -24,12 +23,7 @@ type Args = {
 };
 
 function setup() {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  const { queryClient, wrapper } = queryWrapper();
   const renderFull = ({ initialData, search, mediaType, rating }: Args = {}) =>
     renderHook(
       () => useUserMedia('watched', initialData, search, mediaType, rating),

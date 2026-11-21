@@ -2,14 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import MediaPoster from '@/components/MediaPoster';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
-
-// next/image rewrites src through the configured loader. The image URL the
-// component was given survives as the `url` param or as the src itself.
-function sourceOf(img: HTMLElement) {
-  const src = img.getAttribute('src') ?? '';
-  const url = new URL(src, 'http://localhost');
-  return url.searchParams.get('url') ?? src;
-}
+import { sourceOf } from '@/test/imageSource';
 
 describe('MediaPoster', () => {
   it('renders the given TMDB src', () => {

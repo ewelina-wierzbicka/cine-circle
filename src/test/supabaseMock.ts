@@ -19,17 +19,21 @@ export function createSupabaseMock() {
     const chain: Chain = { table, steps: [] };
     chains.push(chain);
 
+    // `catch` and `finally` are delegated too, not recorded as chain steps: a
+    // service written with `.catch()` must behave like a promise rather than
+    // silently log a step and return the builder.
+    const settled = Promise.resolve({
+      data: result.data ?? null,
+      error: result.error ?? null,
+    });
+    const promiseMethods = ['then', 'catch', 'finally'] as const;
+
     const builder: object = new Proxy(
       {},
       {
         get(_, prop) {
-          if (prop === 'then') {
-            const settled = Promise.resolve({
-              data: result.data ?? null,
-              error: result.error ?? null,
-            });
-            return settled.then.bind(settled);
-          }
+          const method = promiseMethods.find((name) => name === prop);
+          if (method) return settled[method].bind(settled);
           return (...args: unknown[]) => {
             chain.steps.push([String(prop), args]);
             return builder;
@@ -67,6 +71,9 @@ export function createSupabaseMock() {
       queues.clear();
       chains.length = 0;
       this.createClient.mockClear();
+      // mockReset, not mockClear: it also drops a `mockResolvedValueOnce`
+      // queued by a test, and restores the default implementation.
+      client.auth.getUser.mockReset();
     },
   };
 }

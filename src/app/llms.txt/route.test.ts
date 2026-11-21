@@ -1,3 +1,6 @@
+// @vitest-environment node
+// Pure logic, no DOM: the default jsdom environment costs seconds of
+// setup per file and buys nothing here.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { isDisallowed } from '@/test/robotsRules';
 

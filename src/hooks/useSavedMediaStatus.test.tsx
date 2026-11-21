@@ -1,8 +1,7 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { savedKey, useSavedMediaStatus } from '@/hooks/useSavedMediaStatus';
+import { queryWrapper } from '@/test/render';
 import { createSupabaseMock } from '@/test/supabaseMock';
 
 const supabase = createSupabaseMock();
@@ -16,12 +15,7 @@ afterEach(() => {
 });
 
 function renderStatus(enabled = true) {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  const { queryClient, wrapper } = queryWrapper();
   const hook = renderHook(() => useSavedMediaStatus(enabled), { wrapper });
   return { queryClient, ...hook };
 }
@@ -85,7 +79,9 @@ describe('useSavedMediaStatus', () => {
 
   it('fires no query when disabled', async () => {
     const { result } = renderStatus(false);
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    // Flush the effects a fetch would have been started from, rather than
+    // sleeping for it.
+    await act(async () => {});
 
     expect(result.current.fetchStatus).toBe('idle');
     expect(supabase.chains('user_media')).toEqual([]);
