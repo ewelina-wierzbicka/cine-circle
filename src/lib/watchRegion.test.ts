@@ -1,6 +1,4 @@
 // @vitest-environment node
-// Pure logic, no DOM: the default jsdom environment costs seconds of
-// setup per file and buys nothing here.
 import { describe, expect, it } from 'vitest';
 import { toWatchRegion } from '@/lib/watchRegion';
 

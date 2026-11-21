@@ -1,6 +1,4 @@
 // @vitest-environment node
-// Pure logic, no DOM: the default jsdom environment costs seconds of
-// setup per file and buys nothing here.
 import { NextRequest } from 'next/server';
 import { describe, expect, it, vi } from 'vitest';
 import manifest from '@/app/manifest';

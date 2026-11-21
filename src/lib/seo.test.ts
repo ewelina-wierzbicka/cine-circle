@@ -1,6 +1,4 @@
 // @vitest-environment node
-// Pure logic, no DOM: the default jsdom environment costs seconds of
-// setup per file and buys nothing here.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { NormalizedMedia } from '@/types';
 

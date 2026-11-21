@@ -1,6 +1,4 @@
 // @vitest-environment node
-// Pure logic, no DOM: the default jsdom environment costs seconds of
-// setup per file and buys nothing here.
 import type { NextRequest } from 'next/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/cron/keep-alive/route';
