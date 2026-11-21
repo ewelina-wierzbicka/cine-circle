@@ -1,5 +1,5 @@
-import NextLink from 'next/link';
 import { TmdbAttribution } from '@/components/TmdbAttribution';
+import NextLink from 'next/link';
 
 const NAV_LINKS = [
   { href: '/about', label: 'About', extra: '' },
@@ -19,8 +19,8 @@ type Props = {
 export function Footer({ attributionOnly = false }: Props) {
   if (attributionOnly) {
     return (
-      <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
-        <TmdbAttribution className="max-w-xl" />
+      <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12 flex justify-end">
+        <TmdbAttribution className="max-w-130 pl-4" />
       </footer>
     );
   }
@@ -43,11 +43,11 @@ export function Footer({ attributionOnly = false }: Props) {
               Contact
             </a>
           </nav>
-          <p className="ui-mono uppercase text-secondary hidden whitespace-nowrap lg:block">
+          <p className="ui-mono uppercase text-secondary hidden whitespace-nowrap xl:block">
             © 2026 MidnightFrame
           </p>
         </div>
-        <TmdbAttribution className="max-w-xl" />
+        <TmdbAttribution className="max-w-130 pl-4" />
       </div>
     </footer>
   );
