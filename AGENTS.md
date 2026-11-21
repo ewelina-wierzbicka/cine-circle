@@ -28,6 +28,8 @@ Fix all ESLint errors before committing — warnings are acceptable, errors are 
 - **pre-commit** — lint-staged runs ESLint + Prettier on staged `.ts`/`.tsx` files
 - **pre-push** — `type-check` then `test` run on the full project
 
+**CI:** `.github/workflows/checks.yml` runs lint, type-check and the unit suite on every PR and push to `main`. No Supabase, browsers or secrets. Playwright runs separately in `playwright.yml`.
+
 ---
 
 ## Code Style
@@ -556,6 +558,8 @@ Vitest, jsdom and React Testing Library. Run with `npm run test`.
 - `globals` is off: import `describe`, `it`, `expect` and `vi` from `vitest` in every test file.
 - Playwright stays in `e2e/`. Vitest `exclude` covers it, and `playwright.config.ts` is scoped to `testDir: './e2e'`, so neither runner ever sees the other's files.
 - No network calls in the suite — mock `fetch` and `next/cache`.
+- Component tests: `vi.mock('next/navigation', () => import('@/test/navigation'))` gives a shared `router` spy and a settable `navigation.pathname` / `searchParams`; `renderWithQuery` from `src/test/render.tsx` wraps a fresh `QueryClient` with retries off. jsdom lacks `IntersectionObserver` and `scrollIntoView` — stub them in the test that needs them.
+- `src/test/supabaseMock.ts` is the chainable server-client mock for `services/` tests. Each `from(table)` records its builder calls and resolves to the next result queued with `respond(table, ...)`. Assert the recorded calls, never Postgres or RLS behaviour. Browser-client hooks mock `@/lib/supabase/client` with `createClient: () => supabase.client`; it also stubs `auth.getUser`.
 
 ---
 
