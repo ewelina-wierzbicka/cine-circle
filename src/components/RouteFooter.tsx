@@ -11,5 +11,7 @@ type Props = {
 export function RouteFooter({ placement }: Props) {
   const pathname = usePathname();
   const pinned = isInfiniteScrollRoute(pathname);
-  return (placement === 'pinned') === pinned ? <Footer /> : null;
+  return (placement === 'pinned') === pinned ? (
+    <Footer attributionOnly={pinned} />
+  ) : null;
 }

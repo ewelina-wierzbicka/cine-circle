@@ -12,7 +12,19 @@ const CONTACT_EMAIL = 'info@midnightframe.app';
 const linkClass =
   'ui-mono uppercase no-underline text-secondary hover:text-accent transition-colors';
 
-export function Footer() {
+type Props = {
+  attributionOnly?: boolean;
+};
+
+export function Footer({ attributionOnly = false }: Props) {
+  if (attributionOnly) {
+    return (
+      <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
+        <TmdbAttribution className="max-w-xl" />
+      </footer>
+    );
+  }
+
   return (
     <footer className="relative z-10 mt-auto shrink-0 border-t border-white/[0.07] px-4 py-3 md:px-12">
       <div className="flex flex-col items-center gap-2 lg:flex-row lg:justify-between lg:gap-8">
