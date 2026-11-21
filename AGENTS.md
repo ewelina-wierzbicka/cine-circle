@@ -267,10 +267,11 @@ export const colors = {
 
 ### Schema
 
-| Table              | Key columns                                                   | Notes                                                                                       |
-| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                     |
-| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all |
+| Table              | Key columns                                                   | Notes                                                                                                                |
+| ------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `profiles`         | `id`, `user_id` (FK→auth.users), `display_name`, `avatar_url` | Auto-created on first `getProfile` call                                                                              |
+| `media`            | `id`, `tmdb_id`, `media_type`, `title`, `poster_path`         | Shared by every user. No app-user writes: `addUserMedia` upserts it via the admin client from the cached TMDB detail |
+| `deleted_accounts` | `id`, `user_id` (unique, **no FK**), `deleted_at`             | Erasure log written by `deleteAccount` before `deleteUser`. Service role only, RLS deny-all                          |
 
 `deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
 
@@ -582,6 +583,7 @@ Tests live in `e2e/` and use Playwright. Run with `npx playwright test`.
 | `collection.spec.ts`      | T6 add to "to watch", T7 add to "watched" via entry form, T8a move to watched, T8b delete item, T9 tabs + title filter, T21 rating multi-select (watched tab only)                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `watch-providers.spec.ts` | T22 where to watch links each logo to its provider, T24 brand variants dedupe to one logo, T25 ads-only region still renders, T26 no geo header says the region is unknown                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `profile.spec.ts`         | T10 update display name, T11 delete account, T12 invalid email error, T13 valid email change, T14 avatar upload (resized WebP stored), T15 avatar over 1 MB rejected, T16 avatar disallowed type rejected, T17 stored avatar is WebP capped at 128px, T18 delete account clears avatar folder and user rows                                                                                                                                                                                                                                                                      |
+| `media-rls.spec.ts`       | No signed-in user can update, upsert over or insert a shared `media` row                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 **Rules:**
 
