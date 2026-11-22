@@ -141,9 +141,11 @@ export default async function proxy(request: NextRequest) {
   };
 
   if (mediaRoute.kind === 'missing') {
-    return withSessionCookies(
-      NextResponse.rewrite(new URL('/_not-found', request.url)),
-    );
+    // `/_not-found` answers the 404 status itself; the header is what keeps a
+    // crawler from indexing the body whatever Next does with that status.
+    const notFound = NextResponse.rewrite(new URL('/_not-found', request.url));
+    notFound.headers.set('X-Robots-Tag', 'noindex');
+    return withSessionCookies(notFound);
   }
 
   // A mis-slugged URL answers a real 308 to the canonical slug, query intact.
