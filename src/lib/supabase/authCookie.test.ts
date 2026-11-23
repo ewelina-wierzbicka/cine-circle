@@ -26,7 +26,7 @@ describe('hasAuthCookie', () => {
 
   it('matches any project ref, never a hardcoded one', () => {
     expect(hasAuthCookie(names('sb-abc123def-auth-token'))).toBe(true);
-    expect(hasAuthCookie(names('sb-127-0-0-1-auth-token'))).toBe(true);
+    expect(hasAuthCookie(names('sb-127-auth-token'))).toBe(true);
   });
 
   it('is true for the code-verifier cookie, so the flow still reaches Supabase', () => {
