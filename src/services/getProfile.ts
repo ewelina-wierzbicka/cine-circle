@@ -5,10 +5,11 @@ import { UserProfile } from '@/types';
 import { cache } from 'react';
 
 export const getProfile = cache(async (): Promise<UserProfile | null> => {
-  const supabase = await createClient();
   const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('profiles')
