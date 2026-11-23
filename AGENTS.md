@@ -464,6 +464,17 @@ Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails`
 
 - They normalize `runtime` (movies use `runtime`, series fall back to `episode_run_time[0]` then `last_episode_to_air.runtime`), `vote_average` and `vote_count` onto `NormalizedMedia`. `getSeriesDetails` also passes through the TMDB scalars `number_of_seasons` and `number_of_episodes` — never `seasons.length`, which counts the Specials entry. Search results never carry them.
 
+#### TMDB content terms
+
+Four constraints from the [API terms](https://www.themoviedb.org/api-terms-of-use) and [logo attribution](https://www.themoviedb.org/about/logos-attribution) rules, verified 2026-11-23. The code satisfies all four today — do not drift.
+
+- **Showing the `overview` verbatim is licensed, on condition of attribution**: the exact notice plus the TMDB logo, shipped by `components/TmdbAttribution.tsx` in `Footer` (every route) and `AuthFormLayout`. Removing either breaks the licence, not just the look.
+- **Never paraphrase, rewrite or LLM-summarise an overview.** The terms forbid derivatives of TMDB Content, and forbid training or running ML/AI on it. Truncating for a meta description is excerpting and stays fine.
+- **Never persist `overview` into Supabase.** The terms cap caching of TMDB information at 6 months. `use cache` with `cacheLife('days')` is inside that; a database column is not. The `media` table has no `overview` column — keep it that way.
+- **Posters stay on TMDB's CDN.** The terms forbid using TMDB as an image host for our own assets, and re-hosting posters in Supabase Storage would be an uncapped cache. `lib/imageLoader.ts` pointing at `image.tmdb.org` is the compliant path.
+
+Commercial use (ads, paid tiers) needs a separate written TMDB agreement, so monetisation is a licence question before it is a product one.
+
 **User-specific Supabase data must stream via Suspense** — it cannot live inside `use cache` (cookies/headers are forbidden there). Lift the cached fetch into the parent Server Component, then wrap the user-enriched subtree in `<Suspense>`:
 
 ```tsx
