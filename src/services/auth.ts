@@ -1,5 +1,7 @@
 'use server';
 
+import { isRateLimited, reportAuthFailure } from '@/lib/authFailureAlert';
+import { captureSecurityEvent } from '@/lib/captureSecurityEvent';
 import { safeRedirectPath } from '@/lib/safeRedirectPath';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
@@ -11,6 +13,8 @@ export async function login(email: string, password: string, rurl?: string) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (isRateLimited(error)) captureSecurityEvent('auth.rate_limited');
+    else await reportAuthFailure();
     return { error: error.message };
   }
 
@@ -64,6 +68,7 @@ export async function register(email: string, password: string) {
   });
 
   if (error) {
+    if (isRateLimited(error)) captureSecurityEvent('auth.rate_limited');
     return { error: error.message };
   }
 
@@ -90,6 +95,8 @@ export async function sendPasswordReset(
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/api/auth/reset-callback`,
   });
+
+  if (error && isRateLimited(error)) captureSecurityEvent('auth.rate_limited');
 
   // ponytail: treat user-not-found as success to prevent account enumeration
   if (error && !error.message.toLowerCase().includes('user not found')) {
