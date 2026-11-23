@@ -505,6 +505,8 @@ return (
 
 **`services/getCurrentUser.ts` is the only server-side `auth.getUser()` call site.** It is wrapped in React `cache`, so every server component, service and server action in one request shares a single round trip. Use it for every server-side authentication check — never call `supabase.auth.getUser()` directly. Two exceptions: `proxy.ts` runs its own client outside React, and client components (`ProfileContent`, `hooks/useUserMedia`) use the browser client, where `cache` does not apply.
 
+- It returns `null` with no network call when `hasAuthCookie` (`lib/supabase/authCookie.ts`) finds no `sb-*-auth-token` cookie: absence proves signed out, so an anonymous view pays no Supabase round trip. A present but expired cookie still goes to Supabase — only absence short circuits.
+
 - `(app)/page.tsx` — `getTrendingMovies()` awaited directly; `RecentWatched` streams via `<Suspense fallback={null}>`.
 - `components/MediaPage.tsx` — TMDB cached fetch awaited directly and rendered **once**, outside every boundary, by `MediaDetail` → `MediaInfoHeader`. Two server-rendered `<Suspense>` subtrees are handed to `MediaDetail` as the `actions` and `form` props: `UserEnrichedActions` → `MediaActions` (step 1) and `UserEnrichedForm` → `MediaEntryForm` (step 2). Both call `getEnrichedMedia`, which is wrapped in React `cache`, so they share one Supabase round trip.
 
