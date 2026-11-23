@@ -33,7 +33,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   `img-src ${sources("'self'", 'data:', 'blob:', 'https://image.tmdb.org', 'https://*.supabase.co', supabaseOrigin)}`,
   "font-src 'self'",
-  `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com')}`,
+  `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com', 'https://*.sentry.io')}`,
   // Covered by default-src already, but Safari has historically needed it named.
   "manifest-src 'self'",
   "frame-ancestors 'none'",
