@@ -26,11 +26,11 @@ const linkedUrls = (text: string) =>
   [...text.matchAll(/\]\((https?:\/\/[^)\s]+)\)/g)].map((m) => new URL(m[1]));
 
 describe('/llms-full.txt', () => {
-  it('lists no page that robots.ts disallows', async () => {
+  it('lists no page that robots.txt disallows', async () => {
     const urls = linkedUrls(await body());
     expect(urls.length).toBeGreaterThan(0);
     for (const url of urls) {
-      expect(isDisallowed(url.pathname), url.pathname).toBe(false);
+      expect(await isDisallowed(url.pathname), url.pathname).toBe(false);
     }
   });
 

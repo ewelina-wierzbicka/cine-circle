@@ -23,10 +23,10 @@ need no account.
 Individual titles live at \`/movie/<id>-<slug>\` and \`/series/<id>-<slug>\`,
 where \`<id>\` is the TMDB id. The slug is cosmetic; any other slug for the same
 id redirects to the canonical URL. Each page carries the poster, synopsis, genres,
-director or creator, release date, runtime, TMDB score and related titles. Each
-page also lists where the title can be streamed, rented or bought in the viewer's
-region, with a link out to each provider; that data comes from JustWatch via
-TMDB. There is no cast list.
+director or creator, release date, runtime, TMDB score and related titles. There
+is no cast list. Each page also lists where the title can be streamed, rented or
+bought, from JustWatch via TMDB and resolved per visitor from their region, so a
+crawler sees one region's view only, most often the US.
 
 ## Optional
 
