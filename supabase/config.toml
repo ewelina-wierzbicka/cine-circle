@@ -185,19 +185,32 @@ password_requirements = ""
 # rp_origins = ["http://127.0.0.1:3000"]
 
 [auth.rate_limit]
+# Every "per IP address" limit below keys on the IP that connects to GoTrue. login,
+# register and sendPasswordReset are server actions, so that is the Vercel egress IP,
+# shared by every visitor. Each raised value is deliberately above the CLI default:
+# at the default one attacker exhausts the pooled bucket and locks out the whole app.
+# Per-IP limits are not the control here. See AGENTS.md, Auth rate limits.
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+# Raised from 2. Per project, not per IP, so this one binds. Resend free tier is
+# 100 emails/day, which is the hard backstop behind this number.
+email_sent = 10
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
+# Inert: [auth.sms] is disabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
+# Inert: enable_anonymous_sign_ins = false.
 anonymous_users = 30
 # Number of sessions that can be refreshed in a 5 minute interval per IP address.
-token_refresh = 150
+# Raised from 150. proxy.ts refreshes from the pooled egress IP on every request.
+token_refresh = 1500
 # Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
-sign_in_sign_ups = 30
+# Raised from 30, which is 6 sign-ins per minute for the entire app.
+sign_in_sign_ups = 300
 # Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
-token_verifications = 30
+# Raised from 30. The confirm and reset callbacks exchange codes server-side.
+token_verifications = 300
 # Number of Web3 logins that can be made in a 5 minute interval per IP address.
+# Inert: no web3 provider.
 web3 = 30
 
 # Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
@@ -218,6 +231,9 @@ enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
+# Local only. Production keeps the Supabase default of 60s. This limit keys on the
+# user, not the IP, so it is one of the few that actually binds for this app. The e2e
+# suite sends several emails per user inside a run, so 1s locally is deliberate.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6

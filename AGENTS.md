@@ -272,6 +272,16 @@ export const colors = {
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
 - **Supabase CLI 3.x is required.** `supabase/config.toml` uses `[local_smtp]`, the section that replaced `[inbucket]` in v3. CLI 2.x rejects `local_smtp` and 3.x rejects `inbucket`, so the two cannot coexist — `supabase start` fails on the wrong major. Both workflows pin `supabase/setup-cli` to `3.0.0`; `version: latest` is what broke CI when v3 shipped. Upgrade locally with `brew upgrade supabase`.
 
+### Auth rate limits
+
+**Per-IP auth rate limits are not an effective control for this app.** `login`, `register` and `sendPasswordReset` are server actions in `services/auth.ts` on the server client, so GoTrue sees the Vercel egress IP, not the visitor. Supabase Auth keys those limits on the connecting IP; the only override is the `Sb-Forwarded-For` header, which must be enabled per project and requires a **secret** API key (publishable and legacy `anon`/`service_role` keys are rejected). The SSR cookie client sends the anon key, so the app cannot use it. Every per-IP limit is therefore one pooled app-wide bucket, and a low value lets one attacker lock out every user. Verified against the Supabase Auth rate-limit docs, 2026-11-23. **Move this block to `docs/SECURITY.md` when that file lands.**
+
+- Recommended production dashboard values (Authentication > Rate Limits), matching `[auth.rate_limit]` in `config.toml`: sign-ups/sign-ins **300**/5min, token verifications **300**/5min, token refresh **1500**/5min, emails **10**/hour. Not applied yet, board sign-off pending.
+- Raising them is the point, not a weakening. They are capacity guards for a shared bucket, not a security boundary.
+- The limits that do bind: `email_sent` (per project, caps the Resend spend; free tier is 100/day and fails closed) and the 60s `max_frequency` per user on confirmation and reset emails. Keep both.
+- The real controls see the browser IP, not ours: a captcha on `/login` and `/register` (`[auth.captcha]`, hCaptcha or Turnstile) or Vercel Firewall rate limiting. Neither is in place. Each is its own task.
+- Do not lower `sign_in_sign_ups` to "harden" login. That is a self-inflicted outage.
+
 ### Schema
 
 | Table              | Key columns                                                   | Notes                                                                                                                |
