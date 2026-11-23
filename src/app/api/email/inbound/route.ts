@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from 'crypto';
+import * as Sentry from '@sentry/nextjs';
 import { type NextRequest, NextResponse } from 'next/server';
 
 interface ResendInboundEmail {
@@ -46,32 +47,45 @@ function verifySignature(
 
 export async function POST(request: NextRequest) {
   const secret = process.env.RESEND_WEBHOOK_SECRET;
+
+  if (!secret) {
+    console.error(
+      'RESEND_WEBHOOK_SECRET is not set — rejecting inbound email webhook',
+    );
+    Sentry.captureMessage('inbound-webhook-secret-missing', {
+      level: 'warning',
+      tags: { security: true },
+    });
+    return NextResponse.json(
+      { error: 'Webhook verification unavailable' },
+      { status: 500 },
+    );
+  }
+
+  const svixId = request.headers.get('svix-id') ?? '';
+  const svixTimestamp = request.headers.get('svix-timestamp') ?? '';
+  const svixSignature = request.headers.get('svix-signature') ?? '';
+
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    return NextResponse.json(
+      { error: 'Missing signature headers' },
+      { status: 400 },
+    );
+  }
+
+  const timestampMs = Number(svixTimestamp) * 1000;
+  const fiveMinutes = 5 * 60 * 1000;
+  if (Math.abs(Date.now() - timestampMs) > fiveMinutes) {
+    return NextResponse.json(
+      { error: 'Timestamp out of range' },
+      { status: 400 },
+    );
+  }
+
   const body = await request.text();
 
-  if (secret) {
-    const svixId = request.headers.get('svix-id') ?? '';
-    const svixTimestamp = request.headers.get('svix-timestamp') ?? '';
-    const svixSignature = request.headers.get('svix-signature') ?? '';
-
-    if (!svixId || !svixTimestamp || !svixSignature) {
-      return NextResponse.json(
-        { error: 'Missing signature headers' },
-        { status: 400 },
-      );
-    }
-
-    const timestampMs = Number(svixTimestamp) * 1000;
-    const fiveMinutes = 5 * 60 * 1000;
-    if (Math.abs(Date.now() - timestampMs) > fiveMinutes) {
-      return NextResponse.json(
-        { error: 'Timestamp out of range' },
-        { status: 400 },
-      );
-    }
-
-    if (!verifySignature(secret, svixId, svixTimestamp, body, svixSignature)) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
+  if (!verifySignature(secret, svixId, svixTimestamp, body, svixSignature)) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   let payload: ResendInboundPayload;

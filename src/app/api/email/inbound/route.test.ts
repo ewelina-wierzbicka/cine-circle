@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { createHmac } from 'node:crypto';
+import * as Sentry from '@sentry/nextjs';
 import type { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from '@/app/api/email/inbound/route';
@@ -8,6 +9,8 @@ const SECRET = 'whsec_c2VjcmV0LWtleS1ieXRlcw==';
 const SVIX_ID = 'msg_1';
 
 const fetchMock = vi.fn<typeof fetch>();
+
+vi.mock('@sentry/nextjs', () => ({ captureMessage: vi.fn() }));
 
 const payload = {
   type: 'email.received',
@@ -29,9 +32,10 @@ function sign(body: string, timestamp: string, secret = SECRET) {
   return `v1,${mac}`;
 }
 
+/** Headers default to a valid signature, so each test opts out explicitly. */
 function post(
   body: unknown,
-  headers: Record<string, string> = {},
+  headers: Record<string, string> = signedHeaders(body),
 ): Promise<Response> {
   const text = typeof body === 'string' ? body : JSON.stringify(body);
   return POST(
@@ -57,9 +61,11 @@ function signedHeaders(body: unknown, offsetMs = 0) {
 beforeEach(() => {
   fetchMock.mockResolvedValue(Response.json({ text: 'body text' }));
   vi.stubGlobal('fetch', fetchMock);
+  vi.stubEnv('RESEND_WEBHOOK_SECRET', SECRET);
 });
 
 afterEach(() => {
+  vi.mocked(Sentry.captureMessage).mockReset();
   fetchMock.mockReset();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
@@ -76,7 +82,6 @@ const sentBody = () =>
 describe('POST /api/email/inbound', () => {
   describe('signature verification', () => {
     beforeEach(() => {
-      vi.stubEnv('RESEND_WEBHOOK_SECRET', SECRET);
       vi.stubEnv('RESEND_NOTIFICATION_EMAIL', '');
       vi.stubEnv('RESEND_API_KEY', '');
     });
@@ -184,21 +189,33 @@ describe('POST /api/email/inbound', () => {
     });
   });
 
-  // Known gap, asserted so a fix is a deliberate change: with no secret
-  // configured the handler forwards unverified mail.
-  it('skips verification entirely with no secret configured', async () => {
-    vi.stubEnv('RESEND_WEBHOOK_SECRET', '');
+  // The route sits outside the proxy matcher, so an unverified POST would be
+  // an open relay on our Resend quota. It has to fail closed.
+  it.each([
+    ['unset', undefined],
+    ['empty', ''],
+  ])('500s and sends nothing with the secret %s', async (_, value) => {
+    vi.stubEnv('RESEND_WEBHOOK_SECRET', value);
     vi.stubEnv('RESEND_NOTIFICATION_EMAIL', 'owner@example.com');
     vi.stubEnv('RESEND_API_KEY', 'key');
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const response = await post(payload);
 
-    expect(response.status).toBe(200);
-    expect(sendCalls()).toHaveLength(1);
+    expect(response.status).toBe(500);
+    await expect(response.json()).resolves.toEqual({
+      error: 'Webhook verification unavailable',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(Sentry.captureMessage).toHaveBeenCalledWith(
+      'inbound-webhook-secret-missing',
+      expect.objectContaining({ tags: { security: true } }),
+    );
+    error.mockRestore();
   });
 
   it('400s on a body that is not JSON', async () => {
-    vi.stubEnv('RESEND_WEBHOOK_SECRET', '');
     const response = await post('not json');
 
     expect(response.status).toBe(400);
@@ -206,7 +223,6 @@ describe('POST /api/email/inbound', () => {
   });
 
   it('ignores an event that is not email.received', async () => {
-    vi.stubEnv('RESEND_WEBHOOK_SECRET', '');
     vi.stubEnv('RESEND_NOTIFICATION_EMAIL', 'owner@example.com');
     vi.stubEnv('RESEND_API_KEY', 'key');
 
@@ -218,7 +234,6 @@ describe('POST /api/email/inbound', () => {
 
   describe('forwarding', () => {
     beforeEach(() => {
-      vi.stubEnv('RESEND_WEBHOOK_SECRET', '');
       vi.stubEnv('RESEND_NOTIFICATION_EMAIL', 'owner@example.com');
       vi.stubEnv('RESEND_API_KEY', 'key');
     });

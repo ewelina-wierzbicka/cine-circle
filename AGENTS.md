@@ -126,7 +126,7 @@ src/
           route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
       email/
         inbound/
-          route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails
+          route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails. Fails closed: a missing or empty secret 500s before any parse or Resend call, so it can never relay unverified mail
     layout.tsx                # root layout
     not-found.tsx             # root 404 — same <NotFoundState />, full-screen wrapper; renders for URLs that match no route at all
     sitemap.ts                # /sitemap.xml — open routes + trending and popular media (~86 URLs)
