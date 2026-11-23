@@ -35,9 +35,9 @@ async function sitemapUrls() {
 }
 
 describe('sitemap', () => {
-  it('lists no path that robots.ts disallows', async () => {
+  it('lists no path that robots.txt disallows', async () => {
     for (const url of await sitemapUrls()) {
-      expect(isDisallowed(url.pathname), url.pathname).toBe(false);
+      expect(await isDisallowed(url.pathname), url.pathname).toBe(false);
     }
   });
 
