@@ -22,10 +22,15 @@ import { SENTRY_CSP_REPORT_URL } from './src/lib/sentryDsn';
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
 // - *.sentry.io: error reports from the browser Sentry SDK.
+// - *.vercel.app in manifest-src, preview deployments only: Next marks the
+//   manifest link use-credentials there, and the request can come from a
+//   sibling preview host (alias vs deployment URL).
 
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
   : '';
+
+const isVercelPreview = process.env.VERCEL_ENV === 'preview';
 
 const sources = (...values: string[]) => values.filter(Boolean).join(' ');
 
@@ -37,7 +42,7 @@ const contentSecurityPolicy = [
   "font-src 'self'",
   `connect-src ${sources("'self'", 'https://*.supabase.co', supabaseOrigin, 'https://api.themoviedb.org', 'https://va.vercel-scripts.com', 'https://*.sentry.io')}`,
   // Covered by default-src already, but Safari has historically needed it named.
-  "manifest-src 'self'",
+  `manifest-src ${sources("'self'", isVercelPreview ? 'https://*.vercel.app' : '')}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
