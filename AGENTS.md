@@ -125,7 +125,7 @@ src/
           route.ts            # GET — exchanges the Google PKCE code for a session, redirects to the sanitised `rurl` or `/`; no code or exchange failure → /login?error=oauth_failed
       cron/
         keep-alive/
-          route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, runs one head-only `profiles` count so the Supabase free project never pauses
+          route.ts            # GET — daily Vercel cron ping; requires `Bearer $CRON_SECRET`, compared with `timingSafeEqual` behind a length guard, runs one head-only `profiles` count so the Supabase free project never pauses. A failed ping answers `{ ok: false }` only; the Postgres message is logged server-side
       email/
         inbound/
           route.ts            # POST — Resend inbound email webhook; verifies svix signature (RESEND_WEBHOOK_SECRET), logs received emails. Fails closed: a missing or empty secret 500s before any parse or Resend call, so it can never relay unverified mail

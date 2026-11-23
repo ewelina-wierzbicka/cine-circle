@@ -46,6 +46,9 @@ describe('GET /api/cron/keep-alive', () => {
     ['no header', undefined],
     ['a wrong secret', 'Bearer nope'],
     ['the bare secret', 'secret'],
+    ['a same-length wrong secret', 'Bearer secres'],
+    ['a longer header', 'Bearer secret-extra'],
+    ['a shorter header', 'Bearer secre'],
   ])('401s on %s', async (_, authorization) => {
     vi.stubEnv('CRON_SECRET', 'secret');
     const response = await GET(request(authorization));
@@ -73,7 +76,7 @@ describe('GET /api/cron/keep-alive', () => {
     expect(captureSecurityEvent).not.toHaveBeenCalled();
   });
 
-  it('500s with the message when the ping fails', async () => {
+  it('500s without the Postgres message when the ping fails', async () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.stubEnv('CRON_SECRET', 'secret');
     admin.respond('profiles', { error: { message: 'db down' } });
@@ -81,11 +84,8 @@ describe('GET /api/cron/keep-alive', () => {
     const response = await GET(request('Bearer secret'));
 
     expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({
-      ok: false,
-      error: 'db down',
-    });
-    expect(error).toHaveBeenCalled();
+    await expect(response.json()).resolves.toEqual({ ok: false });
+    expect(error).toHaveBeenCalledWith('[keep-alive ping failed]', 'db down');
     error.mockRestore();
   });
 });
