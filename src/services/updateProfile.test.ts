@@ -47,6 +47,32 @@ describe('updateAvatarPath', () => {
     );
   });
 
+  it.each([
+    ['another user folder', 'user-2/avatar.webp'],
+    ['no folder', 'avatar.webp'],
+    ['a nested path', 'user-1/nested/avatar.webp'],
+    ['a traversal segment', 'user-1/..'],
+    ['an absolute URL', 'http://evil.com/track.png'],
+    ['a prefix collision', 'user-10/avatar.webp'],
+    ['an over-long filename', `user-1/${'a'.repeat(129)}.webp`],
+    ['an empty string', ''],
+  ])('rejects %s before touching the profile row', async (_label, path) => {
+    await expect(updateAvatarPath(path)).rejects.toThrow('Invalid avatar path.');
+    expect(supabase.chains('profiles')).toEqual([]);
+    expect(supabase.chains('storage:avatar')).toEqual([]);
+  });
+
+  it('accepts a path inside the user folder', async () => {
+    supabase.respond('profiles', { data: { avatar_url: null } });
+    supabase.respond('storage:avatar', {
+      data: { signedUrl: 'https://signed/ok' },
+    });
+
+    await expect(updateAvatarPath('user-1/avatar.webp')).resolves.toEqual({
+      avatarUrl: 'https://signed/ok',
+    });
+  });
+
   it('removes the previous object when the path changed', async () => {
     supabase.respond('profiles', { data: { avatar_url: 'user-1/old.webp' } });
     supabase.respond(
