@@ -143,9 +143,45 @@ describe('mediaJsonLd', () => {
       mediaJsonLd(series, 'series'),
       mediaJsonLd(sparse, 'movie'),
       mediaJsonLd({ ...sparse, media_type: 'series' }, 'series'),
+      mediaJsonLd(sparse, 'movie', { wikidataId: null, imdbId: null }),
     ]) {
       expect(emptyValues(payload)).toEqual([]);
     }
+  });
+
+  it('lists only the TMDB page when there are no external ids', async () => {
+    const { mediaJsonLd } = await loadJsonLd();
+    const tmdbPage = 'https://www.themoviedb.org/movie/550';
+
+    expect(mediaJsonLd(movie, 'movie').sameAs).toEqual([tmdbPage]);
+    expect(
+      mediaJsonLd(movie, 'movie', { wikidataId: null, imdbId: null }).sameAs,
+    ).toEqual([tmdbPage]);
+  });
+
+  it('lists TMDB, Wikidata and IMDb in that order', async () => {
+    const { mediaJsonLd } = await loadJsonLd();
+    expect(
+      mediaJsonLd(series, 'series', {
+        wikidataId: 'Q23572',
+        imdbId: 'tt0944947',
+      }).sameAs,
+    ).toEqual([
+      'https://www.themoviedb.org/tv/1399',
+      'https://www.wikidata.org/wiki/Q23572',
+      'https://www.imdb.com/title/tt0944947/',
+    ]);
+  });
+
+  it('keeps the present id when the other one is missing', async () => {
+    const { mediaJsonLd } = await loadJsonLd();
+    expect(
+      mediaJsonLd(movie, 'movie', { wikidataId: null, imdbId: 'tt0137523' })
+        .sameAs,
+    ).toEqual([
+      'https://www.themoviedb.org/movie/550',
+      'https://www.imdb.com/title/tt0137523/',
+    ]);
   });
 
   it('uses the w780 social poster for the image', async () => {

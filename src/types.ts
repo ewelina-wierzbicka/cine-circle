@@ -65,6 +65,11 @@ export type RegionWatchProviders = {
   free?: WatchProvider[];
 };
 
+export type MediaExternalIds = {
+  wikidataId: string | null;
+  imdbId: string | null;
+};
+
 export type RecommendedMedia = {
   id: number;
   title: string;
