@@ -402,6 +402,8 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
 
 Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they cover pages, route handlers and the metadata routes alike. `proxy.ts` excludes `sitemap.xml`, `robots.txt`, `llms.txt` and `manifest.webmanifest` from auth, but `headers()` still applies to them.
 
+`src/lib/securityHeaders.test.ts` locks the contract: it awaits `headers()` off the real config and asserts the five non-CSP headers, the `/:path*` source and every CSP directive the app depends on. Alert channels, the settings that must stay on and the first response for each alert: `docs/SECURITY.md`; disclosure policy for reporters: `SECURITY.md`.
+
 | Header                      | Value                                                          | Why                                     |
 | --------------------------- | -------------------------------------------------------------- | --------------------------------------- |
 | `X-Content-Type-Options`    | `nosniff`                                                      | Stops MIME sniffing of responses        |
