@@ -1,7 +1,17 @@
 // @vitest-environment node
 import { NextRequest } from 'next/server';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/auth/confirm-callback/route';
+
+const captureSecurityEvent = vi.fn<(event: string) => void>();
+
+vi.mock('@/lib/captureSecurityEvent', () => ({
+  captureSecurityEvent: (event: string) => captureSecurityEvent(event),
+}));
+
+afterEach(() => {
+  captureSecurityEvent.mockClear();
+});
 
 const get = (query: string) =>
   GET(
@@ -23,6 +33,7 @@ describe('GET /api/auth/confirm-callback', () => {
     const location = locationOf(response);
     expect(location.pathname).toBe('/registration-confirmed');
     expect(location.search).toBe('');
+    expect(captureSecurityEvent).not.toHaveBeenCalled();
   });
 
   it('sends a missing code to the login toast', async () => {
@@ -30,5 +41,8 @@ describe('GET /api/auth/confirm-callback', () => {
 
     expect(location.pathname).toBe('/login');
     expect(location.searchParams.get('error')).toBe('confirm_failed');
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'auth.confirm_callback_missing_code',
+    );
   });
 });

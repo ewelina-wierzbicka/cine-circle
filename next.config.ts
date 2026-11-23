@@ -1,6 +1,8 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
+import { SENTRY_CSP_REPORT_URL } from './src/lib/sentryDsn';
+
 // The list below says which servers the browser may load things from.
 //
 // The browser blocks anything not listed here. Adding a new
@@ -40,6 +42,11 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "object-src 'none'",
+  // The policy stays enforcing. These two only add reporting: report-uri for
+  // the browsers that still read it, report-to for the Reporting API, whose
+  // endpoint name is defined by the Reporting-Endpoints header below.
+  `report-uri ${SENTRY_CSP_REPORT_URL}`,
+  'report-to csp-endpoint',
 ].join('; ');
 
 const securityHeaders = [
@@ -55,6 +62,10 @@ const securityHeaders = [
     value: 'max-age=63072000; includeSubDomains; preload',
   },
   { key: 'Content-Security-Policy', value: contentSecurityPolicy },
+  {
+    key: 'Reporting-Endpoints',
+    value: `csp-endpoint="${SENTRY_CSP_REPORT_URL}"`,
+  },
 ];
 
 const nextConfig: NextConfig = {

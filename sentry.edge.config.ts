@@ -5,8 +5,10 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { SENTRY_DSN } from './src/lib/sentryDsn';
+
 Sentry.init({
-  dsn: 'https://8e42c9d3b534149a525215f387ba65f6@o4512091748106240.ingest.de.sentry.io/4512112781819984',
+  dsn: SENTRY_DSN,
 
   dataCollection: {
     // To disable sending user data and HTTP bodies, uncomment the lines below. For more info visit:

@@ -7,6 +7,8 @@ const exchangeCodeForSession = vi.fn<
   (code: string) => Promise<{ error?: unknown }>
 >(async () => ({ error: null }));
 
+const captureSecurityEvent = vi.fn<(event: string) => void>();
+
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
     auth: {
@@ -15,8 +17,13 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }));
 
+vi.mock('@/lib/captureSecurityEvent', () => ({
+  captureSecurityEvent: (event: string) => captureSecurityEvent(event),
+}));
+
 afterEach(() => {
   exchangeCodeForSession.mockClear();
+  captureSecurityEvent.mockClear();
 });
 
 const get = (query: string) =>
@@ -35,6 +42,7 @@ describe('GET /api/auth/oauth-callback', () => {
 
     expect(exchangeCodeForSession).toHaveBeenCalledWith('abc');
     expect(location.pathname).toBe('/');
+    expect(captureSecurityEvent).not.toHaveBeenCalled();
   });
 
   it('sends a missing code to the login toast without an exchange', async () => {
@@ -43,6 +51,9 @@ describe('GET /api/auth/oauth-callback', () => {
     expect(exchangeCodeForSession).not.toHaveBeenCalled();
     expect(location.pathname).toBe('/login');
     expect(location.searchParams.get('error')).toBe('oauth_failed');
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'auth.oauth_callback_missing_code',
+    );
   });
 
   it('sends a failed exchange to the login toast', async () => {
@@ -53,6 +64,9 @@ describe('GET /api/auth/oauth-callback', () => {
 
     expect(location.pathname).toBe('/login');
     expect(location.searchParams.get('error')).toBe('oauth_failed');
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'auth.oauth_callback_exchange_failed',
+    );
   });
 
   it('honours a same-site rurl', async () => {

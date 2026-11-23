@@ -5,13 +5,19 @@ import { GET } from '@/app/api/cron/keep-alive/route';
 import { argsOf, createSupabaseMock } from '@/test/supabaseMock';
 
 const admin = createSupabaseMock();
+const captureSecurityEvent = vi.fn<(event: string) => void>();
 
 vi.mock('@/lib/supabase/admin', () => ({
   adminSupabase: { from: (table: string) => admin.client.from(table) },
 }));
 
+vi.mock('@/lib/captureSecurityEvent', () => ({
+  captureSecurityEvent: (event: string) => captureSecurityEvent(event),
+}));
+
 afterEach(() => {
   admin.reset();
+  captureSecurityEvent.mockClear();
   vi.unstubAllEnvs();
 });
 
@@ -31,6 +37,9 @@ describe('GET /api/cron/keep-alive', () => {
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ ok: false });
     expect(admin.chains('profiles')).toEqual([]);
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'cron.keep_alive_unauthorized',
+    );
   });
 
   it.each([
@@ -43,6 +52,9 @@ describe('GET /api/cron/keep-alive', () => {
 
     expect(response.status).toBe(401);
     expect(admin.chains('profiles')).toEqual([]);
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'cron.keep_alive_unauthorized',
+    );
   });
 
   it('pings profiles head-only on a valid secret', async () => {
@@ -58,6 +70,7 @@ describe('GET /api/cron/keep-alive', () => {
       'id',
       { head: true, count: 'exact' },
     ]);
+    expect(captureSecurityEvent).not.toHaveBeenCalled();
   });
 
   it('500s with the message when the ping fails', async () => {

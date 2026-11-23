@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto';
-import * as Sentry from '@sentry/nextjs';
 import { type NextRequest, NextResponse } from 'next/server';
+
+import { captureSecurityEvent } from '@/lib/captureSecurityEvent';
 
 interface ResendInboundEmail {
   email_id: string;
@@ -52,10 +53,7 @@ export async function POST(request: NextRequest) {
     console.error(
       'RESEND_WEBHOOK_SECRET is not set — rejecting inbound email webhook',
     );
-    Sentry.captureMessage('inbound-webhook-secret-missing', {
-      level: 'warning',
-      tags: { security: true },
-    });
+    captureSecurityEvent('email.inbound_missing_secret');
     return NextResponse.json(
       { error: 'Webhook verification unavailable' },
       { status: 500 },
@@ -67,6 +65,7 @@ export async function POST(request: NextRequest) {
   const svixSignature = request.headers.get('svix-signature') ?? '';
 
   if (!svixId || !svixTimestamp || !svixSignature) {
+    captureSecurityEvent('email.inbound_missing_signature_headers');
     return NextResponse.json(
       { error: 'Missing signature headers' },
       { status: 400 },
@@ -76,6 +75,7 @@ export async function POST(request: NextRequest) {
   const timestampMs = Number(svixTimestamp) * 1000;
   const fiveMinutes = 5 * 60 * 1000;
   if (Math.abs(Date.now() - timestampMs) > fiveMinutes) {
+    captureSecurityEvent('email.inbound_timestamp_out_of_range');
     return NextResponse.json(
       { error: 'Timestamp out of range' },
       { status: 400 },
@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
   const body = await request.text();
 
   if (!verifySignature(secret, svixId, svixTimestamp, body, svixSignature)) {
+    captureSecurityEvent('email.inbound_invalid_signature');
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
