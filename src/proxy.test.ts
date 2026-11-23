@@ -3,8 +3,43 @@
 // import.meta.url to an http URL that fileURLToPath rejects.
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
-import { isKnownRoute, parseMediaRoute } from '@/proxy';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { NextRequest } from 'next/server';
+import proxy, { isKnownRoute, parseMediaRoute } from '@/proxy';
+import type { ResolvedMedia } from '@/services/resolveMedia';
+
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+};
+
+const resolveMedia = vi.fn<(mediaType: string, id: string) => ResolvedMedia>();
+// Cookies Supabase refreshes mid-request; the 404 and 308 paths must carry them.
+let refreshedCookies: CookieToSet[] = [];
+
+vi.mock('@/services/resolveMedia', () => ({
+  resolveMedia: (mediaType: string, id: string) => resolveMedia(mediaType, id),
+}));
+
+vi.mock('@supabase/ssr', () => ({
+  createServerClient: (
+    _url: string,
+    _anonKey: string,
+    options: { cookies: { setAll: (cookies: CookieToSet[]) => void } },
+  ) => ({
+    auth: {
+      getUser: async () => {
+        if (refreshedCookies.length) options.cookies.setAll(refreshedCookies);
+        return { data: { user: null } };
+      },
+    },
+  }),
+}));
+
+function mediaRequest(path: string, headers: Record<string, string> = {}) {
+  return new NextRequest(new URL(path, 'http://localhost:3000'), { headers });
+}
 
 describe('isKnownRoute', () => {
   it.each([
@@ -125,5 +160,91 @@ describe('route registration', () => {
 
   it.each(pageRoutes())('registers %s as a known route', (route) => {
     expect(isKnownRoute(route)).toBe(true);
+  });
+});
+
+describe('media route responses', () => {
+  beforeEach(() => {
+    resolveMedia.mockReset();
+    refreshedCookies = [];
+  });
+
+  it('rewrites an unknown id to the not-found route, marked noindex', async () => {
+    resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
+
+    const response = await proxy(mediaRequest('/movie/999999999'));
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'http://localhost:3000/_not-found',
+    );
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
+  });
+
+  it('marks a non-numeric slug noindex without asking TMDB', async () => {
+    const response = await proxy(mediaRequest('/movie/abc'));
+
+    expect(resolveMedia).not.toHaveBeenCalled();
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'http://localhost:3000/_not-found',
+    );
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
+  });
+
+  it('carries a refreshed session cookie on the not-found response', async () => {
+    resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
+    refreshedCookies = [{ name: 'sb-access-token', value: 'refreshed' }];
+
+    const response = await proxy(mediaRequest('/series/999999999'));
+
+    expect(response.cookies.get('sb-access-token')?.value).toBe('refreshed');
+  });
+
+  it('redirects a mis-slugged URL to the canonical path, query intact', async () => {
+    resolveMedia.mockReturnValue({
+      exists: true,
+      id: 550,
+      title: 'Fight Club',
+    });
+
+    const response = await proxy(mediaRequest('/movie/550-wrong?tab=watched'));
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe(
+      'http://localhost:3000/movie/550-fight-club?tab=watched',
+    );
+    expect(response.headers.get('x-robots-tag')).toBeNull();
+  });
+
+  it('leaves the canonical slug alone', async () => {
+    resolveMedia.mockReturnValue({
+      exists: true,
+      id: 550,
+      title: 'Fight Club',
+    });
+
+    const response = await proxy(mediaRequest('/movie/550-fight-club'));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+    expect(response.headers.get('x-robots-tag')).toBeNull();
+  });
+
+  it('passes the request through when TMDB cannot resolve the id', async () => {
+    resolveMedia.mockReturnValue({ exists: true, id: null, title: null });
+
+    const response = await proxy(mediaRequest('/movie/550'));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+    expect(response.headers.get('x-robots-tag')).toBeNull();
+  });
+
+  it('skips the lookup for an RSC navigation', async () => {
+    const response = await proxy(
+      mediaRequest('/movie/999999999', { rsc: '1' }),
+    );
+
+    expect(resolveMedia).not.toHaveBeenCalled();
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
   });
 });
