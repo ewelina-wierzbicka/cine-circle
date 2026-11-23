@@ -21,6 +21,18 @@ interface ResendEmailContent {
   text?: string;
 }
 
+// A non-UUID id would repoint the content fetch, which carries the API key.
+const RESEND_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function verifySignature(
   secret: string,
   svixId: string,
@@ -102,6 +114,11 @@ export async function POST(request: NextRequest) {
 
   const { email_id, from, to, subject } = payload.data;
 
+  if (email_id && !RESEND_ID.test(email_id)) {
+    captureSecurityEvent('email.inbound_invalid_email_id');
+    return NextResponse.json({ error: 'Invalid email_id' }, { status: 400 });
+  }
+
   const notifyTo = process.env.RESEND_NOTIFICATION_EMAIL;
   const apiKey = process.env.RESEND_API_KEY;
   const notifyFrom =
@@ -135,7 +152,7 @@ export async function POST(request: NextRequest) {
         subject: `New email from ${from}: ${subject}`,
         ...(bodyHtml
           ? {
-              html: `<p><strong>From:</strong> ${from}<br><strong>To:</strong> ${to.join(', ')}<br><strong>Subject:</strong> ${subject}</p><hr>${bodyHtml}`,
+              html: `<p><strong>From:</strong> ${escapeHtml(from)}<br><strong>To:</strong> ${escapeHtml(to.join(', '))}<br><strong>Subject:</strong> ${escapeHtml(subject)}</p><hr>${bodyHtml}`,
             }
           : {
               text: `From: ${from}\nTo: ${to.join(', ')}\nSubject: ${subject}\n\n${bodyText ?? '(no body)'}`,

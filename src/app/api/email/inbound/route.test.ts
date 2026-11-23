@@ -6,6 +6,7 @@ import { POST } from '@/app/api/email/inbound/route';
 
 const SECRET = 'whsec_c2VjcmV0LWtleS1ieXRlcw==';
 const SVIX_ID = 'msg_1';
+const EMAIL_ID = '1d1b2d4e-8e2f-4a7b-9c3d-5f6a7b8c9d0e';
 
 const fetchMock = vi.fn<typeof fetch>();
 const captureSecurityEvent = vi.fn<(event: string) => void>();
@@ -18,7 +19,7 @@ const payload = {
   type: 'email.received',
   created_at: '2026-11-21T00:00:00Z',
   data: {
-    email_id: 'email-1',
+    email_id: EMAIL_ID,
     from: 'sender@example.com',
     to: ['hello@midnightframe.app'],
     subject: 'Hi',
@@ -267,7 +268,7 @@ describe('POST /api/email/inbound', () => {
       await post(payload);
 
       expect(String(fetchMock.mock.calls[0][0])).toBe(
-        'https://api.resend.com/emails/receiving/email-1',
+        `https://api.resend.com/emails/receiving/${EMAIL_ID}`,
       );
       const body = sentBody();
       expect(body.html).toContain('<p>Hello</p>');
@@ -310,6 +311,48 @@ describe('POST /api/email/inbound', () => {
       await post(payload);
 
       expect(sentBody().from).toBe('mail@midnightframe.app');
+    });
+
+    // The sender controls these three fields, so raw markup would land in the
+    // operator inbox.
+    it('escapes the sender-controlled fields in the HTML body', async () => {
+      fetchMock.mockResolvedValueOnce(Response.json({ html: '<p>Hi</p>' }));
+      await post({
+        ...payload,
+        data: {
+          ...payload.data,
+          from: 'a&b@example.com',
+          to: ['"quoted"@example.com'],
+          subject: '<script>alert(1)</script>',
+        },
+      });
+
+      const { html } = sentBody();
+      expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+      expect(html).not.toContain('<script>');
+      expect(html).toContain('a&amp;b@example.com');
+      expect(html).toContain('&quot;quoted&quot;@example.com');
+      // The real body is still passed through as HTML.
+      expect(html).toContain('<p>Hi</p>');
+    });
+
+    it.each([
+      ['a traversal', '../../domains'],
+      ['a non-UUID id', 'email-1'],
+    ])('400s on %s email_id and fetches nothing', async (_, id) => {
+      const response = await post({
+        ...payload,
+        data: { ...payload.data, email_id: id },
+      });
+
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toEqual({
+        error: 'Invalid email_id',
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(captureSecurityEvent).toHaveBeenCalledWith(
+        'email.inbound_invalid_email_id',
+      );
     });
 
     it('skips the content fetch with no email_id', async () => {
