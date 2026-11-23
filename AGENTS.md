@@ -133,12 +133,14 @@ src/
     robots.ts                 # /robots.txt — crawler rules and sitemap pointer
     llms.txt/
       route.ts                # GET /llms.txt — plain-text site map for language models; open routes only
+    llms-full.txt/
+      route.ts                # GET /llms-full.txt — full text of the open pages, built from lib/staticPages.ts and lib/homeFaq.ts
     manifest.ts               # /manifest.webmanifest — web app manifest; makes the site installable, no service worker
     opengraph-image.png       # site-wide default OG image, static 1200x630 PNG
     opengraph-image.alt.txt   # alt text for it — becomes og:image:alt / twitter:image:alt
   globals.css
   providers.tsx               # app-wide React context providers
-  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404 and mis-slugged ones a real 308
+  proxy.ts                    # Next.js 16 middleware (formerly middleware.ts) — matcher excludes sitemap.xml, robots.txt, llms.txt, llms-full.txt and manifest.webmanifest; also resolves movie/series ids so unknown ones answer a real 404 and mis-slugged ones a real 308
   types.ts                    # app-wide TypeScript types (NormalizedMedia, SavedMedia, RecommendedMedia, etc.)
   components/                 # shared components (SearchBox, Header, Footer, MediaInfoHeader, AuthErrorState, StaticContentPage, etc.)
   hooks/                      # custom React hooks
@@ -149,7 +151,7 @@ src/
 ```
 
 - Auth is handled in `proxy.ts` (middleware) — unauthenticated users are redirected to `/login` before any page renders. Do not add auth checks in individual pages or layouts.
-- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt`, `manifest.webmanifest` and `opengraph-image` — metadata routes must never be redirected to `/login`, or crawlers cannot fetch them and the install prompt never appears
+- `proxy.ts` is the Next.js 16 middleware file (replaces `middleware.ts`). Its matcher excludes `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`, `manifest.webmanifest` and `opengraph-image` — metadata routes must never be redirected to `/login`, or crawlers cannot fetch them and the install prompt never appears
 - `AUTH_ROUTES` (`/login`, `/register`, `/confirm-email`, `/forgot-password`, `/registration-confirmed`) — logged-in users are redirected away from these to `/`
 - `/reset-password` is not in `AUTH_ROUTES` — it is reached only after the reset-callback exchanges the email-link code for a valid session, so it expects an authenticated user. It receives `error=reset_failed` on the login page (via the `/login?error=reset_failed` redirect) when the callback fails; `LoginForm` surfaces that as a toast.
 - `/registration-confirmed` is an auth route in `AUTH_ROUTES` — Supabase's confirmation link verifies the email at click time, and the confirm-callback redirects there without ever creating a session, so the visitor is logged out; logged-in users hitting it are redirected to `/`. On callback failure, the user lands on `/login?error=confirm_failed`; `LoginForm` surfaces that as a toast.
@@ -330,13 +332,17 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - `dynamicParams` stays default: an unlisted id renders on demand and, on 16.4.6, with a full head. `getStaticMediaParams` swallows a TMDB failure and returns `[]`, so an outage costs prerendering, not the build.
   - The ids are the deduped trending and popular set from `getPopularMediaEntries()`, the same call `sitemap.ts` uses — every URL we advertise is a URL we prerendered. Keep the two on that one function.
   - The page body and JSON-LD still stream, because the pages await `searchParams`. Crawlers get them in the HTML either way. Dropping `searchParams` to pull them into the shell is a separate change.
-- noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. Keep the `robots.ts` `disallow` list in sync with it.
+- noindex list: `(auth)/layout.tsx` (covers every auth route), `/collection`, `/profile`, `/search?query=…`, and unresolvable movie/series slugs. **The `robots.ts` `disallow` list is deliberately different, not out of sync.** It disallows the auth-gated and private paths (`/api/`, the auth routes, `/profile`, `/collection`); `/search?query=…` and unresolvable media slugs are noindex only. A disallowed URL is never fetched, so its `noindex` is never read, and an external link can still get it indexed with no snippet and no way to drop it. Nothing links to a `/search?query=` URL, so there is no crawl-budget case for blocking it either.
 - `sitemap.ts` lists the four open static routes plus trending and popular media, roughly 87 URLs. The media list is `getPopularMediaEntries()` from `services/getStaticMediaParams.ts`, deduped by `${mediaType}-${id}`. Only open routes belong there — never add a path that is in the `robots.ts` `disallow` list.
 - Media URLs are built with `toHref(id, title, mediaType)`, the same call the pages canonicalise with, so no sitemap entry redirects.
 - **`app/llms.txt/route.ts` serves `/llms.txt`**, a plain-text description of the site for language models (`text/plain; charset=utf-8`). The body is a module-level template string built from `SITE_NAME`, `SITE_URL`, `SITE_DESCRIPTION` and `absoluteUrl()` — never hardcode the domain.
   - Same rule as `sitemap.ts`: only open routes may be listed. Never name a path that is in the `robots.ts` `disallow` list. The `## Pages` list is `/`, `/about`, `/search`, `/terms`, `/privacy` — add a new open route here and in `sitemap.ts` together.
   - The handler reads no `cookies()`, `headers()` or Supabase, so it prerenders as static under Cache Components. Keep it that way — no `export const dynamic`.
   - It reaches anonymous crawlers because `llms.txt` is excluded from the `proxy.ts` matcher, not because it is in `KNOWN_ROUTES_EXACT`. Adding it there instead would make it a private route and redirect signed-out visitors to `/login`.
+- **`app/llms-full.txt/route.ts` serves `/llms-full.txt`**, the llmstxt.org companion to `llms.txt`: the full text of the open pages in one plain-text file. Same handler shape and same constraints as `llms.txt` above, and it is linked from the `## Optional` block there.
+  - **Never retype copy into it.** The sections come from `ABOUT_PAGE`, `TERMS_PAGE` and `PRIVACY_PAGE` in `lib/staticPages.ts`, the FAQ from `HOME_FAQ` in `lib/homeFaq.ts`, the same consts the pages render. The route only adds headings and `absoluteUrl()` source links.
+  - `llms-full.txt` needs its own alternative in the `proxy.ts` matcher: the `llms.txt` one does not match it. Do **not** add it to `KNOWN_ROUTES_EXACT`.
+  - It is in neither `sitemap.ts` nor the `robots.ts` rules, same as `llms.txt`.
 - `lastModified` never comes from `new Date()`. Only the three static routes carry one, `STATIC_PAGE_LAST_MODIFIED` from `lib/seo.ts`, bumped by hand when the copy changes. Media entries carry no `lastmod` at all: we do not know when a media page last changed. The field is optional, and crawlers ignore one they cannot corroborate. Don't read the clock in `sitemap.ts` — that would make `/sitemap.xml` dynamic under Cache Components, and it is prerendered today.
 - **JSON-LD lives in `src/lib/jsonLd.ts`.** It exports `siteJsonLd()` (an `@graph` of Organization, WebSite and WebApplication, rendered on `/`), `faqJsonLd()` (a `FAQPage`, also rendered on `/`), `aboutPageJsonLd(name, description)` (an `@graph` of AboutPage and Organization, rendered on `/about`), `mediaJsonLd(media, mediaType)` (`Movie` or `TVSeries`) and `breadcrumbJsonLd(media, mediaType)` (two items: Home, then the media title), both rendered by `components/MediaPage.tsx`, plus `jsonLdScript()`, which serialises a payload and escapes `<` so a `</script>` in a TMDB overview cannot close the tag early.
   - `faqJsonLd()` reads `HOME_FAQ` from `src/lib/homeFaq.ts`, the same array `(app)/HomeAbout.tsx` renders as the accordion. Edit the copy there once and both the markup and the structured data move together. Never retype a question or answer at either call site.
@@ -346,7 +352,7 @@ All SEO constants live in `src/lib/seo.ts`: `SITE_NAME`, `SITE_URL`, `SITE_TITLE
   - URLs come from `absoluteUrl()`, `SITE_URL` and `toHref()`, the same calls the pages canonicalise with. Images use `tmdbSocialImageUrl()` — crawlers fetch the raw URL with no loader, so the `w780` bucket is required.
   - Any key whose source is absent is omitted. Never emit `null` or `""`.
   - The Organization `logo` is `public/icons/icon-512.png`, the square PWA icon, with explicit `width` and `height`. Google requires at least 112x112 and rejects anything smaller. Do not point it back at `/logo.webp`: that wordmark is 400x54 and fails the check. Any replacement must stay square and 112px or larger.
-  - **No `aggregateRating`.** No `SearchAction` either: `/search?query=` is noindex and disallowed in `robots.ts`.
+  - **No `aggregateRating`.** No `SearchAction` either: `/search?query=` is noindex.
   - No JSON-LD on noindex pages: auth routes, `/collection`, `/profile`, `/search`.
 - **`app/opengraph-image.png` is the site-wide OG image**, a static 1200x630 file. It covers Twitter too, so there is no `twitter-image` file: Next falls back to the OG image for `twitter:image` when no `twitter-image` file exists.
   - `app/opengraph-image.alt.txt` holds the alt text and becomes `og:image:alt` and `twitter:image:alt`.

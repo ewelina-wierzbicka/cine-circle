@@ -33,6 +33,8 @@ TMDB. There is no cast list.
 - [Sitemap](${SITE_URL}/sitemap.xml): every indexable URL, including current
   trending and popular titles.
 - [Robots](${SITE_URL}/robots.txt): crawler rules.
+- [Full text](${absoluteUrl('/llms-full.txt')}): the complete text of every
+  public page in one file.
 
 Account, collection and profile pages are private and excluded from crawling.
 `;
