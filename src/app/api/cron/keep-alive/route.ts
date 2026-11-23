@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { captureSecurityEvent } from '@/lib/captureSecurityEvent';
 import { adminSupabase } from '@/lib/supabase/admin';
 
 // Supabase Free pauses a project after 7 days of no activity. Vercel cron hits
@@ -9,6 +10,7 @@ export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
 
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
+    captureSecurityEvent('cron.keep_alive_unauthorized');
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

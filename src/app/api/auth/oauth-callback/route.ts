@@ -1,3 +1,4 @@
+import { captureSecurityEvent } from '@/lib/captureSecurityEvent';
 import { safeRedirectPath } from '@/lib/safeRedirectPath';
 import { createClient } from '@/lib/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
@@ -7,6 +8,7 @@ export async function GET(request: NextRequest) {
   const rurl = safeRedirectPath(request.nextUrl.searchParams.get('rurl'));
 
   if (!code) {
+    captureSecurityEvent('auth.oauth_callback_missing_code');
     return NextResponse.redirect(
       new URL('/login?error=oauth_failed', request.url),
     );
@@ -16,6 +18,7 @@ export async function GET(request: NextRequest) {
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
+    captureSecurityEvent('auth.oauth_callback_exchange_failed');
     const url = new URL('/login', request.url);
     url.searchParams.set('error', 'oauth_failed');
     return NextResponse.redirect(url);

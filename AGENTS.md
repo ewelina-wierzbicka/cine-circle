@@ -383,16 +383,19 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 | `X-Frame-Options`           | `DENY`                                                         | Clickjacking cover for old browsers     |
 | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The app needs none of these APIs        |
 | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                 | HTTPS only, two years                   |
+| `Reporting-Endpoints`       | `csp-endpoint="<Sentry security endpoint>"`                    | Names the endpoint CSP `report-to` uses |
 
 **CSP ships as `Content-Security-Policy`** — the browser blocks anything the policy does not list.
 
 - Do **not** replace it with a nonce-based CSP in `proxy.ts`. A per-request nonce forces every route dynamic and destroys the PPR static shell (`cacheComponents: true`).
 - `script-src` keeps `'unsafe-inline'` because Next.js streams the RSC payload through inline scripts. `style-src` keeps it for the same reason. So the policy does not stop inline-script injection; it stops loading scripts from an attacker-controlled domain.
-- Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`. `*.sentry.io` in `connect-src` for browser error reports, sent to the ingest host in the DSN in `src/instrumentation-client.ts`. The host wildcard matches any depth, so it covers `o4512091748106240.ingest.de.sentry.io`.
+- Origins are: `image.tmdb.org` for posters (the custom loader points straight at TMDB), `*.supabase.co` for avatars and browser-side Supabase calls, `va.vercel-scripts.com` for `@vercel/analytics` in dev and preview. In production that script is served same-origin from `/_vercel/insights/script.js`. `*.sentry.io` in `connect-src` for browser error reports, sent to the ingest host in `SENTRY_DSN` (`lib/sentryDsn.ts`). The host wildcard matches any depth, so it covers `o4512091748106240.ingest.de.sentry.io`.
 - `img-src` and `connect-src` also carry the origin of `NEXT_PUBLIC_SUPABASE_URL`. Local development and the e2e suite point at it, which is neither `'self'` nor covered by the `*.supabase.co` wildcard, so without it every browser-side Supabase call is blocked locally.
 - Fonts come from `next/font/google` and are self-hosted, so `font-src 'self'` is correct. Do not add `fonts.gstatic.com`.
 - `manifest-src 'self'` is redundant next to `default-src 'self'`, but Safari has historically needed it named, so it stays. There is no `worker-src` because there is no service worker.
 - Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
+- The policy ends with `report-uri <Sentry security endpoint>` and `report-to csp-endpoint`, both built from `SENTRY_CSP_REPORT_URL` in `lib/sentryDsn.ts`. That module holds the one copy of `SENTRY_DSN`, read by the three Sentry init files too — never retype the public key.
+- `lib/captureSecurityEvent.ts` sends a named `SecurityEvent` to Sentry at `warning` level with `tags: { security: true }`. Call it from a rejection branch in a route handler only (bad cron secret, forged webhook, failed auth callback), never for a normal user error, and pass nothing but the name: no bodies, tokens, emails or user ids.
 
 ---
 

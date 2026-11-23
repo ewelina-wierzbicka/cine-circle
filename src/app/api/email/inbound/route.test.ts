@@ -1,6 +1,5 @@
 // @vitest-environment node
 import { createHmac } from 'node:crypto';
-import * as Sentry from '@sentry/nextjs';
 import type { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { POST } from '@/app/api/email/inbound/route';
@@ -9,8 +8,11 @@ const SECRET = 'whsec_c2VjcmV0LWtleS1ieXRlcw==';
 const SVIX_ID = 'msg_1';
 
 const fetchMock = vi.fn<typeof fetch>();
+const captureSecurityEvent = vi.fn<(event: string) => void>();
 
-vi.mock('@sentry/nextjs', () => ({ captureMessage: vi.fn() }));
+vi.mock('@/lib/captureSecurityEvent', () => ({
+  captureSecurityEvent: (event: string) => captureSecurityEvent(event),
+}));
 
 const payload = {
   type: 'email.received',
@@ -65,8 +67,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  vi.mocked(Sentry.captureMessage).mockReset();
   fetchMock.mockReset();
+  captureSecurityEvent.mockClear();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
@@ -99,6 +101,9 @@ describe('POST /api/email/inbound', () => {
       await expect(response.json()).resolves.toEqual({
         error: 'Missing signature headers',
       });
+      expect(captureSecurityEvent).toHaveBeenCalledWith(
+        'email.inbound_missing_signature_headers',
+      );
     });
 
     it.each([
@@ -111,6 +116,9 @@ describe('POST /api/email/inbound', () => {
       await expect(response.json()).resolves.toEqual({
         error: 'Timestamp out of range',
       });
+      expect(captureSecurityEvent).toHaveBeenCalledWith(
+        'email.inbound_timestamp_out_of_range',
+      );
     });
 
     it.each([
@@ -119,6 +127,7 @@ describe('POST /api/email/inbound', () => {
     ])('accepts a timestamp %s', async (_, offsetMs) => {
       const response = await post(payload, signedHeaders(payload, offsetMs));
       expect(response.status).toBe(200);
+      expect(captureSecurityEvent).not.toHaveBeenCalled();
     });
 
     it('401s on a signature from another secret', async () => {
@@ -137,6 +146,9 @@ describe('POST /api/email/inbound', () => {
       await expect(response.json()).resolves.toEqual({
         error: 'Invalid signature',
       });
+      expect(captureSecurityEvent).toHaveBeenCalledWith(
+        'email.inbound_invalid_signature',
+      );
     });
 
     it('401s when the body no longer matches the signature', async () => {
@@ -208,9 +220,8 @@ describe('POST /api/email/inbound', () => {
     });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(error).toHaveBeenCalledTimes(1);
-    expect(Sentry.captureMessage).toHaveBeenCalledWith(
-      'inbound-webhook-secret-missing',
-      expect.objectContaining({ tags: { security: true } }),
+    expect(captureSecurityEvent).toHaveBeenCalledWith(
+      'email.inbound_missing_secret',
     );
     error.mockRestore();
   });
