@@ -20,6 +20,13 @@ const eslintConfig = defineConfig([
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
+  {
+    // CLI scripts report progress on stdout. `console.log` is their output.
+    files: ['scripts/**'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ]);
 
 export default eslintConfig;
