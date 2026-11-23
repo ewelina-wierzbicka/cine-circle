@@ -2,7 +2,7 @@ import { HOME_FAQ } from '@/lib/homeFaq';
 import { toHref } from '@/lib/mediaUtils';
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/seo';
 import { tmdbSocialImageUrl } from '@/lib/tmdbImage';
-import { MediaType, NormalizedMedia } from '@/types';
+import { MediaExternalIds, MediaType, NormalizedMedia } from '@/types';
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const WEBSITE_ID = `${SITE_URL}/#website`;
@@ -11,6 +11,8 @@ const FAQ_ID = `${SITE_URL}/#faq`;
 const ABOUT_PAGE_ID = `${SITE_URL}/about#webpage`;
 
 const TMDB_PAGE_BASE = 'https://www.themoviedb.org';
+const WIKIDATA_PAGE_BASE = 'https://www.wikidata.org/wiki';
+const IMDB_TITLE_BASE = 'https://www.imdb.com/title';
 
 const ORGANIZATION_LOGO_PATH = '/icons/icon-512.png';
 const ORGANIZATION_LOGO_SIZE = 512;
@@ -78,7 +80,7 @@ export type MediaJsonLd = {
   '@id': string;
   name: string;
   url: string;
-  sameAs: string;
+  sameAs: string[];
   description?: string;
   image?: string;
   genre?: string[];
@@ -208,6 +210,7 @@ function isoDuration(minutes: number | undefined): string | undefined {
 export function mediaJsonLd(
   media: NormalizedMedia,
   mediaType: MediaType,
+  externalIds?: MediaExternalIds,
 ): MediaJsonLd {
   const {
     id,
@@ -227,6 +230,15 @@ export function mediaJsonLd(
   // Movies only: for a series `runtime` is `episode_run_time[0]`, a per-episode
   // value, so publishing it as the series duration would state something false.
   const duration = isSeries ? undefined : isoDuration(runtime);
+  const sameAs = [
+    `${TMDB_PAGE_BASE}/${isSeries ? 'tv' : 'movie'}/${id}`,
+    ...(externalIds?.wikidataId
+      ? [`${WIKIDATA_PAGE_BASE}/${externalIds.wikidataId}`]
+      : []),
+    ...(externalIds?.imdbId
+      ? [`${IMDB_TITLE_BASE}/${externalIds.imdbId}/`]
+      : []),
+  ];
 
   return {
     '@context': 'https://schema.org',
@@ -234,7 +246,7 @@ export function mediaJsonLd(
     '@id': `${url}#media`,
     name: title,
     url,
-    sameAs: `${TMDB_PAGE_BASE}/${isSeries ? 'tv' : 'movie'}/${id}`,
+    sameAs,
     ...(overview ? { description: overview } : {}),
     ...(poster_path ? { image: tmdbSocialImageUrl(poster_path) } : {}),
     ...(genre?.length ? { genre } : {}),

@@ -1,11 +1,11 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  getExternalIds,
   getMedia,
   getMovieDetails,
   getSeriesDetails,
   getWatchProviders,
-  getWikidataId,
 } from '@/services/getMedia';
 
 // The services carry 'use cache', which is inert outside Next. Only the
@@ -212,7 +212,7 @@ describe('getMovieDetails', () => {
       ],
     },
     'watch/providers': { results: { US: { link: 'https://tmdb' } } },
-    external_ids: { wikidata_id: 'Q190050' },
+    external_ids: { wikidata_id: 'Q190050', imdb_id: 'tt0137523' },
   };
 
   it('takes the director from the crew member whose job is Director', async () => {
@@ -326,16 +326,76 @@ describe('getWatchProviders', () => {
   });
 });
 
-describe('getWikidataId', () => {
-  it('returns external_ids.wikidata_id', async () => {
+describe('getExternalIds', () => {
+  it('returns both ids off the cached detail response', async () => {
     route({
-      '/tv/1399': { ...seriesPayload, external_ids: { wikidata_id: 'Q23572' } },
+      '/tv/1399': {
+        ...seriesPayload,
+        external_ids: { wikidata_id: 'Q23572', imdb_id: 'tt0944947' },
+      },
     });
-    expect(await getWikidataId('1399', 'series')).toBe('Q23572');
+    expect(await getExternalIds('1399', 'series')).toEqual({
+      wikidataId: 'Q23572',
+      imdbId: 'tt0944947',
+    });
   });
 
-  it('returns null when absent', async () => {
+  it('reads the ids without a second request', async () => {
+    route({
+      '/movie/550': {
+        id: 550,
+        title: 'Fight Club',
+        external_ids: { wikidata_id: 'Q190050', imdb_id: 'tt0137523' },
+      },
+    });
+    await getExternalIds('550', 'movie');
+
+    expect(requestedUrls()).toEqual([
+      'https://api.themoviedb.org/3/movie/550?append_to_response=credits,recommendations,watch/providers,external_ids',
+    ]);
+  });
+
+  it('nulls the empty imdb_id TMDB sends when it has none', async () => {
+    route({
+      '/movie/550': {
+        id: 550,
+        title: 'Fight Club',
+        external_ids: { wikidata_id: 'Q190050', imdb_id: '' },
+      },
+    });
+    expect(await getExternalIds('550', 'movie')).toEqual({
+      wikidataId: 'Q190050',
+      imdbId: null,
+    });
+  });
+
+  it('nulls a malformed id', async () => {
+    route({
+      '/movie/550': {
+        id: 550,
+        title: 'Fight Club',
+        external_ids: { wikidata_id: 'P190050', imdb_id: 'nm0000399' },
+      },
+    });
+    expect(await getExternalIds('550', 'movie')).toEqual({
+      wikidataId: null,
+      imdbId: null,
+    });
+  });
+
+  it('returns nulls when the block is absent', async () => {
     route({ '/movie/550': { id: 550, title: 'Fight Club' } });
-    expect(await getWikidataId('550', 'movie')).toBeNull();
+    expect(await getExternalIds('550', 'movie')).toEqual({
+      wikidataId: null,
+      imdbId: null,
+    });
+  });
+
+  it('returns nulls for a media TMDB 404s', async () => {
+    route({});
+    expect(await getExternalIds('999999999', 'movie')).toEqual({
+      wikidataId: null,
+      imdbId: null,
+    });
   });
 });

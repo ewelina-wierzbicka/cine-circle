@@ -2,10 +2,10 @@ import { Suspense } from 'react';
 import { getCurrentUser } from '@/services/getCurrentUser';
 import { headers } from 'next/headers';
 import {
+  getExternalIds,
   getMovieDetails,
   getSeriesDetails,
   getWatchProviders,
-  getWikidataId,
 } from '@/services/getMedia';
 import { getProviderDeepLinks } from '@/services/getProviderDeepLinks';
 import { toWatchRegion } from '@/lib/watchRegion';
@@ -60,10 +60,10 @@ export default async function MediaPage({
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
 
-  const tmdbData =
-    mediaType === 'series'
-      ? await getSeriesDetails(id)
-      : await getMovieDetails(id);
+  const [tmdbData, externalIds] = await Promise.all([
+    mediaType === 'series' ? getSeriesDetails(id) : getMovieDetails(id),
+    getExternalIds(id, mediaType),
+  ]);
   if (!tmdbData) notFound();
 
   const canonicalHref = toHref(tmdbData.id, tmdbData.title, mediaType);
@@ -83,7 +83,7 @@ export default async function MediaPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLdScript(mediaJsonLd(baseMedia, mediaType)),
+          __html: jsonLdScript(mediaJsonLd(baseMedia, mediaType, externalIds)),
         }}
       />
       <script
@@ -119,6 +119,7 @@ export default async function MediaPage({
               tmdbId={id}
               mediaType={mediaType}
               title={baseMedia.title}
+              wikidataId={externalIds.wikidataId}
             />
           </Suspense>
         }
@@ -166,10 +167,12 @@ async function ViewerWatchProviders({
   tmdbId,
   mediaType,
   title,
+  wikidataId,
 }: {
   tmdbId: string;
   mediaType: 'movie' | 'series';
   title: string;
+  wikidataId: string | null;
 }) {
   const requestHeaders = await headers();
   const region = toWatchRegion(
@@ -177,10 +180,7 @@ async function ViewerWatchProviders({
   );
   if (!region) return <WatchRegionUnknown />;
 
-  const [providers, wikidataId] = await Promise.all([
-    getWatchProviders(tmdbId, mediaType, region),
-    getWikidataId(tmdbId, mediaType),
-  ]);
+  const providers = await getWatchProviders(tmdbId, mediaType, region);
   if (!providers) return null;
 
   const deepLinks = await getProviderDeepLinks(wikidataId, mediaType);

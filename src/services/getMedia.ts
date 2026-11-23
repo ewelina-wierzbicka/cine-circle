@@ -1,5 +1,6 @@
 import {
   FilterMediaType,
+  MediaExternalIds,
   MediaType,
   Movie,
   NormalizedMedia,
@@ -20,8 +21,11 @@ type TmdbWatchProviders = {
   results?: Record<string, RegionWatchProviders | undefined>;
 };
 
-/** Only the Wikidata id is read; the rest of the block is ignored. */
-type TmdbExternalIds = { wikidata_id?: string | null };
+/** Only the Wikidata and IMDb ids are read; the rest of the block is ignored. */
+type TmdbExternalIds = {
+  wikidata_id?: string | null;
+  imdb_id?: string | null;
+};
 
 type MovieDetailResponse = NormalizedMedia & {
   credits?: { crew?: { job: string; name: string }[] };
@@ -247,16 +251,24 @@ export const getSeriesDetails = async (
   return data === null ? null : normalizeSeriesResult(data);
 };
 
-export const getWikidataId = async (
+const matching = (
+  value: string | null | undefined,
+  pattern: RegExp,
+): string | null => (value && pattern.test(value) ? value : null);
+
+export const getExternalIds = async (
   id: string,
   mediaType: MediaType,
-): Promise<string | null> => {
+): Promise<MediaExternalIds> => {
   const data =
     mediaType === 'series'
       ? await getSeriesDetailResponse(id)
       : await getMovieDetailResponse(id);
 
-  return data?.external_ids?.wikidata_id ?? null;
+  return {
+    wikidataId: matching(data?.external_ids?.wikidata_id, /^Q\d+$/),
+    imdbId: matching(data?.external_ids?.imdb_id, /^tt\d+$/),
+  };
 };
 
 const pickProviders = (
