@@ -7,6 +7,7 @@ import {
   getSeriesDetails,
   getWatchProviders,
 } from '@/services/getMedia';
+import { cacheLife, cacheTag } from 'next/cache';
 
 // The services carry 'use cache', which is inert outside Next. Only the
 // cacheLife and cacheTag calls need stubbing.
@@ -282,6 +283,26 @@ describe('getMedia', () => {
     expect(requestedUrls()).toEqual([
       'https://api.themoviedb.org/3/search/movie?query=Tom%20%26%20Jerry%3F&page=1',
     ]);
+  });
+
+  it('caches each search page and tags it by media type', async () => {
+    route({
+      '/search/movie': { results: [], total_pages: 1 },
+      '/search/tv': { results: [], total_pages: 1 },
+    });
+    await getMedia('x', 1, 'all');
+
+    expect(cacheLife).toHaveBeenCalledWith('hours');
+    expect(cacheTag).toHaveBeenCalledWith('search-movies');
+    expect(cacheTag).toHaveBeenCalledWith('search-series');
+  });
+
+  // The cache lives in the directive now, so the fetch carries no next config.
+  it('passes no next option to the TMDB search fetch', async () => {
+    route({ '/search/movie': { results: [], total_pages: 1 } });
+    await getMedia('x', 1, 'movie');
+
+    expect(fetchMock.mock.calls[0]?.[1]).not.toHaveProperty('next');
   });
 });
 

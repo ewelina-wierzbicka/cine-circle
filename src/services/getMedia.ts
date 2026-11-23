@@ -46,13 +46,9 @@ function getTmdbToken(): string {
   return token;
 }
 
-async function tmdbFetch<T>(
-  path: string,
-  nextConfig: { revalidate?: number; tags?: string[] } = {},
-): Promise<T> {
+async function tmdbFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${TMDB_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
-    next: nextConfig,
   });
   if (!res.ok) throw new Error('Failed to load data. Please try again.');
   return res.json() as Promise<T>;
@@ -123,6 +119,37 @@ interface SearchMediaResponse {
   hasMore: boolean;
 }
 
+interface TmdbSearchPage<T> {
+  results: T[];
+  total_pages: number;
+}
+
+const searchMoviePage = async (
+  query: string,
+  page: number,
+): Promise<TmdbSearchPage<Movie>> => {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('search-movies');
+
+  return tmdbFetch<TmdbSearchPage<Movie>>(
+    `/search/movie?query=${encodeURIComponent(query)}&page=${page}`,
+  );
+};
+
+const searchSeriesPage = async (
+  query: string,
+  page: number,
+): Promise<TmdbSearchPage<Series>> => {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('search-series');
+
+  return tmdbFetch<TmdbSearchPage<Series>>(
+    `/search/tv?query=${encodeURIComponent(query)}&page=${page}`,
+  );
+};
+
 export const getMedia = async (
   query: string,
   page: number = 1,
@@ -140,12 +167,7 @@ export const getMedia = async (
   }
 
   if (type === 'series') {
-    const data = await tmdbFetch<{
-      results: Series[];
-      total_pages: number;
-    }>(`/search/tv?query=${encodeURIComponent(query)}&page=${page}`, {
-      revalidate: 3600,
-    });
+    const data = await searchSeriesPage(query, page);
     const sortedResults = data?.results
       ?.map(normalizeSeriesResult)
       .toSorted((a, b) => (b.popularity || 0) - (a.popularity || 0));
@@ -156,12 +178,7 @@ export const getMedia = async (
     };
   }
 
-  const data = await tmdbFetch<{
-    results: Movie[];
-    total_pages: number;
-  }>(`/search/movie?query=${encodeURIComponent(query)}&page=${page}`, {
-    revalidate: 3600,
-  });
+  const data = await searchMoviePage(query, page);
 
   const sortedResults = data?.results
     ?.map((movie) => ({ ...movie, media_type: 'movie' as const }))
