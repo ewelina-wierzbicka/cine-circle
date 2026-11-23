@@ -35,6 +35,7 @@ The CSP is not restated here. Read `next.config.ts` — the comment block at the
 | ---------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | Secret scanning alert              | A credential pattern was found in the repository or its history              | GitHub → Security → Secret scanning, plus owner email | 4.1                                                                                           |
 | Push protection block              | A push was rejected because it contained a credential. Nothing leaked yet    | The failed `git push` output                          | 4.1, minus the rotation if it never landed                                                    |
+| Snyk PR check failure              | A changed dependency manifest brought in a known vulnerability               | The PR check, plus the Snyk org `ewierzbicka3`        | 4.2                                                                                           |
 | Dependabot alert                   | A dependency has a known CVE                                                 | GitHub → Security → Dependabot                        | 4.2                                                                                           |
 | Private vulnerability report       | An outside reporter found something                                          | GitHub → Security → Advisories, plus owner email      | 4.3                                                                                           |
 | `Checks` workflow failure          | Lint, type-check or the unit suite broke on `main` or a PR                   | GitHub Actions, plus email on the `main` run          | Read the job log. A failing `securityHeaders.test.ts` means a header changed                  |
@@ -51,7 +52,7 @@ Know these gaps before relying on the table above.
 
 - **No CSP violation reporting.** There is no `report-uri` or `report-to`, so a directive that blocks something legitimate shows up as a broken feature, not as an alert. `securityHeaders.test.ts` covers the opposite failure, a directive going missing.
 - **No alert for a successful attack.** There is no WAF, no rate limiting, no auth-failure threshold and no audit-log review. A credential-stuffing run against `/login` is invisible.
-- **No SAST.** No CodeQL workflow, no `dependabot.yml`.
+- **No SAST.** Nothing scans this project's own code for vulnerable patterns. No CodeQL workflow, no `dependabot.yml`. Snyk is dependency scanning, and it reports on a pull request that touches a manifest, not on the dependency set of the running deployment.
 - **Nobody is paged.** Every channel above is an email or a dashboard badge, read on a hobby schedule. Check the Actions tab and the Sentry inbox monthly regardless of whether anything arrived.
 
 ---
@@ -68,9 +69,10 @@ Know these gaps before relying on the table above.
 | Dependabot security updates          | Yes      | **Disabled**        |
 | Private vulnerability reporting      | Yes      | **Disabled**        |
 | Two-factor auth on the owner account | Yes      | Verify by hand      |
+| Snyk GitHub app installed            | Yes      | Enabled             |
 | Branch protection on `main`          | Wanted   | **None**            |
 
-The three disabled rows are why `SECURITY.md` currently advertises a reporting form that is not switched on. Turn them on at repository → Settings → Advanced Security; private vulnerability reporting is one checkbox on the same page.
+Private vulnerability reporting being disabled is why `SECURITY.md` currently advertises a reporting form that is not switched on. Turn the three disabled rows on at repository → Settings → Advanced Security; private vulnerability reporting is one checkbox on the same page. Snyk covering dependencies on pull requests is not a substitute for Dependabot alerts: a CVE published tomorrow against a package nobody is editing produces no Snyk check run.
 
 Secrets used by CI, all four required by the backup workflow: `SUPABASE_DB_URL`, `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_BACKUP_AGE_KEY`. Playwright needs `TMDB_TOKEN` and the `NEXT_PUBLIC_SITE_URL` repository variable. Never add a secret the unit suite would need: `checks.yml` runs with none, and that is deliberate.
 
@@ -111,6 +113,7 @@ Secrets used by CI, all four required by the backup workflow: `SUPABASE_DB_URL`,
 2. Reachable, or unclear: bump it. `npm audit fix` for the simple case, a manual version bump plus `npm run lint && npm run type-check && npm run test` otherwise.
 3. Not reachable (a dev-only transitive dependency, for example): say so in the alert dismissal, with the reason.
 4. A major bump to `next`, `react` or `@supabase/*` is its own PR, never a drive-by fix.
+5. A Snyk check that failed on a PR blocks that PR only. Fix it in the same branch, and do not merge past it on the grounds that the finding is old.
 
 ### 4.3 Vulnerability report from outside
 
