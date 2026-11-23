@@ -27,8 +27,7 @@ const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const sources = (...values: string[]) => values.filter(Boolean).join(' ');
 
-// Exported for `src/cspHeaders.test.ts` only. Next.js reads the default export.
-export const contentSecurityPolicy = [
+const contentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline'",

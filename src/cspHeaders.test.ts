@@ -1,10 +1,22 @@
-import { describe, expect, it } from 'vitest';
-import { contentSecurityPolicy } from '../next.config';
+// @vitest-environment node
+import { beforeAll, describe, expect, it } from 'vitest';
+import nextConfig from '../next.config';
+
+let policy = '';
+
+beforeAll(async () => {
+  const routes = (await nextConfig.headers?.()) ?? [];
+  const route = routes.find((entry) => entry.source === '/:path*');
+  if (!route) throw new Error('no headers configured for /:path*');
+  const header = route.headers.find(
+    (entry) => entry.key === 'Content-Security-Policy',
+  );
+  if (!header) throw new Error('/:path* sends no Content-Security-Policy');
+  policy = header.value;
+});
 
 const directive = (name: string) => {
-  const match = contentSecurityPolicy
-    .split('; ')
-    .find((part) => part.startsWith(`${name} `));
+  const match = policy.split('; ').find((part) => part.startsWith(`${name} `));
   if (!match) throw new Error(`CSP has no ${name} directive`);
   return match.slice(name.length + 1).split(' ');
 };
@@ -36,14 +48,14 @@ describe('content security policy', () => {
       "'unsafe-inline'",
       'https://va.vercel-scripts.com',
     ]);
-    expect(contentSecurityPolicy).not.toContain('unsafe-eval');
-    expect(contentSecurityPolicy).not.toContain('nonce-');
+    expect(policy).not.toContain('unsafe-eval');
+    expect(policy).not.toContain('nonce-');
   });
 
   it('keeps the restrictive defaults', () => {
-    expect(contentSecurityPolicy).toContain("default-src 'self'");
-    expect(contentSecurityPolicy).toContain("font-src 'self'");
-    expect(contentSecurityPolicy).toContain("frame-ancestors 'none'");
-    expect(contentSecurityPolicy).toContain("object-src 'none'");
+    expect(policy).toContain("default-src 'self'");
+    expect(policy).toContain("font-src 'self'");
+    expect(policy).toContain("frame-ancestors 'none'");
+    expect(policy).toContain("object-src 'none'");
   });
 });
