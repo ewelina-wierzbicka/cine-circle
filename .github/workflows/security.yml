@@ -32,8 +32,6 @@ jobs:
   codeql:
     timeout-minutes: 20
     runs-on: ubuntu-latest
-    # Code scanning is free on public repositories. If this repo ever goes
-    # private, CodeQL needs GitHub Advanced Security and this job starts failing.
     permissions:
       actions: read
       contents: read
