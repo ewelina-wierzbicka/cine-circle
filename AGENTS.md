@@ -30,6 +30,8 @@ Fix all ESLint errors before committing — warnings are acceptable, errors are 
 
 **CI:** `.github/workflows/checks.yml` runs lint, type-check and the unit suite on every PR and push to `main`. No Supabase, browsers or secrets. Playwright runs separately in `playwright.yml`.
 
+**Security CI:** `.github/workflows/security.yml` runs `npm audit --audit-level=high` and CodeQL (`javascript-typescript`) on PRs, pushes to `main` and weekly. The audit step is `continue-on-error` until the current transitive dev-tooling advisories clear. CodeQL is free only while the repo is public. `.github/dependabot.yml` opens weekly npm and github-actions PRs, minor and patch grouped, majors separate.
+
 ---
 
 ## Code Style
