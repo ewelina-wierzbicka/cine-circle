@@ -1,11 +1,10 @@
-'use server';
-
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
-import { getSignedAvatarUrl } from '@/services/updateProfile';
+import { signedAvatarUrl } from '@/services/signedAvatarUrl';
 import { UserProfile } from '@/types';
+import { cache } from 'react';
 
-export const getProfile = async (): Promise<UserProfile | null> => {
+export const getProfile = cache(async (): Promise<UserProfile | null> => {
   const supabase = await createClient();
   const user = await getCurrentUser();
 
@@ -36,7 +35,7 @@ export const getProfile = async (): Promise<UserProfile | null> => {
   if (insertError) throw insertError;
 
   return resolveAvatarUrl(supabase, created as UserProfile);
-};
+});
 
 const identityDisplayName = (
   metadata: Record<string, unknown>,
@@ -53,6 +52,6 @@ const resolveAvatarUrl = async (
   if (!profile.avatar_url || profile.avatar_url.startsWith('http')) {
     return profile;
   }
-  const signedUrl = await getSignedAvatarUrl(supabase, profile.avatar_url);
+  const signedUrl = await signedAvatarUrl(supabase, profile.avatar_url);
   return { ...profile, avatar_url: signedUrl };
 };
