@@ -14,6 +14,10 @@ export type SecurityEvent =
 
 // Name only. Never pass a body, a token, an email or a user id.
 export function captureSecurityEvent(event: SecurityEvent): void {
+  // The DSN is unconditional, so without this the e2e suite and local dev
+  // would fire the alert on every rejection they exercise.
+  if (process.env.NODE_ENV !== 'production') return;
+
   Sentry.captureMessage(event, {
     level: 'warning',
     tags: { security: true, security_event: event },

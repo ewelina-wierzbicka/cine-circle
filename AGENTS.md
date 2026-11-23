@@ -395,7 +395,7 @@ Sent from `next.config.ts` via `async headers()` on `source: '/:path*'`, so they
 - `manifest-src 'self'` is redundant next to `default-src 'self'`, but Safari has historically needed it named, so it stays. There is no `worker-src` because there is no service worker.
 - Add a new third-party origin to the policy in the same PR that adds the dependency, or its requests will show up as violation reports.
 - The policy ends with `report-uri <Sentry security endpoint>` and `report-to csp-endpoint`, both built from `SENTRY_CSP_REPORT_URL` in `lib/sentryDsn.ts`. That module holds the one copy of `SENTRY_DSN`, read by the three Sentry init files too — never retype the public key.
-- `lib/captureSecurityEvent.ts` sends a named `SecurityEvent` to Sentry at `warning` level with `tags: { security: true }`. Call it from a rejection branch in a route handler only (bad cron secret, forged webhook, failed auth callback), never for a normal user error, and pass nothing but the name: no bodies, tokens, emails or user ids.
+- `lib/captureSecurityEvent.ts` sends a named `SecurityEvent` to Sentry at `warning` level with `tags: { security: true }`. Call it from a rejection branch in a route handler only (bad cron secret, forged webhook, failed auth callback), never for a normal user error, and pass nothing but the name: no bodies, tokens, emails or user ids. It returns early outside `NODE_ENV=production`: the DSN is unconditional, so without that the e2e suite would fire the alert on T5, T9 and T13.
 
 ---
 
