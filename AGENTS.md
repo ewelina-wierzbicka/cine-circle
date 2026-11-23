@@ -144,6 +144,7 @@ src/
   hooks/                      # custom React hooks
   icons/                      # icon components
   lib/                        # utilities, helpers, constants
+    staticPages.ts            # ABOUT_PAGE, TERMS_PAGE, PRIVACY_PAGE copy; the three pages render from it
   services/                   # data fetching / API service functions
 ```
 
