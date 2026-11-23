@@ -4,22 +4,20 @@ import { adminSupabase } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { getMovieDetails, getSeriesDetails } from '@/services/getMedia';
 import { getCurrentUser } from '@/services/getCurrentUser';
+import { userMediaColumns } from '@/lib/userMediaColumns';
 import { NormalizedMedia, UserEntry } from '@/types';
 
 export const addUserMedia = async (
   { id: tmdb_id, media_type }: Pick<NormalizedMedia, 'id' | 'media_type'>,
   userEntry: UserEntry,
 ) => {
-  const { watchStatus } = userEntry;
-  const { watched_date, rating, review } =
-    userEntry.watchStatus === 'watched'
-      ? userEntry
-      : { watched_date: undefined, rating: undefined, review: undefined };
   const supabase = await createClient();
 
   const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
+
+  const columns = userMediaColumns(userEntry);
 
   const tmdb = await (
     media_type === 'series'
@@ -56,10 +54,11 @@ export const addUserMedia = async (
   if (checkError) throw new Error('Failed to save. Please try again.');
 
   if (existingEntry) {
-    if (watchStatus !== 'watched') return { status: 'duplicate' as const };
+    if (columns.watchStatus !== 'watched')
+      return { status: 'duplicate' as const };
     const { error: updateError } = await supabase
       .from('user_media')
-      .update({ watchStatus, watched_date, rating, review })
+      .update(columns)
       .eq('id', existingEntry.id)
       .eq('user_id', user.id);
     if (updateError) throw new Error('Failed to save. Please try again.');
@@ -69,10 +68,7 @@ export const addUserMedia = async (
   const { error: entryError } = await supabase.from('user_media').insert({
     user_id: user.id,
     media_id: media.id,
-    watchStatus,
-    watched_date,
-    rating,
-    review,
+    ...columns,
   });
   if (entryError) throw new Error('Failed to save. Please try again.');
 
@@ -89,9 +85,11 @@ export const updateUserMedia = async (
 
   if (!user) throw new Error('Not authenticated');
 
+  const columns = userMediaColumns(entry);
+
   const { error } = await supabase
     .from('user_media')
-    .update(entry)
+    .update(columns)
     .eq('id', id)
     .eq('user_id', user.id);
 
