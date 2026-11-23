@@ -12,9 +12,6 @@ const WARM_ROUTES = [
   '/search',
   '/movie/27205',
   '/series/214582',
-  // The proxy rewrites an unknown id here, and `/_not-found` compiles on its
-  // own first request.
-  '/movie/999999999',
   // Toast-on-redirect tests only get the 5s the toast lives, so these
   // handlers must already be compiled when the test navigates.
   '/api/auth/confirm-callback',

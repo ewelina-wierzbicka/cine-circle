@@ -141,8 +141,6 @@ export default async function proxy(request: NextRequest) {
   };
 
   if (mediaRoute.kind === 'missing') {
-    // `/_not-found` answers the 404 status itself; the header is what keeps a
-    // crawler from indexing the body whatever Next does with that status.
     const notFound = NextResponse.rewrite(new URL('/_not-found', request.url));
     notFound.headers.set('X-Robots-Tag', 'noindex');
     return withSessionCookies(notFound);
