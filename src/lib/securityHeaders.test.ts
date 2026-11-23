@@ -2,6 +2,8 @@
 import type { NextConfig } from 'next';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { SENTRY_CSP_REPORT_URL } from './sentryDsn';
+
 vi.mock('@sentry/nextjs/config', () => ({
   withSentryConfig: (config: NextConfig) => config,
 }));
@@ -107,6 +109,17 @@ describe('security headers', () => {
 
   it('serves fonts from self only, never fonts.gstatic.com', async () => {
     expect((await loadDirectives()).get('font-src')).toEqual(["'self'"]);
+  });
+
+  it('reports violations to the Sentry security endpoint', async () => {
+    const headers = await loadHeaders();
+    const directives = await loadDirectives();
+
+    expect(directives.get('report-uri')).toEqual([SENTRY_CSP_REPORT_URL]);
+    expect(directives.get('report-to')).toEqual(['csp-endpoint']);
+    expect(headers.get('Reporting-Endpoints')).toBe(
+      `csp-endpoint="${SENTRY_CSP_REPORT_URL}"`,
+    );
   });
 
   it('allows the configured Supabase origin to be reached', async () => {

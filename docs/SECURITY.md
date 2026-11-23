@@ -22,6 +22,9 @@ Settings state below was read from the GitHub API on 2026-11-23. Re-read it befo
 | Secret scanning           | GitHub repository settings                                       | A committed key stays committed. Push protection blocks most of them up front                 |
 | Encrypted backups         | `.github/workflows/backup.yml`, see [`BACKUPS.md`](BACKUPS.md)   | No recovery path on the Supabase Free plan                                                    |
 | Error reports without PII | `instrumentation-client.ts`, `sentry.server.config.ts`           | `userInfo: false` and `httpBodies: []`. Turning either on sends user data to Sentry           |
+| CSP violation reports     | `report-uri` and `report-to` in `next.config.ts`                 | A directive that blocks something real goes back to being a bug report, not an alert          |
+| Security-event alerts     | `lib/captureSecurityEvent.ts`, called from rejection branches    | A bad cron secret or forged webhook stops reaching Sentry. Production only, by design         |
+| Supply-chain scanning     | `.github/dependabot.yml`, `.github/workflows/security.yml`       | Weekly dependency PRs, `npm audit` and CodeQL all stop running                                |
 
 The CSP is not restated here. Read `next.config.ts` — the comment block at the top says where each allowed origin comes from, and the test next to it says which directives are load-bearing.
 
@@ -31,67 +34,77 @@ The CSP is not restated here. Read `next.config.ts` — the comment block at the
 
 ## 2. Alert channels
 
-| Channel                            | What it means                                                                | Where it lands                                        | First response                                                                                |
-| ---------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Secret scanning alert              | A credential pattern was found in the repository or its history              | GitHub → Security → Secret scanning, plus owner email | 4.1                                                                                           |
-| Push protection block              | A push was rejected because it contained a credential. Nothing leaked yet    | The failed `git push` output                          | 4.1, minus the rotation if it never landed                                                    |
-| Snyk PR check failure              | A changed dependency manifest brought in a known vulnerability               | The PR check, plus the Snyk org `ewierzbicka3`        | 4.2                                                                                           |
-| Dependabot alert                   | A dependency has a known CVE                                                 | GitHub → Security → Dependabot                        | 4.2                                                                                           |
-| Private vulnerability report       | An outside reporter found something                                          | GitHub → Security → Advisories, plus owner email      | 4.3                                                                                           |
-| `Checks` workflow failure          | Lint, type-check or the unit suite broke on `main` or a PR                   | GitHub Actions, plus email on the `main` run          | Read the job log. A failing `securityHeaders.test.ts` means a header changed                  |
-| `Playwright` workflow failure      | An end-to-end path broke. `rls.spec.ts` failing is an access-control failure | GitHub Actions                                        | 4.6 if it is an `rls.spec.ts` case                                                            |
-| `Supabase backup` workflow failure | No usable backup was produced last night                                     | GitHub Actions, email on scheduled-run failure        | 4.4                                                                                           |
-| Sentry issue alert                 | A runtime error in the browser, server or edge runtime                       | Sentry project `midnightframe`, org `ewierzbicka`     | 4.5                                                                                           |
-| Vercel deployment failure          | A build or deployment did not go out                                         | Vercel dashboard and its notification settings        | Read the build log. The previous deployment stays live                                        |
-| Vercel cron failure                | `/api/cron/keep-alive` is not returning 200                                  | Vercel → Cron Jobs → the invocation log               | Check `CRON_SECRET` exists in Production. A 401 every run ends with a paused Supabase project |
-| Supabase project paused            | Roughly 7 days of low activity on the Free plan                              | Supabase dashboard and its email                      | Resume the project, then check why the keep-alive cron stopped working                        |
+| Channel                            | What it means                                                                 | Where it lands                                        | First response                                                                                |
+| ---------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Secret scanning alert              | A credential pattern was found in the repository or its history               | GitHub → Security → Secret scanning, plus owner email | 4.1                                                                                           |
+| Push protection block              | A push was rejected because it contained a credential. Nothing leaked yet     | The failed `git push` output                          | 4.1, minus the rotation if it never landed                                                    |
+| Snyk PR check failure              | A changed dependency manifest brought in a known vulnerability                | The PR check, plus the Snyk org `ewierzbicka3`        | 4.2                                                                                           |
+| Dependabot alert                   | A dependency has a known CVE                                                  | GitHub → Security → Dependabot                        | 4.2                                                                                           |
+| Private vulnerability report       | An outside reporter found something                                           | GitHub → Security → Advisories, plus owner email      | 4.3                                                                                           |
+| `Checks` workflow failure          | Lint, type-check or the unit suite broke on `main` or a PR                    | GitHub Actions, plus email on the `main` run          | Read the job log. A failing `securityHeaders.test.ts` means a header changed                  |
+| `Playwright` workflow failure      | An end-to-end path broke. `rls.spec.ts` failing is an access-control failure  | GitHub Actions                                        | 4.6 if it is an `rls.spec.ts` case                                                            |
+| `Supabase backup` workflow failure | No usable backup was produced last night                                      | GitHub Actions, email on scheduled-run failure        | 4.4                                                                                           |
+| Sentry issue alert                 | A runtime error in the browser, server or edge runtime                        | Sentry project `midnightframe`, org `ewierzbicka`     | 4.5                                                                                           |
+| Sentry `SecurityEvent`             | A request was rejected: bad cron secret, forged webhook, failed auth callback | Same project, tag `security:true`                     | 4.7                                                                                           |
+| Sentry CSP report                  | A browser blocked something the policy does not allow                         | Same project, CSP-type issues                         | 4.8                                                                                           |
+| CodeQL alert                       | Static analysis found a vulnerable pattern in this project's own code         | GitHub → Security → Code scanning                     | Read the alert, fix or dismiss with a reason. Severity drives urgency, not the count          |
+| `Security` workflow `npm audit`    | A lockfile advisory at high or above. Advisory only today                     | GitHub Actions, the `audit` job log                   | 4.2                                                                                           |
+| Vercel deployment failure          | A build or deployment did not go out                                          | Vercel dashboard and its notification settings        | Read the build log. The previous deployment stays live                                        |
+| Vercel cron failure                | `/api/cron/keep-alive` is not returning 200                                   | Vercel → Cron Jobs → the invocation log               | Check `CRON_SECRET` exists in Production. A 401 every run ends with a paused Supabase project |
+| Supabase project paused            | Roughly 7 days of low activity on the Free plan                               | Supabase dashboard and its email                      | Resume the project, then check why the keep-alive cron stopped working                        |
 
 ### Channels that do not exist
 
 Know these gaps before relying on the table above.
 
-- **No CSP violation reporting.** There is no `report-uri` or `report-to`, so a directive that blocks something legitimate shows up as a broken feature, not as an alert. `securityHeaders.test.ts` covers the opposite failure, a directive going missing.
-- **No alert for a successful attack.** There is no WAF, no rate limiting, no auth-failure threshold and no audit-log review. A credential-stuffing run against `/login` is invisible.
-- **No SAST.** Nothing scans this project's own code for vulnerable patterns. No CodeQL workflow, no `dependabot.yml`. Snyk is dependency scanning, and it reports on a pull request that touches a manifest, not on the dependency set of the running deployment.
+- **No rate limiting, no WAF rule yet.** A credential-stuffing run against `/login`, or a scraper on `/api/search`, is invisible and uncapped. Item 11 of the checklist is the fix, and it belongs in the Vercel Firewall rather than in code: on serverless an in-memory counter resets with every cold start, so it counts nothing.
+- **No audit-log review.** Nothing reads the Supabase or Vercel logs on a schedule.
+- **A Sentry rule with no notification channel fires into nothing.** The `security` tag reaches Sentry whether or not anyone is told about it. Checklist items 8 and 9 are what turn it into an alert.
 - **Nobody is paged.** Every channel above is an email or a dashboard badge, read on a hobby schedule. Check the Actions tab and the Sentry inbox monthly regardless of whether anything arrived.
 
 ---
 
-## 3. Settings that must stay on
+## 3. Dashboard checklist
 
-### GitHub
+Every line here is a toggle in somebody's dashboard. No PR can set one, and nothing in CI checks them. `[x]` is what the provider reported on 2026-11-23; re-read before trusting it.
 
-| Setting                              | Required | State on 2026-11-23 |
-| ------------------------------------ | -------- | ------------------- |
-| Secret scanning                      | Yes      | Enabled             |
-| Push protection                      | Yes      | Enabled             |
-| Dependabot alerts                    | Yes      | **Disabled**        |
-| Dependabot security updates          | Yes      | **Disabled**        |
-| Private vulnerability reporting      | Yes      | **Disabled**        |
-| Two-factor auth on the owner account | Yes      | Verify by hand      |
-| Snyk GitHub app installed            | Yes      | Enabled             |
-| Branch protection on `main`          | Wanted   | **None**            |
+### GitHub — repository → Settings → Advanced Security (older UI: Code security and analysis)
 
-Private vulnerability reporting being disabled is why `SECURITY.md` currently advertises a reporting form that is not switched on. Turn the three disabled rows on at repository → Settings → Advanced Security; private vulnerability reporting is one checkbox on the same page. Snyk covering dependencies on pull requests is not a substitute for Dependabot alerts: a CVE published tomorrow against a package nobody is editing produces no Snyk check run.
+- [x] **1. Dependabot alerts.** Off: a CVE published against the deployed lockfile never surfaces. Fires → 4.2. Eighteen are open today, ten of them high.
+- [x] **2. Dependabot security updates.** Off: alerts still arrive, but no fix PR is ever opened. `.github/dependabot.yml` only covers the weekly version bumps.
+- [x] **3. Secret scanning.** Off: a committed credential stays live and unflagged in a public history. Fires → 4.1.
+- [x] **4. Secret scanning push protection.** Off: the key reaches the public history before anyone reads an alert. All four are free on a public repository.
+- [x] **5. Private vulnerability reporting.** Same page, near the bottom. Off: the report link in `SECURITY.md` 404s and the reporter falls back to a public issue. Fires → 4.3.
+- [x] **6. Branch ruleset on `main`.** Settings → Rules → Rulesets → `midnightframe`. It requires a pull request with one approval, `checks` and `test` green, and blocks deletion and force-push. Off: a regression test can be bypassed by pushing straight to `main`. Add the `Security` workflow jobs as required checks only once the `npm audit` step drops `continue-on-error` — an advisory job cannot block anything.
+- [ ] **7. Two-factor auth on GitHub, Vercel and Supabase.** Each provider's account settings. Off: one password stands between an attacker and the data, and on the Free plan Supabase holds the only live copy.
+
+### Sentry — org `ewierzbicka`, project `midnightframe`
+
+- [ ] **8. Issue alert rule on the `security` tag.** Alerts → Create Alert → Issues, condition on tag `security` equals `true` (set by `lib/captureSecurityEvent.ts`). Off: rejected cron, webhook and auth-callback requests reach Sentry and nobody is told. Fires → 4.7.
+- [ ] **9. A notification channel on that rule.** The rule's action, plus Settings → Integrations for Slack. Off: the rule fires into nothing, which looks exactly like no attack.
+- [ ] **10. Confirm the CSP endpoint is receiving.** Open the project's issues and look for CSP reports. A wrong `sentry_key` fails silently and the browser never retries; the URL is built once in `lib/sentryDsn.ts`. Fires → 4.8.
+
+### Vercel — project settings
+
+- [ ] **11. Firewall rate-limit rule on `/api/search`.** Firewall → Rules. Off: nothing caps a scraper or a credential-stuffing run. This cannot be code: on serverless an in-memory counter resets with every cold start, so it counts nothing. Confirm the rate-limit action is available on the current plan before ticking.
+- [x] **12. `CRON_SECRET` set in Production.** Off: Vercel sends no `Authorization` header, the keep-alive handler 401s every run, and the Supabase project pauses silently after about a week.
+- [x] **13. `RESEND_WEBHOOK_SECRET` set in Production.** Off: the inbound email handler 500s on every delivery. It fails closed on purpose, so a missing secret is downtime rather than unverified mail.
+
+### Supabase — project settings
+
+- [ ] **14. Leaked-password protection.** Authentication → Sign In / Providers → Password. Off: a user can pick a password that is already in a public breach list. The toggle names its plan requirement if it has one.
+
+Ticked 12 and 13 because the app would be visibly broken otherwise, not from reading the dashboard. Verify them there.
+
+### Not toggles, so they live in review instead
+
+- `SUPABASE_SECRET_KEY`, `TMDB_TOKEN`, `RESEND_API_KEY` and `RESEND_WEBHOOK_SECRET` are server-only. Only `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` may carry that prefix.
+- RLS on every table, including new ones. A migration that creates a table without a policy is an access-control bug, and `e2e/rls.spec.ts` is where the proof goes. `deleted_accounts` stays service-role-only with deny-all.
+- The `avatar` bucket stays private, read and write scoped to `{user_id}/`.
+- Email confirmation stays on for password signups, and the Google OAuth redirect URLs stay limited to the live domain and localhost.
+- HTTPS only. `Strict-Transport-Security` carries a two-year `max-age` with `preload`, so a downgrade to plain HTTP is not recoverable for existing visitors.
 
 Secrets used by CI, all four required by the backup workflow: `SUPABASE_DB_URL`, `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_BACKUP_AGE_KEY`. Playwright needs `TMDB_TOKEN` and the `NEXT_PUBLIC_SITE_URL` repository variable. Never add a secret the unit suite would need: `checks.yml` runs with none, and that is deliberate.
-
-### Vercel
-
-- `CRON_SECRET` set in Production, or the cron 401s every run and Supabase pauses silently.
-- `SUPABASE_SECRET_KEY`, `TMDB_TOKEN`, `RESEND_API_KEY` and `RESEND_WEBHOOK_SECRET` are server-only. Confirm none of them is exposed to the browser: only `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` may carry that prefix.
-- `NEXT_PUBLIC_SITE_URL` set in every environment, or `metadataBase` falls back to localhost.
-- HTTPS only. `Strict-Transport-Security` in `next.config.ts` has a two-year `max-age` with `preload`, so a downgrade to plain HTTP is not recoverable for existing visitors.
-- Two-factor auth on the account.
-
-### Supabase
-
-- RLS enabled on every table, including new ones. A migration that creates a table without a policy is an access-control bug, and `e2e/rls.spec.ts` is where the proof goes.
-- `deleted_accounts` stays service-role-only with deny-all RLS.
-- The `avatar` bucket stays private, read and write scoped to `{user_id}/`.
-- Email confirmation stays on for password signups.
-- Google OAuth redirect URLs limited to the live domain and localhost.
-- Two-factor auth on the account. The Supabase account holds the data and, on the Free plan, the only live copy.
 
 ---
 
@@ -141,6 +154,21 @@ Full detail in [`BACKUPS.md`](BACKUPS.md) sections 2 and 3. Short version: read 
 3. Passing but the report stands: the leak is above the database. Check whether the route is in the known-route list in `proxy.ts`, and whether the handler uses the admin client where it should use the server client.
 4. Either way, assume the data was read. Section 4.1 step 6 applies.
 
+### 4.7 `SecurityEvent` in Sentry
+
+1. Read `security_event` on the event. It names the branch that rejected the request: cron secret, webhook signature, or an auth callback.
+2. One or two is noise: a stale bookmark, a retried email link, a scanner. A run of them against the same route is not.
+3. Cron events: check that `CRON_SECRET` in Vercel Production matches what the handler expects. A rotation applied in only one place looks identical to an attack.
+4. Webhook events: confirm the signing secret in Resend matches `RESEND_WEBHOOK_SECRET`. Forged deliveries and a mismatched secret both land here.
+5. The payload carries a name and nothing else, by design. Do not add bodies, tokens or emails to make triage easier.
+
+### 4.8 CSP report in Sentry
+
+1. Read the blocked URI. A first-party path means the policy is wrong; a third-party origin means something new was added without updating `next.config.ts`.
+2. Legitimate origin: add it to the right directive in the same PR as the dependency, and add a case to `securityHeaders.test.ts`.
+3. Injected or unexpected origin: that is an incident, not a config gap. Treat it as 4.1 and look at what shipped last.
+4. A flood from one browser extension is noise. Extensions are the usual source of `report-uri` volume.
+
 ---
 
 ## 5. Where each credential lives
@@ -163,10 +191,10 @@ The age **private** key is never in CI and never in the repository. Losing it ma
 
 ## 6. Recommendation
 
-In order, cheapest first:
+What is left after the checklist, in order:
 
-1. **Enable Dependabot alerts, Dependabot security updates and private vulnerability reporting.** Three checkboxes, no cost. Until the third one is on, the reporting link in `SECURITY.md` does not work.
-2. **Enable two-factor auth on GitHub, Vercel and Supabase** if it is not already on. The Supabase account is the single point of failure for the data.
-3. **Protect `main`**: require `Checks` to pass before merge. The regression tests only help if they cannot be bypassed.
-4. **Add a CSP reporting endpoint** when there is appetite for the noise. It is the only way a broken directive becomes an alert instead of a bug report.
-5. **Revisit rate limiting** if sign-ups ever come from outside a friend group. Nothing today limits login attempts.
+1. **Finish checklist items 7 to 11.** Two-factor auth, the Sentry rule and its channel, the CSP receipt check, and the Vercel rate-limit rule. Nothing there needs a PR.
+2. **Work the eighteen open Dependabot alerts down**, highest severity first. Section 4.2 is the per-alert decision.
+3. **Drop `continue-on-error` from the `npm audit` step** once the lockfile is clean, then add the `Security` jobs to the ruleset's required checks. Until then the job reports and blocks nothing.
+4. **Go to Supabase Pro when the user base is real.** Managed daily backups, and it is also where the paid auth protections live. See [`BACKUPS.md`](BACKUPS.md) section 8.
+5. **Revisit audit-log review** if there is ever a second maintainer. One person reading dashboards monthly is the current control, and it does not scale to an incident.
