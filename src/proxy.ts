@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { hasAuthCookie } from './lib/supabase/authCookie';
 import { supabaseConfig } from './lib/supabase/config';
 import { toHref } from './lib/mediaUtils';
 import { resolveMedia } from './services/resolveMedia';
@@ -105,33 +106,43 @@ export default async function proxy(request: NextRequest) {
 
   let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          );
+  let signedIn = false;
+  let mediaRoute: MediaRouteOutcome;
+
+  // No session cookie means there is no session to read and none to refresh, so
+  // the Supabase round trip is pure cost. Anonymous traffic is the bulk of the
+  // middleware bill, and it all takes this branch.
+  if (hasAuthCookie(request.cookies.getAll())) {
+    const supabase = createServerClient(
+      supabaseConfig.url,
+      supabaseConfig.anonKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value),
+            );
+            supabaseResponse = NextResponse.next({ request });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options),
+            );
+          },
         },
       },
-    },
-  );
+    );
 
-  const [
-    {
-      data: { user },
-    },
-    mediaRoute,
-  ] = await Promise.all([supabase.auth.getUser(), resolveMediaRoute(request)]);
+    const [auth, resolved] = await Promise.all([
+      supabase.auth.getUser(),
+      resolveMediaRoute(request),
+    ]);
+    signedIn = auth.data.user !== null;
+    mediaRoute = resolved;
+  } else {
+    mediaRoute = await resolveMediaRoute(request);
+  }
 
   const withSessionCookies = (response: NextResponse) => {
     supabaseResponse.cookies
@@ -158,13 +169,13 @@ export default async function proxy(request: NextRequest) {
     OPEN_ROUTES_EXACT.includes(pathname) ||
     OPEN_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
-  if (!user && !isAuthRoute && !isOpenRoute) {
+  if (!signedIn && !isAuthRoute && !isOpenRoute) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('rurl', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (user && isAuthRoute) {
+  if (signedIn && isAuthRoute) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
@@ -172,16 +183,23 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run only on page routes. Excluded:
+  // Run only on page routes. Every excluded path is one middleware invocation
+  // we do not pay for. Excluded:
   // - _next/* static assets and image optimisation
-  // - favicon and common image extensions
+  // - favicon, static asset and font extensions
+  // - icons/ — the PWA icon folder in public/
+  // - .well-known/ and _vercel/ — probe and platform paths, never page routes
   // - sitemap.xml, robots.txt, llms.txt, llms-full.txt, manifest.webmanifest,
   //   opengraph-image —
   //   metadata routes. They carry no session and must never redirect, or
   //   crawlers cannot fetch them and the install prompt never appears
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
+  //
+  // This stays a deny-list. `matcher` must be a static literal, so it cannot be
+  // derived from `KNOWN_ROUTES_EXACT`, and two hand-synced lists would fail by
+  // silently making a private route public.
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|api/|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|icons/|\\.well-known/|_vercel/|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|json|xml|woff2)$).*)',
   ],
 };

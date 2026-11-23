@@ -5,7 +5,7 @@ import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-import proxy, { isKnownRoute, parseMediaRoute } from '@/proxy';
+import proxy, { config, isKnownRoute, parseMediaRoute } from '@/proxy';
 import type { ResolvedMedia } from '@/services/resolveMedia';
 
 type CookieToSet = {
@@ -15,8 +15,12 @@ type CookieToSet = {
 };
 
 const resolveMedia = vi.fn<(mediaType: string, id: string) => ResolvedMedia>();
+// Records that the Supabase client was constructed at all, which is the whole
+// cost the cookie-less branch skips.
+const createServerClient = vi.fn<(url: string, anonKey: string) => void>();
 // Cookies Supabase refreshes mid-request; the 404 and 308 paths must carry them.
 let refreshedCookies: CookieToSet[] = [];
+let sessionUser: { id: string } | null = null;
 
 vi.mock('@/services/resolveMedia', () => ({
   resolveMedia: (mediaType: string, id: string) => resolveMedia(mediaType, id),
@@ -24,22 +28,40 @@ vi.mock('@/services/resolveMedia', () => ({
 
 vi.mock('@supabase/ssr', () => ({
   createServerClient: (
-    _url: string,
-    _anonKey: string,
+    url: string,
+    anonKey: string,
     options: { cookies: { setAll: (cookies: CookieToSet[]) => void } },
-  ) => ({
-    auth: {
-      getUser: async () => {
-        if (refreshedCookies.length) options.cookies.setAll(refreshedCookies);
-        return { data: { user: null } };
+  ) => {
+    createServerClient(url, anonKey);
+    return {
+      auth: {
+        getUser: async () => {
+          if (refreshedCookies.length) options.cookies.setAll(refreshedCookies);
+          return { data: { user: sessionUser } };
+        },
       },
-    },
-  }),
+    };
+  },
 }));
+
+// A session cookie Supabase would have written. Its presence is what decides
+// whether the proxy pays for a `getUser()` round trip.
+const SESSION_COOKIE = { cookie: 'sb-localhost-auth-token=session-value' };
 
 function mediaRequest(path: string, headers: Record<string, string> = {}) {
   return new NextRequest(new URL(path, 'http://localhost:3000'), { headers });
 }
+
+function locationOf(response: Response) {
+  return new URL(response.headers.get('location') ?? '');
+}
+
+beforeEach(() => {
+  resolveMedia.mockReset();
+  createServerClient.mockReset();
+  refreshedCookies = [];
+  sessionUser = null;
+});
 
 describe('isKnownRoute', () => {
   it.each([
@@ -164,11 +186,6 @@ describe('route registration', () => {
 });
 
 describe('media route responses', () => {
-  beforeEach(() => {
-    resolveMedia.mockReset();
-    refreshedCookies = [];
-  });
-
   it('rewrites an unknown id to the not-found route, marked noindex', async () => {
     resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
 
@@ -194,8 +211,26 @@ describe('media route responses', () => {
     resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
     refreshedCookies = [{ name: 'sb-access-token', value: 'refreshed' }];
 
-    const response = await proxy(mediaRequest('/series/999999999'));
+    const response = await proxy(
+      mediaRequest('/series/999999999', SESSION_COOKIE),
+    );
 
+    expect(response.cookies.get('sb-access-token')?.value).toBe('refreshed');
+  });
+
+  it('carries a refreshed session cookie on the canonical redirect', async () => {
+    resolveMedia.mockReturnValue({
+      exists: true,
+      id: 550,
+      title: 'Fight Club',
+    });
+    refreshedCookies = [{ name: 'sb-access-token', value: 'refreshed' }];
+
+    const response = await proxy(
+      mediaRequest('/movie/550-wrong', SESSION_COOKIE),
+    );
+
+    expect(response.status).toBe(308);
     expect(response.cookies.get('sb-access-token')?.value).toBe('refreshed');
   });
 
@@ -246,5 +281,142 @@ describe('media route responses', () => {
 
     expect(resolveMedia).not.toHaveBeenCalled();
     expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+  });
+});
+
+// No session cookie means no session to read and none to refresh, so the
+// Supabase round trip is skipped. Every routing decision must be unchanged.
+describe('the cookie-less branch', () => {
+  it.each(['/collection', '/profile', '/reset-password'])(
+    'redirects %s to login without constructing a Supabase client',
+    async (path) => {
+      const response = await proxy(mediaRequest(path));
+
+      expect(createServerClient).not.toHaveBeenCalled();
+      expect(response.status).toBe(307);
+      expect(locationOf(response).pathname).toBe('/login');
+      expect(locationOf(response).searchParams.get('rurl')).toBe(path);
+    },
+  );
+
+  it.each(['/', '/about', '/login', '/search'])(
+    'serves %s without constructing a Supabase client',
+    async (path) => {
+      const response = await proxy(mediaRequest(path));
+
+      expect(createServerClient).not.toHaveBeenCalled();
+      expect(response.status).toBe(200);
+      expect(response.headers.get('location')).toBeNull();
+    },
+  );
+
+  it('still rewrites an unknown media id to the noindex 404', async () => {
+    resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
+
+    const response = await proxy(mediaRequest('/movie/999999999'));
+
+    expect(createServerClient).not.toHaveBeenCalled();
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'http://localhost:3000/_not-found',
+    );
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
+  });
+
+  it('still redirects a mis-slugged media URL to the canonical path', async () => {
+    resolveMedia.mockReturnValue({
+      exists: true,
+      id: 550,
+      title: 'Fight Club',
+    });
+
+    const response = await proxy(mediaRequest('/movie/550'));
+
+    expect(createServerClient).not.toHaveBeenCalled();
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe(
+      'http://localhost:3000/movie/550-fight-club',
+    );
+  });
+});
+
+describe('the cookie-bearing branch', () => {
+  it('asks Supabase for the session', async () => {
+    const response = await proxy(mediaRequest('/collection', SESSION_COOKIE));
+
+    expect(createServerClient).toHaveBeenCalledTimes(1);
+    // A cookie is not a session: an expired one still redirects to login.
+    expect(locationOf(response).pathname).toBe('/login');
+  });
+
+  it('serves a private route to a signed-in user', async () => {
+    sessionUser = { id: 'user-1' };
+
+    const response = await proxy(mediaRequest('/collection', SESSION_COOKIE));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('location')).toBeNull();
+  });
+
+  it.each(['/login', '/register', '/registration-confirmed'])(
+    'redirects a signed-in user off %s',
+    async (path) => {
+      sessionUser = { id: 'user-1' };
+
+      const response = await proxy(mediaRequest(path, SESSION_COOKIE));
+
+      expect(response.status).toBe(307);
+      expect(locationOf(response).pathname).toBe('/');
+    },
+  );
+
+  it('resolves the media id alongside the session check', async () => {
+    resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
+
+    const response = await proxy(
+      mediaRequest('/movie/999999999', SESSION_COOKIE),
+    );
+
+    expect(createServerClient).toHaveBeenCalledTimes(1);
+    expect(resolveMedia).toHaveBeenCalledWith('movie', '999999999');
+    expect(response.headers.get('x-robots-tag')).toBe('noindex');
+  });
+});
+
+// Each excluded path is one middleware invocation we do not pay for.
+describe('config.matcher', () => {
+  const matcher = new RegExp(`^${config.matcher[0]}$`);
+
+  it.each([
+    '/',
+    '/collection',
+    '/profile',
+    '/login',
+    '/search',
+    '/movie/550',
+    '/movie/550-fight-club',
+    '/series/1399',
+    '/nonexistent-xyz',
+  ])('invokes the proxy for %s', (path) => {
+    expect(matcher.test(path)).toBe(true);
+  });
+
+  it.each([
+    '/icons/icon-512.png',
+    '/icons/icon-maskable-512.png',
+    '/.well-known/anything',
+    '/.well-known/appspecific/com.chrome.devtools.json',
+    '/_vercel/insights/script.js',
+    '/_next/static/chunks/main.js',
+    '/favicon.ico',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/llms.txt',
+    '/llms-full.txt',
+    '/manifest.webmanifest',
+    '/opengraph-image.png',
+    '/logo.webp',
+    '/api/cron/keep-alive',
+  ])('skips the proxy for %s', (path) => {
+    expect(matcher.test(path)).toBe(false);
   });
 });
