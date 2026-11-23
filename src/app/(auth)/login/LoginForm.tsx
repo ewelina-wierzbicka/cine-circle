@@ -29,17 +29,23 @@ export function LoginForm() {
       toast.error('Password reset failed. Please try again.', {
         toastId: errorParam,
       });
-      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+      router.replace(
+        rurl ? `/login?rurl=${encodeURIComponent(rurl)}` : '/login',
+      );
     } else if (errorParam === 'confirm_failed') {
       toast.error('Email confirmation failed. Please try again.', {
         toastId: errorParam,
       });
-      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+      router.replace(
+        rurl ? `/login?rurl=${encodeURIComponent(rurl)}` : '/login',
+      );
     } else if (errorParam === 'oauth_failed') {
       toast.error('Google sign-in failed. Please try again.', {
         toastId: errorParam,
       });
-      router.replace(rurl ? `/login?rurl=${rurl}` : '/login');
+      router.replace(
+        rurl ? `/login?rurl=${encodeURIComponent(rurl)}` : '/login',
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
