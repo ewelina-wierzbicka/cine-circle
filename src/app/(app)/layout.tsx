@@ -26,9 +26,16 @@ export default function PrivateLayout({
       </Suspense>
       <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
-        <RouteFooter placement="in-flow" />
+        {/* `RouteFooter` reads `usePathname()`. Outside Suspense that blocks
+            the whole shell on a dynamic route, where the path is unknown at
+            build time, which is what emptied the `/movie/[id]` shell. */}
+        <Suspense fallback={null}>
+          <RouteFooter placement="in-flow" />
+        </Suspense>
       </main>
-      <RouteFooter placement="pinned" />
+      <Suspense fallback={null}>
+        <RouteFooter placement="pinned" />
+      </Suspense>
     </div>
   );
 }

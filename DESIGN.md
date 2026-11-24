@@ -170,7 +170,7 @@ export const motion = {
 One component per repeated link style. Never retype the classes at a call site.
 
 - `Link` (`src/components/Link.tsx`) — inline accent link, `text-accent hover:opacity-80 transition-opacity`. Auth form footers.
-- `BackLink` (`src/components/BackLink.tsx`) — the `← LABEL` page back link, `inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start`. Renders the arrow itself (`aria-hidden`), so children are the label only. Used by `MediaInfoHeader` (BACK TO SEARCH) and `CollectionBackLink` (BACK TO COLLECTION), which is now a thin wrapper that picks the tab href.
+- `BackLink` (`src/components/BackLink.tsx`) — the `← LABEL` page back link, `inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start`. Renders the arrow itself (`aria-hidden`), so children are the label only. Used by the `navLink` slot in `MediaPage` (BACK TO SEARCH) and `CollectionBackLink` (BACK TO COLLECTION), which is now a thin wrapper that picks the tab href.
 - `Logo` (`src/components/Logo.tsx`) — `/logo.webp` 200×50 linking home, `flex items-center gap-2.5`. Props: `className` for positioning, `priority` for the LCP preload. Used by `Header`, `HeaderSkeleton`, `AuthFormLayout` (all `priority`) and `AuthErrorState`.
 - `MediaPosterLink` (`src/components/MediaPosterLink.tsx`) — 110×165 poster tile link (`w-27.5 h-41.25 rounded-xl border border-white/[0.07]`), optional genre badge (`ui-mono uppercase`) and truncated title below. Used by the home "Recently Watched" strip and the "More like this" row.
 
@@ -224,14 +224,14 @@ One component per repeated link style. Never retype the classes at a call site.
 
 ### MediaInfoHeader & MediaActions
 
-- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: search back link, genre pills, type label, `h1` (`display-serif text-[clamp(42px,5.5vw,72px)]`), director/date/runtime/score meta row, accent divider, overview. `label-mono` and `ui-mono` for labels. It renders in exactly one place, outside every Suspense boundary. Takes `fromSearch` as a plain prop. The collection back link is not part of it — see `CollectionBackLink` under Info & Form.
+- `src/components/MediaInfoHeader.tsx` renders the whole TMDB block: genre pills, type label, `h1` (`display-serif text-[clamp(42px,5.5vw,72px)]`), director/date/runtime/score meta row, accent divider, overview. `label-mono` and `ui-mono` for labels. It renders in exactly one place, outside every Suspense boundary, and takes only `media`. Neither back link is part of it — both come through the `navLink` slot.
 - `src/components/MediaActions.tsx` renders everything below the divider that depends on the signed-in user: the signed-out sign-in prompt, the `to_watch` buttons, the default add buttons, and the `watched` body (rating via `StarRating`, watched date, review) with its UPDATE / DELETE buttons.
 - `src/components/MediaActionsSkeleton.tsx` is its Suspense fallback. Two `Skeleton` blocks, no text.
 
 ### MediaDetail & MediaDetailWrapper
 
-- `src/components/MediaDetail.tsx` orchestrates detail UI and form vs info slots.
-- `MediaDetailWrapper.tsx` provides backdrop radial gradients and two-column layout with `MediaPoster` on the left (hidden on small screens).
+- `src/components/MediaDetail.tsx` orchestrates detail UI and form vs info slots. Server component, no step logic.
+- `MediaDetailWrapper.tsx` provides backdrop radial gradients and two-column layout with `MediaPoster` on the left (hidden on small screens). Step 2 is a CSS state: `DetailStepFlag` streams `<span hidden data-step="two">` into the layout and `group-has-[[data-step=two]]/step:*` variants hide the info column, poster, where-to-watch and recommendations.
 
 ### MediaPage
 
@@ -504,8 +504,8 @@ Overall structure
 - `MediaPage` is an async route loader using the PPR pattern. It `await`s the cached TMDB fetch (`getMovieDetails`/`getSeriesDetails`, both `use cache` + `cacheLife('days')` + `cacheTag`) directly, so the static shell prerenders with TMDB data.
 - **The TMDB block renders once.** `MediaPage` passes `baseMedia` straight to `MediaDetail`, which renders `MediaInfoHeader` outside every boundary. Only the user-dependent parts stream: `MediaPage` hands `MediaDetail` three server-rendered `<Suspense>` subtrees as the `navLink`, `actions` and `form` props. `actions` and `form` call `getEnrichedMedia` (cookies + Supabase) inside; `navLink` is the auth-gated `CollectionBackLink`.
 - The `actions` fallback is `MediaActionsSkeleton` — two `Skeleton` blocks (`h-12 w-full sm:w-44 rounded-xl` and `h-12 w-full sm:w-36 rounded-xl`), `aria-busy="true" aria-live="polite"`, and no text. The `form` fallback is `UserEntryFormSkeleton`. A fallback that repeated the TMDB copy used to ship the `h1` and overview twice in the SSR HTML.
-- `MediaDetail` orchestrates `infoSlot` vs `formSlot` using `useDetailStep` (step 1 = header + `actions`, 2 = `form`). `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
-- `MediaDetailWrapper` provides the backdrop layers and two-column layout. The left poster column contains `MediaPoster`; it is `h-[50vh]` on small screens, `md:w-1/2` above that, and hidden on step 2 (form). From `md` up it is a 2x2 grid: poster and info share row 1, so the poster centers against the info column down to the actions. The `whereToWatchSlot` sits in row 2 under the info column, step 1 only, and never pulls the poster down.
+- **Step 2 is a CSS state, not a branch.** Both `infoSlot` and `formSlot` always render; `DetailStepFlag` (client, its own `<Suspense fallback={null}>` inside `MediaDetailWrapper`) emits `<span hidden data-step="two">` when the URL carries `?step=2`, and `group-has-[[data-step=two]]/step:*` variants do the swap. That keeps `MediaInfoHeader` in the prerendered shell while the step still flips instantly on `goToForm`. `MediaActions` and `MediaEntryForm` detect saved state by checking `watchStatus` in the media object.
+- `MediaDetailWrapper` provides the backdrop layers and two-column layout. The left poster column contains `MediaPoster`; it is `h-[50vh]` on small screens, `md:w-1/2` above that, and hidden on step 2 (form) below `md`. From `md` up it is a 2x2 grid: poster and info share row 1, so the poster centers against the info column down to the actions. The `whereToWatchSlot` sits in row 2 under the info column, step 1 only, and never pulls the poster down.
 - **The page scrolls in `main`, never inside the detail layout.** The wrapper carries `shrink-0` alongside its `overflow-hidden`: `overflow-hidden` zeroes the element's automatic minimum size, so as a flex child of the `(app)` layout's `main` it would otherwise shrink to the viewport and silently clip everything past the fold. That was the mobile "cannot scroll" bug — `main` reported 907px of scroll while the wrapper held 1326px of content, so the overview, actions and "More like this" were unreachable. The info column must stay free of `overflow-y-auto` for the same reason: a nested scroll area there swallows the gesture on touch. `MediaDetailSkeleton` mirrors both rules so the streamed skeleton and the real tree measure the same.
 - The cinematic backdrop (blue radial + dark linear overlay) is `fixed inset-0` so it covers the full viewport — header and `main` share the same gradient, no visible seam between them. The backdrop's `bg-dark` base layer makes it fully opaque, hiding the `(app)` layout's ambient blobs on movie/series pages so the header (transparent) and `main` (MediaDetailWrapper `bg-dark`) render identically. `MediaDetailSkeleton` mirrors this so the streamed skeleton matches.
 
@@ -517,7 +517,7 @@ Poster & Visuals
 Info & Form
 
 - Info view (`MediaInfoHeader` + `MediaActions`) shows:
-  - Back link (`label-mono`). `← BACK TO SEARCH` renders in `MediaInfoHeader` when `fromSearch`. `← BACK TO COLLECTION` (`CollectionBackLink`) renders only for signed-in users: `MediaPage` streams it through the `navLink` slot inside `<Suspense fallback={null}>`, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
+  - Back link (`label-mono`). Both variants stream through the one `navLink` slot inside `<Suspense fallback={null}>`, which reads `searchParams` there instead of above the boundary: `← BACK TO SEARCH` on `?from=search`, otherwise `← BACK TO COLLECTION` (`CollectionBackLink`) for signed-in users only, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `ui-mono uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `label-mono text-secondary`.
   - Title: `display-serif text-[clamp(42px,5.5vw,72px)]`.
