@@ -109,9 +109,6 @@ export default async function proxy(request: NextRequest) {
   let signedIn = false;
   let mediaRoute: MediaRouteOutcome;
 
-  // No session cookie means there is no session to read and none to refresh, so
-  // the Supabase round trip is pure cost. Anonymous traffic is the bulk of the
-  // middleware bill, and it all takes this branch.
   if (hasAuthCookie(request.cookies.getAll())) {
     const supabase = createServerClient(
       supabaseConfig.url,
@@ -195,10 +192,6 @@ export const config = {
   //   crawlers cannot fetch them and the install prompt never appears
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
-  //
-  // This stays a deny-list. `matcher` must be a static literal, so it cannot be
-  // derived from `KNOWN_ROUTES_EXACT`, and two hand-synced lists would fail by
-  // silently making a private route public.
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|icons/|\\.well-known/|_vercel/|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|json|xml|woff2)$).*)',
   ],

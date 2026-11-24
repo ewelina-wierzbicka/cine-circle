@@ -45,10 +45,6 @@ function writeCache(key: string, resolved: ResolvedMedia) {
 }
 
 /**
- * One TMDB detail request, used by `proxy.ts` to decide between a 404, a 308 to
- * the canonical slug, and letting the request through. The title comes from the
- * same response as the status — never add a second fetch for it.
- *
  * Resolved and missing ids are memoized for the life of the instance. An
  * `UNRESOLVED` result never is: it means the token is missing or TMDB failed,
  * and caching an outage would freeze soft 404s in place.
