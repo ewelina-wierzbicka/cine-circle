@@ -1,0 +1,45 @@
+name: Security
+# Supply-chain and static analysis. Kept apart from checks.yml so a PR still
+# gets a fast lint/type/test result while these slower jobs run.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly, so a new advisory against an unchanged lockfile still surfaces.
+    # GitHub fires this repo's schedule hours late; the day is what matters here.
+    - cron: '23 5 * * 1'
+jobs:
+  audit:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      # Advisory for now: the lockfile carries 13 advisories (5 high), all
+      # transitive dev tooling with no runtime reach. Drop continue-on-error
+      # once they clear, so a vulnerable dependency blocks the PR.
+      - name: npm audit
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+  codeql:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+      # No build step: the javascript-typescript analysis reads the source tree.
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@v4
