@@ -36,7 +36,7 @@
     "@tanstack/eslint-plugin-query": "^5.108.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
-    "@types/node": "^20",
+    "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.3.0",
@@ -45,11 +45,11 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jsdom": "^31.0.1",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.6.1",
     "prettier": "^3.10.1",
     "tailwindcss": "^4",
     "typescript": "^7",
-    "vitest": "^4.1.12"
+    "vitest": "^5.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
