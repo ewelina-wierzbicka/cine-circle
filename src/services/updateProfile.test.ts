@@ -4,11 +4,9 @@ import { argsOf, createSupabaseMock } from '@/test/supabaseMock';
 import { updateAvatarPath, updateDisplayName } from '@/services/updateProfile';
 
 const supabase = createSupabaseMock();
-const currentUser = vi.fn(
-  async (): Promise<{ id: string } | null> => ({
-    id: 'user-1',
-  }),
-);
+const currentUser = vi.fn(async (): Promise<{ id: string } | null> => ({
+  id: 'user-1',
+}));
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => supabase.createClient(),
@@ -48,7 +46,11 @@ describe('updateAvatarPath', () => {
   });
 
   it('removes the previous object when the path changed', async () => {
-    supabase.respond('profiles', { data: { avatar_url: 'user-1/old.webp' } });
+    supabase.respond(
+      'profiles',
+      { data: { avatar_url: 'user-1/old.webp' } },
+      { data: { updated_at: '2026-11-24T10:00:00.000Z' } },
+    );
     supabase.respond(
       'storage:avatar',
       {},
@@ -64,7 +66,11 @@ describe('updateAvatarPath', () => {
   });
 
   it('does not remove when the path is unchanged', async () => {
-    supabase.respond('profiles', { data: { avatar_url: 'user-1/same.webp' } });
+    supabase.respond(
+      'profiles',
+      { data: { avatar_url: 'user-1/same.webp' } },
+      { data: { updated_at: '2026-11-24T10:00:00.000Z' } },
+    );
     supabase.respond('storage:avatar', {
       data: { signedUrl: 'https://signed/same' },
     });

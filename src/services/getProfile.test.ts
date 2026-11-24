@@ -1,23 +1,28 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { argsOf, createSupabaseMock } from '@/test/supabaseMock';
+import { requestScope } from '@/test/reactCache';
 import { getProfile } from '@/services/getProfile';
 
 type User = { id: string; user_metadata: Record<string, unknown> };
 
 const supabase = createSupabaseMock();
-const currentUser = vi.fn(
-  async (): Promise<User | null> => ({ id: 'user-1', user_metadata: {} }),
-);
+const currentUser = vi.fn(async (): Promise<User | null> => ({
+  id: 'user-1',
+  user_metadata: {},
+}));
 
+// getProfile is wrapped in React `cache`, which only memoizes in the
+// react-server build with a per-request dispatcher installed. See reactCache.
+vi.mock('react', async () => ({
+  cache: (await import('@/test/reactCache')).serverCache,
+}));
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => supabase.createClient(),
 }));
 vi.mock('@/services/getCurrentUser', () => ({
   getCurrentUser: () => currentUser(),
 }));
-// getProfile reaches getSignedAvatarUrl through updateProfile, which revalidates.
-vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
 afterEach(() => {
   supabase.reset();
@@ -95,6 +100,37 @@ describe('getProfile', () => {
 
     const [signing] = supabase.chains('storage:avatar');
     expect(argsOf(signing, 'createSignedUrl')).toEqual(['user-1/a.webp', 3600]);
+  });
+
+  // `updated_at` is selected for the signed-URL cache key. It must not reach
+  // the returned UserProfile, which crosses into a client component.
+  it('keeps updated_at out of the returned profile', async () => {
+    supabase.respond('profiles', {
+      data: { ...row, updated_at: '2026-11-24T10:00:00.000Z' },
+    });
+
+    await expect(getProfile()).resolves.toEqual(row);
+  });
+
+  it('queries profiles once for two calls in one request', async () => {
+    supabase.respond('profiles', { data: row });
+
+    const results = await requestScope(async () => [
+      await getProfile(),
+      await getProfile(),
+    ]);
+
+    expect(results).toEqual([row, row]);
+    expect(supabase.chains('profiles')).toHaveLength(1);
+  });
+
+  it('queries profiles again in the next request', async () => {
+    supabase.respond('profiles', { data: row }, { data: row });
+
+    await requestScope(() => getProfile());
+    await requestScope(() => getProfile());
+
+    expect(supabase.chains('profiles')).toHaveLength(2);
   });
 
   it.each([
