@@ -3,19 +3,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { argsOf, createSupabaseMock } from '@/test/supabaseMock';
 import {
   SIGNED_AVATAR_REUSE_MS,
-  signedAvatarUrl,
-} from '@/services/signedAvatarUrl';
+  getSignedAvatarUrl,
+} from '@/services/getSignedAvatarUrl';
 
 const supabase = createSupabaseMock();
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => supabase.createClient(),
 }));
-// signedAvatarUrl reaches getSignedAvatarUrl through updateProfile, which
-// revalidates.
+// signAvatarUrl lives in updateProfile, which revalidates.
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
-type ServerClient = Parameters<typeof signedAvatarUrl>[0];
+type ServerClient = Parameters<typeof getSignedAvatarUrl>[0];
 const client = supabase.client as unknown as ServerClient;
 
 beforeEach(() => {
@@ -27,13 +26,13 @@ afterEach(() => {
   supabase.reset();
 });
 
-describe('signedAvatarUrl', () => {
+describe('getSignedAvatarUrl', () => {
   it('reuses the signed URL for a repeat sign of the same path', async () => {
     supabase.respond('storage:avatar', { data: { signedUrl: 'https://a/1' } });
 
-    const first = await signedAvatarUrl(client, 'reuse/avatar.webp');
+    const first = await getSignedAvatarUrl(client, 'reuse/avatar.webp');
     vi.advanceTimersByTime(SIGNED_AVATAR_REUSE_MS - 1);
-    const second = await signedAvatarUrl(client, 'reuse/avatar.webp');
+    const second = await getSignedAvatarUrl(client, 'reuse/avatar.webp');
 
     expect(second).toBe(first);
     expect(supabase.chains('storage:avatar')).toHaveLength(1);
@@ -46,12 +45,12 @@ describe('signedAvatarUrl', () => {
       { data: { signedUrl: 'https://a/theirs' } },
     );
 
-    await expect(signedAvatarUrl(client, 'mine/avatar.webp')).resolves.toBe(
+    await expect(getSignedAvatarUrl(client, 'mine/avatar.webp')).resolves.toBe(
       'https://a/mine',
     );
-    await expect(signedAvatarUrl(client, 'theirs/avatar.webp')).resolves.toBe(
-      'https://a/theirs',
-    );
+    await expect(
+      getSignedAvatarUrl(client, 'theirs/avatar.webp'),
+    ).resolves.toBe('https://a/theirs');
 
     const chains = supabase.chains('storage:avatar');
     expect(chains).toHaveLength(2);
@@ -72,14 +71,14 @@ describe('signedAvatarUrl', () => {
       { data: { signedUrl: 'https://a/fresh' } },
     );
 
-    await expect(signedAvatarUrl(client, 'expiry/avatar.webp')).resolves.toBe(
-      'https://a/stale',
-    );
+    await expect(
+      getSignedAvatarUrl(client, 'expiry/avatar.webp'),
+    ).resolves.toBe('https://a/stale');
     vi.advanceTimersByTime(SIGNED_AVATAR_REUSE_MS + 1);
 
-    await expect(signedAvatarUrl(client, 'expiry/avatar.webp')).resolves.toBe(
-      'https://a/fresh',
-    );
+    await expect(
+      getSignedAvatarUrl(client, 'expiry/avatar.webp'),
+    ).resolves.toBe('https://a/fresh');
     expect(supabase.chains('storage:avatar')).toHaveLength(2);
   });
 

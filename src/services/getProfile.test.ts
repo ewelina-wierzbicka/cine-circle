@@ -22,7 +22,7 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('@/services/getCurrentUser', () => ({
   getCurrentUser: () => currentUser(),
 }));
-// getProfile reaches getSignedAvatarUrl through updateProfile, which revalidates.
+// signAvatarUrl lives in updateProfile, which revalidates.
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
 afterEach(() => {

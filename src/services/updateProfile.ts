@@ -63,10 +63,10 @@ export const updateAvatarPath = async (
 
   revalidatePath('/', 'layout');
 
-  return { avatarUrl: await getSignedAvatarUrl(supabase, filePath) };
+  return { avatarUrl: await signAvatarUrl(supabase, filePath) };
 };
 
-export const getSignedAvatarUrl = async (
+export const signAvatarUrl = async (
   supabase: Awaited<ReturnType<typeof createClient>>,
   path: string,
 ): Promise<string> => {

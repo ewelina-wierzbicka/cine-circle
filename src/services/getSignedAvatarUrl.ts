@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { getSignedAvatarUrl } from '@/services/updateProfile';
+import { signAvatarUrl } from '@/services/updateProfile';
 
 type ServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -9,7 +9,7 @@ type Entry = { url: string; reuseUntil: number };
 
 const signed = new Map<string, Entry>();
 
-export const signedAvatarUrl = async (
+export const getSignedAvatarUrl = async (
   supabase: ServerClient,
   path: string,
 ): Promise<string> => {
@@ -18,7 +18,7 @@ export const signedAvatarUrl = async (
 
   if (reusable && reusable.reuseUntil > now) return reusable.url;
 
-  const url = await getSignedAvatarUrl(supabase, path);
+  const url = await signAvatarUrl(supabase, path);
 
   for (const [key, entry] of signed) {
     if (entry.reuseUntil <= now) signed.delete(key);

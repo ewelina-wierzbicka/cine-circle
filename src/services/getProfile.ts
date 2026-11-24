@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
-import { signedAvatarUrl } from '@/services/signedAvatarUrl';
+import { getSignedAvatarUrl } from '@/services/getSignedAvatarUrl';
 import { UserProfile } from '@/types';
 import { cache } from 'react';
 
@@ -53,6 +53,6 @@ const resolveAvatarUrl = async (
   if (!profile.avatar_url || profile.avatar_url.startsWith('http')) {
     return profile;
   }
-  const signedUrl = await signedAvatarUrl(supabase, profile.avatar_url);
+  const signedUrl = await getSignedAvatarUrl(supabase, profile.avatar_url);
   return { ...profile, avatar_url: signedUrl };
 };
