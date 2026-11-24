@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
+import { getSignedAvatarUrl } from '@/services/getSignedAvatarUrl';
 import { revalidatePath } from 'next/cache';
 
 export const updateDisplayName = async (displayName: string): Promise<void> => {
@@ -50,30 +51,27 @@ export const updateAvatarPath = async (
       throw new Error('Failed to update avatar. Please try again.');
   }
 
-  const { error } = await supabase.from('profiles').upsert(
-    {
-      user_id: user.id,
-      avatar_url: filePath,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id' },
-  );
+  // The stored `updated_at` is the signed-URL cache key, and the BEFORE UPDATE
+  // trigger sets it, so read it back rather than reusing the value sent.
+  const { data: saved, error } = await supabase
+    .from('profiles')
+    .upsert(
+      {
+        user_id: user.id,
+        avatar_url: filePath,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' },
+    )
+    .select('updated_at')
+    .single();
 
-  if (error) throw new Error('Failed to update avatar. Please try again.');
+  if (error || !saved)
+    throw new Error('Failed to update avatar. Please try again.');
 
   revalidatePath('/', 'layout');
 
-  return { avatarUrl: await signAvatarUrl(supabase, filePath) };
-};
-
-export const signAvatarUrl = async (
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  path: string,
-): Promise<string> => {
-  const { data, error } = await supabase.storage
-    .from('avatar')
-    .createSignedUrl(path, 60 * 60);
-
-  if (error) throw new Error('Failed to load avatar image.');
-  return data.signedUrl;
+  return {
+    avatarUrl: await getSignedAvatarUrl(supabase, filePath, saved.updated_at),
+  };
 };

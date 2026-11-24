@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server';
-import { signAvatarUrl } from '@/services/updateProfile';
 
 type ServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -12,18 +11,27 @@ const signed = new Map<string, Entry>();
 export const getSignedAvatarUrl = async (
   supabase: ServerClient,
   path: string,
+  updatedAt: string,
 ): Promise<string> => {
+  const key = `${updatedAt}\n${path}`;
   const now = Date.now();
-  const reusable = signed.get(path);
+  const reusable = signed.get(key);
 
   if (reusable && reusable.reuseUntil > now) return reusable.url;
 
-  const url = await signAvatarUrl(supabase, path);
+  const { data, error } = await supabase.storage
+    .from('avatar')
+    .createSignedUrl(path, 60 * 60);
 
-  for (const [key, entry] of signed) {
-    if (entry.reuseUntil <= now) signed.delete(key);
+  if (error) throw new Error('Failed to load avatar image.');
+
+  for (const [stale, entry] of signed) {
+    if (entry.reuseUntil <= now) signed.delete(stale);
   }
-  signed.set(path, { url, reuseUntil: now + SIGNED_AVATAR_REUSE_MS });
+  signed.set(key, {
+    url: data.signedUrl,
+    reuseUntil: now + SIGNED_AVATAR_REUSE_MS,
+  });
 
-  return url;
+  return data.signedUrl;
 };

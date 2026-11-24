@@ -4,6 +4,11 @@ import { getSignedAvatarUrl } from '@/services/getSignedAvatarUrl';
 import { UserProfile } from '@/types';
 import { cache } from 'react';
 
+// `updated_at` is read for the signed-URL cache key only, never returned.
+const COLUMNS = 'id, user_id, display_name, avatar_url, updated_at';
+
+type ProfileRow = UserProfile & { updated_at: string };
+
 export const getProfile = cache(async (): Promise<UserProfile | null> => {
   const user = await getCurrentUser();
 
@@ -13,13 +18,13 @@ export const getProfile = cache(async (): Promise<UserProfile | null> => {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, user_id, display_name, avatar_url')
+    .select(COLUMNS)
     .eq('user_id', user.id)
     .maybeSingle();
 
   if (error) throw error;
 
-  if (data) return resolveAvatarUrl(supabase, data as UserProfile);
+  if (data) return resolveAvatarUrl(supabase, data as ProfileRow);
 
   const { data: created, error: insertError } = await supabase
     .from('profiles')
@@ -30,12 +35,12 @@ export const getProfile = cache(async (): Promise<UserProfile | null> => {
       },
       { onConflict: 'user_id' },
     )
-    .select('id, user_id, display_name, avatar_url')
+    .select(COLUMNS)
     .single();
 
   if (insertError) throw insertError;
 
-  return resolveAvatarUrl(supabase, created as UserProfile);
+  return resolveAvatarUrl(supabase, created as ProfileRow);
 });
 
 const identityDisplayName = (
@@ -48,11 +53,17 @@ const identityDisplayName = (
 
 const resolveAvatarUrl = async (
   supabase: Awaited<ReturnType<typeof createClient>>,
-  profile: UserProfile,
+  row: ProfileRow,
 ): Promise<UserProfile> => {
+  const { updated_at, ...profile } = row;
+
   if (!profile.avatar_url || profile.avatar_url.startsWith('http')) {
     return profile;
   }
-  const signedUrl = await getSignedAvatarUrl(supabase, profile.avatar_url);
+  const signedUrl = await getSignedAvatarUrl(
+    supabase,
+    profile.avatar_url,
+    updated_at,
+  );
   return { ...profile, avatar_url: signedUrl };
 };
