@@ -1,16 +1,11 @@
-'use client';
-
 import MediaDetailWrapper from '@/components/MediaDetailWrapper';
 import MediaInfoHeader from '@/components/MediaInfoHeader';
-import { useDetailStep } from '@/hooks/useDetailStep';
 import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { NormalizedMedia } from '@/types';
 import { ReactNode } from 'react';
 
 type Props = {
   media: NormalizedMedia;
-  initialStep?: number;
-  fromSearch?: boolean;
   navLink?: ReactNode;
   actions: ReactNode;
   whereToWatch?: ReactNode;
@@ -19,26 +14,21 @@ type Props = {
 
 export default function MediaDetail({
   media,
-  initialStep = 1,
-  fromSearch = false,
   navLink,
   actions,
   whereToWatch,
   form,
 }: Props) {
-  const { step } = useDetailStep(initialStep);
-
   return (
     <MediaDetailWrapper
       posterSrc={
         media.poster_path ? tmdbImageUrl(media.poster_path) : undefined
       }
       posterTitle={media.title}
-      step={step}
       infoSlot={
         <div className="flex flex-col w-full animate-fade-up md:max-w-120">
           {navLink}
-          <MediaInfoHeader media={media} fromSearch={fromSearch} />
+          <MediaInfoHeader media={media} />
           {actions}
         </div>
       }

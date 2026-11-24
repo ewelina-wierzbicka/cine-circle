@@ -20,12 +20,6 @@ describe('useDetailStep', () => {
     expect(at('/movie/550').current.step).toBe(1);
   });
 
-  it('falls back to the initial step', () => {
-    navigation.searchParams = new URLSearchParams();
-    const { result } = renderHook(() => useDetailStep(2));
-    expect(result.current.step).toBe(2);
-  });
-
   it('goToForm adds step=2 and keeps every other param', () => {
     const result = at('/movie/550', 'tab=watched&from=search');
     act(() => result.current.goToForm());

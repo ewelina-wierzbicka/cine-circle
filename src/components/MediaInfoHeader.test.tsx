@@ -132,7 +132,6 @@ describe('MediaInfoHeader', () => {
           overview: 'Overview',
           genres: [{ id: 1, name: 'Drama' }],
         }}
-        fromSearch
       />,
     );
     const headings = screen.getAllByRole('heading', { level: 1 });

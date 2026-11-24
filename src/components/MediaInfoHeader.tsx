@@ -1,4 +1,3 @@
-import { BackLink } from '@/components/BackLink';
 import ClockIcon from '@/icons/Clock';
 import { NormalizedMedia } from '@/types';
 
@@ -18,7 +17,6 @@ type Props = {
     | 'number_of_seasons'
     | 'number_of_episodes'
   >;
-  fromSearch?: boolean;
 };
 
 function formatRuntime(minutes: number): string {
@@ -29,7 +27,7 @@ function formatRuntime(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
-export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
+export default function MediaInfoHeader({ media }: Props) {
   const {
     title,
     release_date,
@@ -70,7 +68,6 @@ export default function MediaInfoHeader({ media, fromSearch = false }: Props) {
 
   return (
     <>
-      {fromSearch && <BackLink href="/">BACK TO SEARCH</BackLink>}
       {genres && genres.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {genres.map((g) => (
