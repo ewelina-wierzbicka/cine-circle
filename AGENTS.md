@@ -276,6 +276,18 @@ export const colors = {
 - Do not run raw SQL migrations manually; use Supabase migrations (`supabase/migrations/`)
 - **Supabase CLI 3.x is required.** `supabase/config.toml` uses `[local_smtp]`, the section that replaced `[inbucket]` in v3. CLI 2.x rejects `local_smtp` and 3.x rejects `inbucket`, so the two cannot coexist — `supabase start` fails on the wrong major. Both workflows pin `supabase/setup-cli` to `3.0.0`; `version: latest` is what broke CI when v3 shipped. Upgrade locally with `brew upgrade supabase`.
 
+### Auth rate limits
+
+**Per-IP auth rate limits are not an effective control for this app.** The auth calls are server actions on the server client, so GoTrue sees the Vercel egress IP, not the visitor. Every per-IP limit is one pooled app-wide bucket, so a low value lets one attacker lock out everyone. `Sb-Forwarded-For` is the only override and needs a secret API key, which the SSR client does not send. Verified against the Supabase Auth docs, 2026-11-23. Move to `docs/SECURITY.md` when it lands.
+
+- Production values, matching `[auth.rate_limit]`: sign-ups/sign-ins **300**/5min, verifications **300**/5min, token refresh **1500**/5min, emails **30**/hour. Board sign-off pending.
+- Raising them is the point. They are capacity guards, not a security boundary. Never lower `sign_in_sign_ups` to "harden" login.
+- `email_sent` is per project, not per user. Below 30 it blocks real signups. The spend cap is Resend's 100/day, which fails closed.
+- The 60s `max_frequency` per user is the only limit keyed on the user. Keep it.
+- **`[auth.rate_limit]` is local-only until pushed.** Nothing runs `supabase config push`, so the dashboard holds its own values; `supabase config diff` compares them. A bare push would also send `site_url` and `max_frequency = "1s"` to production, so it needs a `[remotes.production]` block first.
+- Management API names differ: `sign_in_sign_ups` is `rate_limit_otp`, `token_verifications` is `rate_limit_verify`.
+- The real controls see the browser IP: a captcha on `/login` and `/register`, or Vercel Firewall. Neither is in place.
+
 ### Schema
 
 | Table              | Key columns                                                   | Notes                                                                                                                |
