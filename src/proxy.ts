@@ -169,11 +169,11 @@ export default async function proxy(request: NextRequest) {
   if (!signedIn && !isAuthRoute && !isOpenRoute) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('rurl', pathname);
-    return NextResponse.redirect(loginUrl);
+    return withSessionCookies(NextResponse.redirect(loginUrl));
   }
 
   if (signedIn && isAuthRoute) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return withSessionCookies(NextResponse.redirect(new URL('/', request.url)));
   }
 
   return supabaseResponse;
