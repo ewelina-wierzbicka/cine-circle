@@ -59,4 +59,30 @@ export default async function globalSetup() {
       'Storage bucket `avatar` must be private; the app serves avatars via signed URLs.',
     );
   }
+
+  await assertUploadsWork();
+}
+
+// A storage-api container left over from an older CLI runs its upsert against a
+// schema a newer `db reset` has already moved past, and every upload answers
+// `500 DatabaseError code: 42P10`. Probe it once here so the cause is named,
+// instead of three avatar tests failing on an opaque 500.
+async function assertUploadsWork() {
+  const path = `__setup-probe/${crypto.randomUUID()}.webp`;
+  const { error } = await admin.storage
+    .from('avatar')
+    .upload(path, new Blob([new Uint8Array(16)], { type: 'image/webp' }), {
+      contentType: 'image/webp',
+    });
+
+  if (error) {
+    throw new Error(
+      `Storage upload is broken on this stack: ${error.message}. The local ` +
+        'service containers and the database schema come from different ' +
+        'Supabase CLI versions. Run `npx supabase stop && npx supabase start ' +
+        '&& npx supabase db reset`, and use one CLI major per checkout.',
+    );
+  }
+
+  await admin.storage.from('avatar').remove([path]);
 }
