@@ -14,6 +14,7 @@ import { CollectionTab, NormalizedMedia } from '@/types';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { toHref } from '@/lib/mediaUtils';
 import { breadcrumbJsonLd, jsonLdScript, mediaJsonLd } from '@/lib/jsonLd';
+import { BackLink } from './BackLink';
 import MediaActions from './MediaActions';
 import MediaActionsSkeleton from './MediaActionsSkeleton';
 import MediaDetail from './MediaDetail';
@@ -31,7 +32,7 @@ export type MediaPageSearchParams = Record<
 type Props = {
   slug: string;
   mediaType: 'movie' | 'series';
-  searchParams?: MediaPageSearchParams;
+  searchParams: Promise<MediaPageSearchParams>;
 };
 
 function toCollectionTab(
@@ -41,21 +42,10 @@ function toCollectionTab(
   return undefined;
 }
 
-function toQueryString(searchParams: MediaPageSearchParams): string {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (Array.isArray(value))
-      value.forEach((entry) => params.append(key, entry));
-    else if (value !== undefined) params.append(key, value);
-  }
-  const query = params.toString();
-  return query ? `?${query}` : '';
-}
-
 export default async function MediaPage({
   slug,
   mediaType,
-  searchParams = {},
+  searchParams,
 }: Props) {
   const id = slug.split('-')[0];
   if (!id || !/^\d+$/.test(id)) notFound();
@@ -68,13 +58,8 @@ export default async function MediaPage({
 
   const canonicalHref = toHref(tmdbData.id, tmdbData.title, mediaType);
   const requestedHref = `/${mediaType}/${slug}`;
-  if (requestedHref !== canonicalHref) {
-    permanentRedirect(`${canonicalHref}${toQueryString(searchParams)}`);
-  }
+  if (requestedHref !== canonicalHref) permanentRedirect(canonicalHref);
 
-  const initialStep = searchParams.step === '2' ? 2 : 1;
-  const fromSearch = searchParams.from === 'search';
-  const fromTab = toCollectionTab(searchParams.tab);
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
   const tmdbId = Number(id);
 
@@ -95,14 +80,10 @@ export default async function MediaPage({
       <MediaDetail
         key={slug}
         media={baseMedia}
-        initialStep={initialStep}
-        fromSearch={fromSearch}
         navLink={
-          !fromSearch ? (
-            <Suspense fallback={null}>
-              <UserCollectionBackLink tab={fromTab} />
-            </Suspense>
-          ) : undefined
+          <Suspense fallback={null}>
+            <ViewerNavLink searchParams={searchParams} />
+          </Suspense>
         }
         actions={
           <Suspense fallback={<MediaActionsSkeleton />}>
@@ -143,10 +124,17 @@ type EnrichedProps = {
   mediaType: 'movie' | 'series';
 };
 
-async function UserCollectionBackLink({ tab }: { tab?: CollectionTab }) {
+async function ViewerNavLink({
+  searchParams,
+}: {
+  searchParams: Promise<MediaPageSearchParams>;
+}) {
+  const { from, tab } = await searchParams;
+  if (from === 'search') return <BackLink href="/">BACK TO SEARCH</BackLink>;
+
   const user = await getCurrentUser();
   if (!user) return null;
-  return <CollectionBackLink tab={tab} />;
+  return <CollectionBackLink tab={toCollectionTab(tab)} />;
 }
 
 async function UserEnrichedActions({

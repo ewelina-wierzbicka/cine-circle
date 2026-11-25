@@ -1,8 +1,16 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import MediaEntryForm from '@/components/MediaEntryForm';
 import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
-import { resetNavigation, router } from '@/test/navigation';
+import { navigation, resetNavigation, router } from '@/test/navigation';
 import { renderWithQuery } from '@/test/render';
 import type { NormalizedMedia, SavedMedia } from '@/types';
 
@@ -18,6 +26,10 @@ beforeAll(async () => {
   await import('@/components/UserEntryForm');
   await import('@/components/DatePicker');
 }, 60_000);
+
+beforeEach(() => {
+  navigation.searchParams = new URLSearchParams('step=2');
+});
 
 afterEach(() => {
   resetNavigation();
@@ -39,6 +51,12 @@ const savedWatched: SavedMedia = {
 };
 
 describe('MediaEntryForm', () => {
+  it('renders nothing on step 1', () => {
+    navigation.searchParams = new URLSearchParams();
+    const { container } = renderWithQuery(<MediaEntryForm media={media} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('adds an unsaved title', async () => {
     renderWithQuery(<MediaEntryForm media={media} />);
     fireEvent.click(await screen.findByRole('button', { name: 'SAVE' }));

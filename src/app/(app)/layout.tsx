@@ -26,9 +26,13 @@ export default function PrivateLayout({
       </Suspense>
       <main className="relative z-10 flex-1 flex flex-col overflow-y-auto">
         {children}
-        <RouteFooter placement="in-flow" />
+        <Suspense fallback={null}>
+          <RouteFooter placement="in-flow" />
+        </Suspense>
       </main>
-      <RouteFooter placement="pinned" />
+      <Suspense fallback={null}>
+        <RouteFooter placement="pinned" />
+      </Suspense>
     </div>
   );
 }

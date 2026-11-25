@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params, searchParams }: Props) {
   const { id: slug } = await params;
-  const search = await searchParams;
-  return <MediaPage slug={slug} mediaType="series" searchParams={search} />;
+  return (
+    <MediaPage slug={slug} mediaType="series" searchParams={searchParams} />
+  );
 }
