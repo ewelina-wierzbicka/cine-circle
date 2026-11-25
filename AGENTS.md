@@ -174,7 +174,7 @@ src/
   - It is skipped when the request carries an `rsc` header. In-app navigation never reaches a crawler and still renders the not-found UI via `notFound()` and redirects via `permanentRedirect()`.
   - `resolveMedia` returns the title from the same response as the status — **never add a second fetch for it**. Series read `name`, movies read `title`.
   - It fails open on a missing `TMDB_TOKEN` or a TMDB error: `exists: true` with a null id and title, so the request passes through unredirected. A soft 404 beats 404ing a real page, and a guessed slug would be a wrong 308.
-  - Both the 404 rewrite and the 308 carry the Supabase cookies off `supabaseResponse` via `withSessionCookies`, or a refreshed session token is dropped.
+  - All four exit paths carry the Supabase cookies off `supabaseResponse` via `withSessionCookies` — the 404 rewrite, the 308, the `/login?rurl=` redirect and the signed-in auth-route redirect to `/` — or a refreshed session token is dropped and the next request refreshes again.
   - The 404 rewrite also sets `X-Robots-Tag: noindex`, and both `not-found.tsx` files export `NOT_FOUND_METADATA` from `lib/seo.ts`, so the body carries `noindex, nofollow` too. Next adds its own `noindex` meta on top. Never drop either half: the header does not depend on what Next does with the status, the metadata covers the root 404 for an unlisted path, which the proxy passes through untouched.
   - `toHref` drops the trailing dash when a title slugifies to nothing, so `/movie/123` is its own canonical and the 308 cannot loop.
   - `MediaPage` keeps its own `notFound()` and `permanentRedirect()` calls. They cover RSC navigation and are the reason the body is correct today.

@@ -18,7 +18,7 @@ const resolveMedia = vi.fn<(mediaType: string, id: string) => ResolvedMedia>();
 // Records that the Supabase client was constructed at all, which is the whole
 // cost the cookie-less branch skips.
 const createServerClient = vi.fn<(url: string, anonKey: string) => void>();
-// Cookies Supabase refreshes mid-request; the 404 and 308 paths must carry them.
+// Cookies Supabase refreshes mid-request; every exit path must carry them.
 let refreshedCookies: CookieToSet[] = [];
 let sessionUser: { id: string } | null = null;
 
@@ -368,6 +368,25 @@ describe('the cookie-bearing branch', () => {
       expect(locationOf(response).pathname).toBe('/');
     },
   );
+
+  it('carries a refreshed session cookie on the login redirect', async () => {
+    refreshedCookies = [{ name: 'sb-access-token', value: 'refreshed' }];
+
+    const response = await proxy(mediaRequest('/profile', SESSION_COOKIE));
+
+    expect(locationOf(response).pathname).toBe('/login');
+    expect(response.cookies.get('sb-access-token')?.value).toBe('refreshed');
+  });
+
+  it('carries a refreshed session cookie off an auth route', async () => {
+    sessionUser = { id: 'user-1' };
+    refreshedCookies = [{ name: 'sb-access-token', value: 'refreshed' }];
+
+    const response = await proxy(mediaRequest('/login', SESSION_COOKIE));
+
+    expect(locationOf(response).pathname).toBe('/');
+    expect(response.cookies.get('sb-access-token')?.value).toBe('refreshed');
+  });
 
   it('resolves the media id alongside the session check', async () => {
     resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
