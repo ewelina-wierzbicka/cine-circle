@@ -179,6 +179,15 @@ test.describe('profiles', () => {
     expect(data?.display_name).toBe('Victim');
   });
 
+  test('another user cannot delete it', async () => {
+    await attacker.client.from('profiles').delete().eq('user_id', victim.id);
+    const { data } = await victim.client
+      .from('profiles')
+      .select('display_name')
+      .eq('user_id', victim.id);
+    expect(data).toEqual([{ display_name: 'Victim' }]);
+  });
+
   test('another user cannot create one in its name', async () => {
     const { error } = await attacker.client
       .from('profiles')
