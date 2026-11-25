@@ -27,7 +27,6 @@ beforeAll(async () => {
   await import('@/components/DatePicker');
 }, 60_000);
 
-// The form only renders on step 2.
 beforeEach(() => {
   navigation.searchParams = new URLSearchParams('step=2');
 });

@@ -34,7 +34,6 @@ test.describe('collection', () => {
 
     await page.getByRole('button', { name: 'I WATCHED' }).click();
 
-    // Step 2 hides the info column. Only the CSS :has() swap does that.
     await expect(page.getByRole('heading', { level: 1 })).toBeHidden();
 
     // Pick a date. Today's button is always enabled and uniquely named.

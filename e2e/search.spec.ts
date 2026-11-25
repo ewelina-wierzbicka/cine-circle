@@ -46,7 +46,6 @@ test.describe('search', () => {
     ).toBeVisible();
     await expect(page.getByText('Science Fiction').first()).toBeVisible();
 
-    // ?from=search swaps the collection back link for the search one.
     await expect(
       page.getByRole('link', { name: 'BACK TO SEARCH' }),
     ).toBeVisible();
