@@ -6,6 +6,7 @@ export type SecurityEvent =
   | 'email.inbound_missing_signature_headers'
   | 'email.inbound_timestamp_out_of_range'
   | 'email.inbound_invalid_signature'
+  | 'email.inbound_invalid_email_id'
   | 'auth.oauth_callback_missing_code'
   | 'auth.oauth_callback_exchange_failed'
   | 'auth.confirm_callback_missing_code'
