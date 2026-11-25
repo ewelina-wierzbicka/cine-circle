@@ -286,6 +286,8 @@ export const colors = {
 
 `deleted_accounts` has no FK to `auth.users` on purpose — the row must outlive the account. It exists so a restore can re-apply deletions taken after the backup, which is what keeps backups "beyond use" under Art. 17. See `docs/BACKUPS.md` section 6.
 
+`user_media` has CHECKs: `review` up to 2000 chars, `rating` 0 to 10. `lib/userMediaColumns.ts` holds the same bounds and the write allowlist.
+
 On creation only, `getProfile` seeds `display_name` from `user_metadata.full_name ?? name` so an OAuth sign-in lands with a readable name. An existing row is never touched.
 
 `[auth.external.google]` is enabled in `supabase/config.toml` and reads `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` from the environment. Both must be set, or `supabase start` fails. `skip_nonce_check = true` is required for local Google sign-in.
