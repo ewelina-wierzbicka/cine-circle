@@ -27,8 +27,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params, searchParams }: Props) {
   const { id: slug } = await params;
-  // `searchParams` is passed down unawaited on purpose: awaiting it here would
-  // put the whole route behind a request and empty the prerendered shell.
   return (
     <MediaPage slug={slug} mediaType="movie" searchParams={searchParams} />
   );

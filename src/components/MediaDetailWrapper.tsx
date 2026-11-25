@@ -6,10 +6,6 @@ import { tmdbImageUrl } from '@/lib/tmdbImage';
 import { RecommendedMedia } from '@/types';
 import { ReactNode, Suspense } from 'react';
 
-// Step 2 is driven by `<DetailStepFlag />`, which streams in from its own
-// Suspense boundary so the TMDB body above can stay in the prerendered shell.
-// Every step-dependent rule therefore reacts to the flag through `:has()`
-// instead of branching the tree on a server-read `step`.
 const HIDE_ON_FORM_STEP = 'group-has-[[data-step=two]]/step:hidden';
 const SHOW_ON_FORM_STEP = 'hidden group-has-[[data-step=two]]/step:block';
 

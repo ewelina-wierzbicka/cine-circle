@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function MediaEntryForm({ media }: Props) {
-  const { goToInfo } = useDetailStep();
+  const { step, goToInfo } = useDetailStep();
   const router = useRouter();
 
   const saved = 'watchStatus' in media ? media : null;
@@ -36,6 +36,8 @@ export default function MediaEntryForm({ media }: Props) {
     : watchStatus === 'watched'
       ? handleUpdateSuccess
       : handleMoveToWatchedSuccess;
+
+  if (step !== 2) return null;
 
   return (
     <UserEntryForm

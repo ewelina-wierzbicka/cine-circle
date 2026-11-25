@@ -32,8 +32,6 @@ export type MediaPageSearchParams = Record<
 type Props = {
   slug: string;
   mediaType: 'movie' | 'series';
-  // Stays a promise all the way down. Awaiting it above a Suspense boundary
-  // would make the whole route dynamic and empty the prerendered shell.
   searchParams: Promise<MediaPageSearchParams>;
 };
 
@@ -60,8 +58,6 @@ export default async function MediaPage({
 
   const canonicalHref = toHref(tmdbData.id, tmdbData.title, mediaType);
   const requestedHref = `/${mediaType}/${slug}`;
-  // No query string: `proxy.ts` answers the document 308 with the search
-  // appended, and in-app navigation always builds a canonical href.
   if (requestedHref !== canonicalHref) permanentRedirect(canonicalHref);
 
   const baseMedia: NormalizedMedia = { ...tmdbData, media_type: mediaType };
