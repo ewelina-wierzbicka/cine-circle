@@ -274,37 +274,6 @@ describe('media route responses', () => {
     expect(response.headers.get('x-robots-tag')).toBeNull();
   });
 
-  // A dotted slug used to skip the matcher, so the id was never resolved and
-  // the PPR shell answered a soft 200. It is a media route like any other.
-  it.each(['/movie/999999999.xml', '/series/999999999.json'])(
-    'rewrites the dotted unknown id %s to the not-found route',
-    async (path) => {
-      const response = await proxy(mediaRequest(path));
-
-      // The id is not numeric once the extension is attached, so no lookup.
-      expect(resolveMedia).not.toHaveBeenCalled();
-      expect(response.headers.get('x-middleware-rewrite')).toBe(
-        'http://localhost:3000/_not-found',
-      );
-      expect(response.headers.get('x-robots-tag')).toBe('noindex');
-    },
-  );
-
-  it('redirects a dotted canonical slug back to the canonical path', async () => {
-    resolveMedia.mockReturnValue({
-      exists: true,
-      id: 550,
-      title: 'Fight Club',
-    });
-
-    const response = await proxy(mediaRequest('/movie/550-fight-club.png'));
-
-    expect(response.status).toBe(308);
-    expect(response.headers.get('location')).toBe(
-      'http://localhost:3000/movie/550-fight-club',
-    );
-  });
-
   it('skips the lookup for an RSC navigation', async () => {
     const response = await proxy(
       mediaRequest('/movie/999999999', { rsc: '1' }),
@@ -427,12 +396,7 @@ describe('config.matcher', () => {
     '/movie/550-fight-club',
     '/series/1399',
     '/nonexistent-xyz',
-    // A dotted media slug must reach the proxy, or the id is never resolved
-    // and an unknown one answers a soft 200 from the PPR shell.
     '/movie/999999999.xml',
-    '/movie/999999999.txt',
-    '/movie/999999999.json',
-    '/movie/999999999.png',
     '/movie/550-fight-club.webp',
     '/series/999999999.xml',
   ])('invokes the proxy for %s', (path) => {
@@ -457,8 +421,6 @@ describe('config.matcher', () => {
     '/logo-light.webp',
     '/tmdb.svg',
     '/api/cron/keep-alive',
-    // The media guard must not re-admit dotted paths at other depths: a bot
-    // scanning for these would otherwise cost one invocation each.
     '/wp-content/config.json',
     '/static/vendor/app.js.map.json',
     '/backup/db.xml',

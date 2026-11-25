@@ -192,13 +192,6 @@ export const config = {
   //   crawlers cannot fetch them and the install prompt never appears
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
-  //
-  // The extension alternative carries a `(?!movie/|series/)` guard. Without it
-  // `/movie/<id>.xml` skipped middleware, so the id was never resolved and an
-  // unknown one answered a soft 200 from the PPR shell. `toSlug` strips `.`
-  // from every title, so no canonical media URL has an extension and nothing
-  // in `public/` lives under those prefixes: the guard re-admits bogus URLs
-  // only. Every other dotted path, at any depth, stays excluded.
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|icons/|\\.well-known/|_vercel/|api/|(?!movie/|series/).*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|json|xml|woff2)$).*)',
   ],
