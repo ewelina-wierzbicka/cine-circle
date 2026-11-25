@@ -61,7 +61,11 @@ describe('updateAvatarPath', () => {
   });
 
   it('accepts a path inside the user folder', async () => {
-    supabase.respond('profiles', { data: { avatar_url: null } });
+    supabase.respond(
+      'profiles',
+      { data: { avatar_url: null } },
+      { data: { updated_at: '2026-11-24T11:00:00.000Z' } },
+    );
     supabase.respond('storage:avatar', {
       data: { signedUrl: 'https://signed/ok' },
     });
