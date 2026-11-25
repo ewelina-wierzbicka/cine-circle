@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { argsOf, createSupabaseMock } from '@/test/supabaseMock';
 import {
+  SIGNED_AVATAR_MAX_ENTRIES,
   SIGNED_AVATAR_REUSE_MS,
   getSignedAvatarUrl,
 } from '@/services/getSignedAvatarUrl';
@@ -108,6 +109,42 @@ describe('getSignedAvatarUrl', () => {
     await expect(
       getSignedAvatarUrl(client, 'denied/avatar.webp', V1),
     ).rejects.toThrow('Failed to load avatar image.');
+  });
+
+  // `updated_at` is part of the key and a caller can bump it in a loop, so the
+  // map must hold at the cap and shed its oldest entry, not grow.
+  it('caps live entries and evicts the oldest first', async () => {
+    const fill = Array.from({ length: SIGNED_AVATAR_MAX_ENTRIES + 1 }, () => ({
+      data: { signedUrl: 'https://a/fill' },
+    }));
+    supabase.respond(
+      'storage:avatar',
+      ...fill,
+      { data: { signedUrl: 'https://a/evicted-resign' } },
+      { data: { signedUrl: 'https://a/unused' } },
+    );
+
+    for (let i = 0; i < SIGNED_AVATAR_MAX_ENTRIES; i++) {
+      await getSignedAvatarUrl(client, `cap-${i}/avatar.webp`, V1);
+    }
+    const filled = supabase.chains('storage:avatar').length;
+
+    // One past the cap: the first path signed is the one that goes.
+    await getSignedAvatarUrl(client, 'cap-overflow/avatar.webp', V1);
+
+    // The second oldest is still cached, so exactly one entry was dropped.
+    await expect(
+      getSignedAvatarUrl(client, 'cap-1/avatar.webp', V1),
+    ).resolves.toBe('https://a/fill');
+
+    await expect(
+      getSignedAvatarUrl(client, 'cap-0/avatar.webp', V1),
+    ).resolves.toBe('https://a/evicted-resign');
+
+    expect(filled).toBe(SIGNED_AVATAR_MAX_ENTRIES);
+    expect(supabase.chains('storage:avatar')).toHaveLength(
+      SIGNED_AVATAR_MAX_ENTRIES + 2,
+    );
   });
 
   // The reuse window must stay safely inside the one hour signed-URL expiry.
