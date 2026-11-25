@@ -297,6 +297,8 @@ On creation only, `getProfile` seeds `display_name` from `user_metadata.full_nam
 
 The `avatar` bucket is created by `supabase/migrations/20260917143659_add_avatar_bucket.sql`, so `supabase db reset` gives a fresh local stack a working bucket. Storage RLS policies for it live in the base `remote_schema` migration.
 
+`20261125184205_enforce_avatar_bucket_limits.sql` sets `file_size_limit` (1048576) and `allowed_mime_types` (JPEG, PNG, WebP, GIF) on that row. The upload is a direct browser-to-Storage call with the user's own token, so the bucket row is the only server-side size and type check — the `handleAvatarChange` checks are fast feedback, not enforcement. The two lists must stay in sync, and `image/png` has to stay in the allowlist because `lib/resizeImage.ts` returns the original file when the browser cannot encode WebP.
+
 ### Backups
 
 `.github/workflows/backup.yml` runs a nightly age-encrypted dump (roles, schema, data, plus the `avatar` bucket via `scripts/backup-storage.mjs`) and uploads it as a 30-day artifact. Setup, restore steps, security and GDPR rationale: `docs/BACKUPS.md`.
