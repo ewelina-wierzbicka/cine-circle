@@ -15,7 +15,14 @@ describe('safeRedirectPath', () => {
     expect(safeRedirectPath(value)).toBeUndefined();
   });
 
-  it.each(['https://evil.com', '//evil.com', '/\\evil.com'])(
+  it.each([
+    'https://evil.com',
+    '//evil.com',
+    '/\\evil.com',
+    '/\t/evil.com',
+    '/\n/evil.com',
+    '/\r/evil.com',
+  ])(
     'rejects the off-site target %s',
     (value) => {
       expect(safeRedirectPath(value)).toBeUndefined();
