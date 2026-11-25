@@ -475,6 +475,8 @@ export async function getMovieDetails(id: string) {
 
 Cached TMDB services: `getTrendingMovies` (`trending-movies`), `getMovieDetails` (`movie-<id>`), `getSeriesDetails` (`series-<id>`), `getPopularMovies` (`popular-movies-<page>`), `getPopularSeries` (`popular-series-<page>`). All use `cacheLife('days')`.
 
+- `getMedia` search goes through two cached leaves in the same module, `searchMoviePage` and `searchSeriesPage`, tagged `search-movies` and `search-series` at `cacheLife('hours')`. The key is the `query` and `page` arguments; the tags stay coarse on purpose, since a per-query tag would be unbounded attacker-chosen cardinality. `getMedia` itself is uncached: it only sorts and merges the cached pages, and `type: 'all'` fans out to both leaves.
+
 `getMovieDetails` and `getSeriesDetails` both fetch `append_to_response=credits,recommendations,watch/providers` — one request per detail page. Never split a new field into a second fetch; widen the append list instead.
 
 - `getWatchProviders(id, mediaType, region)` returns one region's slice of that same cached response, or `null`. The full country map is stripped before `NormalizedMedia`, which reaches a client component. `lib/watchRegion.ts` resolves it: `toWatchRegion` takes `x-vercel-ip-country` and returns a two-letter code or **`null`**. There is no default country. A null region renders `WatchRegionUnknown` instead of another country's providers, and skips the provider fetch. `WATCH_REGION` in `.env.local` stands in for the geo header in local dev, which has none; leave it unset in production.
