@@ -17,7 +17,7 @@ export const getEnrichedMedia = cache(
 
     if (!user) return { media: baseMedia, isAuthenticated };
 
-    const userMedia = await getUserMedia(tmdbId, mediaType, user.id).catch(
+    const userMedia = await getUserMedia(tmdbId, mediaType).catch(
       (err: unknown) => {
         if ((err as { code?: string }).code === 'PGRST116') return null;
         throw err;

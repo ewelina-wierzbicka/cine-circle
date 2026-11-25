@@ -50,6 +50,16 @@ describe('getUserMediaList', () => {
 });
 
 describe('getUserMedia', () => {
+  it('filters on the session user, not a caller-supplied id', async () => {
+    supabase.respond('user_media', { data: { id: 1 } });
+    await getUserMedia(550, 'movie');
+
+    expect(eqFilters(supabase.chains('user_media')[0])).toContainEqual([
+      'user_id',
+      'user-1',
+    ]);
+  });
+
   it('throws an error carrying the Postgres code', async () => {
     supabase.respond('user_media', {
       error: { code: 'PGRST116', message: 'no rows' },
