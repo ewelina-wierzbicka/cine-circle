@@ -415,6 +415,9 @@ describe('config.matcher', () => {
     '/movie/550-fight-club',
     '/series/1399',
     '/nonexistent-xyz',
+    '/movie/999999999.xml',
+    '/movie/550-fight-club.webp',
+    '/series/999999999.xml',
   ])('invokes the proxy for %s', (path) => {
     expect(matcher.test(path)).toBe(true);
   });
@@ -434,7 +437,12 @@ describe('config.matcher', () => {
     '/manifest.webmanifest',
     '/opengraph-image.png',
     '/logo.webp',
+    '/logo-light.webp',
+    '/tmdb.svg',
     '/api/cron/keep-alive',
+    '/wp-content/config.json',
+    '/static/vendor/app.js.map.json',
+    '/backup/db.xml',
   ])('skips the proxy for %s', (path) => {
     expect(matcher.test(path)).toBe(false);
   });
