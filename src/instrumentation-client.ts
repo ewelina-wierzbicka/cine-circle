@@ -3,8 +3,10 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { initBotId } from 'botid/client/core';
 
 import { SENTRY_DSN } from '@/lib/sentryDsn';
+import { BOTID_PROTECTED_ROUTES } from '@/lib/botIdRoutes';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -16,5 +18,9 @@ Sentry.init({
     httpBodies: [],
   },
 });
+
+// Patches `fetch` and `XMLHttpRequest`, so the challenge script is fetched on
+// the first matching request, not on every page load. No-op in development.
+initBotId({ protect: BOTID_PROTECTED_ROUTES });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

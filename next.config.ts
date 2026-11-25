@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
+import { withBotId } from 'botid/next/config';
 import type { NextConfig } from 'next';
 
 import { SENTRY_CSP_REPORT_URL } from './src/lib/sentryDsn';
@@ -70,6 +71,20 @@ const securityHeaders = [
   },
 ];
 
+// `withBotId` appends its own header rule for the challenge path. It runs after
+// ours and overwrites every key it names, so the list is passed explicitly to
+// keep the rest of the policy. Only these two change: the challenge loads in a
+// same-origin frame, which `DENY` and `frame-ancestors 'none'` would block.
+const botIdPathOverrides: Record<string, string> = {
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Content-Security-Policy': "frame-ancestors 'self'",
+};
+
+const botIdPathHeaders = securityHeaders.map(({ key, value }) => ({
+  key,
+  value: botIdPathOverrides[key] ?? value,
+}));
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   async headers() {
@@ -96,7 +111,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withBotId(nextConfig, botIdPathHeaders), {
   org: 'ewierzbicka',
   project: 'midnightframe',
   silent: !process.env.CI,

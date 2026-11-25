@@ -5,24 +5,26 @@ import { login, register, sendPasswordReset } from '@/services/auth';
 
 type AuthFailure = { message: string; status?: number; code?: string } | null;
 
-const { auth, captureSecurityEvent, forwardedFor, redirect } = vi.hoisted(
-  () => ({
+const { auth, captureSecurityEvent, checkBotId, forwardedFor, redirect } =
+  vi.hoisted(() => ({
     auth: {
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
       resetPasswordForEmail: vi.fn(),
     },
     captureSecurityEvent: vi.fn(),
+    checkBotId: vi.fn(),
     forwardedFor: { current: '9.9.9.9' },
     redirect: vi.fn(),
-  }),
-);
+  }));
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => Promise.resolve({ auth }),
 }));
 
 vi.mock('@/lib/captureSecurityEvent', () => ({ captureSecurityEvent }));
+
+vi.mock('botid/server', () => ({ checkBotId }));
 
 vi.mock('next/navigation', () => ({ redirect }));
 
@@ -45,11 +47,16 @@ function queue(error: AuthFailure) {
 beforeEach(() => {
   vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://midnightframe.app');
   queue(null);
+  checkBotId.mockResolvedValue({ isBot: false });
 });
 
 afterEach(() => {
   captureSecurityEvent.mockClear();
+  checkBotId.mockReset();
   redirect.mockClear();
+  auth.signInWithPassword.mockClear();
+  auth.signUp.mockClear();
+  auth.resetPasswordForEmail.mockClear();
   vi.unstubAllEnvs();
 });
 
@@ -128,5 +135,66 @@ describe('sendPasswordReset', () => {
 
     await expect(sendPasswordReset('a@b.com')).resolves.toEqual({});
     expect(captureSecurityEvent).not.toHaveBeenCalled();
+  });
+});
+
+describe('BotID', () => {
+  const actions = [
+    ['login', () => login('a@b.com', 'pw'), auth.signInWithPassword],
+    ['register', () => register('a@b.com', 'pw'), auth.signUp],
+    [
+      'sendPasswordReset',
+      () => sendPasswordReset('a@b.com'),
+      auth.resetPasswordForEmail,
+    ],
+  ] as const;
+
+  it.each(actions)(
+    '%s rejects a bot before any Supabase call',
+    async (_name, run, supabaseCall) => {
+      checkBotId.mockResolvedValue({ isBot: true });
+
+      await expect(run()).resolves.toEqual({
+        error: 'Could not verify this request. Please try again.',
+      });
+      expect(supabaseCall).not.toHaveBeenCalled();
+      expect(captureSecurityEvent.mock.calls).toEqual([
+        ['auth.botid_rejected'],
+      ]);
+    },
+  );
+
+  it.each(actions)(
+    '%s proceeds for a human',
+    async (_name, run, supabaseCall) => {
+      await run();
+
+      expect(supabaseCall).toHaveBeenCalled();
+      expect(captureSecurityEvent).not.toHaveBeenCalled();
+    },
+  );
+
+  // A missing VERCEL_OIDC_TOKEN must not lock everyone out of the three forms.
+  it.each(actions)(
+    '%s fails open when the check throws',
+    async (_name, run, supabaseCall) => {
+      checkBotId.mockRejectedValue(new Error('VERCEL_OIDC_TOKEN is not set'));
+
+      await run();
+
+      expect(supabaseCall).toHaveBeenCalled();
+      expect(captureSecurityEvent.mock.calls).toEqual([
+        ['auth.botid_unavailable'],
+      ]);
+    },
+  );
+
+  // The client and server levels must match or verification always fails.
+  it('asks for the Basic check level', async () => {
+    await login('a@b.com', 'pw');
+
+    expect(checkBotId).toHaveBeenCalledWith({
+      advancedOptions: { checkLevel: 'basic' },
+    });
   });
 });
