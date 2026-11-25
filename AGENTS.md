@@ -274,17 +274,15 @@ export const colors = {
 
 ### Auth rate limits
 
-**Per-IP auth rate limits are not an effective control for this app.** `login`, `register` and `sendPasswordReset` are server actions in `services/auth.ts` on the server client, so GoTrue sees the Vercel egress IP, not the visitor. Supabase Auth keys those limits on the connecting IP; the only override is the `Sb-Forwarded-For` header, which must be enabled per project and requires a **secret** API key (publishable and legacy `anon`/`service_role` keys are rejected). The SSR cookie client sends the anon key, so the app cannot use it. Every per-IP limit is therefore one pooled app-wide bucket, and a low value lets one attacker lock out every user. Verified against the Supabase Auth rate-limit docs, 2026-11-23. **Move this block to `docs/SECURITY.md` when that file lands.**
+**Per-IP auth rate limits are not an effective control for this app.** The auth calls are server actions on the server client, so GoTrue sees the Vercel egress IP, not the visitor. Every per-IP limit is one pooled app-wide bucket, so a low value lets one attacker lock out everyone. `Sb-Forwarded-For` is the only override and needs a secret API key, which the SSR client does not send. Verified against the Supabase Auth docs, 2026-11-23. Move to `docs/SECURITY.md` when it lands.
 
-- Recommended production values, matching `[auth.rate_limit]` in `config.toml`: sign-ups/sign-ins **300**/5min, token verifications **300**/5min, token refresh **1500**/5min, emails **30**/hour. Not applied yet, board sign-off pending.
-- **`email_sent` is per project, not per user.** It counts every confirmation, reset and email-change together, so a low value blocks real registrations: at 10/hour the 11th signup in an hour gets no email and the user sees a success screen with nothing in the inbox. 30 is the Supabase default and the floor worth running.
-- **`[auth.rate_limit]` is local-only until someone pushes it.** Nothing in the repo or CI runs `supabase config push`, and there is no `[remotes.*]` block, so the hosted project still holds whatever its dashboard holds. `supabase config diff` is what compares the two; it needs `supabase login`. Read-only check without the CLI: `GET https://api.supabase.com/v1/projects/<ref>/config/auth` with a personal access token, fields prefixed `rate_limit_`.
-- A bare `supabase config push` would also push `site_url = "http://127.0.0.1:3000"` and `max_frequency = "1s"` to production. It needs a `[remotes.production]` block first, or patch the four rate-limit fields on their own.
-- The Management API names do not match the config keys: `sign_in_sign_ups` is `rate_limit_otp`, `token_verifications` is `rate_limit_verify`.
-- Raising them is the point, not a weakening. They are capacity guards for a shared bucket, not a security boundary.
-- The limits that do bind: `email_sent` (per project) and the 60s `max_frequency` per user on confirmation and reset emails. The spend cap is Resend's own 100/day, which fails closed with no overage billing, so `email_sent` buys pacing rather than cost protection.
-- The real controls see the browser IP, not ours: a captcha on `/login` and `/register` (`[auth.captcha]`, hCaptcha or Turnstile) or Vercel Firewall rate limiting. Neither is in place. Each is its own task.
-- Do not lower `sign_in_sign_ups` to "harden" login. That is a self-inflicted outage.
+- Production values, matching `[auth.rate_limit]`: sign-ups/sign-ins **300**/5min, verifications **300**/5min, token refresh **1500**/5min, emails **30**/hour. Board sign-off pending.
+- Raising them is the point. They are capacity guards, not a security boundary. Never lower `sign_in_sign_ups` to "harden" login.
+- `email_sent` is per project, not per user. Below 30 it blocks real signups. The spend cap is Resend's 100/day, which fails closed.
+- The 60s `max_frequency` per user is the only limit keyed on the user. Keep it.
+- **`[auth.rate_limit]` is local-only until pushed.** Nothing runs `supabase config push`, so the dashboard holds its own values; `supabase config diff` compares them. A bare push would also send `site_url` and `max_frequency = "1s"` to production, so it needs a `[remotes.production]` block first.
+- Management API names differ: `sign_in_sign_ups` is `rate_limit_otp`, `token_verifications` is `rate_limit_verify`.
+- The real controls see the browser IP: a captcha on `/login` and `/register`, or Vercel Firewall. Neither is in place.
 
 ### Schema
 

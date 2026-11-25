@@ -185,16 +185,11 @@ password_requirements = ""
 # rp_origins = ["http://127.0.0.1:3000"]
 
 [auth.rate_limit]
-# Every "per IP address" limit below keys on the IP that connects to GoTrue. login,
-# register and sendPasswordReset are server actions, so that is the Vercel egress IP,
-# shared by every visitor. Each raised value is deliberately above the CLI default:
-# at the default one attacker exhausts the pooled bucket and locks out the whole app.
-# Per-IP limits are not the control here. See AGENTS.md, Auth rate limits.
+# Every "per IP address" limit below keys on the Vercel egress IP, shared by every
+# visitor, because the auth calls are server actions. Raised above the CLI defaults so
+# one attacker cannot drain the pooled bucket. See AGENTS.md, Auth rate limits.
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-# Raised from 2 to the Supabase default. Per project, not per user, so a lower value
-# blocks real registrations: at 10, the 11th signup in an hour gets no email. The
-# spend cap is Resend's 100/day, which fails closed with no overage billing, so a
-# tighter value here buys pacing and nothing else.
+# Supabase default. Per project, not per user, so below 30 real signups get no email.
 email_sent = 30
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 # Inert: [auth.sms] is disabled.
@@ -233,9 +228,8 @@ enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-# Local only. Production keeps the Supabase default of 60s. This limit keys on the
-# user, not the IP, so it is one of the few that actually binds for this app. The e2e
-# suite sends several emails per user inside a run, so 1s locally is deliberate.
+# Local only, for the e2e suite. Production keeps the 60s default, the one limit
+# keyed on the user rather than the pooled IP.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
 otp_length = 6
