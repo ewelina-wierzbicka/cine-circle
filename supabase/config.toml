@@ -191,9 +191,11 @@ password_requirements = ""
 # at the default one attacker exhausts the pooled bucket and locks out the whole app.
 # Per-IP limits are not the control here. See AGENTS.md, Auth rate limits.
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-# Raised from 2. Per project, not per IP, so this one binds. Resend free tier is
-# 100 emails/day, which is the hard backstop behind this number.
-email_sent = 10
+# Raised from 2 to the Supabase default. Per project, not per user, so a lower value
+# blocks real registrations: at 10, the 11th signup in an hour gets no email. The
+# spend cap is Resend's 100/day, which fails closed with no overage billing, so a
+# tighter value here buys pacing and nothing else.
+email_sent = 30
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 # Inert: [auth.sms] is disabled.
 sms_sent = 30
