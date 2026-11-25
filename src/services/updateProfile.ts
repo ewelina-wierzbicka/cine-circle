@@ -29,6 +29,11 @@ export const updateDisplayName = async (displayName: string): Promise<void> => {
   revalidatePath('/', 'layout');
 };
 
+const AVATAR_PATH = /^[A-Za-z0-9-]{1,64}\/[A-Za-z0-9_-][A-Za-z0-9._-]{0,127}$/;
+
+const isOwnAvatarPath = (filePath: string, userId: string): boolean =>
+  AVATAR_PATH.test(filePath) && filePath.startsWith(`${userId}/`);
+
 export const updateAvatarPath = async (
   filePath: string,
 ): Promise<{ avatarUrl: string }> => {
@@ -36,6 +41,10 @@ export const updateAvatarPath = async (
   const user = await getCurrentUser();
 
   if (!user) throw new Error('Not authenticated');
+
+  if (!isOwnAvatarPath(filePath, user.id)) {
+    throw new Error('Invalid avatar path.');
+  }
 
   const { data: profile } = await supabase
     .from('profiles')
