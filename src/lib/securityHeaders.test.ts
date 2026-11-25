@@ -1,6 +1,6 @@
 // @vitest-environment node
 import type { NextConfig } from 'next';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SENTRY_CSP_REPORT_URL } from './sentryDsn';
 
@@ -31,6 +31,12 @@ const loadDirectives = async () => {
 
 beforeEach(() => {
   vi.resetModules();
+});
+
+// Not in the test body: a failing expect above it would leak the stubbed
+// Supabase URL into the next test in this file.
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe('security headers', () => {
@@ -128,6 +134,5 @@ describe('security headers', () => {
 
     expect(directives.get('img-src')).toContain('http://127.0.0.1:54321');
     expect(directives.get('connect-src')).toContain('http://127.0.0.1:54321');
-    vi.unstubAllEnvs();
   });
 });
