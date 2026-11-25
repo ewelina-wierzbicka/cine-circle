@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { argsOf, createSupabaseMock, eqFilters } from '@/test/supabaseMock';
-import { addUserMedia } from '@/services/addUserMedia';
+import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
 import type { NormalizedMedia, UserEntry } from '@/types';
 
 const supabase = createSupabaseMock();
@@ -148,5 +148,64 @@ describe('addUserMedia', () => {
       ['id', 3],
       ['user_id', 'user-1'],
     ]);
+  });
+
+  it('writes nothing when the review is too long', async () => {
+    savedMedia(null);
+    await expect(
+      addUserMedia(details, { ...watched, review: 'a'.repeat(2001) }),
+    ).rejects.toThrow('up to 2000 characters');
+    expect(supabase.chains('user_media')).toHaveLength(0);
+    expect(admin.chains('media')).toHaveLength(0);
+  });
+
+  it('writes nothing when the rating is out of range', async () => {
+    savedMedia(null);
+    await expect(
+      addUserMedia(details, { ...watched, rating: 11 }),
+    ).rejects.toThrow('Rating must be between 0 and 10.');
+    expect(supabase.chains('user_media')).toHaveLength(0);
+  });
+});
+
+describe('updateUserMedia', () => {
+  it('updates only the four writable columns', async () => {
+    supabase.respond('user_media', {});
+    const entry = {
+      ...watched,
+      user_id: 'someone-else',
+      media_id: 42,
+      added_at: '1999-01-01',
+    } as UserEntry;
+
+    await updateUserMedia(3, entry);
+
+    const [update] = supabase.chains('user_media');
+    expect(argsOf(update, 'update')).toEqual([
+      {
+        watchStatus: 'watched',
+        watched_date: '2026-11-01',
+        rating: 8,
+        review: 'Great.',
+      },
+    ]);
+    expect(eqFilters(update)).toEqual([
+      ['id', 3],
+      ['user_id', 'user-1'],
+    ]);
+  });
+
+  it('rejects a review over the limit before writing', async () => {
+    await expect(
+      updateUserMedia(3, { ...watched, review: 'a'.repeat(2001) }),
+    ).rejects.toThrow('up to 2000 characters');
+    expect(supabase.chains('user_media')).toHaveLength(0);
+  });
+
+  it('rejects an out-of-range rating before writing', async () => {
+    await expect(
+      updateUserMedia(3, { ...watched, rating: -1 }),
+    ).rejects.toThrow('Rating must be between 0 and 10.');
+    expect(supabase.chains('user_media')).toHaveLength(0);
   });
 });

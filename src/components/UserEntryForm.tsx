@@ -2,6 +2,7 @@
 
 import StarRatingInput from '@/components/StarRatingInput';
 import Textarea from '@/components/Textarea';
+import { REVIEW_MAX_LENGTH } from '@/lib/userMediaColumns';
 import { addUserMedia, updateUserMedia } from '@/services/addUserMedia';
 import { NormalizedMedia, UserEntry } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
@@ -155,8 +156,8 @@ export default function UserEntryForm({
             id="review"
             {...register('review', {
               maxLength: {
-                value: 1000,
-                message: 'Please use up to 1000 characters.',
+                value: REVIEW_MAX_LENGTH,
+                message: `Please use up to ${REVIEW_MAX_LENGTH} characters.`,
               },
             })}
             error={errors.review?.message}
