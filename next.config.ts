@@ -22,9 +22,6 @@ import { SENTRY_CSP_REPORT_URL } from './src/lib/sentryDsn';
 // - va.vercel-scripts.com: analytics in dev and preview only. In production the
 //   same script is served from our own domain.
 // - *.sentry.io: error reports from the browser Sentry SDK.
-// - *.vercel.app in manifest-src, preview deployments only: Next marks the
-//   manifest link use-credentials there, and the request can come from a
-//   sibling preview host (alias vs deployment URL).
 
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
