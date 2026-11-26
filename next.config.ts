@@ -71,10 +71,7 @@ const securityHeaders = [
   },
 ];
 
-// `withBotId` appends its own header rule for the challenge path. It runs after
-// ours and overwrites every key it names, so the list is passed explicitly to
-// keep the rest of the policy. Only these two change: the challenge loads in a
-// same-origin frame, which `DENY` and `frame-ancestors 'none'` would block.
+// withBotId's header rule replaces ours on its path; keep all, relax framing.
 const botIdPathOverrides: Record<string, string> = {
   'X-Frame-Options': 'SAMEORIGIN',
   'Content-Security-Policy': "frame-ancestors 'self'",

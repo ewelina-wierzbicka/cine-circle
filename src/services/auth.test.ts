@@ -174,7 +174,6 @@ describe('BotID', () => {
     },
   );
 
-  // A missing VERCEL_OIDC_TOKEN must not lock everyone out of the three forms.
   it.each(actions)(
     '%s fails open when the check throws',
     async (_name, run, supabaseCall) => {
@@ -189,7 +188,6 @@ describe('BotID', () => {
     },
   );
 
-  // The client and server levels must match or verification always fails.
   it('asks for the Basic check level', async () => {
     await login('a@b.com', 'pw');
 

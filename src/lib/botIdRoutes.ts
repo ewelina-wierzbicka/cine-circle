@@ -1,9 +1,4 @@
-// The one source for both sides of BotID. `checkLevel` must be identical on the
-// client and the server or verification always fails.
-//
-// POST only, and only paths a browser running the client SDK posts to. A webhook,
-// a cron path, a page GET or a metadata route carries no challenge header, so
-// listing one would make every real request look like a bot.
+// Client and server checkLevel must match. Browser POSTs only.
 const advancedOptions = { checkLevel: 'basic' } as const;
 
 export const BOTID_CHECK_OPTIONS = { advancedOptions };

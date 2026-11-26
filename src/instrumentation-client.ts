@@ -19,8 +19,6 @@ Sentry.init({
   },
 });
 
-// Patches `fetch` and `XMLHttpRequest`, so the challenge script is fetched on
-// the first matching request, not on every page load. No-op in development.
 initBotId({ protect: BOTID_PROTECTED_ROUTES });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

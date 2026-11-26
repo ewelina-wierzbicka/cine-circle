@@ -11,17 +11,13 @@ import { redirect } from 'next/navigation';
 
 const BOT_REJECTED = 'Could not verify this request. Please try again.';
 
-// `checkBotId` reads request headers, so it can never sit inside a `use cache`
-// function. It returns a human verdict in local development.
 async function isBotRequest() {
   let verification;
 
   try {
     verification = await checkBotId(BOTID_CHECK_OPTIONS);
   } catch {
-    // Fails open, and reports it. `checkBotId` throws on a missing
-    // `VERCEL_OIDC_TOKEN`, which no request can provoke, and throwing on would
-    // lock every visitor out of all three forms.
+    // Fail open: a missing VERCEL_OIDC_TOKEN must not lock users out.
     captureSecurityEvent('auth.botid_unavailable');
     return false;
   }
