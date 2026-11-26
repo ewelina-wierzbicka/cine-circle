@@ -26,6 +26,7 @@ Settings state and alert counts below were read from the GitHub API on 2026-11-2
 | Security-event alerts     | `lib/captureSecurityEvent.ts`, called from rejection branches                       | A bad cron secret or forged webhook stops reaching Sentry. Production only, by design              |
 | Auth-failure detection    | `lib/authFailureAlert.ts`, called from `services/auth.ts`                           | A credential-stuffing run against `/login` goes back to being invisible. Alert only, never a block |
 | Supply-chain scanning     | `.github/dependabot.yml`, `.github/workflows/security.yml`                          | Weekly dependency PRs, `npm audit` and CodeQL all stop running                                     |
+| Vercel Firewall           | Vercel dashboard, not in the repo. See checklist item 11                            | Auth form POSTs and crawler bursts are no longer capped per visitor IP                             |
 
 The CSP is not restated here. Read `next.config.ts` — the comment block at the top says where each allowed origin comes from, and the test next to it says which directives are load-bearing.
 
@@ -64,15 +65,15 @@ Four questions settled. They are the reason the gaps below are gaps.
 
 - **Auth-failure handling is alert-only.** No soft block, no lockout, no captcha. `lib/authFailureAlert.ts` fires `auth.sign_in_failure_burst` once per key per window, and `auth.rate_limited` on a GoTrue 429. A failed sign-in never changes what the user sees.
 - **The alert channel is email.** The Sentry rule on tag `security:true` is a dashboard action, checklist item 8.
-- **No WAF.** Vercel Firewall rate-limit rules are not available on this plan. Accepted as a residual gap, not deferred.
+- **No WAF.** Superseded 2026-11-26: Hobby allows 3 custom rules, one a rate limit. See checklist item 11.
 - **The four GitHub toggles stay open.** The board did not answer that question, so nothing was declined. Checklist items 1, 2, 5 and 6 read enabled from the provider anyway; what is outstanding is the board's own confirmation, not the setting.
 
 ### Channels that do not exist
 
 Know these gaps before relying on the table above.
 
-- **Burst detection is per instance.** The window in `lib/authFailureAlert.ts` lives in module scope on one serverless instance, so a slow distributed run spread across instances stays under every threshold and never fires. No control in the repo sees the real visitor IP across instances, and with no WAF on this plan none can.
-- **Nothing is capped.** Detection is not throttling. A scraper on `/search` or a credential-stuffing run is counted, at best, and never slowed.
+- **Burst detection is per instance.** The window in `lib/authFailureAlert.ts` lives in module scope on one serverless instance, so a slow distributed run spread across instances stays under every threshold and never fires. The firewall rate limit in item 11 is the only control that sees the real visitor IP across instances.
+- **Little is capped.** Only the auth form POSTs and PerplexityBot hit the firewall rate limit. A scraper on `/search` is never slowed.
 - **No audit-log review.** Nothing reads the Supabase or Vercel logs on a schedule.
 - **Nobody is paged.** Every channel above is an email or a dashboard badge, read on a hobby schedule. Check the Actions tab and the Sentry inbox monthly regardless of whether anything arrived.
 
@@ -106,7 +107,11 @@ Items 1, 2, 5 and 6 are the four the board was asked about on 2026-11-23, on the
 
 ### Vercel — project settings
 
-- **11. Firewall rate-limit rule. Not available on this plan**, confirmed by the board on 2026-11-25. Not a checkbox, so it carries none. It is the only control that would see the real visitor IP across instances, which is why its absence is listed as a residual gap in section 2 rather than as work.
+- [x] **11. Firewall rules.** Live since 2026-11-26. Hobby allows 3 custom rules, one a rate limit, so the one rate limit is shared. Check with `vercel firewall rules list`.
+  - **Rate limit crawlers and auth posts:** PerplexityBot, or a POST to `/login`, `/register` or `/forgot-password`. 3 per minute per IP, then 429.
+  - **Deny PetalBot.**
+  - **Bot Protection** managed ruleset on Log. Switch to Challenge once the log shows only fake browsers.
+  - Never deny or challenge `/api/cron/keep-alive`, or the cron stops and Supabase pauses.
 - [x] **12. `CRON_SECRET` set in Production.** Off: Vercel sends no `Authorization` header, the keep-alive handler 401s every run, and the Supabase project pauses silently after about a week.
 - [x] **13. `RESEND_WEBHOOK_SECRET` set in Production.** Off: the inbound email handler 500s on every delivery. It fails closed on purpose, so a missing secret is downtime rather than unverified mail.
 
@@ -231,4 +236,4 @@ What is left after the checklist, in order:
 4. **Go to Supabase Pro when the user base is real.** Managed daily backups, and it is also where the paid auth protections live. See [`BACKUPS.md`](BACKUPS.md) section 8.
 5. **Revisit audit-log review** if there is ever a second maintainer. One person reading dashboards monthly is the current control, and it does not scale to an incident.
 
-Not on this list, by decision: a WAF, a soft block on failed logins, and a lower Supabase auth rate limit. See the board decisions in section 2.
+Not on this list, by decision: a soft block on failed logins and a lower Supabase auth rate limit. See the board decisions in section 2.
