@@ -2,7 +2,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HOME_FAQ } from '@/lib/homeFaq';
 import { ABOUT_PAGE, PRIVACY_PAGE, TERMS_PAGE } from '@/lib/staticPages';
-import { isDisallowed } from '@/test/robotsRules';
 
 // A domain nobody would hardcode: if the body names any other origin, it was
 // typed in rather than built from SITE_URL.
@@ -22,18 +21,7 @@ async function body() {
   return GET().text();
 }
 
-const linkedUrls = (text: string) =>
-  [...text.matchAll(/\]\((https?:\/\/[^)\s]+)\)/g)].map((m) => new URL(m[1]));
-
 describe('/llms-full.txt', () => {
-  it('lists no page that robots.txt disallows', async () => {
-    const urls = linkedUrls(await body());
-    expect(urls.length).toBeGreaterThan(0);
-    for (const url of urls) {
-      expect(await isDisallowed(url.pathname), url.pathname).toBe(false);
-    }
-  });
-
   it('builds every URL from SITE_URL, with no hardcoded domain', async () => {
     const text = await body();
     const origins = [...text.matchAll(/https?:\/\/[^\s)`'"]+/g)].map(

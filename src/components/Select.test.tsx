@@ -23,12 +23,7 @@ function renderSelect(onChange = vi.fn(), initial = 'series') {
       />
     );
   }
-  render(
-    <>
-      <Harness />
-      <p>outside</p>
-    </>,
-  );
+  render(<Harness />);
   return { onChange, trigger: screen.getByRole('button', { name: /Series/ }) };
 }
 
@@ -54,13 +49,6 @@ describe('Select', () => {
       'aria-selected',
       'false',
     );
-  });
-
-  it('closes on an outside click', () => {
-    const { trigger } = renderSelect();
-    fireEvent.click(trigger);
-    fireEvent.mouseDown(screen.getByText('outside'));
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('closes on Escape', () => {

@@ -25,6 +25,9 @@ export default defineConfig({
   resolve: { alias },
   test: {
     environment: 'jsdom',
+    // One jsdom per worker instead of one per file, which was two thirds of
+    // the suite's runtime. vmThreads keeps per-file module isolation.
+    pool: 'vmThreads',
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     // Playwright owns `e2e/`. Without this, a Playwright spec that happens to

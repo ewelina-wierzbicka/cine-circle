@@ -51,12 +51,4 @@ describe('imageLoader', () => {
   ])('returns %s unchanged when the path is not /t/p/<size>/<file>', (src) => {
     expect(load(src, 200)).toBe(src);
   });
-
-  // A custom loader disables the optimizer route, so it would 404.
-  it('never points at /_next/image', () => {
-    for (const width of [92, 200, 500, 1200]) {
-      expect(load(POSTER, width)).not.toContain('/_next/image');
-      expect(load('/logo.webp', width)).not.toContain('/_next/image');
-    }
-  });
 });

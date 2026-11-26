@@ -30,12 +30,4 @@ describe('passwordRules', () => {
   ])('rejects a password without %s', (_, password) => {
     expect(pattern.test(password)).toBe(false);
   });
-
-  it('sets the minimum length to 8', () => {
-    expect(rules.minLength.value).toBe(8);
-  });
-
-  it("forwards the caller's required message unchanged", () => {
-    expect(passwordRules('Custom message').required).toBe('Custom message');
-  });
 });

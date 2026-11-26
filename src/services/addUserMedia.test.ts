@@ -6,18 +6,14 @@ import type { NormalizedMedia, UserEntry } from '@/types';
 
 const supabase = createSupabaseMock();
 const admin = createSupabaseMock();
-const tmdb = vi.fn(
-  async (): Promise<Partial<NormalizedMedia> | null> => ({
-    title: 'Fight Club',
-    release_date: '1999-10-15',
-    poster_path: '/tmdb-poster.jpg',
-  }),
-);
-const currentUser = vi.fn(
-  async (): Promise<{ id: string } | null> => ({
-    id: 'user-1',
-  }),
-);
+const tmdb = vi.fn(async (): Promise<Partial<NormalizedMedia> | null> => ({
+  title: 'Fight Club',
+  release_date: '1999-10-15',
+  poster_path: '/tmdb-poster.jpg',
+}));
+const currentUser = vi.fn(async (): Promise<{ id: string } | null> => ({
+  id: 'user-1',
+}));
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => supabase.createClient(),
@@ -150,6 +146,8 @@ describe('addUserMedia', () => {
     ]);
   });
 
+  // One proof that the bounds run before any write. The bounds themselves are
+  // covered in lib/userMediaColumns.test.ts.
   it('writes nothing when the review is too long', async () => {
     savedMedia(null);
     await expect(
@@ -157,14 +155,6 @@ describe('addUserMedia', () => {
     ).rejects.toThrow('up to 2000 characters');
     expect(supabase.chains('user_media')).toHaveLength(0);
     expect(admin.chains('media')).toHaveLength(0);
-  });
-
-  it('writes nothing when the rating is out of range', async () => {
-    savedMedia(null);
-    await expect(
-      addUserMedia(details, { ...watched, rating: 11 }),
-    ).rejects.toThrow('Rating must be between 0 and 10.');
-    expect(supabase.chains('user_media')).toHaveLength(0);
   });
 });
 
@@ -193,19 +183,5 @@ describe('updateUserMedia', () => {
       ['id', 3],
       ['user_id', 'user-1'],
     ]);
-  });
-
-  it('rejects a review over the limit before writing', async () => {
-    await expect(
-      updateUserMedia(3, { ...watched, review: 'a'.repeat(2001) }),
-    ).rejects.toThrow('up to 2000 characters');
-    expect(supabase.chains('user_media')).toHaveLength(0);
-  });
-
-  it('rejects an out-of-range rating before writing', async () => {
-    await expect(
-      updateUserMedia(3, { ...watched, rating: -1 }),
-    ).rejects.toThrow('Rating must be between 0 and 10.');
-    expect(supabase.chains('user_media')).toHaveLength(0);
   });
 });

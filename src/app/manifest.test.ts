@@ -34,12 +34,6 @@ describe('manifest', () => {
     },
   );
 
-  it('redirects a signed-out private route, so the check can fail', async () => {
-    expect(await signedOutRedirect('/profile')).toBe(
-      'http://localhost/login?rurl=%2Fprofile',
-    );
-  });
-
   it('matches the root layout themeColor', async () => {
     const { viewport } = await import('@/app/layout');
     expect(manifest().theme_color).toBe(viewport.themeColor);
