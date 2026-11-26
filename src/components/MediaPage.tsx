@@ -129,11 +129,10 @@ async function ViewerNavLink({
 }: {
   searchParams: Promise<MediaPageSearchParams>;
 }) {
-  const { from, tab } = await searchParams;
-  if (from === 'search') return <BackLink href="/">BACK TO SEARCH</BackLink>;
+  const { tab } = await searchParams;
 
   const user = await getCurrentUser();
-  if (!user) return null;
+  if (!user) return <BackLink href="/">BACK TO HOME</BackLink>;
   return <CollectionBackLink tab={toCollectionTab(tab)} />;
 }
 

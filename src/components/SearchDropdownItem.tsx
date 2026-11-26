@@ -18,7 +18,7 @@ const SearchDropdownItem = forwardRef<HTMLButtonElement, Props>(
   ({ item, isActive, onMouseEnter }, ref) => {
     const router = useRouter();
 
-    const href = `${toHref(item.id, item.title, item.media_type)}?from=search`;
+    const href = toHref(item.id, item.title, item.media_type);
 
     return (
       <button

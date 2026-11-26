@@ -170,7 +170,7 @@ export const motion = {
 One component per repeated link style. Never retype the classes at a call site.
 
 - `Link` (`src/components/Link.tsx`) — inline accent link, `text-accent hover:opacity-80 transition-opacity`. Auth form footers.
-- `BackLink` (`src/components/BackLink.tsx`) — the `← LABEL` page back link, `inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start`. Renders the arrow itself (`aria-hidden`), so children are the label only. Used by the `navLink` slot in `MediaPage` (BACK TO SEARCH) and `CollectionBackLink` (BACK TO COLLECTION), which is now a thin wrapper that picks the tab href.
+- `BackLink` (`src/components/BackLink.tsx`) — the `← LABEL` page back link, `inline-flex items-center gap-2 label-mono text-secondary hover:text-accent transition-colors duration-150 mb-9 self-start`. Renders the arrow itself (`aria-hidden`), so children are the label only. Used by the `navLink` slot in `MediaPage` (BACK TO HOME) and `CollectionBackLink` (BACK TO COLLECTION), which is now a thin wrapper that picks the tab href.
 - `Logo` (`src/components/Logo.tsx`) — `/logo.webp` 200×50 linking home, `flex items-center gap-2.5`. Props: `className` for positioning, `priority` for the LCP preload. Used by `Header`, `HeaderSkeleton`, `AuthFormLayout` (all `priority`) and `AuthErrorState`.
 - `MediaPosterLink` (`src/components/MediaPosterLink.tsx`) — 110×165 poster tile link (`w-27.5 h-41.25 rounded-xl border border-white/[0.07]`), optional genre badge (`ui-mono uppercase`) and truncated title below. Used by the home "Recently Watched" strip and the "More like this" row.
 
@@ -517,7 +517,7 @@ Poster & Visuals
 Info & Form
 
 - Info view (`MediaInfoHeader` + `MediaActions`) shows:
-  - Back link (`label-mono`). Both variants stream through the one `navLink` slot inside `<Suspense fallback={null}>`, which reads `searchParams` there instead of above the boundary: `← BACK TO SEARCH` on `?from=search`, otherwise `← BACK TO COLLECTION` (`CollectionBackLink`) for signed-in users only, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
+  - Back link (`label-mono`). Both variants stream through the one `navLink` slot inside `<Suspense fallback={null}>`, which reads `searchParams` there instead of above the boundary: `← BACK TO COLLECTION` (`CollectionBackLink`, carrying `?tab`) for signed-in users, `← BACK TO HOME` for everyone else, gated by a bare `supabase.auth.getUser()` check — never `getEnrichedMedia`, which would cost a user-media query for a boolean.
   - Genre pills (when available): flex-wrap row of `ui-mono uppercase px-2.5 py-1 rounded-full border border-secondary/25 text-accent` spans. Placed above the type label.
   - Eyebrow (type) using `label-mono text-secondary`.
   - Title: `display-serif text-[clamp(42px,5.5vw,72px)]`.

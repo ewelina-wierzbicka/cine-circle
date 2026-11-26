@@ -44,7 +44,6 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: SITE_NAME,
     locale: 'en_US',
-    url: '/',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
   },
