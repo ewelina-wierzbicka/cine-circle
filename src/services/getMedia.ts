@@ -13,6 +13,7 @@ import {
 import { cacheLife, cacheTag } from 'next/cache';
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const TMDB_TIMEOUT_MS = 10_000;
 
 /** One request per detail page — never split these into extra fetches. */
 const DETAIL_APPEND = 'credits,recommendations,watch/providers,external_ids';
@@ -49,6 +50,7 @@ function getTmdbToken(): string {
 async function tmdbFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${TMDB_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
+    signal: AbortSignal.timeout(TMDB_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error('Failed to load data. Please try again.');
   return res.json() as Promise<T>;
@@ -57,6 +59,7 @@ async function tmdbFetch<T>(path: string): Promise<T> {
 async function tmdbFetchOrNull<T>(path: string): Promise<T | null> {
   const res = await fetch(`${TMDB_BASE_URL}${path}`, {
     headers: { Authorization: `Bearer ${getTmdbToken()}` },
+    signal: AbortSignal.timeout(TMDB_TIMEOUT_MS),
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to load data. Please try again.');
