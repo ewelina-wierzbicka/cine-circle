@@ -3,8 +3,10 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { initBotId } from 'botid/client/core';
 
 import { SENTRY_DSN } from '@/lib/sentryDsn';
+import { BOTID_PROTECTED_ROUTES } from '@/lib/botIdRoutes';
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -16,5 +18,7 @@ Sentry.init({
     httpBodies: [],
   },
 });
+
+initBotId({ protect: BOTID_PROTECTED_ROUTES });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

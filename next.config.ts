@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
+import { withBotId } from 'botid/next/config';
 import type { NextConfig } from 'next';
 
 import { SENTRY_CSP_REPORT_URL } from './src/lib/sentryDsn';
@@ -70,6 +71,17 @@ const securityHeaders = [
   },
 ];
 
+// withBotId's header rule replaces ours on its path; keep all, relax framing.
+const botIdPathOverrides: Record<string, string> = {
+  'X-Frame-Options': 'SAMEORIGIN',
+  'Content-Security-Policy': "frame-ancestors 'self'",
+};
+
+const botIdPathHeaders = securityHeaders.map(({ key, value }) => ({
+  key,
+  value: botIdPathOverrides[key] ?? value,
+}));
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   async headers() {
@@ -96,7 +108,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withBotId(nextConfig, botIdPathHeaders), {
   org: 'ewierzbicka',
   project: 'midnightframe',
   silent: !process.env.CI,

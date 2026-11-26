@@ -13,7 +13,9 @@ export type SecurityEvent =
   | 'auth.reset_callback_missing_code'
   | 'auth.reset_callback_exchange_failed'
   | 'auth.sign_in_failure_burst'
-  | 'auth.rate_limited';
+  | 'auth.rate_limited'
+  | 'auth.botid_rejected'
+  | 'auth.botid_unavailable';
 
 // Name only. Never pass a body, a token, an email or a user id.
 export function captureSecurityEvent(event: SecurityEvent): void {

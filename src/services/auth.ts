@@ -1,13 +1,36 @@
 'use server';
 
 import { isRateLimited, reportAuthFailure } from '@/lib/authFailureAlert';
+import { BOTID_CHECK_OPTIONS } from '@/lib/botIdRoutes';
 import { captureSecurityEvent } from '@/lib/captureSecurityEvent';
 import { safeRedirectPath } from '@/lib/safeRedirectPath';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/services/getCurrentUser';
+import { checkBotId } from 'botid/server';
 import { redirect } from 'next/navigation';
 
+const BOT_REJECTED = 'Could not verify this request. Please try again.';
+
+async function isBotRequest() {
+  let verification;
+
+  try {
+    verification = await checkBotId(BOTID_CHECK_OPTIONS);
+  } catch {
+    // Fail open: a missing VERCEL_OIDC_TOKEN must not lock users out.
+    captureSecurityEvent('auth.botid_unavailable');
+    return false;
+  }
+
+  if (!verification.isBot) return false;
+
+  captureSecurityEvent('auth.botid_rejected');
+  return true;
+}
+
 export async function login(email: string, password: string, rurl?: string) {
+  if (await isBotRequest()) return { error: BOT_REJECTED };
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -53,6 +76,8 @@ export async function signInWithGoogle(rurl?: string) {
 }
 
 export async function register(email: string, password: string) {
+  if (await isBotRequest()) return { error: BOT_REJECTED };
+
   const supabase = await createClient();
 
   const origin = process.env.NEXT_PUBLIC_SITE_URL;
@@ -84,6 +109,8 @@ export async function logout() {
 export async function sendPasswordReset(
   email: string,
 ): Promise<{ error?: string }> {
+  if (await isBotRequest()) return { error: BOT_REJECTED };
+
   const supabase = await createClient();
 
   const origin = process.env.NEXT_PUBLIC_SITE_URL;
