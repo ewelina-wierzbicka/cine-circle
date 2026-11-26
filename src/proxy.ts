@@ -148,8 +148,14 @@ export default async function proxy(request: NextRequest) {
     return response;
   };
 
+  // The 404 status has to be set here. `/_not-found` is a PPR route, so Vercel
+  // serves its prerendered shell and ignores the `initialStatus: 404` in the
+  // prerender manifest: a bare rewrite answers 200 there. `next start` renders
+  // the route itself and answers 404 either way, so only the platform shows it.
   if (mediaRoute.kind === 'missing') {
-    const notFound = NextResponse.rewrite(new URL('/_not-found', request.url));
+    const notFound = NextResponse.rewrite(new URL('/_not-found', request.url), {
+      status: 404,
+    });
     notFound.headers.set('X-Robots-Tag', 'noindex');
     return withSessionCookies(notFound);
   }

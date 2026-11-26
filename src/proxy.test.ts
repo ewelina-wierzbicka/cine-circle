@@ -186,21 +186,28 @@ describe('route registration', () => {
 });
 
 describe('media route responses', () => {
-  it('rewrites an unknown id to the not-found route, marked noindex', async () => {
-    resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
+  // The status is the half Vercel reads. Without it the platform serves the
+  // prerendered `/_not-found` shell with a 200 and every bad id is a soft 404.
+  it.each(['/movie/999999999', '/movie/0', '/series/999999999'])(
+    'answers 404 for %s, rewritten to the not-found route and noindex',
+    async (path) => {
+      resolveMedia.mockReturnValue({ exists: false, id: null, title: null });
 
-    const response = await proxy(mediaRequest('/movie/999999999'));
+      const response = await proxy(mediaRequest(path));
 
-    expect(response.headers.get('x-middleware-rewrite')).toBe(
-      'http://localhost:3000/_not-found',
-    );
-    expect(response.headers.get('x-robots-tag')).toBe('noindex');
-  });
+      expect(response.status).toBe(404);
+      expect(response.headers.get('x-middleware-rewrite')).toBe(
+        'http://localhost:3000/_not-found',
+      );
+      expect(response.headers.get('x-robots-tag')).toBe('noindex');
+    },
+  );
 
-  it('marks a non-numeric slug noindex without asking TMDB', async () => {
+  it('answers 404 for a non-numeric slug without asking TMDB', async () => {
     const response = await proxy(mediaRequest('/movie/abc'));
 
     expect(resolveMedia).not.toHaveBeenCalled();
+    expect(response.status).toBe(404);
     expect(response.headers.get('x-middleware-rewrite')).toBe(
       'http://localhost:3000/_not-found',
     );
@@ -316,6 +323,7 @@ describe('the cookie-less branch', () => {
     const response = await proxy(mediaRequest('/movie/999999999'));
 
     expect(createServerClient).not.toHaveBeenCalled();
+    expect(response.status).toBe(404);
     expect(response.headers.get('x-middleware-rewrite')).toBe(
       'http://localhost:3000/_not-found',
     );
