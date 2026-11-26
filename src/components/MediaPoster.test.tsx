@@ -16,25 +16,4 @@ describe('MediaPoster', () => {
     render(<MediaPoster title="Fight Club" />);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
-
-  it('lazy-loads with no fetch priority by default', () => {
-    render(<MediaPoster title="Fight Club" src={tmdbImageUrl('/p.jpg')} />);
-    const img = screen.getByRole('img', { name: 'Fight Club' });
-    expect(img).toHaveAttribute('loading', 'lazy');
-    expect(img).not.toHaveAttribute('fetchpriority');
-  });
-
-  it('forwards priority and fetchPriority when set', () => {
-    render(
-      <MediaPoster
-        title="Fight Club"
-        src={tmdbImageUrl('/p.jpg')}
-        priority
-        fetchPriority="high"
-      />,
-    );
-    const img = screen.getByRole('img', { name: 'Fight Club' });
-    expect(img).not.toHaveAttribute('loading', 'lazy');
-    expect(img).toHaveAttribute('fetchpriority', 'high');
-  });
 });

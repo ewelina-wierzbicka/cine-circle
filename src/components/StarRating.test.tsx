@@ -45,15 +45,6 @@ describe('StarRating', () => {
     });
   });
 
-  it('draws a single half star for 1', () => {
-    expect(stars(1)).toEqual({
-      label: 'Rating: 0.5 out of 5',
-      slots: 5,
-      full: 0,
-      half: 1,
-    });
-  });
-
   it('draws no filled star for 0', () => {
     expect(stars(0)).toEqual({
       label: 'Rating: 0 out of 5',

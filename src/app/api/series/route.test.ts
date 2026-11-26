@@ -2,6 +2,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/api/series/route';
 
+// The id validation is the same code as api/movie and is covered there. This
+// file asserts only what differs: the service it calls and its two messages.
 const getSeriesDetails = vi.fn<(id: string) => Promise<unknown>>(async () => ({
   id: 1399,
 }));
@@ -18,22 +20,8 @@ const get = (query: string) =>
   GET(new Request(`https://midnightframe.app/api/series${query}`));
 
 describe('GET /api/series', () => {
-  it.each([
-    ['no id param', '', 'Missing id parameter'],
-    ['an empty id', '?id=', 'Missing id parameter'],
-    ['a whitespace id', '?id=%20%20', 'Missing id parameter'],
-    ['a non-numeric id', '?id=1399-got', 'Invalid id parameter'],
-    ['a negative id', '?id=-1399', 'Invalid id parameter'],
-  ])('400s on %s', async (_, query, error) => {
-    const response = await get(query);
-
-    expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toEqual({ error });
-    expect(getSeriesDetails).not.toHaveBeenCalled();
-  });
-
-  it('trims the id before the lookup', async () => {
-    const response = await get('?id=%201399%20');
+  it('looks the id up and returns the payload', async () => {
+    const response = await get('?id=1399');
 
     expect(response.status).toBe(200);
     expect(getSeriesDetails).toHaveBeenCalledWith('1399');

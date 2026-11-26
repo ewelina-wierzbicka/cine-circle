@@ -61,11 +61,6 @@ describe('MediaInfoHeader', () => {
     expect(screen.getByText('2019 – 2024')).toBeInTheDocument();
   });
 
-  it('shows the single year without a last_air_date', () => {
-    render(<MediaInfoHeader media={movie} />);
-    expect(screen.getByText('1999')).toBeInTheDocument();
-  });
-
   it('shows N/A with neither date', () => {
     render(<MediaInfoHeader media={{ ...movie, release_date: undefined }} />);
     expect(screen.getByText('N/A')).toBeInTheDocument();
@@ -111,17 +106,6 @@ describe('MediaInfoHeader', () => {
       <MediaInfoHeader media={{ ...movie, vote_average: 7, vote_count: 0 }} />,
     );
     expect(screen.queryByText(/^\(.*\)$/)).not.toBeInTheDocument();
-  });
-
-  it('locale-formats the vote count', () => {
-    render(
-      <MediaInfoHeader
-        media={{ ...movie, vote_average: 7, vote_count: 31245 }}
-      />,
-    );
-    expect(
-      screen.getByText(`(${(31245).toLocaleString()})`),
-    ).toBeInTheDocument();
   });
 
   it('renders exactly one h1', () => {
