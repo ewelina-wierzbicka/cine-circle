@@ -186,6 +186,7 @@ export const config = {
   // - favicon, static asset and font extensions
   // - icons/ — the PWA icon folder in public/
   // - .well-known/ and _vercel/ — probe and platform paths, never page routes
+  // - the BotID challenge prefix, rewritten to Vercel after the proxy runs
   // - sitemap.xml, robots.txt, llms.txt, llms-full.txt, manifest.webmanifest,
   //   opengraph-image —
   //   metadata routes. They carry no session and must never redirect, or
@@ -193,6 +194,6 @@ export const config = {
   // - /api/* — TMDB proxy routes don't use Supabase auth;
   //   add individual API paths back here once they require session data
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|icons/|\\.well-known/|_vercel/|api/|(?!movie/|series/).*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|json|xml|woff2)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|llms.txt|llms-full.txt|manifest.webmanifest|opengraph-image|icons/|\\.well-known/|_vercel/|149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/|api/|(?!movie/|series/).*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|txt|json|xml|woff2)$).*)',
   ],
 };
