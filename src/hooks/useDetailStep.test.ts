@@ -21,24 +21,22 @@ describe('useDetailStep', () => {
   });
 
   it('goToForm adds step=2 and keeps every other param', () => {
-    const result = at('/movie/550', 'tab=watched&from=search');
+    const result = at('/movie/550', 'tab=watched&ref=x');
     act(() => result.current.goToForm());
 
     const pushed = new URL(router.push.mock.calls[0][0], 'http://x');
     expect(pushed.pathname).toBe('/movie/550');
     expect(Object.fromEntries(pushed.searchParams)).toEqual({
       tab: 'watched',
-      from: 'search',
+      ref: 'x',
       step: '2',
     });
   });
 
   it('goToInfo removes step and keeps the rest', () => {
-    const result = at('/movie/550', 'tab=watched&step=2&from=search');
+    const result = at('/movie/550', 'tab=watched&step=2&ref=x');
     act(() => result.current.goToInfo());
-    expect(router.push).toHaveBeenCalledWith(
-      '/movie/550?tab=watched&from=search',
-    );
+    expect(router.push).toHaveBeenCalledWith('/movie/550?tab=watched&ref=x');
   });
 
   it('pushes the bare pathname when no params remain', () => {

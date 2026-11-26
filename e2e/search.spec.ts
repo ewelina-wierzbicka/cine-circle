@@ -47,7 +47,7 @@ test.describe('search', () => {
     await expect(page.getByText('Science Fiction').first()).toBeVisible();
 
     await expect(
-      page.getByRole('link', { name: 'BACK TO SEARCH' }),
+      page.getByRole('link', { name: 'BACK TO HOME' }),
     ).toBeVisible();
   });
 });

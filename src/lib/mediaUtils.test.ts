@@ -42,15 +42,14 @@ describe('toHref', () => {
 });
 
 describe('toSearchMediaListProps', () => {
-  it('appends ?from=search to the href', () => {
+  // No query param: a crawlable search card must link to the canonical path.
+  it('links to the bare canonical href', () => {
     const media: NormalizedMedia = {
       id: 550,
       title: 'Fight Club',
       media_type: 'movie',
     };
-    expect(toSearchMediaListProps(media).href).toBe(
-      '/movie/550-fight-club?from=search',
-    );
+    expect(toSearchMediaListProps(media).href).toBe('/movie/550-fight-club');
   });
 });
 

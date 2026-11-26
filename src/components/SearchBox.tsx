@@ -191,9 +191,7 @@ export function SearchBox({
           e.preventDefault();
           if (activeIndex >= 0 && displayResults[activeIndex]) {
             const item = displayResults[activeIndex];
-            router.push(
-              `${toHref(item.id, item.title, item.media_type)}?from=search`,
-            );
+            router.push(toHref(item.id, item.title, item.media_type));
           } else {
             navigate(query);
           }
@@ -390,7 +388,7 @@ export function SearchBox({
             {hintTitles.map((item) => (
               <Link
                 key={item.id}
-                href={`${toHref(item.id, item.title, item.type)}?from=search`}
+                href={toHref(item.id, item.title, item.type)}
                 className="px-4 py-1.5 rounded-full border border-secondary/20 text-secondary text-sm transition-all duration-150 hover:border-accent hover:text-accent"
               >
                 {item.title}

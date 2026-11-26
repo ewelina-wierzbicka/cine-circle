@@ -121,7 +121,7 @@ describe('SearchBox', () => {
     );
 
     expect(router.push).toHaveBeenCalledWith(
-      `${toHref(550, 'Fight Club', 'movie')}?from=search`,
+      toHref(550, 'Fight Club', 'movie'),
     );
   });
 });
