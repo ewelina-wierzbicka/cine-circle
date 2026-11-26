@@ -186,9 +186,7 @@ export const config = {
   // - favicon, static asset and font extensions
   // - icons/ — the PWA icon folder in public/
   // - .well-known/ and _vercel/ — probe and platform paths, never page routes
-  // - the BotID challenge prefix — `withBotId` rewrites it to
-  //   api.vercel.com/bot-protection, and the proxy runs before that rewrite,
-  //   so without the exclusion every challenge fetch bills an invocation
+  // - the BotID challenge prefix, rewritten to Vercel after the proxy runs
   // - sitemap.xml, robots.txt, llms.txt, llms-full.txt, manifest.webmanifest,
   //   opengraph-image —
   //   metadata routes. They carry no session and must never redirect, or

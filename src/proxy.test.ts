@@ -443,14 +443,12 @@ describe('config.matcher', () => {
     '/wp-content/config.json',
     '/static/vendor/app.js.map.json',
     '/backup/db.xml',
-    // The two BotID scripts: the challenge and the Kasada SDK.
     '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/a-4-a/c.js',
     '/149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/p.js',
   ])('skips the proxy for %s', (path) => {
     expect(matcher.test(path)).toBe(false);
   });
 
-  // The exclusion is the full two-segment BotID prefix, nothing wider.
   it.each([
     '/149e9513-01fa-4fb0-aad4-566afd725d1b',
     '/149e9513-01fa-4fb0-aad4-566afd725d1b/other',
